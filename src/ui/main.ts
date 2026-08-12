@@ -237,8 +237,19 @@ function explicarMetodo(r: Resultado): string {
     case "proyeccion": {
       const { mesesEstimados, tasaMensualPct, base } = r.metodo;
       const n = mesesEstimados.length;
+
+      // Elegir "no estimar ninguno" y ver la tabla llena de filas estimadas se lee
+      // como si el selector estuviera roto. No lo está: para un mes que todavía no
+      // llegó no existe ningún tramo publicado equivalente que sirva de referencia,
+      // así que no hay alternativa. Hay que decirlo donde se mira, no en /datos.
+      const forzada = r.metodologia === "sin_proyectar";
+      const porQue = forzada
+        ? `Elegiste no estimar ningún mes, pero ${nombrarPunto(r.hasta)} todavía no llegó y no ` +
+          `hay ningún tramo ya publicado que sirva de referencia. `
+        : "";
+
       const faltan =
-        `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, así que ` +
+        `${porQue}El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, así que ` +
         `${plural(n, "ese mes se estima", "esos meses se estiman")} `;
 
       if (base.fuente === "rem") {

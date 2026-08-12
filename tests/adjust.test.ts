@@ -303,6 +303,23 @@ describe("metodologías elegibles", () => {
     expect(sin.montoAjustado).toBeCloseTo(ultimo.montoAjustado, 9);
   });
 
+  /**
+   * El resultado tiene que recordar qué se pidió, no sólo qué se hizo. Con destino
+   * futuro, `sin_proyectar` termina proyectando; sin este dato la interfaz no puede
+   * explicar por qué eligiendo "no estimar" aparecen filas estimadas, y eso se lee
+   * como si el selector estuviera roto.
+   */
+  it("recuerda la metodología pedida aunque no se haya podido aplicar", () => {
+    const r = adjust(1000, "2020-03", "2020-06", conRem, { hoy: "2020-04" });
+    expect(r.metodologia).toBe("sin_proyectar");
+    expect(r.metodo.tipo).toBe("proyeccion");
+
+    for (const metodologia of ["sin_proyectar", "repite_ultimo", "rem"] as const) {
+      expect(adjust(1000, "2020-03", "2020-06", conRem, { hoy: "2020-04", metodologia }).metodologia)
+        .toBe(metodologia);
+    }
+  });
+
   it("sin meses faltantes las tres metodologías coinciden", () => {
     const opciones = { hoy: "2020-04" } as const;
     const montos = (["sin_proyectar", "repite_ultimo", "rem"] as const).map(

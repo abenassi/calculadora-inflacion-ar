@@ -223,6 +223,10 @@ export function adjust(
 ): Resultado {
   if (!Number.isFinite(monto)) throw new RangoError("El monto tiene que ser un número");
 
+  const metodologia = opciones.metodologia ?? "sin_proyectar";
+  return { ...resolver(), metodologia };
+
+  function resolver(): Resultado {
   const idx = armarIndice(serie);
   const hoy = opciones.hoy ?? mesActual();
   const nuevo = extremoNuevo(desde, hasta);
@@ -245,8 +249,6 @@ export function adjust(
   if (desplazamiento === 0) {
     return calcularDirecto(monto, desde, hasta, idx);
   }
-
-  const metodologia = opciones.metodologia ?? "sin_proyectar";
 
   // La ventana corrida sólo sirve como referencia de un período que ya transcurrió.
   // Para un mes futuro no existe equivalente publicado, así que aun con la
@@ -285,6 +287,7 @@ export function adjust(
     fuente: "ultimo_mes",
     mes: idx.ultimoOficial,
   }));
+  }
 }
 
 /** Arma el desglose y el resultado a partir de una lista de puntos ya calculables. */
@@ -317,6 +320,8 @@ function armarResultado(
 
   const factor = idx.valorEn(puntos.at(-1)!) / indiceBase;
   return {
+    // Lo pisa `adjust`, que es quien sabe qué se pidió.
+    metodologia: "sin_proyectar",
     monto,
     desde,
     hasta,

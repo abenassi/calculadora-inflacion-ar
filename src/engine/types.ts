@@ -176,6 +176,15 @@ export type BaseProyeccion =
 export type Metodologia = "sin_proyectar" | "repite_ultimo" | "rem";
 
 export type Resultado = {
+  /**
+   * La metodología que se pidió, que no siempre es la que terminó aplicándose.
+   *
+   * `sin_proyectar` con un destino futuro es el caso: no existe ningún tramo
+   * publicado equivalente, así que hay que estimar igual. Sin este dato la interfaz
+   * no puede explicar por qué eligiendo "no estimar" aparecen filas estimadas, y esa
+   * contradicción se lee como si el selector estuviera roto.
+   */
+  metodologia: Metodologia;
   monto: number;
   desde: Punto;
   hasta: Punto;
