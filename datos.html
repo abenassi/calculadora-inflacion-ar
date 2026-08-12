@@ -70,30 +70,37 @@
 
       <h2>Los meses que el INDEC todavía no publicó</h2>
       <p>
-        El IPC se publica con varias semanas de retraso. Si pedís un período que llega más allá del
-        último dato publicado, la calculadora te muestra <strong>dos resultados</strong>: arriba, el
-        del período que pediste, marcado como estimado y con el detalle de qué meses se estimaron y
-        a qué tasa; debajo, el que sale usando solamente meses ya publicados.
+        El IPC se publica con varias semanas de retraso. El mes en curso nunca tiene dato, y a veces
+        el anterior tampoco: hoy, por ejemplo, el último publicado es junio. Como el uso más común
+        es justamente traer un monto de antes hasta hoy, el hueco aparece casi siempre. Hay tres
+        caminos, y la calculadora te dice cuál usó.
       </p>
       <p>
-        Junto al resultado estimado siempre está la lista de los meses publicados cuyo promedio da
-        la tasa de proyección, con el porcentaje de cada uno. La idea es que puedas explicarle a
-        otra persona de dónde sale el número, no solo saberlo vos.
+        <strong>Si todo el período ya está publicado</strong>, no hay nada que resolver: el
+        resultado es el cociente entre los dos índices.
       </p>
       <p>
-        Si el <em>punto de partida</em> cae en un mes que todavía no se publicó, no hay ningún
-        resultado oficial que mostrar: el cálculo es un cociente entre dos índices, y si el de abajo
-        está estimado, todo el resultado lo está. En ese caso la calculadora muestra un solo número,
-        marcado como estimación.
+        <strong>Si el mes de destino ya pasó o está pasando pero todavía no salió</strong> —el caso
+        típico— la calculadora no estima nada. Cuenta cuántos meses tiene el período que pediste y
+        aplica la inflación acumulada de esa misma cantidad de meses, tomando los últimos
+        publicados. De mayo a agosto pasan tres meses, así que usa la inflación de los últimos tres
+        meses publicados. Son todos datos oficiales del INDEC.
       </p>
       <p>
-        La proyección usa el promedio de las últimas tres variaciones mensuales publicadas. Es el
-        mismo método que aplica la herramienta <code>ajuste_por_inflacion</code> de Argentina Data
-        MCP, para que preguntar desde acá o desde tu propio agente de IA dé el mismo número.
+        Conviene entender qué es y qué no es: <em>no</em> es la inflación de mayo a agosto, que
+        nadie puede conocer todavía, sino la del período publicado más reciente de la misma
+        duración. Por eso la calculadora nombra siempre los meses concretos que usó, para que puedas
+        explicarle a otra persona de dónde sale el número.
       </p>
       <p>
-        Una estimación no es un pronóstico. Si el mes que te interesa todavía no salió, el número
-        oficial es el de arriba.
+        <strong>Si pedís un mes futuro</strong>, más allá del mes en curso, ahí sí hay que estimar.
+        Se hace de la forma más simple que existe: repitiendo la última variación mensual publicada,
+        tantas veces como haga falta. Nada de promedios ni modelos. Esas filas aparecen marcadas
+        como <strong>estimado</strong> y el resultado lleva un rótulo de estimación.
+      </p>
+      <p>
+        Una estimación no es un pronóstico. Cuanto más lejos en el futuro está el mes que pedís,
+        menos vale el número.
       </p>
 
       <h2>Meses o días</h2>
@@ -106,8 +113,9 @@
       </p>
       <p>
         Ojo con una consecuencia: cualquier día posterior al 1 del último mes publicado necesita el
-        índice del mes siguiente, que todavía no existe. Por eso aparece marcado como estimación
-        aunque su propio mes ya esté publicado.
+        índice del mes siguiente, que todavía no existe. Por eso una fecha de un mes ya publicado
+        puede igualmente caer en el segundo caso de arriba y resolverse con la ventana de meses
+        recientes.
       </p>
 
       <h2>Sobre la precisión</h2>

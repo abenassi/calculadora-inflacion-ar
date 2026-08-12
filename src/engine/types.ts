@@ -62,50 +62,64 @@ export type Fila = {
   origen: Origen;
 };
 
-export type Tramo = {
-  hasta: Punto;
-  monto: number;
-  variacionPct: number;
-};
-
-/** Un mes publicado que entra en el promedio de la proyección. */
-export type MesBase = {
-  mes: Mes;
-  varMensualPct: number;
-};
-
-export type TramoEstimado = Tramo & {
-  /** Los meses concretos que el INDEC todavía no publicó y hubo que estimar. */
-  mesesFaltantes: Mes[];
-  /** Tasa mensual usada para proyectar, en porcentaje. */
-  tasaMensualPct: number;
+/**
+ * Cómo se resolvió el cálculo.
+ *
+ * El IPC se publica con semanas de retraso, así que el mes en curso —y a veces el
+ * anterior— nunca tienen dato. Como el uso dominante es justamente traer un monto
+ * del pasado al presente, el método tiene que resolver ese hueco de una forma que
+ * se pueda explicar en una oración.
+ */
+export type Metodo =
+  /** Todo el período está publicado. No hace falta ningún artilugio. */
+  | { tipo: "directo" }
   /**
-   * Los meses publicados cuyo promedio da `tasaMensualPct`.
+   * El destino todavía no se publicó, pero no es futuro: ya pasó o está pasando.
    *
-   * Se expone para que la interfaz pueda mostrarlos: sin esto, la tasa de
-   * proyección es un número que aparece de la nada, y alguien que tiene que
-   * justificar el resultado ante otra persona no puede explicar de dónde salió.
+   * En vez de inventar los meses que faltan, se corre la ventana hacia atrás y se
+   * usa la inflación de los últimos N meses publicados, con N igual a la cantidad
+   * de meses del período pedido. Todos los números son del INDEC.
+   *
+   * Sigue siendo una aproximación —no es la inflación del período pedido, sino la
+   * del período publicado más reciente de igual duración— y por eso la interfaz
+   * nombra siempre los meses concretos que se usaron.
    */
-  base: MesBase[];
-};
+  | {
+      tipo: "ventana_reciente";
+      /** Cuántos meses abarca el período pedido. */
+      mesesDelPeriodo: number;
+      /** Cuántos meses hacia atrás se corrió la ventana. */
+      desplazamiento: number;
+      /** Los meses del período pedido que el INDEC todavía no publicó. */
+      mesesSinPublicar: Mes[];
+    }
+  /**
+   * El destino es un mes futuro. Acá no queda otra que estimar, y se hace de la
+   * forma más simple que existe: repitiendo la última variación mensual publicada.
+   */
+  | {
+      tipo: "repite_ultimo";
+      /** Tasa mensual repetida, en porcentaje. */
+      tasaMensualPct: number;
+      /** El mes publicado del que sale esa tasa. */
+      mesBase: Mes;
+      /** Los meses futuros que se estimaron. */
+      mesesEstimados: Mes[];
+    };
 
 export type Resultado = {
   monto: number;
   desde: Punto;
   hasta: Punto;
+  montoAjustado: number;
+  variacionPct: number;
+  metodo: Metodo;
   /**
-   * Resultado usando exclusivamente datos oficiales publicados.
+   * El cálculo mostrado paso a paso.
    *
-   * **Ausente** cuando el propio punto de origen cae en un mes sin publicar: en ese
-   * caso el cociente de índices tiene una proyección en el denominador y no queda
-   * ningún número que se pueda llamar oficial. Marcarlo como oficial sería mentir
-   * justo sobre la procedencia del dato, que es lo único que este sitio promete.
+   * Con `ventana_reciente`, las filas son los meses publicados que se usaron, no
+   * los del período pedido: son esos los que hay que poder mostrar cuando alguien
+   * pregunta de dónde sale el número.
    */
-  oficial?: Tramo;
-  /**
-   * Presente sólo si el período toca meses sin publicar. Cuando falta, la UI
-   * muestra un único resultado y no hay nada que aclarar.
-   */
-  estimado?: TramoEstimado;
   desglose: Fila[];
 };

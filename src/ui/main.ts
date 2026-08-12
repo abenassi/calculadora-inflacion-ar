@@ -14,6 +14,7 @@ import {
   abreviarPunto,
   aOrdinal,
   deOrdinal,
+  esFecha,
   esFechaValida,
   esMesValido,
   mesDe,
@@ -50,8 +51,8 @@ function usaDias(): boolean {
 
 function poblarSelects(): void {
   const primero = serie.datos[0]!.mes;
-  // Proyectar más lejos que dos años con el promedio de tres meses es ruido con
-  // forma de número, así que ese es el techo.
+  // Repetir la última variación mensual más allá de dos años es ruido con forma
+  // de número, así que ese es el techo.
   const ultimo = deOrdinal(aOrdinal(serie.ultimo_oficial) + HORIZONTE_MESES);
 
   for (const id of ["desde-mes", "hasta-mes"]) {
@@ -124,7 +125,7 @@ function alternarModo(): void {
 
 /* ------------------------------------------------------------------ resultado */
 
-/** A partir de cuántos meses estimados dejamos de tratarlo como una cuenta razonable. */
+/** A partir de cuántos meses proyectados dejamos de tratarlo como una cuenta razonable. */
 const MESES_PROYECCION_LARGA = 4;
 
 function listar(nombres: string[], union = "y"): string {
@@ -133,11 +134,9 @@ function listar(nombres: string[], union = "y"): string {
 }
 
 /**
- * Nombra los meses faltantes en castellano legible.
- *
- * Hasta tres, los enumera colapsando el año repetido ("julio y agosto de 2026").
- * De ahí en más pasa a un rango: enumerar doce meses uno por uno produce una
- * oración que nadie lee, y el dato que importa es cuántos son y hasta dónde llegan.
+ * Nombra una lista de meses en castellano legible: hasta tres los enumera
+ * colapsando el año repetido ("julio y agosto de 2026"); de ahí en más los resume
+ * como rango, porque enumerar doce meses produce una oración que nadie lee.
  */
 function frasearMeses(meses: Mes[], union = "y"): string {
   if (meses.length === 0) return "";
@@ -154,88 +153,112 @@ function frasearMeses(meses: Mes[], union = "y"): string {
 
 /** "un aumento de 11,53%" / "una baja de 10,34%". El signo no se lee en una frase. */
 function frasearVariacion(pct: number): string {
-  const palabra = pct < 0 ? "una baja" : "un aumento";
-  return `${palabra} de ${porcentaje(Math.abs(pct), false)}`;
+  return `${pct < 0 ? "una baja" : "un aumento"} de ${porcentaje(Math.abs(pct), false)}`;
+}
+
+function plural(n: number, singular: string, plural: string): string {
+  return n === 1 ? singular : plural;
 }
 
 /**
- * La explicación de dónde sale la tasa de proyección.
+ * El párrafo que explica cómo se llegó al número.
  *
- * Es la respuesta a "¿de dónde sacaste ese porcentaje?". Sin esto, la tasa es un
- * número sin origen visible y el resultado no se puede defender ante nadie.
+ * Es lo único que separa un resultado defendible de un número que apareció solo.
+ * Tiene que nombrar los meses concretos que se usaron, siempre.
  */
-function pintarBaseProyeccion(r: Resultado): void {
-  const bloque = el("base-proyeccion");
-  const e = r.estimado;
-  bloque.hidden = !e;
-  if (!e) return;
+function explicar(r: Resultado): string {
+  const encabezado = `${pesos(r.monto)} de ${nombrarPunto(r.desde)}, con ${frasearVariacion(r.variacionPct)}.`;
 
-  el("base-resumen").textContent = `¿De dónde sale ese ${porcentaje(e.tasaMensualPct, false)}?`;
+  switch (r.metodo.tipo) {
+    case "directo":
+      return `${encabezado} Todos los meses del cálculo son datos oficiales ya publicados por el INDEC.`;
 
-  el("base-cuerpo").replaceChildren(
-    ...e.base.map((m) => {
-      const tr = document.createElement("tr");
-      const th = document.createElement("th");
-      th.scope = "row";
-      th.textContent = nombrarMes(m.mes);
-      const td = document.createElement("td");
-      td.textContent = porcentaje(m.varMensualPct);
-      tr.append(th, td);
-      return tr;
-    }),
-  );
+    case "ventana_reciente": {
+      const { mesesDelPeriodo, mesesSinPublicar } = r.metodo;
+      const contexto =
+        `${encabezado} De ${nombrarPunto(r.desde)} a ${nombrarPunto(r.hasta)} ` +
+        `${plural(mesesDelPeriodo, "pasa 1 mes", `pasan ${mesesDelPeriodo} meses`)}, y el INDEC ` +
+        `todavía no publicó ${frasearMeses(mesesSinPublicar, "ni")}. `;
+      const cierre = "Son todos datos oficiales del INDEC: acá no hay ningún número estimado.";
 
-  el("base-promedio").textContent = porcentaje(e.tasaMensualPct, false);
-  el("base-nota").textContent =
-    `Es el promedio de la inflación de los últimos ${e.base.length} meses que el INDEC ya ` +
-    `publicó. Ese promedio se aplica a cada mes que todavía falta publicar.`;
+      // En modo por día las filas son fechas, no meses: enumerar sus meses
+      // duplicaría el del extremo. Se nombra el tramo por sus puntas, que además
+      // es lo que efectivamente se calculó.
+      if (esFecha(r.desglose[0]!.punto)) {
+        return (
+          `${contexto}Así que usamos el período equivalente más reciente que sí está publicado: ` +
+          `del ${nombrarPunto(r.desglose[0]!.punto)} al ${nombrarPunto(r.desglose.at(-1)!.punto)}. ${cierre}`
+        );
+      }
+
+      const usados = frasearMeses(r.desglose.slice(1).map((f) => mesDe(f.punto)));
+      return (
+        `${contexto}Así que usamos la inflación de ` +
+        `${plural(mesesDelPeriodo, "el último mes publicado", `los últimos ${mesesDelPeriodo} meses publicados`)} ` +
+        `(${usados}). ${cierre}`
+      );
+    }
+
+    case "repite_ultimo": {
+      const { mesesEstimados, tasaMensualPct, mesBase } = r.metodo;
+      const n = mesesEstimados.length;
+      return (
+        `${encabezado} El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, ` +
+        `y el período llega más allá del mes en curso, así que ` +
+        `${plural(n, "ese mes se estima", "esos meses se estiman")} repitiendo la última ` +
+        `inflación publicada, la de ${nombrarMes(mesBase)} (${porcentaje(tasaMensualPct)}).`
+      );
+    }
+  }
+}
+
+/** El pie de la tabla, que dice qué está mirando el lector. */
+function explicarTabla(r: Resultado): string {
+  switch (r.metodo.tipo) {
+    case "directo":
+      return "Todas las filas son datos oficiales publicados por el INDEC. Acá no hay nada estimado.";
+    case "ventana_reciente":
+      return (
+        `Estos son los últimos meses que publicó el INDEC. Los usamos como referencia porque ` +
+        `el período que pediste tiene la misma cantidad de meses y los últimos todavía no salieron.`
+      );
+    case "repite_ultimo": {
+      const proyectadas = r.desglose.filter((f) => f.esProyeccion).length;
+      return (
+        `Las filas resaltadas (${proyectadas}) son meses sin publicar, estimados repitiendo la ` +
+        `inflación de ${nombrarMes(r.metodo.mesBase)} (${porcentaje(r.metodo.tasaMensualPct)}). ` +
+        `El resto son datos oficiales.`
+      );
+    }
+  }
 }
 
 function pintarResultado(r: Resultado): void {
-  const e = r.estimado;
+  const esProyeccion = r.metodo.tipo === "repite_ultimo";
 
-  // El bloque principal responde el período pedido, haya o no estimación.
-  const tramo = e ?? r.oficial!;
-  el("chip-estimado").hidden = !e;
+  el("chip-estimado").hidden = !esProyeccion;
+  // Anunciar "estimado" en la leyenda cuando no hay ninguna fila estimada hace
+  // dudar de un resultado que es enteramente oficial.
+  el("leyenda-estimado").hidden = !esProyeccion;
+  // Con `ventana_reciente` el eje del gráfico son los meses de referencia, no los
+  // del período pedido: el título lo dice para que nadie lea mal las fechas.
+  el("titulo-grafico").textContent =
+    r.metodo.tipo === "ventana_reciente"
+      ? "Evolución del monto en los meses de referencia"
+      : "Evolución del monto";
   el("rotulo-principal").textContent = `A ${nombrarPunto(r.hasta)}`;
-  el("cifra-principal").textContent = e ? `~${pesosRedondo(tramo.monto)}` : pesosRedondo(tramo.monto);
+  el("cifra-principal").textContent =
+    r.metodo.tipo === "directo" ? pesosRedondo(r.montoAjustado) : `~${pesosRedondo(r.montoAjustado)}`;
+  el("detalle-principal").textContent = explicar(r);
 
-  if (e) {
-    const uno = e.mesesFaltantes.length === 1;
-    el("detalle-principal").textContent =
-      `${pesos(r.monto)} de ${nombrarPunto(r.desde)}, con ${frasearVariacion(e.variacionPct)}. ` +
-      `El INDEC todavía no publicó ${frasearMeses(e.mesesFaltantes, "ni")}, ` +
-      `así que ${uno ? "ese mes se estima" : "esos meses se estiman"} en ` +
-      `${porcentaje(e.tasaMensualPct, false)} cada uno.`;
-  } else {
-    el("detalle-principal").textContent =
-      `${pesos(r.monto)} de ${nombrarPunto(r.desde)}, con ${frasearVariacion(tramo.variacionPct)}. ` +
-      `Todos los meses del cálculo son datos oficiales ya publicados por el INDEC.`;
-  }
-
-  // Cuanto más lejos se proyecta, más deja de ser una cuenta y más se parece a un
-  // pronóstico. Un aviso escalonado evita que una fecha lejana se lea con la misma
-  // confianza que el mes que viene.
+  // Cuanto más lejos se proyecta, menos es una cuenta y más un pronóstico.
   const aviso = el("aviso-largo");
-  const largo = (e?.mesesFaltantes.length ?? 0) >= MESES_PROYECCION_LARGA;
-  aviso.hidden = !largo;
-  if (largo && e) {
+  const meses = r.metodo.tipo === "repite_ultimo" ? r.metodo.mesesEstimados.length : 0;
+  aviso.hidden = meses < MESES_PROYECCION_LARGA;
+  if (!aviso.hidden) {
     aviso.textContent =
-      `Son ${e.mesesFaltantes.length} meses sin publicar. Esto es una cuenta, no un ` +
-      `pronóstico: la inflación real de esos meses puede ser bastante distinta.`;
-  }
-
-  pintarBaseProyeccion(r);
-
-  // El respaldo sólo aparece cuando aporta algo: si no hubo estimación, ya es el
-  // número principal, y si el origen tampoco está publicado, no existe.
-  const respaldo = el("bloque-respaldo");
-  respaldo.hidden = !e || !r.oficial;
-  if (e && r.oficial) {
-    el("cifra-respaldo").textContent = pesosRedondo(r.oficial.monto);
-    el("detalle-respaldo").textContent =
-      `A ${nombrarPunto(r.oficial.hasta)}, el último mes que publicó el INDEC. ` +
-      `Sobre este número no hay nada estimado: es ${frasearVariacion(r.oficial.variacionPct)}.`;
+      `Son ${meses} meses sin publicar. Esto es una cuenta, no un pronóstico: la inflación ` +
+      `real de esos meses puede ser bastante distinta.`;
   }
 
   // Construido con nodos en vez de innerHTML: la tabla es lo único que se arma a
@@ -276,12 +299,7 @@ function pintarResultado(r: Resultado): void {
     }),
   );
 
-  const proyectadas = r.desglose.filter((f) => f.esProyeccion).length;
-  el("pie-tabla").textContent = proyectadas
-    ? `Las filas resaltadas (${proyectadas}) son las estimadas: el INDEC todavía no publicó ` +
-      `esos meses. El resto son datos oficiales.`
-    : "Todas las filas son datos oficiales publicados. Acá no hay ninguna estimación.";
-
+  el("pie-tabla").textContent = explicarTabla(r);
   dibujar(el<HTMLCanvasElement>("grafico"), r);
 }
 
@@ -293,41 +311,21 @@ function pintarResultado(r: Resultado): void {
  * explicación que se lea sola y que traiga la fuente adentro.
  */
 function armarExplicacion(r: Resultado): string {
-  const e = r.estimado;
-  const tramo = e ?? r.oficial!;
-  const lineas: string[] = [];
-
-  lineas.push(
+  const lineas: string[] = [
     `${pesos(r.monto)} de ${nombrarPunto(r.desde)} equivalen a ` +
-      `${e ? "unos " : ""}${pesosRedondo(tramo.monto)} en ${nombrarPunto(r.hasta)}.`,
-    `Variación acumulada: ${porcentaje(tramo.variacionPct)} (inflación oficial, IPC del INDEC).`,
+      `${r.metodo.tipo === "directo" ? "" : "unos "}${pesosRedondo(r.montoAjustado)} ` +
+      `en ${nombrarPunto(r.hasta)}.`,
+    `Variación acumulada: ${porcentaje(r.variacionPct)} (inflación oficial, IPC del INDEC).`,
     "",
-    "Mes a mes:",
-  );
+    r.metodo.tipo === "ventana_reciente" ? "Meses usados:" : "Mes a mes:",
+  ];
 
   for (const f of r.desglose.slice(1)) {
     const etiqueta = f.origen === "proyeccion" ? "estimado" : "oficial INDEC";
     lineas.push(`- ${abreviarPunto(f.punto)}: ${porcentaje(f.varMensualPct ?? 0)} (${etiqueta})`);
   }
 
-  if (e) {
-    lineas.push(
-      "",
-      `El INDEC todavía no publicó ${frasearMeses(e.mesesFaltantes, "ni")}. ` +
-        `Se ${e.mesesFaltantes.length === 1 ? "estima" : "estiman"} en ` +
-        `${porcentaje(e.tasaMensualPct, false)}, que es el promedio de los últimos ` +
-        `${e.base.length} meses publicados (${e.base
-          .map((m) => `${nombrarMes(m.mes)} ${porcentaje(m.varMensualPct)}`)
-          .join(", ")}).`,
-    );
-    if (r.oficial) {
-      lineas.push(
-        `Contando solo los meses ya publicados, hasta ${nombrarPunto(r.oficial.hasta)}: ` +
-          `${pesosRedondo(r.oficial.monto)} (${porcentaje(r.oficial.variacionPct)}).`,
-      );
-    }
-  }
-
+  lineas.push("", explicar(r));
   lineas.push("", `Fuente: IPC Nivel General Nacional, INDEC. Calculado en ${location.href}`);
   return lineas.join("\n");
 }
@@ -339,21 +337,17 @@ function calcular(): void {
     if (!Number.isFinite(monto)) throw new RangoError("Escribí un monto para calcular.");
     if (monto <= 0) throw new RangoError("El monto tiene que ser mayor que cero.");
 
-    const desde = leerPunto("desde");
-    const hasta = leerPunto("hasta");
-
-    const r = adjust(monto, desde, hasta, serie);
+    const r = adjust(monto, leerPunto("desde"), leerPunto("hasta"), serie);
     ultimoResultado = r;
     error.hidden = true;
     el("bloque-principal").hidden = false;
     pintarResultado(r);
-    sincronizarUrl(monto, desde, hasta);
+    sincronizarUrl(monto, r.desde, r.hasta);
   } catch (e) {
     ultimoResultado = null;
     error.textContent = e instanceof RangeError ? e.message : "No se pudo calcular.";
     error.hidden = false;
     el("bloque-principal").hidden = true;
-    el("bloque-respaldo").hidden = true;
     el("cuerpo-desglose").replaceChildren();
     el("pie-tabla").textContent = "";
   }
@@ -429,12 +423,22 @@ function descargarCsv(): void {
     ]),
   ];
 
-  // Los meses base van dentro del CSV: si alguien descarga esto para mostrárselo a
-  // otra persona, la justificación de la tasa tiene que viajar con los números.
-  if (r.estimado) {
-    filas.push([], ["proyeccion_base_mes", "variacion_pct"]);
-    for (const m of r.estimado.base) filas.push([m.mes, m.varMensualPct.toFixed(2)]);
-    filas.push(["promedio_aplicado", r.estimado.tasaMensualPct.toFixed(2)]);
+  // El método viaja adentro del archivo. Si alguien descarga esto para mostrárselo
+  // a otra persona, los números solos no alcanzan: hay que poder decir de qué meses
+  // salieron y por qué.
+  filas.push([], ["# metodo", r.metodo.tipo]);
+  if (r.metodo.tipo === "ventana_reciente") {
+    filas.push(
+      ["# meses_del_periodo", String(r.metodo.mesesDelPeriodo)],
+      ["# meses_sin_publicar", r.metodo.mesesSinPublicar.join(" ")],
+      ["# ventana_corrida_meses", String(r.metodo.desplazamiento)],
+    );
+  } else if (r.metodo.tipo === "repite_ultimo") {
+    filas.push(
+      ["# mes_base", r.metodo.mesBase],
+      ["# tasa_mensual_repetida_pct", r.metodo.tasaMensualPct.toFixed(2)],
+      ["# meses_estimados", r.metodo.mesesEstimados.join(" ")],
+    );
   }
 
   const csv = filas.map((f) => f.join(",")).join("\n");

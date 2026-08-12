@@ -257,22 +257,6 @@ button:focus-visible {
 }
 
 /*
- * El respaldo es deliberadamente más chico que el principal: informa, no compite.
- * Cuando los dos tenían el mismo peso, la persona se llevaba el que estaba más
- * arriba sin evaluar cuál contestaba su pregunta.
- */
-.resultado--respaldo {
-  background: var(--plane);
-}
-
-.resultado__cifra-chica {
-  margin: 0.25rem 0;
-  font-size: clamp(1.35rem, 4vw, 1.75rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-/*
  * El chip marca la estimación sin gritar. Antes llevaba un triángulo de alerta y
  * eso pintaba con lenguaje de error justo al número que la persona vino a buscar:
  * estimado no es peligro.

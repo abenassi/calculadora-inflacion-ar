@@ -1,33 +1,25 @@
 /**
  * Motor de ajuste por inflación.
  *
- * La regla que gobierna todo el archivo: nunca devolver un número solo cuando parte
- * de ese número es una estimación. Si el período pedido incluye meses que el INDEC
- * todavía no publicó, `Resultado` trae `oficial` y `estimado` por separado, el
- * desglose marca fila por fila de dónde salió cada dato, y `estimado.base` expone
- * los meses concretos cuyo promedio produjo la tasa de proyección.
+ * El problema de fondo: el IPC se publica con semanas de retraso, así que el mes en
+ * curso nunca tiene dato y el anterior muchas veces tampoco. Y el uso dominante de
+ * una calculadora de inflación es justamente traer un monto del pasado al presente.
+ * O sea que el hueco no es un caso raro: es el caso normal.
  *
- * Esa última parte importa tanto como el número: alguien que usa esto para
- * justificar un precio ante un cliente necesita poder decir "sale del promedio de
- * abril, mayo y junio", no "lo dice la calculadora".
+ * La respuesta de este motor tiene tres formas, según qué tan lejos llega el
+ * período pedido (ver `Metodo` en types.ts):
  *
- * La proyección usa el promedio de las últimas 3 variaciones mensuales publicadas,
- * que es exactamente lo que hace la tool `ajuste_por_inflacion` de Argentina Data
- * MCP. Es una decisión de diseño, no una coincidencia: el sitio y el MCP tienen que
- * dar siempre el mismo número, y hay un test que lo verifica.
+ *   directo           todo publicado, no hay nada que resolver
+ *   ventana_reciente  el destino ya pasó pero no se publicó → se usa la inflación
+ *                     de los últimos N meses publicados, sin inventar ningún número
+ *   repite_ultimo     el destino es futuro → se repite la última variación publicada
+ *
+ * La regla que gobierna el archivo sigue siendo la misma: nunca devolver un número
+ * sin poder decir exactamente de qué meses salió. Por eso el desglose muestra
+ * siempre los meses que se usaron de verdad, no los que se pidieron.
  */
 
-import type {
-  Fila,
-  Mes,
-  MesBase,
-  Origen,
-  Punto,
-  Resultado,
-  SerieIndice,
-  Tramo,
-  TramoEstimado,
-} from "./types.js";
+import type { Fila, Mes, Metodo, Punto, Resultado, SerieIndice } from "./types.js";
 import {
   aOrdinal,
   compararMeses,
@@ -40,34 +32,35 @@ import {
   nombrarMes,
   primerDia,
   rangoMeses,
+  sumarMeses,
 } from "./mes.js";
-
-/** Cuántos meses publicados promedia la proyección. Alineado con `ajuste_por_inflacion`. */
-export const MESES_PROMEDIO_PROYECCION = 3;
 
 export class RangoError extends RangeError {}
 
-type Indice = {
-  valorEn(punto: Punto): number;
-  esProyectado(punto: Punto): boolean;
-  origenDe(punto: Punto): Origen;
-  primerMes: Mes;
-  ultimoOficial: Mes;
-  tasaProyeccionPct: number;
-  base: MesBase[];
+export type OpcionesAjuste = {
+  /** Mes en curso. Parametrizable para poder testear sin depender del reloj. */
+  hoy?: Mes;
 };
 
-/**
- * Envuelve la serie en un índice consultable que además la extiende hacia el futuro
- * bajo demanda. Extender bajo demanda —en vez de materializar N meses de
- * proyección— evita tener que decidir arbitrariamente hasta dónde proyectar.
- */
+/* ------------------------------------------------------------------- índice */
+
+type Indice = {
+  valorEn(punto: Punto): number;
+  primerMes: Mes;
+  ultimoOficial: Mes;
+  /** Variación mensual del último mes publicado, en porcentaje. */
+  ultimaVariacionPct: number;
+  origenDe(mes: Mes): "indec" | "bcra";
+};
+
 function armarIndice(serie: SerieIndice): Indice {
   const { datos } = serie;
-  if (datos.length === 0) throw new RangoError("La serie de índices está vacía");
+  if (datos.length < 2) {
+    throw new RangoError("La serie necesita al menos 2 meses");
+  }
 
   const porMes = new Map<Mes, number>();
-  const origenPorMes = new Map<Mes, Origen>();
+  const origenPorMes = new Map<Mes, "indec" | "bcra">();
   for (const p of datos) {
     porMes.set(p.mes, p.indice);
     origenPorMes.set(p.mes, p.origen);
@@ -75,113 +68,79 @@ function armarIndice(serie: SerieIndice): Indice {
 
   const primerMes = datos[0]!.mes;
   const ultimoOficial = serie.ultimo_oficial;
+  const ultimo = datos.at(-1)!;
+  const penultimo = datos.at(-2)!;
 
-  const indiceAncla = porMes.get(ultimoOficial);
-  if (indiceAncla === undefined) {
-    throw new RangoError(
-      `La serie declara ultimo_oficial="${ultimoOficial}" pero no tiene ese mes entre sus datos`,
-    );
-  }
-  // Copia a una constante ya tipada como `number`: `indiceDeMes` es una declaración
-  // hoisteada, y TypeScript no propaga el estrechamiento del `if` hacia adentro de
-  // funciones que podrían llamarse antes.
-  const anclaProyeccion: number = indiceAncla;
-
-  const base = mesesBase(datos);
-  const tasaProyeccionPct = base.reduce((a, m) => a + m.varMensualPct, 0) / base.length;
-
-  /** Índice al día 1 de un mes; proyecta si el mes todavía no se publicó. */
   function indiceDeMes(mes: Mes): number {
-    const conocido = porMes.get(mes);
-    if (conocido !== undefined) return conocido;
-
-    if (compararMeses(mes, primerMes) < 0) {
-      throw new RangoError(
-        `No hay datos de inflación anteriores a ${nombrarMes(primerMes)}. ` +
-          `Pediste ${nombrarMes(mes)}.`,
-      );
-    }
-    const meses = diffMeses(ultimoOficial, mes);
-    return anclaProyeccion * Math.pow(1 + tasaProyeccionPct / 100, meses);
+    const valor = porMes.get(mes);
+    if (valor !== undefined) return valor;
+    throw new RangoError(
+      compararMeses(mes, primerMes) < 0
+        ? `No hay datos de inflación anteriores a ${nombrarMes(primerMes)}. Pediste ${nombrarMes(mes)}.`
+        : `El INDEC todavía no publicó ${nombrarMes(mes)}.`,
+    );
   }
 
   return {
     primerMes,
     ultimoOficial,
-    tasaProyeccionPct,
-    base,
+    ultimaVariacionPct: (ultimo.indice / penultimo.indice - 1) * 100,
+    origenDe: (mes) => origenPorMes.get(mes) ?? "indec",
 
     /**
-     * Para un mes, el índice de ese mes. Para un día, interpola geométricamente
-     * entre el índice de su mes y el del siguiente, en proporción a los días
-     * transcurridos. Es el mismo criterio con el que el BCRA convierte el IPC
-     * mensual en el coeficiente diario CER.
+     * Para un mes, su índice. Para un día, interpola geométricamente entre el
+     * índice de su mes y el del siguiente, en proporción a los días transcurridos.
+     * Es el criterio con el que el BCRA convierte el IPC mensual en el coeficiente
+     * diario CER.
      */
     valorEn(punto: Punto): number {
       const mes = mesDe(punto);
       const inicio = indiceDeMes(mes);
       if (!esFecha(punto) || diaDe(punto) === 1) return inicio;
-
-      const siguiente = indiceDeMes(deOrdinal(aOrdinal(mes) + 1));
+      const siguiente = indiceDeMes(sumarMeses(mes, 1));
       return inicio * Math.pow(siguiente / inicio, fraccionDeMes(punto));
-    },
-
-    /**
-     * Un día posterior al 1 del último mes publicado ya depende del índice del mes
-     * siguiente, que todavía no existe: aunque su propio mes esté publicado, el
-     * valor interpolado es en parte proyección. Decirlo es incómodo pero es la
-     * verdad, y callarlo sería exactamente el problema que este sitio ataca.
-     */
-    esProyectado(punto: Punto): boolean {
-      const mes = mesDe(punto);
-      const comparacion = compararMeses(mes, ultimoOficial);
-      if (comparacion > 0) return true;
-      return comparacion === 0 && esFecha(punto) && diaDe(punto) > 1;
-    },
-
-    origenDe(punto: Punto): Origen {
-      if (this.esProyectado(punto)) return "proyeccion";
-      return origenPorMes.get(mesDe(punto)) ?? "proyeccion";
     },
   };
 }
 
-/** Las últimas variaciones mensuales publicadas, de la más vieja a la más nueva. */
-function mesesBase(datos: SerieIndice["datos"]): MesBase[] {
-  const salida: MesBase[] = [];
-  for (let i = datos.length - 1; i > 0 && salida.length < MESES_PROMEDIO_PROYECCION; i--) {
-    const actual = datos[i]!;
-    const previo = datos[i - 1]!;
-    salida.push({
-      mes: actual.mes,
-      varMensualPct: (actual.indice / previo.indice - 1) * 100,
-    });
-  }
-  if (salida.length === 0) {
-    throw new RangoError("La serie necesita al menos 2 meses para poder proyectar");
-  }
-  return salida.reverse();
+/* --------------------------------------------------------- meses y ventanas */
+
+/**
+ * Cuántos meses hay que retroceder un punto para que su índice sea calculable con
+ * datos publicados.
+ *
+ * Un día posterior al 1 necesita también el índice del mes siguiente para
+ * interpolar, así que tiene que quedar un mes más atrás que un mes entero.
+ */
+function desplazamientoNecesario(punto: Punto, ultimoOficial: Mes): number {
+  const necesitaMesSiguiente = esFecha(punto) && diaDe(punto) > 1;
+  const topeUtil = necesitaMesSiguiente ? sumarMeses(ultimoOficial, -1) : ultimoOficial;
+  return Math.max(0, diffMeses(topeUtil, mesDe(punto)));
 }
 
-/** Un punto como día concreto, para poder comparar meses y fechas entre sí. */
-function comoDia(punto: Punto): string {
-  return esFecha(punto) ? punto : primerDia(punto);
+function correr(punto: Punto, meses: number): Punto {
+  if (meses === 0) return punto;
+  const mes = sumarMeses(mesDe(punto), -meses);
+  return esFecha(punto) ? `${mes}-${punto.slice(8, 10)}` : mes;
+}
+
+/** El extremo más nuevo del intervalo, sin importar en qué orden vinieron. */
+function extremoNuevo(desde: Punto, hasta: Punto): Punto {
+  return compararMeses(mesDe(hasta), mesDe(desde)) >= 0 ? hasta : desde;
 }
 
 /**
  * Los puntos que componen el desglose.
  *
- * Con meses enteros es simplemente la lista de meses. Con días, a los dos extremos
- * pedidos se les suman los días 1 de cada mes que quede estrictamente en el medio.
- *
- * El corte en los días 1 no es cosmético: garantiza que **ninguna fila abarque más
- * de un mes**. Sin él, un período del 1 de julio al 5 de agosto aparecería como una
- * sola fila de +2,49%, y quien la lea va a suponer que es la inflación de un mes
- * cuando en realidad son 35 días.
+ * Con meses enteros es la lista de meses. Con días, a los extremos se les suman los
+ * días 1 de cada mes que quede estrictamente en el medio, para que ninguna fila
+ * abarque más de un mes: un tramo del 1 de julio al 5 de agosto mostrado como una
+ * sola fila se leería como si fuera la inflación de un mes, y son 35 días.
  */
 function puntosDelRecorrido(desde: Punto, hasta: Punto): Punto[] {
   if (!esFecha(desde) && !esFecha(hasta)) return rangoMeses(desde, hasta);
 
+  const comoDia = (p: Punto) => (esFecha(p) ? p : primerDia(p));
   const inicio = comoDia(desde);
   const fin = comoDia(hasta);
   const haciaAdelante = fin >= inicio;
@@ -193,93 +152,203 @@ function puntosDelRecorrido(desde: Punto, hasta: Punto): Punto[] {
   return [desde, ...intermedios, hasta];
 }
 
+/* ------------------------------------------------------------------- ajuste */
+
 /**
  * Ajusta `monto` desde el punto `desde` hasta el punto `hasta`.
  *
  * Los extremos pueden ser meses (`2026-05`) o días (`2026-05-15`), y se pueden
- * mezclar. Funciona en ambas direcciones: si `hasta` es anterior a `desde`
- * deflacta y el desglose camina hacia atrás. En cualquier dirección, el acumulado
- * de cada fila se mide siempre contra el origen.
+ * mezclar. Funciona en las dos direcciones: si `hasta` es anterior a `desde`,
+ * deflacta.
  */
-export function adjust(monto: number, desde: Punto, hasta: Punto, serie: SerieIndice): Resultado {
+export function adjust(
+  monto: number,
+  desde: Punto,
+  hasta: Punto,
+  serie: SerieIndice,
+  opciones: OpcionesAjuste = {},
+): Resultado {
   if (!Number.isFinite(monto)) throw new RangoError("El monto tiene que ser un número");
 
   const idx = armarIndice(serie);
-  const indiceDesde = idx.valorEn(desde);
-  const puntos = puntosDelRecorrido(desde, hasta);
+  const hoy = opciones.hoy ?? mesActual();
+  const nuevo = extremoNuevo(desde, hasta);
+
+  const desplazamiento = Math.max(
+    desplazamientoNecesario(desde, idx.ultimoOficial),
+    desplazamientoNecesario(hasta, idx.ultimoOficial),
+  );
+
+  // El destino es futuro de verdad (posterior al mes en curso): no hay ventana
+  // publicada equivalente que sirva de referencia, hay que proyectar.
+  const esFuturo = compararMeses(mesDe(nuevo), hoy) > 0;
+
+  // Correr la ventana no puede empujar el origen antes de donde arranca la serie.
+  const cabeLaVentana =
+    compararMeses(mesDe(correr(desde, desplazamiento)), idx.primerMes) >= 0 &&
+    compararMeses(mesDe(correr(hasta, desplazamiento)), idx.primerMes) >= 0;
+
+  if (desplazamiento === 0) {
+    return calcularDirecto(monto, desde, hasta, idx);
+  }
+  if (!esFuturo && cabeLaVentana) {
+    return calcularVentanaReciente(monto, desde, hasta, idx, desplazamiento);
+  }
+  return calcularRepitiendoUltimo(monto, desde, hasta, idx, serie);
+}
+
+/** Arma el desglose y el resultado a partir de una lista de puntos ya calculables. */
+function armarResultado(
+  monto: number,
+  desde: Punto,
+  hasta: Punto,
+  puntos: Punto[],
+  idx: Indice,
+  metodo: Metodo,
+  esProyeccion: (punto: Punto) => boolean,
+): Resultado {
+  const indiceBase = idx.valorEn(puntos[0]!);
 
   const desglose: Fila[] = puntos.map((punto, i) => {
     const indice = idx.valorEn(punto);
     const previo = i === 0 ? null : idx.valorEn(puntos[i - 1]!);
+    const proyectado = esProyeccion(punto);
     return {
       punto,
       indice,
       varMensualPct: previo === null ? null : (indice / previo - 1) * 100,
-      acumuladoPct: i === 0 ? null : (indice / indiceDesde - 1) * 100,
-      monto: (monto * indice) / indiceDesde,
-      esProyeccion: idx.esProyectado(punto),
-      origen: idx.origenDe(punto),
+      acumuladoPct: i === 0 ? null : (indice / indiceBase - 1) * 100,
+      monto: (monto * indice) / indiceBase,
+      esProyeccion: proyectado,
+      origen: proyectado ? "proyeccion" : idx.origenDe(mesDe(punto)),
     };
   });
 
-  const tramoEn = (punto: Punto): Tramo => {
-    const indice = idx.valorEn(punto);
-    return {
-      hasta: punto,
-      monto: (monto * indice) / indiceDesde,
-      variacionPct: (indice / indiceDesde - 1) * 100,
-    };
+  const factor = idx.valorEn(puntos.at(-1)!) / indiceBase;
+  return {
+    monto,
+    desde,
+    hasta,
+    montoAjustado: monto * factor,
+    variacionPct: (factor - 1) * 100,
+    metodo,
+    desglose,
   };
+}
 
-  const resultado: Resultado = { monto, desde, hasta, desglose };
-
-  /*
-   * El tramo oficial existe sólo si el origen está publicado.
-   *
-   * Todo resultado es un cociente `idx(hasta) / idx(desde)`. Si `desde` cae en un
-   * mes sin publicar, ese cociente arrastra una proyección en el denominador y
-   * ningún punto del recorrido produce un número oficial, por más que el destino
-   * sí esté publicado. Es el caso de "cobré esto en agosto, ¿cuánto era en marzo?"
-   * cuando agosto todavía no salió.
-   */
-  if (!idx.esProyectado(desde)) {
-    const ultimoPublicado = desglose.filter((f) => !f.esProyeccion).at(-1)?.punto ?? desde;
-    resultado.oficial = tramoEn(ultimoPublicado);
-  }
-
-  const faltantes = mesesFaltantes(desglose, idx.ultimoOficial);
-  if (faltantes.length > 0) {
-    const estimado: TramoEstimado = {
-      ...tramoEn(hasta),
-      mesesFaltantes: faltantes,
-      tasaMensualPct: idx.tasaProyeccionPct,
-      base: idx.base,
-    };
-    resultado.estimado = estimado;
-  }
-
-  return resultado;
+function calcularDirecto(monto: number, desde: Punto, hasta: Punto, idx: Indice): Resultado {
+  const puntos = puntosDelRecorrido(desde, hasta);
+  return armarResultado(monto, desde, hasta, puntos, idx, { tipo: "directo" }, () => false);
 }
 
 /**
- * Qué meses sin publicar necesita el cálculo, del más viejo al más nuevo.
+ * Corre la ventana hacia atrás hasta que entre entera en los datos publicados.
  *
- * No alcanza con mirar el destino: yendo hacia atrás desde un mes sin publicar, los
- * meses estimados están del lado del origen. Se derivan del recorrido, que es lo
- * que efectivamente se usó.
+ * De mayo a agosto pasan tres meses; si julio y agosto no salieron, se usa la
+ * inflación de abril, mayo y junio. El resultado no lleva ningún número inventado,
+ * y la explicación cabe en una oración.
  */
-function mesesFaltantes(desglose: Fila[], ultimoOficial: Mes): Mes[] {
-  let tope = 0;
-  for (const fila of desglose) {
-    if (!fila.esProyeccion) continue;
-    // Un día posterior al 1 del último mes publicado necesita el índice del mes
-    // siguiente: cuenta como un mes faltante aunque su propio mes esté publicado.
-    tope = Math.max(tope, Math.max(1, diffMeses(ultimoOficial, mesDe(fila.punto))));
-  }
-  return Array.from({ length: tope }, (_, i) => deOrdinal(aOrdinal(ultimoOficial) + i + 1));
+function calcularVentanaReciente(
+  monto: number,
+  desde: Punto,
+  hasta: Punto,
+  idx: Indice,
+  desplazamiento: number,
+): Resultado {
+  const puntos = puntosDelRecorrido(correr(desde, desplazamiento), correr(hasta, desplazamiento));
+
+  const nuevo = extremoNuevo(desde, hasta);
+  const viejo = nuevo === hasta ? desde : hasta;
+  const mesesDelPeriodo = Math.abs(diffMeses(mesDe(viejo), mesDe(nuevo)));
+
+  const sinPublicar = rangoMeses(sumarMeses(idx.ultimoOficial, 1), mesDe(nuevo));
+
+  return armarResultado(
+    monto,
+    desde,
+    hasta,
+    puntos,
+    idx,
+    {
+      tipo: "ventana_reciente",
+      mesesDelPeriodo,
+      desplazamiento,
+      mesesSinPublicar: sinPublicar,
+    },
+    () => false,
+  );
 }
 
-/** El mes más nuevo que la UI permite elegir: el actual, aunque sea proyección. */
+/**
+ * Extiende la serie repitiendo la última variación mensual publicada.
+ *
+ * Es deliberadamente la proyección más simple que existe. Un promedio de varios
+ * meses, o cualquier modelo, obliga a explicar el modelo; repetir el último dato se
+ * cuenta en media oración y no pretende ser un pronóstico.
+ */
+function calcularRepitiendoUltimo(
+  monto: number,
+  desde: Punto,
+  hasta: Punto,
+  idx: Indice,
+  serie: SerieIndice,
+): Resultado {
+  const tasa = idx.ultimaVariacionPct;
+  const ultimoIndice = serie.datos.at(-1)!.indice;
+  const ultimoOficial = idx.ultimoOficial;
+
+  const extendido: Indice = {
+    ...idx,
+    valorEn(punto: Punto): number {
+      const mes = mesDe(punto);
+      const indiceDe = (m: Mes) =>
+        compararMeses(m, ultimoOficial) <= 0
+          ? idx.valorEn(m)
+          : ultimoIndice * Math.pow(1 + tasa / 100, diffMeses(ultimoOficial, m));
+
+      const inicio = indiceDe(mes);
+      if (!esFecha(punto) || diaDe(punto) === 1) return inicio;
+      const siguiente = indiceDe(sumarMeses(mes, 1));
+      return inicio * Math.pow(siguiente / inicio, fraccionDeMes(punto));
+    },
+  };
+
+  const esProyeccion = (punto: Punto): boolean => {
+    const comparacion = compararMeses(mesDe(punto), ultimoOficial);
+    if (comparacion > 0) return true;
+    // Un día posterior al 1 del último mes publicado ya necesita el índice del mes
+    // siguiente, que no existe: es en parte proyección aunque su mes sí esté.
+    return comparacion === 0 && esFecha(punto) && diaDe(punto) > 1;
+  };
+
+  const puntos = puntosDelRecorrido(desde, hasta);
+  const mesTope = puntos
+    .filter(esProyeccion)
+    .map((p) => mesDe(p))
+    .sort()
+    .at(-1);
+
+  const estimados = mesTope
+    ? rangoMeses(sumarMeses(ultimoOficial, 1), compararMeses(mesTope, ultimoOficial) > 0 ? mesTope : sumarMeses(ultimoOficial, 1))
+    : [];
+
+  return armarResultado(
+    monto,
+    desde,
+    hasta,
+    puntos,
+    extendido,
+    {
+      tipo: "repite_ultimo",
+      tasaMensualPct: tasa,
+      mesBase: ultimoOficial,
+      mesesEstimados: estimados,
+    },
+    esProyeccion,
+  );
+}
+
+/** El mes en curso. */
 export function mesActual(ahora = new Date()): Mes {
   return deOrdinal(aOrdinal(`${ahora.getUTCFullYear()}-01`) + ahora.getUTCMonth());
 }

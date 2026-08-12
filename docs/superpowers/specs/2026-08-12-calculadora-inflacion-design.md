@@ -56,8 +56,8 @@ leer letra chica, cuánto vale su plata con datos oficiales y cuánto es estimac
 | Decisión | Elección | Razón |
 |---|---|---|
 | Origen de datos | Snapshot diario cacheado en el repo | La API key nunca llega al cliente; cero quota por visita; cero latencia; el JSON en el repo público es prueba social del MCP |
-| Meses sin dato oficial | Dos resultados separados | Es la ambigüedad exacta que motivó el proyecto |
-| Método de proyección | Promedio de las últimas 3 variaciones mensuales | Reproduce exactamente lo que devuelve `ajuste_por_inflacion`: sitio y MCP nunca se contradicen |
+| Meses sin dato oficial | Ventana de meses recientes si el destino no es futuro; repetir el último valor si lo es | Ver §5, *Los meses sin publicar* (revisado) |
+| Método de proyección | Repetir la última variación mensual publicada | Se explica en una oración a alguien que no maneja números |
 | Cobertura | 1990-01 en adelante | Mismo empalme que ya usa el MCP; no inventa metodología propia |
 | Stack | Vite + TypeScript vanilla | Una página, un formulario; deps mínimas, build trivial, sobrevive sin mantenimiento |
 | Hosting | GitHub Pages + `inflacion.mymcps.dev` | Estático puro; dominio y token de Cloudflare ya disponibles |
@@ -135,23 +135,32 @@ y se testea aislada.
 - `adjust.ts` — la API pública:
 
 ```ts
-adjust(monto: number, desde: Mes, hasta: Mes, serie: SerieIndice): Resultado
+adjust(monto: number, desde: Punto, hasta: Punto,
+       serie: SerieIndice, opciones?: { hoy?: Mes }): Resultado
 
 type Resultado = {
-  oficial:   { hasta: Mes; monto: number; variacionPct: number };
-  estimado?: { hasta: Mes; monto: number; variacionPct: number;
-               mesesProyectados: number; tasaMensualPct: number };
-  desglose:  Fila[];
+  monto: number; desde: Punto; hasta: Punto;
+  montoAjustado: number; variacionPct: number;
+  metodo: Metodo; desglose: Fila[];
 };
 
+type Metodo =
+  | { tipo: "directo" }
+  | { tipo: "ventana_reciente"; mesesDelPeriodo: number;
+      desplazamiento: number; mesesSinPublicar: Mes[] }
+  | { tipo: "repite_ultimo"; tasaMensualPct: number;
+      mesBase: Mes; mesesEstimados: Mes[] };
+
 type Fila = {
-  mes: Mes; indice: number; varMensualPct: number | null;
-  acumuladoPct: number | null; monto: number; esProyeccion: boolean;
+  punto: Punto; indice: number; varMensualPct: number | null;
+  acumuladoPct: number | null; monto: number;
+  esProyeccion: boolean; origen: Origen;
 };
 ```
 
-`estimado` está presente solo si `hasta` supera el último mes oficial. Cuando no hay
-proyección, la UI muestra un único resultado y no hay bloque secundario que explicar.
+Hay **un solo resultado**, y `metodo` dice cómo se llegó a él. La versión original de
+este spec devolvía un par `oficial` / `estimado` y la UI mostraba dos números; se
+descartó (ver §6).
 
 ### Convención de fechas
 
@@ -164,15 +173,34 @@ explícito: la primera fila es el mes de origen con el monto original y sin
 variación, y cada fila siguiente es un mes transcurrido. Nunca se muestra un
 porcentaje acumulado sin las filas que lo componen.
 
-### Proyección
+### Los meses sin publicar
 
-Tasa mensual `t` = promedio aritmético de las variaciones mensuales de los últimos
-3 meses oficiales. Cada mes faltante multiplica por `(1 + t/100)`.
+El IPC sale con semanas de retraso: el mes en curso nunca tiene dato y a veces el
+anterior tampoco. Como el uso dominante es traer un monto del pasado al presente, el
+hueco aparece en casi toda consulta. `adjust` lo resuelve por tres caminos, elegidos
+por el desplazamiento necesario y por si el destino supera el mes en curso:
 
-**Test de oro:** para `(520000, 2026-05, 2026-08)` el motor debe devolver
-`6.43%` / `$553.448,55`, idéntico a `ajuste_por_inflacion`. Este test se corre en CI
-contra el fixture y protege la propiedad de que sitio y MCP nunca se contradigan.
-**Verificado:** el sitio en producción devuelve exactamente ese valor.
+| `metodo.tipo` | Cuándo | Qué hace |
+|---|---|---|
+| `directo` | Todo el período está publicado | `idx(hasta) / idx(desde)` |
+| `ventana_reciente` | El destino no se publicó pero no es futuro | Corre la ventana hacia atrás: aplica la inflación de los últimos *N* meses publicados, con *N* = meses del período pedido |
+| `repite_ultimo` | El destino supera el mes en curso | Extrapola repitiendo la última variación mensual publicada |
+
+`ventana_reciente` **no estima nada**: todos los números son del INDEC. Tampoco es la
+inflación del período pedido, sino la del período publicado más reciente de igual
+duración, así que la UI nombra siempre los meses concretos que entraron. El desglose
+muestra esos meses, no los del período pedido.
+
+`repite_ultimo` repite en lugar de promediar a propósito: la explicación cabe en una
+oración, y para el usuario objetivo eso vale más que la sofisticación.
+
+**Test de oro:** `(520000, 2026-05, 2026-08)` con `hoy = 2026-08` resuelve por
+`ventana_reciente` con `mesesDelPeriodo = 3`, desglose `mar–jun 2026` y `+6,76%`.
+
+Esto rompe deliberadamente la paridad numérica con `ajuste_por_inflacion`, que sigue
+proyectando con el promedio de tres meses. La coherencia con el MCP se mantiene en el
+empalme y en el índice; el tratamiento del hueco es una decisión de producto del
+sitio.
 
 ### Precisión: divergencia deliberada con el MCP en plazos largos
 
@@ -189,34 +217,29 @@ del ruido de redondeo, y la página `/datos` lo explica al lector.
 
 ## 6. Interfaz
 
-Una página, un formulario, cuatro presets.
+Una página, un formulario, un solo modo de cálculo.
 
-**Presets** (chips sobre el formulario, cambian etiquetas y defaults, no el motor):
+**Sin presets.** El spec original definía cuatro (presupuesto, sueldo, alquiler,
+cuánto vale hoy). Se eliminaron: sugerían que había cálculos distintos cuando siempre
+es el mismo —un monto, dos fechas, el IPC— y hacían dudar al usuario sobre si había
+elegido bien.
 
-| Preset | Qué configura |
-|---|---|
-| ¿Cuánto vale hoy? | Default. Mes de origen libre → mes actual |
-| Actualizar un presupuesto | Etiquetas de honorarios/cotización. El caso testigo |
-| Actualizar un sueldo | Además del ajuste, muestra cuánto perdió el monto real |
-| Actualizar un alquiler | Periodicidad trimestral/cuatrimestral/semestral/anual |
-
-El preset de alquiler aclara de forma visible que calcula IPC y que, desde el DNU
-70/2023, la actualización contractual es la que las partes pactaron. Es una
-calculadora, no un dictamen.
-
-**Resultado.** Primario grande (solo datos oficiales, con el mes de corte dicho en
-palabras). Secundario separado por regla y con chip `ESTIMADO`, indicando cuántos
-meses se proyectaron y a qué tasa. Nunca uno solo cuando hay proyección de por
-medio.
+**Resultado.** Un solo número grande, con el mes de destino dicho en palabras y un
+párrafo que nombra los meses concretos que se usaron. Chip `ESTIMADO` sólo cuando el
+método es `repite_ultimo`; prefijo `~` en `ventana_reciente` y `repite_ultimo`.
 
 **Desglose.** Tabla mes a mes: índice, variación mensual, acumulado desde el
 origen, monto, y origen del dato (`INDEC ✓` / `BCRA ✓` / `estimado`). Las filas
-proyectadas van visualmente diferenciadas.
+proyectadas van visualmente diferenciadas. En `ventana_reciente` el pie de la tabla
+aclara que las filas son los meses publicados de referencia.
+
+**Modo por día.** Opcional, apagado por defecto. Interpola el índice dentro del mes
+en proporción a los días, con el criterio del coeficiente CER del BCRA.
 
 **Gráfico.** Línea del monto en el tiempo, con el tramo proyectado punteado.
 Chart.js.
 
-**Compartir.** URL que reproduce la consulta (`?monto=&desde=&hasta=&preset=`) y
+**Compartir.** URL que reproduce la consulta (`?monto=&desde=&hasta=`) y
 descarga del desglose en CSV. El objetivo explícito es que la gente mande el link en
 vez de un screenshot.
 
@@ -238,21 +261,24 @@ como un anuncio. La conversión viene de que el cálculo esté bien hecho.
 
 **Unitarios (vitest) sobre el motor** — es la única parte con lógica no trivial:
 
-- Test de oro contra `ajuste_por_inflacion` (caso testigo).
+- Test de oro del caso testigo: `ventana_reciente` sobre los últimos 3 meses publicados.
 - Empalme en el borde: dic-2016 debe dar idéntico por ambas ramas.
 - Mes de origen = mes destino → monto sin cambios, desglose de una fila.
 - Destino anterior al origen → deflación, montos decrecientes.
 - Hiperinflación 1990 (79,2% / 61,6% / 95,5% mensual) sin pérdida de precisión.
-- Destino más allá del último oficial → `estimado` presente, `mesesProyectados`
-  correcto, filas marcadas.
-- Destino dentro del rango oficial → `estimado` ausente.
+- Destino sin publicar pero no futuro → `ventana_reciente`, desglose corrido, sin
+  ninguna fila estimada.
+- Destino futuro → `repite_ultimo`, todas las filas faltantes a la misma tasa.
+- Destino dentro del rango publicado → `directo`.
+- Modo por día: un día posterior al 1 del último mes publicado fuerza el
+  desplazamiento aunque su propio mes ya esté publicado.
 - Fechas fuera de rango (anterior a 1990-01) → error explícito, no un `NaN`.
 
 **Integración:** el pipeline corre contra el MCP real en CI y valida el esquema y la
 monotonía del snapshot.
 
-**End-to-end (Playwright headless):** el caso testigo cargado por URL renderiza los
-dos resultados y el desglose completo.
+**End-to-end (Playwright headless):** el caso testigo cargado por URL renderiza el
+resultado, el párrafo que nombra los meses usados y el desglose completo.
 
 ## 9. Estructura
 
@@ -264,7 +290,7 @@ scripts/mcp-client.ts            JSON-RPC sobre HTTP, desenmarcado de SSE
 scripts/provision-api-key.sh     aprovisionamiento de la key dedicada
 public/data/*.json               snapshot commiteado
 src/engine/{splice,adjust,mes,types}.ts
-src/ui/{main,chart,format,presets,datos}.ts
+src/ui/{main,chart,format,datos}.ts
 tests/{adjust,splice,format}.test.ts
 index.html · datos.html
 ```

@@ -21,12 +21,13 @@ serie del IPC a mano.
 
 Esta calculadora hace esa planilla por vos:
 
-- **Contesta el período que pediste**, aunque haya que estimar para llegar. La
-  estimación se marca; no se esconde ni se trata como un error. Debajo, como
-  respaldo, el número que sale usando solo meses ya publicados.
-- **De dónde sale la tasa de proyección**, siempre a la vista: los meses publicados
-  que entran en el promedio, con el porcentaje de cada uno. Es la respuesta a
-  "¿de dónde sacaste ese porcentaje?".
+- **Contesta el período que pediste**, y dice con qué meses concretos lo contestó.
+  Cuando el destino es el mes en curso —el caso más común, traer un monto de antes
+  a hoy— no estima nada: usa la inflación de los últimos N meses ya publicados,
+  con N igual a la cantidad de meses del período.
+- **De dónde salen los números, siempre a la vista**: los meses que entraron en la
+  cuenta, nombrados, con el porcentaje de cada uno. Es la respuesta a "¿de dónde
+  sacaste ese porcentaje?".
 - **El desglose mes a mes.** Cuánto subió, cuánto acumula, cuánta plata, y de qué
   fuente salió cada fila: `INDEC ✓`, `BCRA ✓` o `estimado`.
 - **Un texto para pegar.** El botón *Copiar explicación* arma un párrafo que se
@@ -62,12 +63,26 @@ mensual.
 
 Es el mismo empalme que hace la herramienta `ajuste_por_inflacion` del MCP.
 
-### La proyección
+### Los meses sin publicar
 
-Promedio de las últimas tres variaciones mensuales publicadas — otra vez, el mismo
-método que `ajuste_por_inflacion`. La coherencia es deliberada: preguntar desde el
-sitio o desde tu propio agente de IA tiene que dar el mismo número. Hay un test que
-lo verifica contra el caso testigo.
+El IPC sale con retraso, así que el mes en curso nunca tiene dato y a veces el
+anterior tampoco. Hay tres caminos, y la interfaz siempre dice cuál usó:
+
+| Situación | Qué hace | ¿Estima algo? |
+|---|---|---|
+| Todo el período está publicado | Cociente entre los dos índices | No |
+| El destino ya pasó o está pasando, pero no salió | Usa la inflación de los últimos N meses publicados, con N = meses del período pedido | No |
+| El destino es un mes futuro | Repite la última variación mensual publicada | Sí, y se marca |
+
+El segundo caso es el que resuelve el uso dominante —traer un monto de mayo a hoy—
+sin inventar ningún número: de mayo a agosto pasan tres meses, así que se aplica la
+inflación acumulada de los últimos tres meses publicados. **No es la inflación del
+período pedido**, sino la del período publicado más reciente de igual duración; por
+eso la interfaz nombra siempre los meses concretos que usó.
+
+El tercer caso repite el último valor conocido en lugar de promediar. Es menos
+sofisticado a propósito: se explica en una oración y no esconde que es una
+estimación.
 
 ### Sobre la precisión
 

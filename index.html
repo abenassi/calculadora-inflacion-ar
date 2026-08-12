@@ -77,11 +77,12 @@
         <p class="error" id="error" hidden></p>
 
         <!--
-          El bloque principal responde SIEMPRE el período que la persona pidió,
-          aunque para llegar hasta ahí haya que estimar. Antes el número grande era
-          el del último mes publicado, que es una pregunta que nadie hizo: alguien
-          que consultaba hasta agosto se llevaba el valor de junio sin notarlo.
-          La estimación se marca, pero no se esconde ni se trata como un error.
+          Un solo número, el del período que se pidió.
+          El IPC se publica con retraso, así que el mes en curso nunca tiene dato.
+          En vez de estimarlo, se usa la inflación de los últimos meses publicados
+          (misma cantidad de meses que el período pedido), y el párrafo de abajo
+          dice exactamente cuáles. Sólo cuando el destino es un mes futuro aparece
+          el chip ESTIMADO, porque ahí sí hay una proyección de por medio.
         -->
         <div class="tarjeta resultado resultado--principal" id="bloque-principal">
           <p class="resultado__rotulo">
@@ -92,33 +93,7 @@
           </p>
           <p class="resultado__cifra" id="cifra-principal"></p>
           <p class="resultado__detalle" id="detalle-principal"></p>
-
           <p class="aviso-largo" id="aviso-largo" hidden></p>
-
-          <!--
-            De dónde sale la tasa de proyección. Es la respuesta a "¿de dónde
-            sacaste ese porcentaje?": sin esto la tasa es un número que aparece de
-            la nada, y nadie puede defender el resultado ante otra persona.
-          -->
-          <details class="base-proyeccion" id="base-proyeccion" open hidden>
-            <summary id="base-resumen"></summary>
-            <table class="base-tabla">
-              <tbody id="base-cuerpo"></tbody>
-              <tfoot>
-                <tr>
-                  <th scope="row">Promedio</th>
-                  <td id="base-promedio"></td>
-                </tr>
-              </tfoot>
-            </table>
-            <p class="base-nota" id="base-nota"></p>
-          </details>
-        </div>
-
-        <div class="tarjeta resultado resultado--respaldo" id="bloque-respaldo" hidden>
-          <p class="resultado__rotulo">Sin estimar nada, solo con lo ya publicado</p>
-          <p class="resultado__cifra-chica" id="cifra-respaldo"></p>
-          <p class="resultado__detalle" id="detalle-respaldo"></p>
         </div>
 
         <div class="acciones acciones--compartir">
@@ -139,10 +114,12 @@
 
       <section class="tarjeta panel" id="panel-grafico">
         <div class="panel__cabecera">
-          <h2>Evolución del monto</h2>
+          <h2 id="titulo-grafico">Evolución del monto</h2>
           <p class="leyenda-inline">
             <span class="muestra muestra--oficial" aria-hidden="true"></span> dato oficial
-            <span class="muestra muestra--estimado" aria-hidden="true"></span> estimado
+            <span id="leyenda-estimado"
+              ><span class="muestra muestra--estimado" aria-hidden="true"></span> estimado</span
+            >
           </p>
         </div>
         <div class="grafico">
@@ -152,7 +129,7 @@
 
       <section class="tarjeta panel">
         <div class="panel__cabecera">
-          <h2>El cálculo, paso a paso</h2>
+          <h2 id="titulo-tabla">El cálculo, paso a paso</h2>
         </div>
         <!--
           Orden de columnas pensado para leerse de izquierda a derecha y cortar
