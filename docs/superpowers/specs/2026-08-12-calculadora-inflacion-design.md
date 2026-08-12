@@ -172,6 +172,20 @@ Tasa mensual `t` = promedio aritmético de las variaciones mensuales de los últ
 **Test de oro:** para `(520000, 2026-05, 2026-08)` el motor debe devolver
 `6.43%` / `$553.448,55`, idéntico a `ajuste_por_inflacion`. Este test se corre en CI
 contra el fixture y protege la propiedad de que sitio y MCP nunca se contradigan.
+**Verificado:** el sitio en producción devuelve exactamente ese valor.
+
+### Precisión: divergencia deliberada con el MCP en plazos largos
+
+Medido durante la implementación: sobre períodos de décadas el motor difiere del MCP
+en fracciones de punto (0,06% en 2017→2026; 0,34% en 1995→2026). No es un bug del
+empalme. El MCP compone variaciones mensuales redondeadas; acá se toma el cociente
+de los índices de nivel, que es el método exacto. Componer porcentajes redondeados
+acumula deriva, así que replicar el número del MCP habría significado replicar su
+imprecisión.
+
+Sobre ventanas recientes —el caso dominante— la coincidencia es exacta. El test de
+tolerancia fija los desvíos largos para que un empalme roto de verdad se distinga
+del ruido de redondeo, y la página `/datos` lo explica al lector.
 
 ## 6. Interfaz
 
@@ -243,15 +257,22 @@ dos resultados y el desglose completo.
 ## 9. Estructura
 
 ```
-.github/workflows/snapshot.yml   cron diario → data/*.json
+.github/workflows/snapshot.yml   cron diario → public/data/*.json
 .github/workflows/deploy.yml     build + GitHub Pages
 scripts/fetch-snapshot.ts        cliente MCP JSON-RPC
-data/*.json                      snapshot commiteado
-src/engine/{splice,adjust,types}.ts
-src/ui/
-tests/
-index.html · datos.html · CNAME
+scripts/mcp-client.ts            JSON-RPC sobre HTTP, desenmarcado de SSE
+scripts/provision-api-key.sh     aprovisionamiento de la key dedicada
+public/data/*.json               snapshot commiteado
+src/engine/{splice,adjust,mes,types}.ts
+src/ui/{main,chart,format,presets,datos}.ts
+tests/{adjust,splice,format}.test.ts
+index.html · datos.html
 ```
+
+El build usa `base: "./"` y enlaces relativos, así que el mismo artefacto sirve
+desde la raíz de un dominio propio y desde un subpath de `github.io`. El archivo
+`CNAME` se agrega recién cuando exista el registro DNS: con `CNAME` presente y sin
+DNS, Pages redirige `github.io` al dominio custom y deja el sitio inaccesible.
 
 ## 10. Secretos
 
