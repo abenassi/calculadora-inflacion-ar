@@ -294,23 +294,51 @@ describe("metodologías elegibles", () => {
 });
 
 describe("modo por día", () => {
-  it("el día 1 vale igual que el mes entero", () => {
-    const porMes = adjust(1000, "2020-01", "2020-03", sintetica, { hoy: "2020-06" });
-    const porDia = adjust(1000, "2020-01-01", "2020-03-01", sintetica, { hoy: "2020-06" });
+  /**
+   * El índice de un mes es el nivel al que se llega al terminarlo, así que el 1 de
+   * un mes y el cierre del anterior son el mismo punto. De ahí sale todo lo demás.
+   */
+  it("el día 1 de un mes vale igual que el mes anterior entero", () => {
+    const porMes = adjust(1000, "2020-01", "2020-03", irregular, { hoy: "2020-06" });
+    const porDia = adjust(1000, "2020-02-01", "2020-04-01", irregular, { hoy: "2020-06" });
     expect(porDia.montoAjustado).toBeCloseTo(porMes.montoAjustado, 10);
   });
 
-  it("interpola dentro del mes en proporción a los días", () => {
-    // Febrero 2020 tiene 29 días: el 15 lleva 14/29 del camino de 110 a 121.
-    const r = adjust(1000, "2020-02-01", "2020-02-15", sintetica, { hoy: "2020-06" });
-    expect(r.montoAjustado).toBeCloseTo(1000 * Math.pow(121 / 110, 14 / 29), 8);
+  /**
+   * Lo que hace legible la tabla: el tramo del 1 de marzo al 1 de abril contiene la
+   * inflación de marzo. Con el anclaje anterior contenía la de abril, que es
+   * contraintuitivo hasta el ridículo.
+   */
+  it("el tramo de 1 a 1 contiene la inflación del mes que abarca", () => {
+    const r = adjust(1000, "2020-03-01", "2020-04-01", irregular, { hoy: "2020-06" });
+    expect(r.variacionPct).toBeCloseTo(2, 8); // marzo, no abril
+  });
+
+  it("prorratea la inflación del propio mes, no la del siguiente", () => {
+    // Marzo tiene 31 días y subió 2%: el 15 lleva 14/31 de ese 2%.
+    const r = adjust(1000, "2020-03-01", "2020-03-15", irregular, { hoy: "2020-06" });
+    expect(r.montoAjustado).toBeCloseTo(1000 * Math.pow(1.02, 14 / 31), 8);
+  });
+
+  /**
+   * Las puntas son tramos de días sueltos y las del medio meses completos. La
+   * distinción tiene que salir del motor: la interfaz no puede etiquetar como dato
+   * oficial del INDEC un número que es un prorrateo nuestro.
+   */
+  it("marca como parciales sólo las filas de las puntas", () => {
+    const r = adjust(1000, "2020-02-15", "2020-04-05", irregular, { hoy: "2020-06" });
+    expect(r.desglose.map((f) => f.esParcial)).toEqual([false, true, false, true]);
+  });
+
+  it("con meses enteros ninguna fila es parcial", () => {
+    const r = adjust(1000, "2020-01", "2020-04", irregular, { hoy: "2020-06" });
+    expect(r.desglose.every((f) => !f.esParcial)).toBe(true);
   });
 
   it("ninguna fila abarca más de un mes", () => {
-    const r = adjust(1000, "2020-01-15", "2020-04-05", sintetica, { hoy: "2020-06" });
+    const r = adjust(1000, "2020-02-15", "2020-04-05", irregular, { hoy: "2020-06" });
     expect(r.desglose.map((f) => f.punto)).toEqual([
-      "2020-01-15",
-      "2020-02-01",
+      "2020-02-15",
       "2020-03-01",
       "2020-04-01",
       "2020-04-05",
@@ -318,25 +346,72 @@ describe("modo por día", () => {
   });
 
   /**
-   * Un día posterior al 1 necesita el índice del mes siguiente para interpolar, así
-   * que la ventana tiene que correrse un mes más que con meses enteros.
+   * Con el anclaje al día 1, un día suelto necesitaba el índice del mes siguiente y
+   * la ventana tenía que correrse un mes de más. Ese costo desapareció: días y
+   * meses piden exactamente lo mismo.
    */
-  it("corre un mes extra cuando el destino es un día suelto", () => {
-    const r = adjust(1000, "2020-02-10", "2020-04-20", sintetica, { hoy: "2020-05" });
-    if (r.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");
-    expect(r.metodo.desplazamiento).toBe(1);
-    expect(r.desglose[0]!.punto).toBe("2020-01-10");
-    expect(r.desglose.at(-1)!.punto).toBe("2020-03-20");
+  it("un día del último mes publicado ya no obliga a correr la ventana", () => {
+    // Antes, el 20 de abril necesitaba el índice de mayo y esto era
+    // `ventana_reciente`. Ese mes de frescura es lo que se gana con el cambio.
+    const r = adjust(1000, "2020-02-10", "2020-04-20", irregular, { hoy: "2020-05" });
+    expect(r.metodo.tipo).toBe("directo");
+  });
+
+  it("cuando hay que correr la ventana, días y meses corren lo mismo", () => {
+    const porDia = adjust(1000, "2020-03-10", "2020-05-20", irregular, { hoy: "2020-05" });
+    const porMes = adjust(1000, "2020-03", "2020-05", irregular, { hoy: "2020-05" });
+    if (porDia.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");
+    if (porMes.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");
+    expect(porDia.metodo.desplazamiento).toBe(porMes.metodo.desplazamiento);
+    expect(porDia.desglose[0]!.punto).toBe("2020-02-10");
+    expect(porDia.desglose.at(-1)!.punto).toBe("2020-04-20");
   });
 
   it("ida y vuelta con días devuelve el monto original", () => {
-    const ida = adjust(1000, "2020-01-10", "2020-03-20", sintetica, { hoy: "2020-06" });
-    const vuelta = adjust(ida.montoAjustado, "2020-03-20", "2020-01-10", sintetica, {
+    const ida = adjust(1000, "2020-02-10", "2020-04-20", irregular, { hoy: "2020-06" });
+    const vuelta = adjust(ida.montoAjustado, "2020-04-20", "2020-02-10", irregular, {
       hoy: "2020-06",
     });
     expect(vuelta.montoAjustado).toBeCloseTo(1000, 8);
   });
+
+  /**
+   * Prorratear un día necesita el mes anterior, así que el primer mes de la serie no
+   * admite fechas. Tiene que fallar con un mensaje que se entienda, no con un NaN.
+   */
+  it("una fecha del primer mes de la serie falla explícitamente", () => {
+    expect(() => adjust(1000, "2020-01-15", "2020-03-01", irregular, { hoy: "2020-06" })).toThrow(
+      RangoError,
+    );
+  });
+
+  /**
+   * El desfasaje que tenía el método de proyección: la última fila interpolaba con
+   * el mes siguiente, así que usaba un mes estimado más de los que declaraba.
+   */
+  /**
+   * El 1 de un mes es el cierre del anterior, así que el tramo que va del 1 de abril
+   * al 1 de mayo contiene la inflación de **abril**, que está publicada. Marcarlo
+   * como estimado porque su etiqueta cae en mayo sería mentir sobre un dato oficial,
+   * justo en la columna que existe para no mentir sobre eso.
+   */
+  it("declara como estimados exactamente los tramos que necesitan un mes sin publicar", () => {
+    const r = adjust(1000, "2020-03-10", "2020-05-20", irregular, {
+      hoy: "2020-05",
+      metodologia: "repite_ultimo",
+    });
+    if (r.metodo.tipo !== "proyeccion") throw new Error("tipo inesperado");
+    expect(r.metodo.mesesEstimados).toEqual(["2020-05"]);
+    expect(r.desglose.map((f) => f.punto)).toEqual([
+      "2020-03-10",
+      "2020-04-01",
+      "2020-05-01",
+      "2020-05-20",
+    ]);
+    expect(r.desglose.map((f) => f.esProyeccion)).toEqual([false, false, false, true]);
+  });
 });
+
 
 describe("bordes y errores", () => {
   it("rechaza meses anteriores al inicio de la serie", () => {

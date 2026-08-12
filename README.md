@@ -32,8 +32,9 @@ Esta calculadora hace esa planilla por vos:
   fuente salió cada fila: `INDEC ✓`, `BCRA ✓` o `estimado`.
 - **Un texto para pegar.** El botón *Copiar explicación* arma un párrafo que se
   entiende solo y trae la fuente adentro, listo para mandar por mensaje.
-- **Meses por defecto, días si hacen falta.** El modo por día interpola el índice
-  dentro del mes, con el mismo criterio del coeficiente CER del BCRA.
+- **Meses por defecto, días si hacen falta.** El modo por día le da a los días
+  sueltos de las puntas la parte proporcional de la inflación de su mes, y los marca
+  como `prorrateado` en vez de atribuirle al INDEC un número que no publicó.
 
 ## Cómo funciona
 

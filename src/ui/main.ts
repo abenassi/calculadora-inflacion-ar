@@ -15,6 +15,7 @@ import {
   aOrdinal,
   deOrdinal,
   esFecha,
+  diasEntre,
   esFechaValida,
   esMesValido,
   mesDe,
@@ -24,6 +25,7 @@ import {
 } from "../engine/mes.js";
 import type { Mes, Metodologia, Punto, Resultado, SerieIndice } from "../engine/types.js";
 import { dibujar } from "./chart.js";
+import { rotularFila } from "./etiquetas.js";
 import { fechaLarga, indice, pesos, pesosRedondo, porcentaje } from "./format.js";
 
 const NOMBRES_MES = [
@@ -85,10 +87,12 @@ function poblarSelects(): void {
   }
 
   // Los input[type=date] se acotan al mismo rango, para que el calendario del
-  // navegador no ofrezca fechas que el motor va a rechazar.
+  // navegador no ofrezca fechas que el motor va a rechazar. El piso es el segundo
+  // mes de la serie: prorratear un día necesita el mes anterior, y el primero no
+  // lo tiene.
   for (const id of ["desde-dia", "hasta-dia"]) {
     const input = el<HTMLInputElement>(id);
-    input.min = primerDia(primero);
+    input.min = primerDia(deOrdinal(aOrdinal(primero) + 1));
     input.max = `${ultimo}-28`;
   }
 }
@@ -195,19 +199,30 @@ function explicarMetodo(r: Resultado): string {
 
     case "ventana_reciente": {
       const { mesesDelPeriodo, mesesSinPublicar } = r.metodo;
+      // Con fechas exactas el período casi nunca son meses redondos: del 15 de mayo
+      // al 10 de agosto no pasaron 3 meses, pasaron 87 días. Decir "3 meses" es
+      // falso y lo detecta cualquiera que mire el calendario.
+      const largo = esFecha(r.desde) || esFecha(r.hasta)
+        ? `pasaron ${diasEntre(r.desde, r.hasta)} días`
+        : plural(mesesDelPeriodo, "pasó 1 mes", `pasaron ${mesesDelPeriodo} meses`);
       const contexto =
-        `De ${nombrarPunto(r.desde)} a ${nombrarPunto(r.hasta)} ` +
-        `${plural(mesesDelPeriodo, "pasó 1 mes", `pasaron ${mesesDelPeriodo} meses`)}, y el INDEC ` +
+        `De ${nombrarPunto(r.desde)} a ${nombrarPunto(r.hasta)} ${largo}, y el INDEC ` +
         `todavía no publicó ${frasearMeses(mesesSinPublicar, "ni")}. `;
-      const cierre = "Para no tener que hacer ninguna estimación.";
+      // El resultado se muestra con "~" y antes esta frase decía que no había
+      // ninguna estimación. Las dos cosas son ciertas y juntas se contradicen, así
+      // que la aproximación tiene que quedar atribuida a su causa real.
+      const cierre =
+        "Son todos datos publicados por el INDEC; el ~ está porque el tramo que se usó " +
+        "no es exactamente el tuyo.";
 
       // En modo por día las filas son fechas, no meses: enumerar sus meses
       // duplicaría el del extremo. Se nombra el tramo por sus puntas, que además
       // es lo que efectivamente se calculó.
       if (esFecha(r.desglose[0]!.punto)) {
         return (
-          `${contexto}Así que usamos el período equivalente más reciente que sí está publicado: ` +
-          `del ${nombrarPunto(r.desglose[0]!.punto)} al ${nombrarPunto(r.desglose.at(-1)!.punto)}. ${cierre}`
+          `${contexto}Así que usamos el tramo equivalente más reciente que sí está publicado: ` +
+          `del ${nombrarPunto(r.desglose[0]!.punto)} al ${nombrarPunto(r.desglose.at(-1)!.punto)} ` +
+          `(${diasEntre(r.desglose[0]!.punto, r.desglose.at(-1)!.punto)} días). ${cierre}`
         );
       }
 
@@ -248,15 +263,34 @@ function explicar(r: Resultado): string {
   return `${resumir(r)} ${explicarMetodo(r)}`;
 }
 
+/**
+ * Las filas de las puntas, en modo por día, son días sueltos: llevan la parte
+ * proporcional de la inflación de su mes, no un número que el INDEC haya publicado.
+ * Mezcladas con meses completos en la misma columna, hay que decirlo.
+ */
+function aclararParciales(r: Resultado): string {
+  const parciales = r.desglose.filter((f) => f.esParcial).length;
+  if (parciales === 0) return "";
+  return (
+    ` ${plural(parciales, "La fila marcada como prorrateada no es un mes entero", "Las filas marcadas como prorrateadas no son meses enteros")}: ` +
+    `${plural(parciales, "es un tramo", "son tramos")} de días sueltos, y ` +
+    `${plural(parciales, "le toca", "les toca")} la parte proporcional de la inflación de su mes.`
+  );
+}
+
 /** El pie de la tabla, que dice qué está mirando el lector. */
 function explicarTabla(r: Resultado): string {
   switch (r.metodo.tipo) {
     case "directo":
-      return "Todas las filas son datos oficiales publicados por el INDEC. Acá no hay nada estimado.";
+      return (
+        "Todas las filas salen de datos oficiales publicados por el INDEC. Acá no hay nada estimado." +
+        aclararParciales(r)
+      );
     case "ventana_reciente":
       return (
-        `Estos son los últimos meses que publicó el INDEC. Los usamos como referencia porque ` +
-        `el período que pediste tiene la misma cantidad de meses y los últimos todavía no salieron.`
+        `Este es el tramo publicado más reciente del mismo largo que el que pediste. Lo usamos ` +
+        `como referencia porque los últimos meses del tuyo todavía no salieron.` +
+        aclararParciales(r)
       );
     case "proyeccion": {
       const { base, tasaMensualPct } = r.metodo;
@@ -267,9 +301,9 @@ function explicarTabla(r: Resultado): string {
           : `la inflación de ${nombrarMes(base.mes)}`;
       return (
         `Estos son los meses que pediste. ${plural(proyectadas, "La fila resaltada", `Las ${proyectadas} filas resaltadas`)} ` +
-        `${plural(proyectadas, "es un mes proyectado", "son meses proyectados")}, no publicado${plural(proyectadas, "", "s")} ` +
-        `por el INDEC: ${plural(proyectadas, "se estimó", "se estimaron")} con ${de}, a ` +
-        `${porcentaje(tasaMensualPct)} por mes. El resto son datos oficiales.`
+        `${plural(proyectadas, "es un tramo proyectado", "son tramos proyectados")}, que el INDEC ` +
+        `todavía no publicó: ${plural(proyectadas, "se estimó", "se estimaron")} con ${de}, a ` +
+        `${porcentaje(tasaMensualPct)} por mes. El resto son datos oficiales.` + aclararParciales(r)
       );
     }
   }
@@ -307,13 +341,13 @@ function pintarResultado(r: Resultado): void {
   // partir de datos, y así el snapshot nunca puede inyectar markup por más que
   // cambie de forma.
   el("cuerpo-desglose").replaceChildren(
-    ...r.desglose.map((f) => {
+    ...r.desglose.map((f, i) => {
       const tr = document.createElement("tr");
       if (f.esProyeccion) tr.className = "fila--estimada";
 
       const th = document.createElement("th");
       th.scope = "row";
-      th.textContent = abreviarPunto(f.punto);
+      th.textContent = rotularFila(r.desglose, i);
       tr.append(th);
 
       const celda = (texto: string, clase?: string) => {
@@ -323,11 +357,25 @@ function pintarResultado(r: Resultado): void {
         return td;
       };
 
+      // Una fila parcial no lleva el sello del INDEC: su número es la parte
+      // proporcional que le toca a esos días, o sea una cuenta nuestra sobre un
+      // dato del INDEC. Poner "INDEC ✓" ahí sería atribuirle una cifra que nunca
+      // publicó. `estimado` gana sobre `prorrateado` porque es la advertencia que
+      // más importa.
       const tdOrigen = document.createElement("td");
       const marca = document.createElement("span");
-      marca.className = `origen origen--${f.origen}`;
-      marca.textContent =
-        f.origen === "indec" ? "INDEC ✓" : f.origen === "bcra" ? "BCRA ✓" : "estimado";
+      const clase = f.esProyeccion ? "proyeccion" : f.esParcial ? "prorrateado" : f.origen;
+      marca.className = `origen origen--${clase}`;
+      marca.textContent = f.esProyeccion
+        ? "estimado"
+        : f.esParcial
+          ? "prorrateado"
+          : f.origen === "indec"
+            ? "INDEC ✓"
+            : "BCRA ✓";
+      if (f.esParcial && !f.esProyeccion) {
+        marca.title = `Parte proporcional de la inflación de ${nombrarMes(mesDe(f.punto))}, según el INDEC.`;
+      }
       tdOrigen.append(marca);
 
       tr.append(
@@ -341,7 +389,16 @@ function pintarResultado(r: Resultado): void {
     }),
   );
 
+  // Vanina, en el review: "esa tabla yo no se la puedo mostrar al cliente, lo
+  // primero que me dice es '¿qué febrero? yo vine en mayo'". El título es lo
+  // primero que se lee y lo único que puede anticipar la sorpresa.
+  el("titulo-tabla").textContent =
+    r.metodo.tipo === "ventana_reciente"
+      ? "El cálculo, paso a paso (sobre el tramo de referencia)"
+      : "El cálculo, paso a paso";
   el("pie-tabla").textContent = explicarTabla(r);
+  // Con una sola variación no hay nada que sumar mal.
+  el("nota-compuesto").hidden = r.desglose.length < 3;
   dibujar(el<HTMLCanvasElement>("grafico"), r);
 }
 

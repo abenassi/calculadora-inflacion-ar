@@ -41,7 +41,7 @@ import {
   diaDe,
   diffMeses,
   esFecha,
-  fraccionDeMes,
+  interpolarEnMes,
   mesDe,
   nombrarMes,
   primerDia,
@@ -109,17 +109,20 @@ function armarIndice(serie: SerieIndice): Indice {
     origenDe: (mes) => origenPorMes.get(mes) ?? "indec",
 
     /**
-     * Para un mes, su índice. Para un día, interpola geométricamente entre el
-     * índice de su mes y el del siguiente, en proporción a los días transcurridos.
-     * Es el criterio con el que el BCRA convierte el IPC mensual en el coeficiente
-     * diario CER.
+     * Para un mes, su índice. Para un día, la parte proporcional de la inflación de
+     * su propio mes (ver `interpolarEnMes`).
      */
     valorEn(punto: Punto): number {
       const mes = mesDe(punto);
-      const inicio = indiceDeMes(mes);
-      if (!esFecha(punto) || diaDe(punto) === 1) return inicio;
-      const siguiente = indiceDeMes(sumarMeses(mes, 1));
-      return inicio * Math.pow(siguiente / inicio, fraccionDeMes(punto));
+      if (!esFecha(punto)) return indiceDeMes(mes);
+      const anterior = sumarMeses(mes, -1);
+      if (compararMeses(anterior, primerMes) < 0) {
+        throw new RangoError(
+          `Para una fecha de ${nombrarMes(mes)} hace falta el índice del mes anterior, ` +
+            `y la serie arranca en ${nombrarMes(primerMes)}.`,
+        );
+      }
+      return interpolarEnMes(indiceDeMes(anterior), indiceDeMes(mes), punto);
     },
   };
 }
@@ -130,19 +133,43 @@ function armarIndice(serie: SerieIndice): Indice {
  * Cuántos meses hay que retroceder un punto para que su índice sea calculable con
  * datos publicados.
  *
- * Un día posterior al 1 necesita también el índice del mes siguiente para
- * interpolar, así que tiene que quedar un mes más atrás que un mes entero.
+ * Días y meses tienen el mismo requisito —que el mes del punto esté publicado—
+ * porque prorratear un día usa su propio mes y el anterior, nunca el siguiente.
  */
 function desplazamientoNecesario(punto: Punto, ultimoOficial: Mes): number {
-  const necesitaMesSiguiente = esFecha(punto) && diaDe(punto) > 1;
-  const topeUtil = necesitaMesSiguiente ? sumarMeses(ultimoOficial, -1) : ultimoOficial;
-  return Math.max(0, diffMeses(topeUtil, mesDe(punto)));
+  return Math.max(0, diffMeses(ultimoOficial, mesDe(punto)));
 }
 
 function correr(punto: Punto, meses: number): Punto {
   if (meses === 0) return punto;
   const mes = sumarMeses(mesDe(punto), -meses);
   return esFecha(punto) ? `${mes}-${punto.slice(8, 10)}` : mes;
+}
+
+/**
+ * El mes más nuevo que hace falta tener publicado para poder ubicar un punto.
+ *
+ * Un mes entero necesita su propio índice. Un día necesita el de su mes y el del
+ * anterior, salvo el día 1, que es exactamente el cierre del mes anterior y por eso
+ * no necesita el suyo. Esa excepción no es un detalle: sin ella, el tramo que va del
+ * 1 de junio al 1 de julio queda marcado como estimado porque "julio no salió",
+ * cuando lo que contiene es la inflación de junio, ya publicada.
+ */
+function mesTopeNecesario(punto: Punto): Mes {
+  const mes = mesDe(punto);
+  return esFecha(punto) && diaDe(punto) === 1 ? sumarMeses(mes, -1) : mes;
+}
+
+/**
+ * Si el tramo entre dos puntos consecutivos del desglose abarca un mes calendario
+ * completo. Con meses enteros siempre; con días, sólo cuando va del 1 de un mes al 1
+ * del siguiente. Las puntas del período nunca lo cumplen.
+ */
+function cubreUnMesEntero(a: Punto, b: Punto): boolean {
+  const arrancaElUno = (p: Punto) => !esFecha(p) || diaDe(p) === 1;
+  return (
+    arrancaElUno(a) && arrancaElUno(b) && Math.abs(diffMeses(mesDe(a), mesDe(b))) === 1
+  );
 }
 
 /** El extremo más nuevo del intervalo, sin importar en qué orden vinieron. */
@@ -249,14 +276,14 @@ function armarResultado(
   puntos: Punto[],
   idx: Indice,
   metodo: Metodo,
-  esProyeccion: (punto: Punto) => boolean,
+  esProyeccion: (punto: Punto, anterior: Punto | null) => boolean,
 ): Resultado {
   const indiceBase = idx.valorEn(puntos[0]!);
 
   const desglose: Fila[] = puntos.map((punto, i) => {
     const indice = idx.valorEn(punto);
     const previo = i === 0 ? null : idx.valorEn(puntos[i - 1]!);
-    const proyectado = esProyeccion(punto);
+    const proyectado = esProyeccion(punto, i === 0 ? null : puntos[i - 1]!);
     return {
       punto,
       indice,
@@ -265,6 +292,7 @@ function armarResultado(
       monto: (monto * indice) / indiceBase,
       esProyeccion: proyectado,
       origen: proyectado ? "proyeccion" : idx.origenDe(mesDe(punto)),
+      esParcial: i > 0 && !cubreUnMesEntero(puntos[i - 1]!, punto),
     };
   });
 
@@ -356,25 +384,24 @@ function calcularProyectando(
           ? idx.valorEn(m)
           : ultimoIndice * Math.pow(1 + tasa / 100, diffMeses(ultimoOficial, m));
 
-      const inicio = indiceDe(mes);
-      if (!esFecha(punto) || diaDe(punto) === 1) return inicio;
-      const siguiente = indiceDe(sumarMeses(mes, 1));
-      return inicio * Math.pow(siguiente / inicio, fraccionDeMes(punto));
+      if (!esFecha(punto)) return indiceDe(mes);
+      return interpolarEnMes(indiceDe(sumarMeses(mes, -1)), indiceDe(mes), punto);
     },
   };
 
-  const esProyeccion = (punto: Punto): boolean => {
-    const comparacion = compararMeses(mesDe(punto), ultimoOficial);
-    if (comparacion > 0) return true;
-    // Un día posterior al 1 del último mes publicado ya necesita el índice del mes
-    // siguiente, que no existe: es en parte proyección aunque su mes sí esté.
-    return comparacion === 0 && esFecha(punto) && diaDe(punto) > 1;
-  };
+  // Una fila es una estimación si el tramo que representa necesita algún mes sin
+  // publicar. Se evalúa sobre el tramo y no sobre el punto final: la fila que va del
+  // 1 de junio al 1 de julio contiene la inflación de junio y es un dato oficial,
+  // por más que su etiqueta de punto final caiga en julio.
+  const necesitaEstimar = (punto: Punto) =>
+    compararMeses(mesTopeNecesario(punto), ultimoOficial) > 0;
+  const esProyeccion = (punto: Punto, anterior: Punto | null): boolean =>
+    necesitaEstimar(punto) || (anterior !== null && necesitaEstimar(anterior));
 
   const puntos = puntosDelRecorrido(desde, hasta);
   const mesTope = puntos
-    .filter(esProyeccion)
-    .map((p) => mesDe(p))
+    .map(mesTopeNecesario)
+    .filter((m) => compararMeses(m, ultimoOficial) > 0)
     .sort()
     .at(-1);
 

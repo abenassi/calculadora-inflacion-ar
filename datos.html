@@ -164,19 +164,42 @@
         menos vale el número, elijas la metodología que elijas.
       </p>
 
-      <h2>Meses o días</h2>
+      <h2 id="fechas-exactas">Meses o días</h2>
       <p>
         Por defecto se trabaja con meses enteros, que es como se publica el IPC y como la gente
-        piensa estos cálculos. Si activás <em>usar fechas exactas</em>, podés elegir días
-        puntuales: para una fecha dentro de un mes, el índice se interpola entre el valor de ese
-        mes y el del siguiente, en proporción a los días transcurridos. Es el mismo criterio con el
-        que el BCRA convierte el IPC mensual en el coeficiente diario CER.
+        piensa estos cálculos. Si activás <em>usar fechas exactas</em>, podés elegir días puntuales.
       </p>
       <p>
-        Ojo con una consecuencia: cualquier día posterior al 1 del último mes publicado necesita el
-        índice del mes siguiente, que todavía no existe. Por eso una fecha de un mes ya publicado
-        puede igualmente caer en el segundo caso de arriba y resolverse con la ventana de meses
-        recientes.
+        El INDEC publica un solo número por mes, no uno por día. Cuando elegís fechas exactas, a los
+        días sueltos de las puntas les damos la parte proporcional de la inflación de su mes: si de
+        mayo usás 9 días, contamos 9 de las 31 partes de lo que subió mayo, repartidas parejo día a
+        día. Las filas del medio siguen siendo meses completos.
+      </p>
+      <p>
+        Por eso las filas de arriba y de abajo de la tabla aparecen marcadas como
+        <strong>prorrateado</strong> y no con el sello del INDEC: ese porcentaje no es un número que
+        el INDEC haya publicado, es una cuenta nuestra sobre un dato suyo. Las del medio sí llevan
+        el sello, porque son meses enteros tal como los publicó.
+      </p>
+      <p>
+        <strong>Ningún reparto por día puede ser exacto</strong>, y conviene saber por qué. El
+        índice de un mes sale de precios relevados a lo largo de todo ese mes, no de una foto de un
+        día. Nosotros lo tomamos como el nivel al que se llega al terminar el mes, que es la lectura
+        que permite decir "en mayo la inflación fue 2,15% y usaste 9 días, así que va la parte
+        proporcional". Es una convención razonable y explicable, pero es una convención: el
+        resultado puede moverse alrededor de medio mes de inflación en cada punta.
+      </p>
+      <p>
+        Si necesitás un número que nadie pueda discutir, usá el modo por meses, que es el que viene
+        por defecto.
+      </p>
+      <p>
+        Una nota para quien conozca el <abbr title="Coeficiente de Estabilización de Referencia">CER</abbr>
+        del Banco Central: el reparto geométrico es la misma técnica, pero <strong>los números no
+        son comparables</strong>. El CER se calcula con meses ya publicados, con un retraso de
+        alrededor de dos meses, porque tiene que poder computarse todos los días sin esperar al
+        INDEC. Acá no hay retraso: usamos la inflación del mes que estás mirando. Un contrato
+        ajustado por CER entre dos fechas se movió distinto que este cálculo, y eso es esperable.
       </p>
 
       <h2>Sobre la precisión</h2>

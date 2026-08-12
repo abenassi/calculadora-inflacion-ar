@@ -82,6 +82,15 @@ export type Fila = {
   monto: number;
   esProyeccion: boolean;
   origen: Origen;
+  /**
+   * El tramo que representa la fila no cubre un mes calendario entero.
+   *
+   * Sólo pasa en modo por día, en las puntas del período. Importa porque el número
+   * de esas filas **no es un dato que el INDEC haya publicado**: es la parte
+   * proporcional que le toca a esos días. Etiquetarlas como oficiales sería
+   * atribuirle al INDEC una cuenta nuestra.
+   */
+  esParcial: boolean;
 };
 
 /**

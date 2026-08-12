@@ -265,7 +265,20 @@ proyectadas van visualmente diferenciadas. En `ventana_reciente` el pie de la ta
 aclara que las filas son los meses publicados de referencia.
 
 **Modo por día.** Opcional, apagado por defecto. Interpola el índice dentro del mes
-en proporción a los días, con el criterio del coeficiente CER del BCRA.
+en proporción a los días, prorrateando la inflación del **propio mes**.
+
+El anclaje se cambió tras una auditoría metodológica (2026-08-12). La versión
+original tomaba el índice de un mes como el nivel del **día 1**, lo que obligaba a
+pedir el índice del mes siguiente para cualquier día posterior, llevaba a decir que
+los días de mayo se ajustan con la inflación de junio, y costaba un mes de frescura
+en la ventana de referencia. Sobre el tramo 15-feb → 10-may de la serie real, el
+anclaje al día 1 daba 7,13%, a mitad de mes 7,68% y a fin de mes 8,24%: la
+convención vieja subestimaba mientras la inflación bajara. Mitad de mes es la más
+exacta pero mezcla dos meses por fila y es inexplicable para el público del sitio.
+
+También se eliminó la afirmación de que este es "el criterio del CER". Es falsa: el
+CER usa meses ya publicados con un retraso de ~2 meses, justamente para no depender
+de un dato futuro. Lo único que comparten es que el reparto es geométrico.
 
 **Gráfico.** Barras de la variación mensual del IPC en los meses que entraron en el
 cálculo, al final de la página. Chart.js.

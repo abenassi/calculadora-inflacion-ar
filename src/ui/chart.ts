@@ -25,7 +25,7 @@ import {
 } from "chart.js";
 
 import type { Resultado } from "../engine/types.js";
-import { abreviarPunto } from "../engine/mes.js";
+import { rotularFila } from "./etiquetas.js";
 import { porcentaje } from "./format.js";
 
 Chart.register(CategoryScale, LinearScale, BarController, BarElement, Tooltip);
@@ -95,7 +95,8 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
   grafico = new Chart(canvas, {
     type: "bar",
     data: {
-      labels: filas.map((f) => abreviarPunto(f.punto)),
+      // `i + 1` porque `filas` salteó la fila de origen del desglose.
+      labels: filas.map((_, i) => rotularFila(r.desglose, i + 1, true)),
       datasets: [
         {
           label: "Inflación mensual",
@@ -121,6 +122,13 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      // Sin animación, por dos razones. La primera es que el gráfico se redibuja en
+      // cada tecla del formulario, así que la animación no llega a terminar nunca y
+      // sólo produce un rebote. La segunda es que ata el dibujo a que corra
+      // `requestAnimationFrame`: si no corre, las barras quedan clavadas en altura
+      // cero y el panel se ve vacío con los ejes puestos, que es exactamente el bug
+      // que este comentario evita que alguien reintroduzca.
+      animation: false,
       interaction: { mode: "index", intersect: false },
       plugins: {
         tooltip: {
@@ -131,7 +139,8 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
             title: (items) => {
               const i = items[0]?.dataIndex ?? 0;
               const fila = filas[i]!;
-              return `${abreviarPunto(fila.punto)}${fila.esProyeccion ? " · estimado" : ""}`;
+              const marca = fila.esProyeccion ? " · estimado" : fila.esParcial ? " · prorrateado" : "";
+              return `${rotularFila(r.desglose, i + 1)}${marca}`;
             },
             label: (item) => {
               const fila = filas[item.dataIndex]!;

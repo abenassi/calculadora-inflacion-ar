@@ -540,6 +540,15 @@ button:focus-visible {
   color: var(--text-secondary);
 }
 
+/*
+ * Prorrateado no es una advertencia como `estimado`: el dato de fondo es del
+ * INDEC. Pero tampoco puede llevar el sello, así que va neutro.
+ */
+.origen--prorrateado {
+  border-style: dashed;
+  color: var(--text-secondary);
+}
+
 .origen--proyeccion {
   border-color: var(--warning);
   background: var(--wash-estimado);
