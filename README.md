@@ -181,6 +181,19 @@ sola llamada de red a nadie: lee un JSON que está commiteado en el repo.
   `Date` y sin líos de zona horaria.
 - El build usa `base: "./"`, así que el mismo artefacto sirve desde un dominio propio
   y desde un subpath de `github.io`. No hay que recompilar para cambiar de uno a otro.
+- `src/ui/analytics.ts` — medición de uso que no guarda IP ni usa cookies. Ver abajo.
+
+### El analytics no se copia prendido
+
+`src/ui/analytics.ts` sólo emite desde los hostnames listados en su mapa `SITIOS`. Tu
+fork, desplegado en cualquier otro lado o corriendo en `localhost`, **no manda nada**: no
+hay red, no hay endpoint, no hay que acordarse de apagar nada ni pedir una key.
+
+Si querés el tuyo, agregá tu hostname al mapa y apuntá `ENDPOINT` a tu backend. El diseño
+está en [`docs/decisiones/0008`](docs/decisiones/0008-analytics-sin-guardar-la-ip.md) y
+vale la pena aunque uses otra herramienta: el visitante sale de un hash con una sal que
+rota a diario y se borra a los dos días, así que se pueden contar personas sin guardar la
+IP, sin identificador persistente y —esto es lo práctico— **sin banner de cookies**.
 
 ### Un consejo que nos costó aprender
 

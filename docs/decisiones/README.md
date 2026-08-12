@@ -20,6 +20,7 @@ arquitectura y la que probablemente quieras copiar tal cual.
 | [0005](0005-precision-y-divergencia-con-el-mcp.md) | El sitio no coincide con el MCP en plazos largos | Y es a propósito |
 | [0006](0006-la-senda-mensual-del-rem.md) | La senda del REM no existía y la indexamos | Cómo se agrega una serie que no está en ninguna API |
 | [0007](0007-como-revisamos-esto.md) | Dos revisores de perfiles opuestos | El método que encontró casi todos los errores de este repo |
+| [0008](0008-analytics-sin-guardar-la-ip.md) | Analytics propio, sin guardar la IP | Cómo medir de verdad sin volverse una base de datos personales |
 
 ## Formato
 

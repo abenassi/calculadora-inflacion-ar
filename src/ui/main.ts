@@ -10,6 +10,7 @@
  */
 
 import { adjust, mesActual, RangoError, tasaMensualDelRem } from "../engine/adjust.js";
+import * as analytics from "./analytics.js";
 import {
   abreviarPunto,
   aOrdinal,
@@ -465,6 +466,27 @@ function armarExplicacion(r: Resultado): string {
   return lineas.join("\n");
 }
 
+/**
+ * El cálculo se recomputa en cada tecla del monto, así que el evento se emite recién cuando la
+ * consulta se asienta. Sin esto, escribir "520000" emitiría seis eventos y la mediana de montos
+ * mediría lo que la gente tipea a mitad de camino ($5, $52, $520…) en vez de lo que quiso
+ * consultar. Los 1200 ms son cómodos para tipear un monto sin cortar en el medio.
+ */
+let temporizadorEvento: number | undefined;
+let ultimoEventoEmitido = "";
+
+function anotarCalculo(r: Resultado): void {
+  clearTimeout(temporizadorEvento);
+  temporizadorEvento = setTimeout(() => {
+    // Además del debounce, no repetir una consulta idéntica: volver a la metodología anterior o
+    // repintar no son consultas nuevas y contarlas infla los totales.
+    const firma = `${r.monto}|${r.desde}|${r.hasta}|${r.metodologia}`;
+    if (firma === ultimoEventoEmitido) return;
+    ultimoEventoEmitido = firma;
+    analytics.calculo(r);
+  }, 1200) as unknown as number;
+}
+
 function calcular(): void {
   const error = el("error");
   try {
@@ -479,6 +501,7 @@ function calcular(): void {
     el("bloque-principal").hidden = false;
     pintarResultado(r);
     sincronizarUrl(monto, r.desde, r.hasta, metodologia);
+    anotarCalculo(r);
   } catch (e) {
     ultimoResultado = null;
     error.textContent = e instanceof RangeError ? e.message : "No se pudo calcular.";
@@ -641,14 +664,22 @@ async function iniciar(): Promise<void> {
     calcular();
   });
   el("formulario").addEventListener("submit", (ev) => ev.preventDefault());
-  el("usar-dias").addEventListener("change", alternarModo);
-  el("metodologia").addEventListener("change", calcular);
+  el("usar-dias").addEventListener("change", () => {
+    alternarModo();
+    analytics.cambioModo(el<HTMLInputElement>("usar-dias").checked ? "fecha" : "mes");
+  });
+  el("metodologia").addEventListener("change", () => {
+    calcular();
+    analytics.cambioMetodologia(leerMetodologia());
+  });
 
-  el<HTMLButtonElement>("copiar").addEventListener("click", (ev) =>
-    copiar(ev.currentTarget as HTMLButtonElement, location.href, "Copiá de la barra ↑"),
-  );
+  el<HTMLButtonElement>("copiar").addEventListener("click", (ev) => {
+    analytics.evento("compartir");
+    copiar(ev.currentTarget as HTMLButtonElement, location.href, "Copiá de la barra ↑");
+  });
   el<HTMLButtonElement>("copiar-explicacion").addEventListener("click", (ev) => {
     if (!ultimoResultado) return;
+    analytics.evento("copiar");
     copiar(
       ev.currentTarget as HTMLButtonElement,
       armarExplicacion(ultimoResultado),
@@ -656,6 +687,9 @@ async function iniciar(): Promise<void> {
     );
   });
   el("csv").addEventListener("click", descargarCsv);
+
+  analytics.pageview();
+  analytics.engancharClics();
 
   calcular();
 }
