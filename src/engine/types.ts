@@ -39,21 +39,25 @@ export type FuenteSerie = {
 
 /**
  * Expectativa de inflación del REM (Relevamiento de Expectativas de Mercado) del
- * BCRA, que releva a consultoras y bancos todos los meses.
+ * BCRA, que releva a consultoras, bancos y centros de investigación todos los meses.
  *
- * OJO con qué es este número: el REM completo publica una senda mes a mes, pero la
- * única serie del relevamiento que expone el catálogo es la **mediana de la
- * variación interanual esperada para los próximos 12 meses**. O sea, un solo número
- * por encuesta. Todo lo que el sitio puede hacer con eso es repartirlo parejo entre
- * los doce meses; no hay forma de saber cuánto de ese total esperan los analistas
- * para cada mes en particular. La interfaz tiene que decirlo.
+ * Trae dos cosas distintas y conviene no confundirlas:
+ *
+ * - `senda`: la mediana esperada **para cada mes**, tal como la publica el REM. Es
+ *   el dato bueno, pero llega hasta seis meses hacia adelante y no más: el
+ *   relevamiento no pronostica mes a mes más allá de eso.
+ * - `expectativaAnualPct`: la mediana a doce meses, un solo número. Sirve para
+ *   estirar la proyección más allá del horizonte de la senda, repartiéndola pareja.
+ *   Ahí sí es un promedio nuestro y no algo que los analistas hayan dicho.
  */
 export type ExpectativaRem = {
+  /** Mediana esperada mes a mes, ordenada. Cubre unos seis meses hacia adelante. */
+  senda: { mes: Mes; tasaPct: number }[];
   /** Mediana de inflación esperada para los próximos 12 meses, en porcentaje. */
   expectativaAnualPct: number;
-  /** Mes de la encuesta de la que sale el número. */
+  /** Mes de la encuesta de la que salen estos números. */
   mes: Mes;
-  serie: string;
+  series: string[];
   organismo: string;
 };
 
@@ -134,8 +138,12 @@ export type Metodo =
    */
   | {
       tipo: "proyeccion";
-      /** Tasa mensual aplicada a cada mes estimado, en porcentaje. */
-      tasaMensualPct: number;
+      /**
+       * Tasa mensual aplicada, en porcentaje. `null` cuando cambia mes a mes, que
+       * es lo que pasa con la senda del REM: ahí el número de cada mes está en su
+       * fila del desglose y no hay una tasa única que nombrar.
+       */
+      tasaMensualPct: number | null;
       /** Los meses sin publicar que se estimaron. */
       mesesEstimados: Mes[];
       base: BaseProyeccion;
@@ -145,10 +153,20 @@ export type BaseProyeccion =
   /** Se repite la última variación mensual publicada por el INDEC. */
   | { fuente: "ultimo_mes"; mes: Mes }
   /**
-   * Se reparte la expectativa del REM en doce meses iguales. `tasaMensualPct` es
-   * la tasa mensual equivalente, no un dato que el REM publique por separado.
+   * La senda mensual del REM. Los meses que el relevamiento pronostica van con su
+   * valor propio; los que quedan más allá de su horizonte se completan repartiendo
+   * la expectativa a doce meses, y esos se listan aparte porque son la única parte
+   * del cálculo que los analistas no dijeron.
    */
-  | { fuente: "rem"; mesEncuesta: Mes; expectativaAnualPct: number };
+  | {
+      fuente: "rem";
+      mesEncuesta: Mes;
+      expectativaAnualPct: number;
+      /** Meses tomados de la senda publicada. */
+      mesesDeLaSenda: Mes[];
+      /** Meses más allá del horizonte del REM, a tasa pareja. */
+      mesesExtrapolados: Mes[];
+    };
 
 /**
  * Qué hacer con los meses que el INDEC todavía no publicó. La elige la persona; el

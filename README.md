@@ -74,7 +74,7 @@ resultado. El default no estima nada, y es al que llega siempre quien entra de c
 |---|---|---|
 | **No estimar ninguno** (default) | Usa la inflación de los últimos N meses publicados, con N = meses del período pedido | No |
 | Inflación del último mes | Repite la última variación mensual publicada sobre los meses que pediste | Sí, marcado |
-| REM del BCRA | Reparte la expectativa del REM en doce meses iguales | Sí, marcado |
+| REM del BCRA | Usa la mediana que el REM pronostica para cada mes | Sí, marcado |
 
 La primera resuelve el uso dominante —traer un monto de mayo a hoy— sin inventar
 ningún número: de mayo a agosto pasan tres meses, así que se aplica la inflación
@@ -86,12 +86,14 @@ Las otras dos muestran los meses que pediste de verdad y completan los que falta
 una tasa mensual constante, marcada como estimación en la tabla y con trama diagonal
 en el gráfico.
 
-Sobre el REM, una limitación que vale la pena conocer: el relevamiento completo
-publica una senda mes a mes, pero la única serie disponible en el catálogo abierto es
-la **mediana de inflación esperada a doce meses** (`bcra:29`), un número por encuesta.
-El sitio lo reparte parejo entre los doce meses. Los analistas no dijeron que cada mes
-vaya a dar eso; es un promedio calculado a partir de lo que sí dijeron, y la página
-`/datos` lo aclara.
+Sobre el REM: el relevamiento publica una mediana esperada **para cada mes**, y eso es
+lo que usa el sitio (`rem:ipc_mensual`). Su horizonte mes a mes llega a unos seis
+meses; más allá, los meses restantes se completan repartiendo pareja la expectativa a
+doce meses (`bcra:29`), y el texto del resultado dice desde qué mes empieza esa parte.
+
+La senda mensual **no existía en el catálogo del MCP** hasta agosto de 2026: sólo
+estaba el número a doce meses. Se indexó a partir del histórico que publica el BCRA,
+justamente para que este sitio pudiera dejar de repartir parejo.
 
 Cuando el período pedido está enteramente publicado, las tres dan el mismo número.
 

@@ -58,7 +58,12 @@ export type OpcionesAjuste = {
   metodologia?: Metodologia;
 };
 
-/** El REM da una expectativa a 12 meses; acá se la reparte en doce meses iguales. */
+/**
+ * Tasa mensual equivalente a una expectativa a doce meses, repartida pareja.
+ *
+ * Sólo se usa para los meses que quedan más allá del horizonte de la senda del REM.
+ * Para los que la senda cubre se usa el valor que publicó el relevamiento.
+ */
 export function tasaMensualDelRem(expectativaAnualPct: number): number {
   return (Math.pow(1 + expectativaAnualPct / 100, 1 / 12) - 1) * 100;
 }
@@ -255,17 +260,31 @@ export function adjust(
     if (!rem) {
       throw new RangoError("No hay datos del REM en este snapshot.");
     }
-    return calcularProyectando(monto, desde, hasta, idx, serie, tasaMensualDelRem(rem.expectativaAnualPct), {
-      fuente: "rem",
-      mesEncuesta: rem.mes,
-      expectativaAnualPct: rem.expectativaAnualPct,
-    });
+    const senda = new Map(rem.senda.map((p) => [p.mes, p.tasaPct]));
+    const paraElResto = tasaMensualDelRem(rem.expectativaAnualPct);
+    return calcularProyectando(
+      monto,
+      desde,
+      hasta,
+      idx,
+      serie,
+      (mes) => senda.get(mes) ?? paraElResto,
+      null,
+      (mesesEstimados) => ({
+        fuente: "rem",
+        mesEncuesta: rem.mes,
+        expectativaAnualPct: rem.expectativaAnualPct,
+        mesesDeLaSenda: mesesEstimados.filter((m) => senda.has(m)),
+        mesesExtrapolados: mesesEstimados.filter((m) => !senda.has(m)),
+      }),
+    );
   }
 
-  return calcularProyectando(monto, desde, hasta, idx, serie, idx.ultimaVariacionPct, {
+  const tasa = idx.ultimaVariacionPct;
+  return calcularProyectando(monto, desde, hasta, idx, serie, () => tasa, tasa, () => ({
     fuente: "ultimo_mes",
     mes: idx.ultimoOficial,
-  });
+  }));
 }
 
 /** Arma el desglose y el resultado a partir de una lista de puntos ya calculables. */
@@ -369,20 +388,34 @@ function calcularProyectando(
   hasta: Punto,
   idx: Indice,
   serie: SerieIndice,
-  tasa: number,
-  base: BaseProyeccion,
+  tasaDe: (mes: Mes) => number,
+  /** La tasa, si es la misma todos los meses. `null` si cambia mes a mes. */
+  tasaConstante: number | null,
+  armarBase: (mesesEstimados: Mes[]) => BaseProyeccion,
 ): Resultado {
   const ultimoIndice = serie.datos.at(-1)!.indice;
   const ultimoOficial = idx.ultimoOficial;
+
+  // La tasa puede cambiar mes a mes (la senda del REM lo hace), así que el índice
+  // proyectado se encadena en vez de elevar una tasa única a la cantidad de meses.
+  // Memorizado porque `valorEn` se llama varias veces por fila.
+  const proyectados = new Map<Mes, number>();
+  const indiceProyectado = (m: Mes): number => {
+    const cacheado = proyectados.get(m);
+    if (cacheado !== undefined) return cacheado;
+    const previo = sumarMeses(m, -1);
+    const base = compararMeses(previo, ultimoOficial) <= 0 ? ultimoIndice : indiceProyectado(previo);
+    const valor = base * (1 + tasaDe(m) / 100);
+    proyectados.set(m, valor);
+    return valor;
+  };
 
   const extendido: Indice = {
     ...idx,
     valorEn(punto: Punto): number {
       const mes = mesDe(punto);
       const indiceDe = (m: Mes) =>
-        compararMeses(m, ultimoOficial) <= 0
-          ? idx.valorEn(m)
-          : ultimoIndice * Math.pow(1 + tasa / 100, diffMeses(ultimoOficial, m));
+        compararMeses(m, ultimoOficial) <= 0 ? idx.valorEn(m) : indiceProyectado(m);
 
       if (!esFecha(punto)) return indiceDe(mes);
       return interpolarEnMes(indiceDe(sumarMeses(mes, -1)), indiceDe(mes), punto);
@@ -417,9 +450,9 @@ function calcularProyectando(
     extendido,
     {
       tipo: "proyeccion",
-      tasaMensualPct: tasa,
+      tasaMensualPct: tasaConstante,
       mesesEstimados: estimados,
-      base,
+      base: armarBase(estimados),
     },
     esProyeccion,
   );

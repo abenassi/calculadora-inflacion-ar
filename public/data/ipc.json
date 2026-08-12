@@ -14,13 +14,46 @@
     }
   ],
   "rem": {
+    "senda": [
+      {
+        "mes": "2026-07",
+        "tasaPct": 1.95
+      },
+      {
+        "mes": "2026-08",
+        "tasaPct": 1.8
+      },
+      {
+        "mes": "2026-09",
+        "tasaPct": 1.8
+      },
+      {
+        "mes": "2026-10",
+        "tasaPct": 1.655048
+      },
+      {
+        "mes": "2026-11",
+        "tasaPct": 1.633374
+      },
+      {
+        "mes": "2026-12",
+        "tasaPct": 1.8
+      },
+      {
+        "mes": "2027-01",
+        "tasaPct": 1.7
+      }
+    ],
     "expectativaAnualPct": 21.8,
     "mes": "2026-07",
-    "serie": "bcra:29",
+    "series": [
+      "bcra:29",
+      "rem:ipc_mensual"
+    ],
     "organismo": "BCRA"
   },
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-12T15:49:35.606Z",
+  "actualizado": "2026-08-12T17:43:55.794Z",
   "datos": [
     {
       "mes": "1990-01",

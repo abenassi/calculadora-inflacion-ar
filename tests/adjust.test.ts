@@ -177,9 +177,15 @@ describe("metodologías elegibles", () => {
   const conRem: SerieIndice = {
     ...irregular,
     rem: {
+      // Senda de dos meses: alcanza para distinguir el tramo pronosticado del
+      // tramo que hay que extrapolar.
+      senda: [
+        { mes: "2020-05", tasaPct: 1.2 },
+        { mes: "2020-06", tasaPct: 1.4 },
+      ],
       expectativaAnualPct: 21.8,
       mes: "2020-04",
-      serie: "bcra:29",
+      series: ["bcra:29", "rem:ipc_mensual"],
       organismo: "BCRA",
     },
   };
@@ -224,17 +230,37 @@ describe("metodologías elegibles", () => {
     expect(proyectada.desglose.map((f) => f.esProyeccion)).toEqual([false, false, true]);
   });
 
-  it("el REM reparte la expectativa anual en doce meses iguales", () => {
-    const r = adjust(1000, "2020-04", "2020-05", conRem, { hoy: "2020-05", metodologia: "rem" });
+  /**
+   * Lo que el REM efectivamente pronostica para cada mes, no un promedio nuestro.
+   * Hasta 2026-08 el catálogo sólo tenía el número a doce meses y había que
+   * repartirlo parejo; la senda mensual se indexó para poder dejar de hacer eso.
+   */
+  it("usa el valor que el REM pronosticó para cada mes", () => {
+    const r = adjust(1000, "2020-04", "2020-06", conRem, { hoy: "2020-06", metodologia: "rem" });
     if (r.metodo.tipo !== "proyeccion") throw new Error("tipo inesperado");
-    expect(r.metodo.base).toEqual({
-      fuente: "rem",
-      mesEncuesta: "2020-04",
-      expectativaAnualPct: 21.8,
-    });
+    expect(r.metodo.tasaMensualPct).toBeNull(); // cambia mes a mes
+    expect(r.desglose.slice(1).map((f) => f.varMensualPct)).toEqual([
+      expect.closeTo(1.2, 6),
+      expect.closeTo(1.4, 6),
+    ]);
+    expect(r.montoAjustado).toBeCloseTo(1000 * 1.012 * 1.014, 6);
+  });
+
+  it("más allá del horizonte de la senda reparte la expectativa a doce meses", () => {
+    const r = adjust(1000, "2020-04", "2020-08", conRem, { hoy: "2020-08", metodologia: "rem" });
+    if (r.metodo.tipo !== "proyeccion") throw new Error("tipo inesperado");
+    if (r.metodo.base.fuente !== "rem") throw new Error("base inesperada");
+    expect(r.metodo.base.mesesDeLaSenda).toEqual(["2020-05", "2020-06"]);
+    expect(r.metodo.base.mesesExtrapolados).toEqual(["2020-07", "2020-08"]);
+
     // 1,218^(1/12) − 1 = 1,657% mensual, y doce de esos meses reconstruyen el 21,8%.
-    expect(r.metodo.tasaMensualPct).toBeCloseTo(1.657, 3);
-    expect(Math.pow(1 + r.metodo.tasaMensualPct / 100, 12)).toBeCloseTo(1.218, 6);
+    const pareja = tasaMensualDelRem(21.8);
+    expect(pareja).toBeCloseTo(1.657, 3);
+    expect(Math.pow(1 + pareja / 100, 12)).toBeCloseTo(1.218, 6);
+    expect(r.montoAjustado).toBeCloseTo(
+      1000 * 1.012 * 1.014 * Math.pow(1 + pareja / 100, 2),
+      6,
+    );
   });
 
   it("pedir el REM sin datos del REM falla y no inventa una tasa", () => {

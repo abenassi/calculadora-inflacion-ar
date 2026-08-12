@@ -1,7 +1,7 @@
 /**
  * Baja las series de Argentina Data MCP y escribe el snapshot que consume el sitio.
  *
- * Corre en GitHub Actions una vez por día. Cinco llamadas de quota.
+ * Corre en GitHub Actions una vez por día. Seis llamadas de quota.
  *
  * Invariante que este script protege: **un snapshot nunca puede encoger ni perder
  * meses**. Si el MCP responde raro, o el INDEC revisa la serie hacia atrás, o una
@@ -29,7 +29,11 @@ const ID_INDEC_IPC = "indec:148.3_INIVELNAL_DICI_M_26";
 // Mediana de la inflación interanual esperada para los próximos 12 meses, del
 // Relevamiento de Expectativas de Mercado. Es la única serie del REM en el
 // catálogo: no hay senda mes a mes.
-const ID_REM = "bcra:29";
+const ID_REM_ANUAL = "bcra:29";
+// Senda mensual del REM: la mediana esperada para cada uno de los próximos ~6
+// meses. Se indexó en el MCP en 2026-08 justamente para este sitio; antes sólo
+// existía el número a 12 meses y había que repartirlo parejo.
+const ID_REM_MENSUAL = "rem:ipc_mensual";
 
 function aPuntos(datos: { fecha: string; valor: number }[]): PuntoCrudo[] {
   return datos
@@ -88,18 +92,35 @@ async function escribirSiMejora(archivo: string, contenido: unknown, minimoDatos
  */
 async function traerRem(): Promise<ExpectativaRem | undefined> {
   try {
-    const serie = await traerSerie(ID_REM, { fecha_desde: "2024-01-01" });
-    const ultimo = serie.datos.at(-1);
+    const [anual, mensual] = await Promise.all([
+      traerSerie(ID_REM_ANUAL, { fecha_desde: "2024-01-01" }),
+      traerSerie(ID_REM_MENSUAL, { fecha_desde: "2024-01-01" }),
+    ]);
+
+    const ultimo = anual.datos.at(-1);
     if (!ultimo || !Number.isFinite(ultimo.valor)) {
-      console.warn("  REM: la serie vino vacía, se omite");
+      console.warn("  REM: la serie a 12 meses vino vacía, se omite");
       return undefined;
     }
-    console.log(`  REM: ${ultimo.valor}% esperado a 12 meses (encuesta de ${aMes(ultimo.fecha)})`);
+
+    // La senda incluye meses ya publicados por el INDEC (el REM también nowcastea
+    // el mes en curso). Esos no interesan: el sitio usa el dato real cuando existe.
+    const encuesta = aMes(ultimo.fecha);
+    const senda = mensual.datos
+      .map((d) => ({ mes: aMes(d.fecha), tasaPct: d.valor }))
+      .filter((p) => Number.isFinite(p.tasaPct))
+      .sort((a, b) => a.mes.localeCompare(b.mes));
+
+    console.log(
+      `  REM: ${ultimo.valor}% a 12 meses y senda de ${senda.length} meses ` +
+        `(hasta ${senda.at(-1)?.mes ?? "—"}), encuesta de ${encuesta}`,
+    );
     return {
+      senda,
       expectativaAnualPct: ultimo.valor,
-      mes: aMes(ultimo.fecha),
-      serie: ID_REM,
-      organismo: serie.fuente,
+      mes: encuesta,
+      series: [ID_REM_ANUAL, ID_REM_MENSUAL],
+      organismo: anual.fuente,
     };
   } catch (e: unknown) {
     console.warn(`  REM: no se pudo traer (${(e as Error).message}), se omite`);
@@ -142,7 +163,18 @@ async function construirIpc(): Promise<SerieIndice> {
         rango: `${primerIndec}/${ultimoOficial}`,
       },
     ],
-    ...(rem ? { rem } : {}),
+    // La senda del REM arranca en 2024 porque incluye los nowcasts de cada
+    // encuesta pasada. El sitio sólo proyecta hacia adelante, así que se guardan
+    // los meses que el INDEC todavía no publicó y nada más: lo demás engorda el
+    // snapshot y confunde a quien lo lea en el repo.
+    ...(rem
+      ? {
+          rem: {
+            ...rem,
+            senda: rem.senda.filter((p) => p.mes > ultimoOficial),
+          },
+        }
+      : {}),
     ultimo_oficial: ultimoOficial,
     actualizado: new Date().toISOString(),
     datos,

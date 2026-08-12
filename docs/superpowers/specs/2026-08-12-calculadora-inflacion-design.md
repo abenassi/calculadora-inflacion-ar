@@ -199,7 +199,7 @@ discreto debajo del resultado):
 |---|---|---|
 | `sin_proyectar` | — sólo proyecta si el destino es futuro, y ahí repite el último mes | ✅ |
 | `repite_ultimo` | Última variación mensual publicada | |
-| `rem` | `(1 + REM/100)^(1/12) − 1`, con REM = mediana a 12 meses de `bcra:29` | |
+| `rem` | La mediana que el REM pronostica para cada mes (`rem:ipc_mensual`); más allá de su horizonte, `(1 + REM/100)^(1/12) − 1` con `bcra:29` | |
 
 `proyeccion.base` discrimina de dónde salió la tasa (`ultimo_mes` | `rem`); las dos
 comparten toda la maquinaria de extrapolación porque la única diferencia real entre
@@ -209,12 +209,21 @@ El default nunca se persiste entre visitas: quien entra de cero ve siempre la
 metodología que no estima nada. Un link con `?metodo=` sí se respeta, porque es una
 elección explícita de quien compartió.
 
-**Limitación del REM, asumida a conciencia.** El relevamiento publica una senda mes a
-mes, pero la única serie del REM en el catálogo es la mediana de inflación esperada a
-doce meses: un número por encuesta. El sitio lo reparte parejo. No es lo que los
-analistas proyectaron para cada mes, y `/datos` lo dice con esas palabras. Si alguna
-vez aparece la senda mensual en el catálogo, `BaseProyeccion` es el lugar donde
-entraría una tercera variante sin tocar el resto.
+**El REM, y una limitación que se resolvió indexando datos nuevos.** La primera
+versión sólo tenía la mediana a doce meses (`bcra:29`) y la repartía pareja, que no es
+lo que los analistas proyectaron para cada mes. La senda mensual no estaba en ninguna
+API: `datos.gob.ar` la republica pero congelada en 2025-12, y la del BCRA vive en el
+Excel histórico del relevamiento, en una URL fija que se sobrescribe cada mes. Se
+indexó como `rem:ipc_mensual` y ahora el sitio usa el valor de cada mes.
+
+Queda un límite real: el REM pronostica mes a mes sólo unos **seis meses** hacia
+adelante, no doce. Más allá se sigue repartiendo pareja la expectativa anual, y
+`BaseProyeccion` distingue `mesesDeLaSenda` de `mesesExtrapolados` para que la
+interfaz pueda decir dónde termina el pronóstico y empieza la cuenta nuestra.
+
+Por eso `Metodo.proyeccion.tasaMensualPct` es `number | null`: con la senda, cada mes
+tiene su tasa y no hay una sola que nombrar. El índice proyectado se encadena mes a
+mes en vez de elevar una tasa única.
 
 `ventana_reciente` **no estima nada**: todos los números son del INDEC. Tampoco es la
 inflación del período pedido, sino la del período publicado más reciente de igual

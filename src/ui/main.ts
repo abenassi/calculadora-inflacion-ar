@@ -9,7 +9,7 @@
  * si había elegido bien.
  */
 
-import { adjust, mesActual, RangoError } from "../engine/adjust.js";
+import { adjust, mesActual, RangoError, tasaMensualDelRem } from "../engine/adjust.js";
 import {
   abreviarPunto,
   aOrdinal,
@@ -242,17 +242,39 @@ function explicarMetodo(r: Resultado): string {
         `${plural(n, "ese mes se estima", "esos meses se estiman")} `;
 
       if (base.fuente === "rem") {
+        const { mesesDeLaSenda, mesesExtrapolados } = base;
+        const rem = `REM del BCRA (encuesta de ${nombrarMes(base.mesEncuesta)})`;
+
+        // La senda llega hasta unos seis meses; más allá no hay pronóstico mes a mes
+        // y hay que repartir el número a doce meses. Esa parte es una cuenta
+        // nuestra, no algo que los analistas hayan dicho, así que va nombrada aparte.
+        if (mesesExtrapolados.length === 0) {
+          return (
+            `${faltan}con el ${rem}: los analistas pronosticaron un valor para cada uno de ` +
+            `esos meses, y son los que ves en la columna Subió.`
+          );
+        }
+        if (mesesDeLaSenda.length === 0) {
+          return (
+            `${faltan}con el ${rem}. Su pronóstico mes a mes no llega tan lejos, así que se ` +
+            `reparte pareja su expectativa a doce meses ` +
+            `(${porcentaje(base.expectativaAnualPct, false)}), o sea ` +
+            `${porcentaje(tasaMensualDelRem(base.expectativaAnualPct))} por mes.`
+          );
+        }
         return (
-          `${faltan}con el REM del BCRA: en la encuesta de ${nombrarMes(base.mesEncuesta)}, ` +
-          `los analistas esperaban ${porcentaje(base.expectativaAnualPct, false)} de inflación ` +
-          `para los doce meses siguientes, que repartido mes a mes da ` +
-          `${porcentaje(tasaMensualPct)} por mes.`
+          `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}. Hasta ` +
+          `${nombrarMes(mesesDeLaSenda.at(-1)!)} se usa el pronóstico mes a mes del ${rem}. ` +
+          `De ahí en adelante el REM ya no llega, así que ${frasearMeses(mesesExtrapolados)} ` +
+          `${plural(mesesExtrapolados.length, "sale", "salen")} de repartir pareja su expectativa ` +
+          `a doce meses (${porcentaje(base.expectativaAnualPct, false)}), o sea ` +
+          `${porcentaje(tasaMensualDelRem(base.expectativaAnualPct))} por mes.`
         );
       }
 
       return (
         `${faltan}repitiendo la última inflación publicada, la de ` +
-        `${nombrarMes(base.mes)} (${porcentaje(tasaMensualPct)}).`
+        `${nombrarMes(base.mes)} (${porcentaje(tasaMensualPct ?? 0)}).`
       );
     }
   }
@@ -299,11 +321,14 @@ function explicarTabla(r: Resultado): string {
         base.fuente === "rem"
           ? `el REM del BCRA de ${nombrarMes(base.mesEncuesta)}`
           : `la inflación de ${nombrarMes(base.mes)}`;
+      // Con la senda del REM cada mes tiene su propia tasa y está en su fila, así
+      // que nombrar "una" tasa sería inventar un promedio que no se usó.
+      const aQueTasa = tasaMensualPct === null ? "" : `, a ${porcentaje(tasaMensualPct)} por mes`;
       return (
         `Estos son los meses que pediste. ${plural(proyectadas, "La fila resaltada", `Las ${proyectadas} filas resaltadas`)} ` +
         `${plural(proyectadas, "es un tramo proyectado", "son tramos proyectados")}, que el INDEC ` +
-        `todavía no publicó: ${plural(proyectadas, "se estimó", "se estimaron")} con ${de}, a ` +
-        `${porcentaje(tasaMensualPct)} por mes. El resto son datos oficiales.` + aclararParciales(r)
+        `todavía no publicó: ${plural(proyectadas, "se estimó", "se estimaron")} con ${de}` +
+        `${aQueTasa}. El resto son datos oficiales.` + aclararParciales(r)
       );
     }
   }
@@ -553,10 +578,14 @@ function descargarCsv(): void {
     const { base } = r.metodo;
     filas.push(
       ["# base_proyeccion", base.fuente],
-      ["# tasa_mensual_aplicada_pct", r.metodo.tasaMensualPct.toFixed(4)],
+      ["# tasa_mensual_aplicada_pct", r.metodo.tasaMensualPct?.toFixed(4) ?? "varía por mes"],
       ["# meses_estimados", r.metodo.mesesEstimados.join(" ")],
       base.fuente === "rem"
-        ? ["# rem_encuesta", `${base.mesEncuesta} ${base.expectativaAnualPct}% a 12 meses`]
+        ? [
+            "# rem_encuesta",
+            `${base.mesEncuesta} · senda: ${base.mesesDeLaSenda.join(" ") || "—"} · ` +
+              `extrapolados a ${base.expectativaAnualPct}% anual: ${base.mesesExtrapolados.join(" ") || "—"}`,
+          ]
         : ["# mes_base", base.mes],
     );
   }
