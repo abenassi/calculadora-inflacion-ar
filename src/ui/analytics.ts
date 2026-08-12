@@ -141,18 +141,40 @@ export function cambioModo(modo: "mes" | "fecha"): void {
   evento("modo", { modo });
 }
 
+const HOST_MCP = "argentinadata.mymcps.dev";
+
 /**
- * Engancha los clics que salen del sitio.
+ * Le pone `?ref=calculadora` a los links al MCP, para que del otro lado se sepa que la visita
+ * (y con suerte la suscripción) vino de acá.
  *
- * A los links al MCP les agrega `?ref=calculadora` además de emitir el evento: el evento dice
- * cuánta gente se fue, y el parámetro es lo que permite que del otro lado se sepa que una visita
- * (y con suerte una suscripción) vino de acá.
+ * Se hace al cargar y NO al hacer clic. Hacerlo en el handler del clic parece equivalente y no lo
+ * es: se pierde en todo lo que no es un clic izquierdo común —abrir en pestaña nueva, clic del
+ * medio, "copiar dirección del enlace", compartir— que es justo cómo se propaga un link que a
+ * alguien le interesó. El atributo tiene que estar puesto antes de que el usuario haga nada.
+ */
+function marcarLinksMcp(): void {
+  for (const link of document.querySelectorAll<HTMLAnchorElement>(`a[href*="${HOST_MCP}"]`)) {
+    try {
+      const url = new URL(link.href, location.href);
+      if (url.hostname !== HOST_MCP || url.searchParams.has("ref")) continue;
+      url.searchParams.set("ref", "calculadora");
+      link.href = url.toString();
+    } catch {
+      // Un href que no parsea no es nuestro problema; se deja como está.
+    }
+  }
+}
+
+/**
+ * Engancha los clics que salen del sitio y marca los links al MCP.
  *
- * Va con delegación en el document y no con listeners por link porque el `<main>` se repinta en
- * cada cálculo: un listener por nodo se perdería en el primer repintado.
+ * Los clics van con delegación en el document y no con listeners por link porque el `<main>` se
+ * repinta en cada cálculo: un listener por nodo se perdería en el primer repintado.
  */
 export function engancharClics(): void {
   if (!SITIO) return;
+
+  marcarLinksMcp();
 
   document.addEventListener("click", (ev) => {
     const link = (ev.target as HTMLElement | null)?.closest?.("a[href]");
@@ -166,13 +188,11 @@ export function engancharClics(): void {
     }
     if (host === location.hostname) return;
 
-    if (host === "argentinadata.mymcps.dev") {
-      const url = new URL(link.href);
-      if (!url.searchParams.has("ref")) {
-        url.searchParams.set("ref", "calculadora");
-        link.href = url.toString();
-      }
-      evento("clic_mcp", { destino: url.pathname });
+    if (host === HOST_MCP) {
+      // `marcarLinksMcp()` ya le puso el ref al cargar; acá se vuelve a intentar sólo por si el
+      // link apareció después. Lo que importa de este handler es el evento.
+      marcarLinksMcp();
+      evento("clic_mcp", { destino: new URL(link.href).pathname });
       return;
     }
 
