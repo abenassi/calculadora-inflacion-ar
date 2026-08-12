@@ -112,21 +112,6 @@
         </p>
       </section>
 
-      <section class="tarjeta panel" id="panel-grafico">
-        <div class="panel__cabecera">
-          <h2 id="titulo-grafico">Evolución del monto</h2>
-          <p class="leyenda-inline">
-            <span class="muestra muestra--oficial" aria-hidden="true"></span> dato oficial
-            <span id="leyenda-estimado"
-              ><span class="muestra muestra--estimado" aria-hidden="true"></span> estimado</span
-            >
-          </p>
-        </div>
-        <div class="grafico">
-          <canvas id="grafico" role="img" aria-label="Evolución del monto ajustado por inflación"></canvas>
-        </div>
-      </section>
-
       <section class="tarjeta panel">
         <div class="panel__cabecera">
           <h2 id="titulo-tabla">El cálculo, paso a paso</h2>
@@ -153,6 +138,25 @@
           </table>
         </div>
         <p class="pie-tabla" id="pie-tabla"></p>
+      </section>
+
+      <section class="tarjeta panel" id="panel-grafico">
+        <div class="panel__cabecera">
+          <h2 id="titulo-grafico">Inflación mensual</h2>
+          <p class="leyenda-inline">
+            <span class="muestra muestra--oficial" aria-hidden="true"></span> dato oficial
+            <span id="leyenda-estimado"
+              ><span class="muestra muestra--estimado" aria-hidden="true"></span> estimado</span
+            >
+          </p>
+        </div>
+        <div class="grafico">
+          <canvas
+            id="grafico"
+            role="img"
+            aria-label="Inflación mensual del IPC en los meses usados para el cálculo"
+          ></canvas>
+        </div>
       </section>
     </main>
 

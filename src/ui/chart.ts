@@ -1,31 +1,34 @@
 /**
- * Gráfico de la evolución del monto.
+ * Gráfico de la inflación mensual del IPC en los meses que entraron en el cálculo.
+ *
+ * Antes graficaba la evolución del monto, y no decía nada: un monto ajustado por
+ * inflación siempre sube, así que la curva era la misma forma para cualquier
+ * consulta. Lo que sí varía —y lo que la persona necesita para defender el
+ * porcentaje que aplicó— es cuánto subió cada mes.
  *
  * Una sola serie, así que no lleva caja de leyenda: el título nombra qué se está
- * viendo. Lo único que hay que distinguir dentro de la serie es el tramo oficial
- * del proyectado, y eso va por trazo (continuo vs punteado) además de por la
- * leyenda inline del encabezado — nunca por color solo.
+ * viendo. Lo único que hay que distinguir dentro de la serie es el mes oficial del
+ * estimado, y eso va por trama diagonal además de por la leyenda inline del
+ * encabezado — nunca por color solo.
  *
  * Colores tomados de la paleta de referencia (slot categórico 1), validados contra
  * ambas superficies con el validador del skill de dataviz.
  */
 
 import {
+  BarController,
+  BarElement,
   CategoryScale,
   Chart,
-  Filler,
   LinearScale,
-  LineController,
-  LineElement,
-  PointElement,
   Tooltip,
 } from "chart.js";
 
 import type { Resultado } from "../engine/types.js";
 import { abreviarPunto } from "../engine/mes.js";
-import { pesos, porcentaje } from "./format.js";
+import { porcentaje } from "./format.js";
 
-Chart.register(CategoryScale, LinearScale, LineController, LineElement, PointElement, Filler, Tooltip);
+Chart.register(CategoryScale, LinearScale, BarController, BarElement, Tooltip);
 
 type Tokens = {
   serie: string;
@@ -47,40 +50,71 @@ function tokens(): Tokens {
   };
 }
 
+/**
+ * Trama diagonal para las barras estimadas.
+ *
+ * La distinción oficial/estimado no puede depender del color: es lo que separa un
+ * dato de una cuenta nuestra. Con trama sobrevive al daltonismo, a la impresión en
+ * blanco y negro y al modo de alto contraste.
+ */
+function trama(color: string, fondo: string): CanvasPattern | string {
+  const tile = document.createElement("canvas");
+  tile.width = 6;
+  tile.height = 6;
+  const ctx = tile.getContext("2d");
+  if (!ctx) return color;
+
+  ctx.fillStyle = fondo;
+  ctx.fillRect(0, 0, 6, 6);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  // Tres trazos: el central más los dos que cierran el calce con la baldosa
+  // vecina, para que la diagonal no se corte en los bordes del patrón.
+  ctx.moveTo(0, 6);
+  ctx.lineTo(6, 0);
+  ctx.moveTo(-1, 1);
+  ctx.lineTo(1, -1);
+  ctx.moveTo(5, 7);
+  ctx.lineTo(7, 5);
+  ctx.stroke();
+
+  return ctx.createPattern(tile, "repeat") ?? color;
+}
+
 let grafico: Chart | null = null;
 
 export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
   const t = tokens();
-  const filas = r.desglose;
-  const primerProyectado = filas.findIndex((f) => f.esProyeccion);
+  // La primera fila es el punto de origen: no tiene variación propia, sólo fija el
+  // monto de partida. Graficarla como una barra en cero sería una lectura falsa.
+  const filas = r.desglose.slice(1);
+  const estimada = trama(t.serie, t.superficie);
 
   grafico?.destroy();
   grafico = new Chart(canvas, {
-    type: "line",
+    type: "bar",
     data: {
       labels: filas.map((f) => abreviarPunto(f.punto)),
       datasets: [
         {
-          label: "Monto ajustado",
-          data: filas.map((f) => f.monto),
+          label: "Inflación mensual",
+          data: filas.map((f) => f.varMensualPct ?? 0),
+          backgroundColor: filas.map((f) => (f.esProyeccion ? estimada : t.serie)),
           borderColor: t.serie,
-          backgroundColor: "transparent",
-          borderWidth: 2,
-          pointRadius: 0,
-          // 10px de diámetro al pasar el mouse: blanco de sobra para el puntero.
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: t.serie,
-          // Anillo de superficie de 2px sobre la marca, para que el punto no se
-          // funda con la línea ni con la grilla.
-          pointHoverBorderColor: t.superficie,
-          pointHoverBorderWidth: 2,
-          tension: 0.15,
-          segment: {
-            // El tramo proyectado va punteado. Es la distinción que da sentido al
-            // producto entero, así que no puede depender del color.
-            borderDash: (ctx) =>
-              primerProyectado > 0 && ctx.p1DataIndex >= primerProyectado ? [5, 4] : undefined,
-          },
+          borderWidth: filas.map((f) => (f.esProyeccion ? 1 : 0)),
+          // Punta redondeada del lado del dato; el extremo apoyado en la línea de
+          // cero queda recto. Con deflación la barra baja y Chart.js invierte el
+          // lado sin que haya que hacer nada.
+          borderRadius: 4,
+          borderSkipped: "start",
+          // Con tres o cuatro meses, barras finas quedan como islas en un
+          // panel vacío. El tope alto las deja legibles sin deformarlas cuando
+          // el período es largo.
+          maxBarThickness: 72,
+          // 2px de superficie entre barras vecinas.
+          categoryPercentage: 0.8,
+          barPercentage: 0.9,
         },
       ],
     },
@@ -101,9 +135,9 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
             },
             label: (item) => {
               const fila = filas[item.dataIndex]!;
-              const partes = [pesos(fila.monto)];
+              const partes = [`Inflación del mes: ${porcentaje(fila.varMensualPct ?? 0)}`];
               if (fila.acumuladoPct !== null) {
-                partes.push(`${porcentaje(fila.acumuladoPct)} desde el origen`);
+                partes.push(`${porcentaje(fila.acumuladoPct)} acumulado`);
               }
               return partes;
             },
@@ -114,17 +148,21 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
         x: {
           grid: { display: false },
           border: { color: t.grilla },
-          ticks: { color: t.eje, maxRotation: 0, autoSkipPadding: 16, font: { size: 11 } },
+          ticks: { color: t.eje, maxRotation: 0, autoSkipPadding: 12, font: { size: 11 } },
         },
         y: {
+          // Siempre desde cero: es una tasa, y recortar la base exagera
+          // visualmente diferencias de décimas.
+          beginAtZero: true,
           grid: { color: t.grilla },
           border: { display: false },
           ticks: {
             color: t.eje,
             font: { size: 11 },
             maxTicksLimit: 6,
+            // Los ticks son valores redondos: "1%" se lee mejor que "1,00%".
             callback: (v) =>
-              new Intl.NumberFormat("es-AR", { notation: "compact" }).format(Number(v)),
+              `${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 }).format(Number(v))}%`,
           },
         },
       },

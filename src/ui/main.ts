@@ -160,26 +160,32 @@ function plural(n: number, singular: string, plural: string): string {
   return n === 1 ? singular : plural;
 }
 
+/** El resultado dicho en una línea, antes de explicar de dónde sale. */
+function resumir(r: Resultado): string {
+  return `${pesos(r.monto)} de ${nombrarPunto(r.desde)}, con ${frasearVariacion(r.variacionPct)}.`;
+}
+
 /**
- * El párrafo que explica cómo se llegó al número.
+ * Por qué el número es ese y con qué meses se calculó.
  *
  * Es lo único que separa un resultado defendible de un número que apareció solo.
  * Tiene que nombrar los meses concretos que se usaron, siempre.
+ *
+ * Va separado de `resumir` porque el texto que se copia ya trae el monto y el
+ * porcentaje en sus primeras dos líneas: repetirlos ahí lee como un error.
  */
-function explicar(r: Resultado): string {
-  const encabezado = `${pesos(r.monto)} de ${nombrarPunto(r.desde)}, con ${frasearVariacion(r.variacionPct)}.`;
-
+function explicarMetodo(r: Resultado): string {
   switch (r.metodo.tipo) {
     case "directo":
-      return `${encabezado} Todos los meses del cálculo son datos oficiales ya publicados por el INDEC.`;
+      return "Todos los meses del cálculo son datos oficiales ya publicados por el INDEC.";
 
     case "ventana_reciente": {
       const { mesesDelPeriodo, mesesSinPublicar } = r.metodo;
       const contexto =
-        `${encabezado} De ${nombrarPunto(r.desde)} a ${nombrarPunto(r.hasta)} ` +
-        `${plural(mesesDelPeriodo, "pasa 1 mes", `pasan ${mesesDelPeriodo} meses`)}, y el INDEC ` +
+        `De ${nombrarPunto(r.desde)} a ${nombrarPunto(r.hasta)} ` +
+        `${plural(mesesDelPeriodo, "pasó 1 mes", `pasaron ${mesesDelPeriodo} meses`)}, y el INDEC ` +
         `todavía no publicó ${frasearMeses(mesesSinPublicar, "ni")}. `;
-      const cierre = "Son todos datos oficiales del INDEC: acá no hay ningún número estimado.";
+      const cierre = "Para no tener que hacer ninguna estimación.";
 
       // En modo por día las filas son fechas, no meses: enumerar sus meses
       // duplicaría el del extremo. Se nombra el tramo por sus puntas, que además
@@ -203,13 +209,18 @@ function explicar(r: Resultado): string {
       const { mesesEstimados, tasaMensualPct, mesBase } = r.metodo;
       const n = mesesEstimados.length;
       return (
-        `${encabezado} El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, ` +
+        `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, ` +
         `y el período llega más allá del mes en curso, así que ` +
         `${plural(n, "ese mes se estima", "esos meses se estiman")} repitiendo la última ` +
         `inflación publicada, la de ${nombrarMes(mesBase)} (${porcentaje(tasaMensualPct)}).`
       );
     }
   }
+}
+
+/** El párrafo completo de la tarjeta: el resultado más su justificación. */
+function explicar(r: Resultado): string {
+  return `${resumir(r)} ${explicarMetodo(r)}`;
 }
 
 /** El pie de la tabla, que dice qué está mirando el lector. */
@@ -244,8 +255,8 @@ function pintarResultado(r: Resultado): void {
   // del período pedido: el título lo dice para que nadie lea mal las fechas.
   el("titulo-grafico").textContent =
     r.metodo.tipo === "ventana_reciente"
-      ? "Evolución del monto en los meses de referencia"
-      : "Evolución del monto";
+      ? "Inflación mensual de los meses de referencia"
+      : "Inflación mensual";
   el("rotulo-principal").textContent = `A ${nombrarPunto(r.hasta)}`;
   el("cifra-principal").textContent =
     r.metodo.tipo === "directo" ? pesosRedondo(r.montoAjustado) : `~${pesosRedondo(r.montoAjustado)}`;
@@ -315,7 +326,7 @@ function armarExplicacion(r: Resultado): string {
     `${pesos(r.monto)} de ${nombrarPunto(r.desde)} equivalen a ` +
       `${r.metodo.tipo === "directo" ? "" : "unos "}${pesosRedondo(r.montoAjustado)} ` +
       `en ${nombrarPunto(r.hasta)}.`,
-    `Variación acumulada: ${porcentaje(r.variacionPct)} (inflación oficial, IPC del INDEC).`,
+    `Inflación acumulada: ${porcentaje(r.variacionPct)} (IPC del INDEC).`,
     "",
     r.metodo.tipo === "ventana_reciente" ? "Meses usados:" : "Mes a mes:",
   ];
@@ -325,7 +336,7 @@ function armarExplicacion(r: Resultado): string {
     lineas.push(`- ${abreviarPunto(f.punto)}: ${porcentaje(f.varMensualPct ?? 0)} (${etiqueta})`);
   }
 
-  lineas.push("", explicar(r));
+  lineas.push("", explicarMetodo(r));
   lineas.push("", `Fuente: IPC Nivel General Nacional, INDEC. Calculado en ${location.href}`);
   return lineas.join("\n");
 }

@@ -236,8 +236,15 @@ aclara que las filas son los meses publicados de referencia.
 **Modo por día.** Opcional, apagado por defecto. Interpola el índice dentro del mes
 en proporción a los días, con el criterio del coeficiente CER del BCRA.
 
-**Gráfico.** Línea del monto en el tiempo, con el tramo proyectado punteado.
-Chart.js.
+**Gráfico.** Barras de la variación mensual del IPC en los meses que entraron en el
+cálculo, al final de la página. Chart.js.
+
+La versión original graficaba la evolución del monto, y se descartó: un monto
+ajustado por inflación siempre sube, así que la curva tenía la misma forma para
+cualquier consulta y no aportaba nada a la pregunta "¿por qué ese porcentaje?". La
+variación mensual sí: muestra la desinflación del período y hace visible que en
+`repite_ultimo` todas las barras estimadas valen lo mismo. Las barras estimadas van
+con trama diagonal, nunca por color solo.
 
 **Compartir.** URL que reproduce la consulta (`?monto=&desde=&hasta=`) y
 descarga del desglose en CSV. El objetivo explícito es que la gente mande el link en

@@ -382,16 +382,28 @@ button:focus-visible {
   gap: 0.4rem;
 }
 
+/*
+ * Las muestras replican el relleno de las barras, no un trazo: desde que el
+ * gráfico es de barras, una rayita no se parecía a nada de lo que hay abajo.
+ */
 .muestra {
   display: inline-block;
-  width: 18px;
-  height: 0;
-  border-top: 2px solid var(--series-1);
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--series-1);
+  vertical-align: -1px;
 }
 
 .muestra--estimado {
-  border-top-style: dashed;
   margin-left: 0.6rem;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--series-1) 0 2px,
+    var(--surface-1) 2px 5px
+  );
+  outline: 1px solid var(--series-1);
+  outline-offset: -1px;
 }
 
 .acciones {
