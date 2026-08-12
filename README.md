@@ -21,11 +21,18 @@ serie del IPC a mano.
 
 Esta calculadora hace esa planilla por vos:
 
-- **Dos resultados separados.** El que sale de datos oficiales publicados, y aparte
-  —marcado, con otro fondo y otro borde— el que incluye la proyección.
-- **El desglose mes a mes.** Índice, variación mensual, acumulado, monto, y de qué
+- **Contesta el período que pediste**, aunque haya que estimar para llegar. La
+  estimación se marca; no se esconde ni se trata como un error. Debajo, como
+  respaldo, el número que sale usando solo meses ya publicados.
+- **De dónde sale la tasa de proyección**, siempre a la vista: los meses publicados
+  que entran en el promedio, con el porcentaje de cada uno. Es la respuesta a
+  "¿de dónde sacaste ese porcentaje?".
+- **El desglose mes a mes.** Cuánto subió, cuánto acumula, cuánta plata, y de qué
   fuente salió cada fila: `INDEC ✓`, `BCRA ✓` o `estimado`.
-- **Método de proyección a la vista.** Cuántos meses se proyectaron y a qué tasa.
+- **Un texto para pegar.** El botón *Copiar explicación* arma un párrafo que se
+  entiende solo y trae la fuente adentro, listo para mandar por mensaje.
+- **Meses por defecto, días si hacen falta.** El modo por día interpola el índice
+  dentro del mes, con el mismo criterio del coeficiente CER del BCRA.
 
 ## Cómo funciona
 

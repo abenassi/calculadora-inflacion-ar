@@ -71,9 +71,20 @@
       <h2>Los meses que el INDEC todavía no publicó</h2>
       <p>
         El IPC se publica con varias semanas de retraso. Si pedís un período que llega más allá del
-        último dato publicado, la calculadora te muestra <strong>dos resultados separados</strong>:
-        primero el que sale de datos oficiales, y aparte —marcado como estimado— el que incluye la
-        proyección.
+        último dato publicado, la calculadora te muestra <strong>dos resultados</strong>: arriba, el
+        del período que pediste, marcado como estimado y con el detalle de qué meses se estimaron y
+        a qué tasa; debajo, el que sale usando solamente meses ya publicados.
+      </p>
+      <p>
+        Junto al resultado estimado siempre está la lista de los meses publicados cuyo promedio da
+        la tasa de proyección, con el porcentaje de cada uno. La idea es que puedas explicarle a
+        otra persona de dónde sale el número, no solo saberlo vos.
+      </p>
+      <p>
+        Si el <em>punto de partida</em> cae en un mes que todavía no se publicó, no hay ningún
+        resultado oficial que mostrar: el cálculo es un cociente entre dos índices, y si el de abajo
+        está estimado, todo el resultado lo está. En ese caso la calculadora muestra un solo número,
+        marcado como estimación.
       </p>
       <p>
         La proyección usa el promedio de las últimas tres variaciones mensuales publicadas. Es el
@@ -83,6 +94,20 @@
       <p>
         Una estimación no es un pronóstico. Si el mes que te interesa todavía no salió, el número
         oficial es el de arriba.
+      </p>
+
+      <h2>Meses o días</h2>
+      <p>
+        Por defecto se trabaja con meses enteros, que es como se publica el IPC y como la gente
+        piensa estos cálculos. Si activás <em>usar fechas exactas</em>, podés elegir días
+        puntuales: para una fecha dentro de un mes, el índice se interpola entre el valor de ese
+        mes y el del siguiente, en proporción a los días transcurridos. Es el mismo criterio con el
+        que el BCRA convierte el IPC mensual en el coeficiente diario CER.
+      </p>
+      <p>
+        Ojo con una consecuencia: cualquier día posterior al 1 del último mes publicado necesita el
+        índice del mes siguiente, que todavía no existe. Por eso aparece marcado como estimación
+        aunque su propio mes ya esté publicado.
       </p>
 
       <h2>Sobre la precisión</h2>

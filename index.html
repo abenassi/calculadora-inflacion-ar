@@ -14,19 +14,19 @@
   <body>
     <header class="cabecera">
       <div class="contenido">
-        <h1 id="titulo">Calculadora de inflación</h1>
-        <p class="bajada" id="bajada">
-          Cuánto valdría hoy un monto del pasado, según el IPC del INDEC.
+        <h1>Calculadora de inflación</h1>
+        <p class="bajada">
+          Cuánto vale un monto de otra fecha, según el IPC del INDEC. Te mostramos el cálculo
+          completo, mes por mes, y te decimos siempre qué parte es dato oficial y qué parte es
+          estimación.
         </p>
       </div>
     </header>
 
     <main class="contenido">
-      <nav class="presets" id="presets" aria-label="Casos de uso"></nav>
-
       <form class="tarjeta formulario" id="formulario">
         <div class="campo campo--monto">
-          <label for="monto" id="etiqueta-monto">Monto</label>
+          <label for="monto">Monto</label>
           <div class="entrada-monto">
             <span aria-hidden="true">$</span>
             <input
@@ -40,58 +40,93 @@
           </div>
         </div>
 
-        <div class="campo">
-          <label for="desde-mes" id="etiqueta-desde">en</label>
+        <div class="campo" data-modo="mes">
+          <label for="desde-mes">de</label>
           <div class="entrada-fecha">
             <select id="desde-mes" aria-label="Mes de origen"></select>
             <select id="desde-anio" aria-label="Año de origen"></select>
           </div>
         </div>
 
-        <div class="campo">
-          <label for="hasta-mes" id="etiqueta-hasta">equivale, en</label>
+        <div class="campo" data-modo="mes">
+          <label for="hasta-mes">equivale, en</label>
           <div class="entrada-fecha">
             <select id="hasta-mes" aria-label="Mes de destino"></select>
             <select id="hasta-anio" aria-label="Año de destino"></select>
           </div>
         </div>
 
-        <div class="campo campo--periodicidad" id="campo-periodicidad" hidden>
-          <label for="periodicidad">Se actualiza cada</label>
-          <select id="periodicidad"></select>
+        <div class="campo" data-modo="dia" hidden>
+          <label for="desde-dia">del día</label>
+          <input type="date" id="desde-dia" aria-label="Fecha de origen" />
+        </div>
+
+        <div class="campo" data-modo="dia" hidden>
+          <label for="hasta-dia">equivale, al día</label>
+          <input type="date" id="hasta-dia" aria-label="Fecha de destino" />
         </div>
       </form>
 
-      <p class="advertencia" id="advertencia" hidden></p>
+      <label class="opcion-dias">
+        <input type="checkbox" id="usar-dias" />
+        <span>Usar fechas exactas en lugar de meses</span>
+        <small>Opcional. Sirve si tu período no arranca ni termina a principio de mes.</small>
+      </label>
 
       <section class="resultados" id="resultados" aria-live="polite">
         <p class="error" id="error" hidden></p>
 
-        <div class="tarjeta resultado resultado--oficial" id="bloque-oficial">
-          <p class="resultado__rotulo" id="rotulo-oficial"></p>
-          <p class="resultado__cifra" id="cifra-oficial"></p>
-          <p class="resultado__detalle" id="detalle-oficial"></p>
-        </div>
-
-        <div class="tarjeta resultado resultado--estimado" id="bloque-estimado" hidden>
+        <!--
+          El bloque principal responde SIEMPRE el período que la persona pidió,
+          aunque para llegar hasta ahí haya que estimar. Antes el número grande era
+          el del último mes publicado, que es una pregunta que nadie hizo: alguien
+          que consultaba hasta agosto se llevaba el valor de junio sin notarlo.
+          La estimación se marca, pero no se esconde ni se trata como un error.
+        -->
+        <div class="tarjeta resultado resultado--principal" id="bloque-principal">
           <p class="resultado__rotulo">
-            <span class="chip chip--estimado">
-              <svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12">
-                <path
-                  d="M6 1.2 11.2 10.5H0.8L6 1.2Z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.3"
-                  stroke-linejoin="round"
-                />
-                <path d="M6 4.6v2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
-                <circle cx="6" cy="8.8" r="0.7" fill="currentColor" />
-              </svg>
-              ESTIMADO
+            <span id="rotulo-principal"></span>
+            <span class="chip chip--estimado" id="chip-estimado" hidden>
+              <span aria-hidden="true">≈</span> ESTIMADO
             </span>
           </p>
-          <p class="resultado__cifra" id="cifra-estimado"></p>
-          <p class="resultado__detalle" id="detalle-estimado"></p>
+          <p class="resultado__cifra" id="cifra-principal"></p>
+          <p class="resultado__detalle" id="detalle-principal"></p>
+
+          <p class="aviso-largo" id="aviso-largo" hidden></p>
+
+          <!--
+            De dónde sale la tasa de proyección. Es la respuesta a "¿de dónde
+            sacaste ese porcentaje?": sin esto la tasa es un número que aparece de
+            la nada, y nadie puede defender el resultado ante otra persona.
+          -->
+          <details class="base-proyeccion" id="base-proyeccion" open hidden>
+            <summary id="base-resumen"></summary>
+            <table class="base-tabla">
+              <tbody id="base-cuerpo"></tbody>
+              <tfoot>
+                <tr>
+                  <th scope="row">Promedio</th>
+                  <td id="base-promedio"></td>
+                </tr>
+              </tfoot>
+            </table>
+            <p class="base-nota" id="base-nota"></p>
+          </details>
+        </div>
+
+        <div class="tarjeta resultado resultado--respaldo" id="bloque-respaldo" hidden>
+          <p class="resultado__rotulo">Sin estimar nada, solo con lo ya publicado</p>
+          <p class="resultado__cifra-chica" id="cifra-respaldo"></p>
+          <p class="resultado__detalle" id="detalle-respaldo"></p>
+        </div>
+
+        <div class="acciones acciones--compartir">
+          <button type="button" id="copiar-explicacion" class="boton--principal">
+            Copiar explicación
+          </button>
+          <button type="button" id="copiar">Copiar link</button>
+          <button type="button" id="csv">Descargar CSV</button>
         </div>
 
         <p class="badge">
@@ -117,27 +152,30 @@
 
       <section class="tarjeta panel">
         <div class="panel__cabecera">
-          <h2>El cálculo, mes a mes</h2>
-          <div class="acciones">
-            <button type="button" id="copiar">Copiar link</button>
-            <button type="button" id="csv">Descargar CSV</button>
-          </div>
+          <h2>El cálculo, paso a paso</h2>
         </div>
+        <!--
+          Orden de columnas pensado para leerse de izquierda a derecha y cortar
+          bien en pantallas chicas: cuándo, cuánto subió, cuánto da, y de dónde
+          sale el dato. "Índice IPC" va última y se oculta en mobile: es la
+          columna que nadie sabe explicar y ocupaba el segundo lugar.
+        -->
         <div class="tabla-scroll">
           <table class="desglose">
             <thead>
               <tr>
-                <th scope="col">Mes</th>
-                <th scope="col">Índice IPC</th>
-                <th scope="col">Var. mensual</th>
-                <th scope="col">Acumulado</th>
+                <th scope="col">Cuándo</th>
+                <th scope="col">Subió</th>
+                <th scope="col" class="col-acumulado">Acumulado</th>
                 <th scope="col">Monto</th>
                 <th scope="col">Origen</th>
+                <th scope="col" class="col-tecnica">Índice IPC</th>
               </tr>
             </thead>
             <tbody id="cuerpo-desglose"></tbody>
           </table>
         </div>
+        <p class="pie-tabla" id="pie-tabla"></p>
       </section>
     </main>
 

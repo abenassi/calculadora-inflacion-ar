@@ -101,37 +101,6 @@ h1 {
   max-width: 46rem;
 }
 
-/* ----------------------------------------------------------------- presets */
-
-.presets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.preset {
-  border: 1px solid var(--border);
-  background: var(--surface-1);
-  color: var(--text-secondary);
-  border-radius: 999px;
-  padding: 0.4rem 0.9rem;
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.preset:hover {
-  background: var(--wash-hover);
-}
-
-.preset--activo {
-  background: var(--series-1);
-  border-color: var(--series-1);
-  color: #ffffff;
-  font-weight: 600;
-}
-
 /* ---------------------------------------------------------------- tarjetas */
 
 .tarjeta {
@@ -209,14 +178,45 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-.advertencia {
+/* ------------------------------------------------- opción de fechas exactas */
+
+/*
+ * Deliberadamente discreta y debajo del formulario: el modo por mes cubre
+ * prácticamente todos los casos, y ofrecer los dos con el mismo peso obligaría a
+ * elegir a alguien que no tiene por qué saber cuál le conviene.
+ */
+.opcion-dias {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 0.5rem;
+  align-items: center;
   margin: 0.75rem 0 0;
-  padding: 0.7rem 0.9rem;
-  border-left: 3px solid var(--warning);
-  background: var(--wash-estimado);
-  border-radius: 0 8px 8px 0;
-  font-size: 0.85rem;
+  padding: 0.5rem 0.25rem;
+  cursor: pointer;
   color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.opcion-dias input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--series-1);
+}
+
+.opcion-dias small {
+  grid-column: 2;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.campo input[type="date"] {
+  border: 1px solid var(--baseline);
+  border-radius: 8px;
+  background: var(--plane);
+  color: inherit;
+  font: inherit;
+  padding: 0.55rem 0.5rem;
+  min-width: 0;
 }
 
 /* -------------------------------------------------------------- resultados */
@@ -249,21 +249,34 @@ button:focus-visible {
   font-size: 0.9rem;
 }
 
+.resultado__rotulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /*
- * El bloque estimado se separa del oficial por borde discontinuo, fondo propio y
- * el chip. La distinción nunca queda en manos del color solo.
+ * El respaldo es deliberadamente más chico que el principal: informa, no compite.
+ * Cuando los dos tenían el mismo peso, la persona se llevaba el que estaba más
+ * arriba sin evaluar cuál contestaba su pregunta.
  */
-.resultado--estimado {
-  border-style: dashed;
-  border-color: var(--warning);
-  background: var(--wash-estimado);
+.resultado--respaldo {
+  background: var(--plane);
 }
 
-.resultado--estimado .resultado__cifra {
-  font-size: clamp(1.5rem, 5vw, 2.25rem);
-  color: var(--text-secondary);
+.resultado__cifra-chica {
+  margin: 0.25rem 0;
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
+/*
+ * El chip marca la estimación sin gritar. Antes llevaba un triángulo de alerta y
+ * eso pintaba con lenguaje de error justo al número que la persona vino a buscar:
+ * estimado no es peligro.
+ */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -271,10 +284,74 @@ button:focus-visible {
   background: var(--warning);
   color: #0b0b0b;
   border-radius: 999px;
-  padding: 0.15rem 0.55rem;
+  padding: 0.15rem 0.6rem;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.08em;
+}
+
+.aviso-largo {
+  margin: 0.75rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-left: 3px solid var(--warning);
+  background: var(--wash-estimado);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* --------------------------------------- de dónde sale la tasa de proyección */
+
+.base-proyeccion {
+  margin-top: 0.9rem;
+  border-top: 1px dashed var(--warning);
+  padding-top: 0.75rem;
+}
+
+.base-proyeccion summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.base-tabla {
+  margin: 0.6rem 0 0;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.base-tabla th,
+.base-tabla td {
+  padding: 0.2rem 0.9rem 0.2rem 0;
+  text-align: left;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.base-tabla td {
+  text-align: right;
+}
+
+.base-tabla tfoot th,
+.base-tabla tfoot td {
+  border-top: 1px solid var(--baseline);
+  padding-top: 0.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.base-nota {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.pie-tabla {
+  margin: 0.9rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
 }
 
 .badge {
@@ -338,6 +415,11 @@ button:focus-visible {
   gap: 0.5rem;
 }
 
+.acciones--compartir {
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
 .acciones button {
   border: 1px solid var(--border);
   background: var(--plane);
@@ -353,6 +435,14 @@ button:focus-visible {
   background: var(--wash-hover);
 }
 
+/* Compartir la explicación es la acción que cierra la tarea, no una más. */
+.boton--principal {
+  background: var(--series-1) !important;
+  border-color: var(--series-1) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
 .grafico {
   position: relative;
   height: 18rem;
@@ -360,8 +450,21 @@ button:focus-visible {
 
 /* ------------------------------------------------------------------- tabla */
 
+/*
+ * La sombra al borde derecho avisa que la tabla sigue. Sin ella, en un celular la
+ * columna de pesos queda fuera de pantalla y nada indica que se puede arrastrar:
+ * se lee como si la tabla mostrara sólo porcentajes.
+ */
 .tabla-scroll {
   overflow-x: auto;
+  background:
+    linear-gradient(to right, var(--surface-1) 30%, transparent),
+    linear-gradient(to left, var(--surface-1) 30%, transparent) 100% 0,
+    radial-gradient(farthest-side at 0 50%, rgba(11, 11, 11, 0.16), transparent),
+    radial-gradient(farthest-side at 100% 50%, rgba(11, 11, 11, 0.16), transparent) 100% 0;
+  background-repeat: no-repeat;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
 }
 
 .desglose {
@@ -472,6 +575,43 @@ button:focus-visible {
   padding: 0.5rem 0.6rem;
   border-bottom: 1px solid var(--gridline);
   vertical-align: top;
+}
+
+/*
+ * En pantallas chicas se cae el índice de precios. Es la columna que nadie sabe
+ * explicar, y su lugar lo necesitan el monto y el origen del dato, que son las dos
+ * respuestas que la persona tiene que poder dar.
+ */
+@media (max-width: 34rem) {
+  /*
+   * En un celular entran cuatro columnas. Se caen el índice de precios (nadie
+   * sabe explicarlo) y el acumulado (ya está, en grande, en la tarjeta del
+   * resultado y en el texto para compartir). Quedan las cuatro que contestan las
+   * preguntas reales: cuándo, cuánto subió ese mes, cuánta plata, y si el dato es
+   * oficial.
+   */
+  .col-tecnica,
+  .col-acumulado {
+    display: none;
+  }
+
+  .desglose {
+    font-size: 0.8rem;
+  }
+
+  .desglose th,
+  .desglose td {
+    padding: 0.5rem 0.3rem;
+  }
+
+  .desglose thead th {
+    font-size: 0.66rem;
+  }
+
+  .origen {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.3rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

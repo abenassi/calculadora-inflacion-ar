@@ -27,8 +27,8 @@ const sintetica: SerieIndice = {
 describe("adjust — comportamiento básico", () => {
   it("mes de origen igual al de destino devuelve el monto intacto", () => {
     const r = adjust(1000, "2020-02", "2020-02", sintetica);
-    expect(r.oficial.monto).toBe(1000);
-    expect(r.oficial.variacionPct).toBe(0);
+    expect(r.oficial!.monto).toBe(1000);
+    expect(r.oficial!.variacionPct).toBe(0);
     expect(r.desglose).toHaveLength(1);
     expect(r.desglose[0]!.varMensualPct).toBeNull();
     expect(r.desglose[0]!.acumuladoPct).toBeNull();
@@ -37,15 +37,15 @@ describe("adjust — comportamiento básico", () => {
 
   it("ajusta hacia adelante componiendo las variaciones", () => {
     const r = adjust(1000, "2020-01", "2020-03", sintetica);
-    expect(r.oficial.monto).toBeCloseTo(1210, 6);
-    expect(r.oficial.variacionPct).toBeCloseTo(21, 6);
+    expect(r.oficial!.monto).toBeCloseTo(1210, 6);
+    expect(r.oficial!.variacionPct).toBeCloseTo(21, 6);
   });
 
   it("ajusta hacia atrás deflactando, y el acumulado siempre se mide contra el origen", () => {
     const r = adjust(1210, "2020-03", "2020-01", sintetica);
-    expect(r.oficial.monto).toBeCloseTo(1000, 6);
-    expect(r.oficial.variacionPct).toBeCloseTo(-17.3553719, 6);
-    expect(r.desglose.map((f) => f.mes)).toEqual(["2020-03", "2020-02", "2020-01"]);
+    expect(r.oficial!.monto).toBeCloseTo(1000, 6);
+    expect(r.oficial!.variacionPct).toBeCloseTo(-17.3553719, 6);
+    expect(r.desglose.map((f) => f.punto)).toEqual(["2020-03", "2020-02", "2020-01"]);
     expect(r.desglose.at(-1)!.acumuladoPct).toBeCloseTo(-17.3553719, 6);
     expect(r.estimado).toBeUndefined();
   });
@@ -53,7 +53,7 @@ describe("adjust — comportamiento básico", () => {
   it("la primera fila del desglose es el punto de partida, sin variación", () => {
     const r = adjust(1000, "2020-01", "2020-03", sintetica);
     expect(r.desglose[0]).toMatchObject({
-      mes: "2020-01",
+      punto: "2020-01",
       monto: 1000,
       varMensualPct: null,
       acumuladoPct: null,
@@ -80,12 +80,12 @@ describe("adjust — separación de dato oficial y proyección", () => {
   it("corta el tramo oficial en el último mes publicado y estima el resto aparte", () => {
     const r = adjust(1000, "2020-01", "2020-06", sintetica);
 
-    expect(r.oficial.hasta).toBe("2020-04");
-    expect(r.oficial.monto).toBeCloseTo(1331, 6);
+    expect(r.oficial!.hasta).toBe("2020-04");
+    expect(r.oficial!.monto).toBeCloseTo(1331, 6);
 
     expect(r.estimado).toBeDefined();
     expect(r.estimado!.hasta).toBe("2020-06");
-    expect(r.estimado!.mesesProyectados).toBe(2);
+    expect(r.estimado!.mesesFaltantes).toEqual(["2020-05", "2020-06"]);
     expect(r.estimado!.tasaMensualPct).toBeCloseTo(10, 6);
     expect(r.estimado!.monto).toBeCloseTo(1331 * 1.1 * 1.1, 6);
   });
@@ -117,12 +117,28 @@ describe("adjust — separación de dato oficial y proyección", () => {
     expect(r.estimado!.tasaMensualPct).toBeCloseTo((100 + 1 + 3) / 3, 6);
   });
 
-  it("si el mes de origen tampoco tiene dato oficial, el tramo oficial queda en el origen", () => {
+  /**
+   * Si el origen cae en un mes sin publicar, el cociente arrastra una proyección en
+   * el denominador: no hay ningún número que se pueda llamar oficial.
+   */
+  it("no hay tramo oficial si el mes de origen tampoco está publicado", () => {
     const r = adjust(1000, "2020-05", "2020-07", sintetica);
-    expect(r.oficial.hasta).toBe("2020-05");
-    expect(r.oficial.monto).toBe(1000);
+    expect(r.oficial).toBeUndefined();
     expect(r.estimado).toBeDefined();
     expect(r.estimado!.hasta).toBe("2020-07");
+  });
+
+  /**
+   * El caso que rompía: yendo hacia atrás desde un mes sin publicar hacia uno
+   * publicado, el destino es oficial pero el origen no. El sitio llegó a rotular
+   * ese resultado como "con datos oficiales publicados", que es falso.
+   */
+  it("yendo hacia atrás desde un mes sin publicar, tampoco hay tramo oficial", () => {
+    const r = adjust(1000, "2020-06", "2020-02", sintetica);
+    expect(r.oficial).toBeUndefined();
+    expect(r.estimado).toBeDefined();
+    // Los meses estimados están del lado del origen, no del destino.
+    expect(r.estimado!.mesesFaltantes).toEqual(["2020-05", "2020-06"]);
   });
 });
 
@@ -145,7 +161,7 @@ describe("adjust — contra la serie real", () => {
   it("atraviesa la hiperinflación de 1990 sin perder precisión", () => {
     // ene→abr 1990: +61,6%, +95,5%, +11,4% acumulan un factor de 3,5157.
     const r = adjust(1, "1990-01", "1990-04", serie);
-    expect(r.oficial.monto).toBeCloseTo(1.616 * 1.955 * 1.114, 6);
+    expect(r.oficial!.monto).toBeCloseTo(1.616 * 1.955 * 1.114, 6);
     expect(r.desglose[1]!.varMensualPct).toBeCloseTo(61.6, 6);
     expect(r.desglose[2]!.varMensualPct).toBeCloseTo(95.5, 6);
   });
@@ -175,8 +191,8 @@ describe("adjust — contra la serie real", () => {
     const negativos = r.desglose.slice(1).filter((f) => f.varMensualPct! < 0);
     expect(negativos.length).toBeGreaterThan(0);
     // En 1996 el nivel de precios terminó por debajo del de enero.
-    expect(r.oficial.variacionPct).toBeLessThan(0);
-    expect(r.oficial.monto).toBeLessThan(1000);
+    expect(r.oficial!.variacionPct).toBeLessThan(0);
+    expect(r.oficial!.monto).toBeLessThan(1000);
   });
 
   it("la serie no tiene huecos", () => {
@@ -202,11 +218,11 @@ describe("adjust — coherencia con Argentina Data MCP", () => {
   it("reproduce el caso testigo", () => {
     const r = adjust(520000, "2026-05", "2026-08", serie);
 
-    expect(r.oficial.hasta).toBe("2026-06");
-    expect(r.oficial.variacionPct).toBeCloseTo(1.8869, 3);
+    expect(r.oficial!.hasta).toBe("2026-06");
+    expect(r.oficial!.variacionPct).toBeCloseTo(1.8869, 3);
 
     expect(r.estimado).toBeDefined();
-    expect(r.estimado!.mesesProyectados).toBe(2);
+    expect(r.estimado!.mesesFaltantes).toEqual(["2026-07", "2026-08"]);
     expect(r.estimado!.tasaMensualPct).toBeCloseTo(2.2, 1);
     expect(r.estimado!.variacionPct).toBeCloseTo(6.43, 2);
     expect(r.estimado!.monto).toBeCloseTo(553448.55, 0);
@@ -229,9 +245,143 @@ describe("adjust — coherencia con Argentina Data MCP", () => {
 
     for (const c of casos) {
       const r = adjust(1000, c.desde, c.hasta, serie);
-      const factorPropio = r.oficial.monto / 1000;
+      const factorPropio = r.oficial!.monto / 1000;
       const desvioPct = Math.abs(factorPropio / c.factorMcp - 1) * 100;
       expect(desvioPct, `${c.desde} → ${c.hasta}`).toBeLessThan(c.toleranciaPct);
     }
+  });
+});
+
+describe("adjust — la base de la proyección", () => {
+  /**
+   * Sin esto, la tasa de proyección es un número que aparece de la nada. Alguien
+   * que usa la calculadora para justificar un precio ante un cliente tiene que
+   * poder decir de qué meses salió el promedio.
+   */
+  it("expone los meses publicados cuyo promedio da la tasa", () => {
+    const r = adjust(1000, "2020-01", "2020-06", sintetica);
+    expect(r.estimado!.base.map((m) => m.mes)).toEqual(["2020-02", "2020-03", "2020-04"]);
+    for (const m of r.estimado!.base) expect(m.varMensualPct).toBeCloseTo(10, 6);
+  });
+
+  it("los meses base vienen del más viejo al más nuevo", () => {
+    const r = adjust(1000, "2026-05", "2026-08", serie);
+    const meses = r.estimado!.base.map((m) => m.mes);
+    expect(meses).toEqual([...meses].sort());
+    expect(meses).toEqual(["2026-04", "2026-05", "2026-06"]);
+  });
+
+  it("el promedio de la base es exactamente la tasa informada", () => {
+    const r = adjust(1000, "2026-05", "2026-08", serie);
+    const e = r.estimado!;
+    const promedio = e.base.reduce((a, m) => a + m.varMensualPct, 0) / e.base.length;
+    expect(promedio).toBeCloseTo(e.tasaMensualPct, 10);
+  });
+
+  it("no hay base que mostrar cuando no se proyecta nada", () => {
+    const r = adjust(1000, "2020-01", "2020-04", sintetica);
+    expect(r.estimado).toBeUndefined();
+  });
+});
+
+describe("adjust — modo por día", () => {
+  it("el día 1 de un mes vale igual que el mes entero", () => {
+    const porMes = adjust(1000, "2020-01", "2020-03", sintetica);
+    const porDia = adjust(1000, "2020-01-01", "2020-03-01", sintetica);
+    expect(porDia.oficial!.monto).toBeCloseTo(porMes.oficial!.monto, 10);
+  });
+
+  it("interpola dentro del mes, entre el índice del mes y el del siguiente", () => {
+    // Febrero 2020 tiene 29 días. El 15 lleva 14/29 del camino de 110 a 121.
+    const r = adjust(1000, "2020-02-01", "2020-02-15", sintetica);
+    const esperado = Math.pow(121 / 110, 14 / 29);
+    expect(r.oficial!.monto).toBeCloseTo(1000 * esperado, 8);
+  });
+
+  it("un período de días queda entre los dos meses que lo rodean", () => {
+    const menor = adjust(1000, "2020-01-01", "2020-02-01", sintetica).oficial!.monto;
+    const mayor = adjust(1000, "2020-01-01", "2020-03-01", sintetica).oficial!.monto;
+    const medio = adjust(1000, "2020-01-01", "2020-02-15", sintetica).oficial!.monto;
+    expect(medio).toBeGreaterThan(menor);
+    expect(medio).toBeLessThan(mayor);
+  });
+
+  it("parte el desglose en los extremos pedidos y los días 1 intermedios", () => {
+    const r = adjust(1000, "2020-01-15", "2020-03-20", sintetica);
+    expect(r.desglose.map((f) => f.punto)).toEqual([
+      "2020-01-15",
+      "2020-02-01",
+      "2020-03-01",
+      "2020-03-20",
+    ]);
+  });
+
+  /**
+   * Sin el corte en el día 1 del mes de destino, el último tramo abarcaría más de
+   * un mes (del 1 de julio al 5 de agosto son 35 días) y su porcentaje se leería
+   * como si fuera la inflación de un mes.
+   */
+  it("ninguna fila abarca más de un mes", () => {
+    const r = adjust(1000, "2020-01-15", "2020-04-05", sintetica);
+    expect(r.desglose.map((f) => f.punto)).toEqual([
+      "2020-01-15",
+      "2020-02-01",
+      "2020-03-01",
+      "2020-04-01",
+      "2020-04-05",
+    ]);
+  });
+
+  it("también corta por meses yendo hacia atrás", () => {
+    const r = adjust(1000, "2020-03-20", "2020-01-15", sintetica);
+    expect(r.desglose.map((f) => f.punto)).toEqual([
+      "2020-03-20",
+      "2020-03-01",
+      "2020-02-01",
+      "2020-01-15",
+    ]);
+  });
+
+  it("acepta mezclar un mes con un día", () => {
+    const r = adjust(1000, "2020-01", "2020-03-10", sintetica);
+    expect(r.desglose[0]!.punto).toBe("2020-01");
+    expect(r.desglose.at(-1)!.punto).toBe("2020-03-10");
+  });
+
+  it("dos días del mismo mes dan una sola transición", () => {
+    const r = adjust(1000, "2020-02-05", "2020-02-25", sintetica);
+    expect(r.desglose.map((f) => f.punto)).toEqual(["2020-02-05", "2020-02-25"]);
+  });
+
+  /**
+   * Un día posterior al 1 del último mes publicado ya necesita el índice del mes
+   * siguiente, que no existe. Aunque su propio mes esté publicado, el valor es en
+   * parte proyección — y el sitio tiene que decirlo.
+   */
+  it("marca como proyección un día dentro del último mes publicado", () => {
+    const r = adjust(1000, "2020-01", "2020-04-20", sintetica);
+    expect(r.estimado).toBeDefined();
+    expect(r.desglose.at(-1)!.esProyeccion).toBe(true);
+    expect(r.estimado!.mesesFaltantes).toEqual(["2020-05"]);
+  });
+
+  it("NO marca como proyección el día 1 del último mes publicado", () => {
+    const r = adjust(1000, "2020-01", "2020-04-01", sintetica);
+    expect(r.estimado).toBeUndefined();
+    expect(r.desglose.at(-1)!.esProyeccion).toBe(false);
+  });
+
+  it("funciona hacia atrás también con días", () => {
+    const ida = adjust(1000, "2020-01-10", "2020-03-20", sintetica).oficial!.monto;
+    const vuelta = adjust(ida, "2020-03-20", "2020-01-10", sintetica).oficial!.monto;
+    expect(vuelta).toBeCloseTo(1000, 8);
+  });
+
+  it("maneja el último día de un mes de 31 sin desbordar al siguiente", () => {
+    const r = adjust(1000, "2020-01-31", "2020-02-01", sintetica);
+    expect(r.desglose).toHaveLength(2);
+    // Del 31 de enero al 1 de febrero queda apenas 1/31 del salto de enero.
+    expect(r.oficial!.variacionPct).toBeGreaterThan(0);
+    expect(r.oficial!.variacionPct).toBeLessThan(1);
   });
 });

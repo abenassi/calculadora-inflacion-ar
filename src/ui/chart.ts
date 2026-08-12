@@ -22,7 +22,7 @@ import {
 } from "chart.js";
 
 import type { Resultado } from "../engine/types.js";
-import { abreviarMes } from "../engine/mes.js";
+import { abreviarPunto } from "../engine/mes.js";
 import { pesos, porcentaje } from "./format.js";
 
 Chart.register(CategoryScale, LinearScale, LineController, LineElement, PointElement, Filler, Tooltip);
@@ -58,7 +58,7 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
   grafico = new Chart(canvas, {
     type: "line",
     data: {
-      labels: filas.map((f) => abreviarMes(f.mes)),
+      labels: filas.map((f) => abreviarPunto(f.punto)),
       datasets: [
         {
           label: "Monto ajustado",
@@ -97,7 +97,7 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
             title: (items) => {
               const i = items[0]?.dataIndex ?? 0;
               const fila = filas[i]!;
-              return `${abreviarMes(fila.mes)}${fila.esProyeccion ? " · estimado" : ""}`;
+              return `${abreviarPunto(fila.punto)}${fila.esProyeccion ? " · estimado" : ""}`;
             },
             label: (item) => {
               const fila = filas[item.dataIndex]!;
