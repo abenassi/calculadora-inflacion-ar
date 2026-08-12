@@ -130,6 +130,65 @@ tests/
 Toda la lógica delicada —el empalme y la proyección— vive en `src/engine`, aislada
 del DOM y de la red, y se testea sola.
 
+### Por qué el código es así
+
+En [`docs/decisiones/`](docs/decisiones/) está el **por qué** de cada decisión, con la
+evidencia que la cambió cuando la hubo: la arquitectura del snapshot, las tres
+metodologías, la auditoría metodológica que movió el resultado medio punto, y cómo se
+indexó una serie del BCRA que no existía en ninguna API.
+
+## Hacé la tuya
+
+**Este repo es un template.** Apretá *Use this template* en GitHub y tenés el mismo
+esqueleto para cualquiera de las 32.000 series del MCP: dólar, salarios, reservas,
+combustibles, precios de supermercados, patentamientos.
+
+El esqueleto es este, y **no depende del IPC**:
+
+```
+GitHub Actions (1×/día)  →  Argentina Data MCP  →  public/data/*.json  →  sitio estático
+```
+
+La API key vive sólo en GitHub Secrets y nunca llega al browser. El sitio no hace una
+sola llamada de red a nadie: lee un JSON que está commiteado en el repo.
+
+### Los cuatro pasos
+
+1. **Conseguí una key.** Escribinos desde [argentinadata.mymcps.dev](https://argentinadata.mymcps.dev).
+   Guardala como secret `ARGENTINA_DATA_API_KEY` en tu repo
+   (*Settings → Secrets and variables → Actions*).
+
+2. **Elegí tu serie.** Buscala con la tool `series_search` desde cualquier agente
+   conectado al MCP, o mirá el catálogo. Anotate el `serie_id`.
+
+3. **Cambiá el pipeline.** En `scripts/fetch-snapshot.ts` están los IDs arriba de
+   todo. Reemplazalos por el tuyo y ajustá qué escribe en `public/data/`. Si tu serie
+   es "un número por fecha" —la mayoría lo son— el resto del pipeline sirve tal cual,
+   incluidas las protecciones: **el snapshot nunca puede encoger**, los tests corren
+   contra los datos recién bajados antes de publicarlos, y no se commitea nada si los
+   datos no cambiaron.
+
+4. **Escribí tu cálculo.** `src/engine/` es TypeScript puro, sin DOM ni red, y se
+   testea solo. Es el único lugar que tenés que pensar de cero.
+
+### Lo que te podés llevar sin tocar
+
+- `scripts/mcp-client.ts` — cliente JSON-RPC del MCP. Resuelve dos cosas que cuestan
+  descubrir solas: la respuesta viene enmarcada en SSE y el payload está
+  doble-serializado dentro de `result.content[0].text`.
+- `.github/workflows/` — snapshot diario y deploy a GitHub Pages, andando.
+- `src/engine/mes.ts` — aritmética de meses y días sobre strings `YYYY-MM`, sin
+  `Date` y sin líos de zona horaria.
+- El build usa `base: "./"`, así que el mismo artefacto sirve desde un dominio propio
+  y desde un subpath de `github.io`. No hay que recompilar para cambiar de uno a otro.
+
+### Un consejo que nos costó aprender
+
+Si vas a mostrar datos oficiales, **mostrá el cálculo y decí siempre qué parte es dato
+y qué parte es cuenta tuya**. Es la diferencia entre un número que la gente puede
+defender ante otra persona y uno que tiene que creer. En `docs/decisiones/` está lo que
+nos enseñó eso, incluidos los errores.
+
 ## Estos datos no son exclusivos del sitio
 
 Argentina Data MCP es un servidor [MCP](https://modelcontextprotocol.io): podés
