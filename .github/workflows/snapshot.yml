@@ -6,6 +6,14 @@ on:
   schedule:
     - cron: "0 12 * * *" # 09:00 ART
   workflow_dispatch:
+  # Correr también cuando cambia el propio pipeline, para no descubrir que lo
+  # rompimos recién al día siguiente a las 9 de la mañana.
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/snapshot.yml"
+      - "scripts/**"
+      - "src/engine/**"
 
 permissions:
   contents: write
