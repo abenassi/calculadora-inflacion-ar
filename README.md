@@ -3,7 +3,7 @@
 Una calculadora de inflación que **muestra el cálculo** y **nunca confunde un dato
 oficial con una estimación**.
 
-🔗 **[abenassi.github.io/calculadora-inflacion-ar](https://abenassi.github.io/calculadora-inflacion-ar/)**
+🔗 **[inflacion.mymcps.dev](https://inflacion.mymcps.dev)**
 
 Datos vía **[Argentina Data MCP](https://argentinadata.mymcps.dev)** — INDEC y BCRA,
 desde enero de 1990.
@@ -118,16 +118,15 @@ padrón de ARCA, precios de supermercados y más.
 }
 ```
 
-## Dominio propio (pendiente)
+## Dominio
 
-El sitio está pensado para vivir en `inflacion.mymcps.dev`. Para activarlo:
+`inflacion.mymcps.dev`, vía un `CNAME` a `abenassi.github.io` **sin proxy de
+Cloudflare** (nube gris): con el proxy adelante, GitHub no puede validar el dominio
+para emitir el certificado.
 
-1. Crear en Cloudflare un registro `CNAME` de `inflacion` → `abenassi.github.io`,
-   **sin proxy** (nube gris), para que GitHub pueda emitir el certificado.
-2. Restaurar el archivo `public/CNAME` con el contenido `inflacion.mymcps.dev`.
-
-El build ya usa rutas relativas, así que sirve igual desde la raíz de un dominio
-propio o desde el subpath de `github.io`: no hay que tocar nada más.
+El build usa rutas relativas, así que el mismo artefacto sirve desde la raíz del
+dominio propio y desde el subpath de `github.io`. No hay que recompilar para
+cambiar de uno a otro.
 
 ## Aviso
 
