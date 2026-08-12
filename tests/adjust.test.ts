@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { adjust, RangoError } from "../src/engine/adjust.js";
+import { adjust, RangoError, tasaMensualDelRem } from "../src/engine/adjust.js";
 import type { SerieIndice } from "../src/engine/types.js";
 
 const serie = JSON.parse(
@@ -119,7 +119,7 @@ describe("ventana reciente — el destino ya pasó pero no se publicó", () => {
   });
 });
 
-describe("repite último — el destino es un mes futuro", () => {
+describe("proyección — el destino es un mes futuro", () => {
   /**
    * Más allá del mes en curso no hay ninguna ventana publicada equivalente que
    * sirva de referencia, así que hay que estimar. Se hace repitiendo la última
@@ -128,10 +128,10 @@ describe("repite último — el destino es un mes futuro", () => {
    */
   it("proyecta repitiendo la última variación publicada", () => {
     const r = adjust(1000, "2020-04", "2020-06", sintetica, { hoy: "2020-05" });
-    expect(r.metodo.tipo).toBe("repite_ultimo");
-    if (r.metodo.tipo !== "repite_ultimo") throw new Error("tipo inesperado");
+    expect(r.metodo.tipo).toBe("proyeccion");
+    if (r.metodo.tipo !== "proyeccion") throw new Error("tipo inesperado");
     expect(r.metodo.tasaMensualPct).toBeCloseTo(10, 6);
-    expect(r.metodo.mesBase).toBe("2020-04");
+    expect(r.metodo.base).toEqual({ fuente: "ultimo_mes", mes: "2020-04" });
     expect(r.metodo.mesesEstimados).toEqual(["2020-05", "2020-06"]);
     expect(r.montoAjustado).toBeCloseTo(1000 * 1.1 * 1.1, 6);
   });
@@ -139,7 +139,7 @@ describe("repite último — el destino es un mes futuro", () => {
   it("repite el último valor, no el promedio de varios", () => {
     // Últimas variaciones: +5%, +2%, +3%. Repetir el último da 3%, no 3,33%.
     const r = adjust(1000, "2020-04", "2020-05", irregular, { hoy: "2020-04" });
-    if (r.metodo.tipo !== "repite_ultimo") throw new Error("tipo inesperado");
+    if (r.metodo.tipo !== "proyeccion") throw new Error("tipo inesperado");
     expect(r.metodo.tasaMensualPct).toBeCloseTo(3, 6);
     expect(r.montoAjustado).toBeCloseTo(1030, 6);
   });
@@ -154,13 +154,13 @@ describe("repite último — el destino es un mes futuro", () => {
     const enCurso = adjust(1000, "2020-04", "2020-05", sintetica, { hoy: "2020-05" });
     const futuro = adjust(1000, "2020-04", "2020-05", sintetica, { hoy: "2020-04" });
     expect(enCurso.metodo.tipo).toBe("ventana_reciente");
-    expect(futuro.metodo.tipo).toBe("repite_ultimo");
+    expect(futuro.metodo.tipo).toBe("proyeccion");
   });
 
   it("cae en proyección si correr la ventana se sale del inicio de la serie", () => {
     // Origen en el primer mes de la serie: no hay lugar para correr nada hacia atrás.
     const r = adjust(1000, "2020-01", "2020-06", sintetica, { hoy: "2020-06" });
-    expect(r.metodo.tipo).toBe("repite_ultimo");
+    expect(r.metodo.tipo).toBe("proyeccion");
     expect(r.desglose.map((f) => f.punto)).toEqual([
       "2020-01",
       "2020-02",
@@ -169,6 +169,127 @@ describe("repite último — el destino es un mes futuro", () => {
       "2020-05",
       "2020-06",
     ]);
+  });
+});
+
+describe("metodologías elegibles", () => {
+  /** Serie de test con REM: 21,8% esperado a 12 meses. */
+  const conRem: SerieIndice = {
+    ...irregular,
+    rem: {
+      expectativaAnualPct: 21.8,
+      mes: "2020-04",
+      serie: "bcra:29",
+      organismo: "BCRA",
+    },
+  };
+
+  /**
+   * La diferencia entre las metodologías sólo aparece cuando el destino no está
+   * publicado pero tampoco es futuro. Es el caso dominante del sitio, así que es
+   * donde importa que elegir cambie algo de verdad.
+   */
+  it("las tres dan resultados distintos en el mes en curso", () => {
+    const opciones = { hoy: "2020-05" } as const;
+    const sin = adjust(1000, "2020-03", "2020-05", conRem, opciones);
+    const ultimo = adjust(1000, "2020-03", "2020-05", conRem, {
+      ...opciones,
+      metodologia: "repite_ultimo",
+    });
+    const rem = adjust(1000, "2020-03", "2020-05", conRem, { ...opciones, metodologia: "rem" });
+
+    expect(sin.metodo.tipo).toBe("ventana_reciente");
+    expect(ultimo.metodo.tipo).toBe("proyeccion");
+    expect(rem.metodo.tipo).toBe("proyeccion");
+    expect(ultimo.montoAjustado).not.toBeCloseTo(sin.montoAjustado, 6);
+    expect(rem.montoAjustado).not.toBeCloseTo(ultimo.montoAjustado, 6);
+  });
+
+  /**
+   * Con la ventana corrida el desglose muestra meses publicados; proyectando
+   * muestra los meses que se pidieron. Esa diferencia es la que la interfaz tiene
+   * que dejar clarísima, porque son las mismas filas diciendo cosas distintas.
+   */
+  it("proyectar usa los meses pedidos, no una ventana corrida", () => {
+    const opciones = { hoy: "2020-05" } as const;
+    const sin = adjust(1000, "2020-03", "2020-05", conRem, opciones);
+    const proyectada = adjust(1000, "2020-03", "2020-05", conRem, {
+      ...opciones,
+      metodologia: "repite_ultimo",
+    });
+
+    expect(sin.desglose.map((f) => f.punto)).toEqual(["2020-02", "2020-03", "2020-04"]);
+    expect(sin.desglose.every((f) => !f.esProyeccion)).toBe(true);
+    expect(proyectada.desglose.map((f) => f.punto)).toEqual(["2020-03", "2020-04", "2020-05"]);
+    expect(proyectada.desglose.map((f) => f.esProyeccion)).toEqual([false, false, true]);
+  });
+
+  it("el REM reparte la expectativa anual en doce meses iguales", () => {
+    const r = adjust(1000, "2020-04", "2020-05", conRem, { hoy: "2020-05", metodologia: "rem" });
+    if (r.metodo.tipo !== "proyeccion") throw new Error("tipo inesperado");
+    expect(r.metodo.base).toEqual({
+      fuente: "rem",
+      mesEncuesta: "2020-04",
+      expectativaAnualPct: 21.8,
+    });
+    // 1,218^(1/12) − 1 = 1,657% mensual, y doce de esos meses reconstruyen el 21,8%.
+    expect(r.metodo.tasaMensualPct).toBeCloseTo(1.657, 3);
+    expect(Math.pow(1 + r.metodo.tasaMensualPct / 100, 12)).toBeCloseTo(1.218, 6);
+  });
+
+  it("pedir el REM sin datos del REM falla y no inventa una tasa", () => {
+    expect(() =>
+      adjust(1000, "2020-04", "2020-05", irregular, { hoy: "2020-05", metodologia: "rem" }),
+    ).toThrow(RangoError);
+  });
+
+  /**
+   * Para un mes futuro no hay ventana publicada equivalente, así que la
+   * metodología que "no estima nada" tiene que estimar igual. Es la única
+   * excepción, y coincide exactamente con repetir el último mes.
+   */
+  it("con destino futuro, no proyectar y repetir el último coinciden", () => {
+    const opciones = { hoy: "2020-04" } as const;
+    const sin = adjust(1000, "2020-03", "2020-06", conRem, opciones);
+    const ultimo = adjust(1000, "2020-03", "2020-06", conRem, {
+      ...opciones,
+      metodologia: "repite_ultimo",
+    });
+    expect(sin.metodo).toEqual(ultimo.metodo);
+    expect(sin.montoAjustado).toBeCloseTo(ultimo.montoAjustado, 9);
+  });
+
+  /**
+   * Con un período de un solo mes, correr la ventana hacia atrás devuelve
+   * justamente el último mes publicado, que es la misma tasa que se repetiría al
+   * proyectar. Coinciden por construcción, no por casualidad, y conviene que
+   * quede fijado: si alguna vez dejan de coincidir, algo cambió de método.
+   */
+  it("en un período de un mes, no proyectar y repetir el último dan lo mismo", () => {
+    const opciones = { hoy: "2020-05" } as const;
+    const sin = adjust(1000, "2020-04", "2020-05", conRem, opciones);
+    const ultimo = adjust(1000, "2020-04", "2020-05", conRem, {
+      ...opciones,
+      metodologia: "repite_ultimo",
+    });
+    expect(sin.metodo.tipo).toBe("ventana_reciente");
+    expect(ultimo.metodo.tipo).toBe("proyeccion");
+    expect(sin.montoAjustado).toBeCloseTo(ultimo.montoAjustado, 9);
+  });
+
+  it("sin meses faltantes las tres metodologías coinciden", () => {
+    const opciones = { hoy: "2020-04" } as const;
+    const montos = (["sin_proyectar", "repite_ultimo", "rem"] as const).map(
+      (metodologia) => adjust(1000, "2020-02", "2020-04", conRem, { ...opciones, metodologia }),
+    );
+    expect(montos.every((r) => r.metodo.tipo === "directo")).toBe(true);
+    expect(new Set(montos.map((r) => r.montoAjustado)).size).toBe(1);
+  });
+
+  it("tasaMensualDelRem compone de vuelta la expectativa anual", () => {
+    for (const anual of [0, 5.5, 21.8, 300]) {
+      expect(Math.pow(1 + tasaMensualDelRem(anual) / 100, 12)).toBeCloseTo(1 + anual / 100, 9);
+    }
   });
 });
 

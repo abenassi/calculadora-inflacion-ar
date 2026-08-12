@@ -96,6 +96,22 @@
           <p class="aviso-largo" id="aviso-largo" hidden></p>
         </div>
 
+        <!--
+          Discreto a propósito: la mayoría no tiene que elegir nada. El default no
+          estima ningún mes, y las otras dos opciones existen para quien sabe lo que
+          está pidiendo. Va debajo del resultado, no arriba, para que no parezca una
+          decisión previa al cálculo.
+        -->
+        <p class="metodologia">
+          <label for="metodologia">Meses que el INDEC no publicó:</label>
+          <select id="metodologia">
+            <option value="sin_proyectar">no estimar ninguno (recomendado)</option>
+            <option value="repite_ultimo">estimarlos con la inflación del último mes</option>
+            <option value="rem" id="opcion-rem">estimarlos con el REM del BCRA</option>
+          </select>
+          <a href="./datos.html#metodologias">¿cuál me conviene?</a>
+        </p>
+
         <div class="acciones acciones--compartir">
           <button type="button" id="copiar-explicacion" class="boton--principal">
             Copiar explicación

@@ -63,26 +63,39 @@ mensual.
 
 Es el mismo empalme que hace la herramienta `ajuste_por_inflacion` del MCP.
 
-### Los meses sin publicar
+### Los meses sin publicar y las tres metodologías
 
 El IPC sale con retraso, así que el mes en curso nunca tiene dato y a veces el
-anterior tampoco. Hay tres caminos, y la interfaz siempre dice cuál usó:
+anterior tampoco. Hay **tres metodologías**, elegibles desde un selector debajo del
+resultado. El default no estima nada, y es al que llega siempre quien entra de cero.
 
-| Situación | Qué hace | ¿Estima algo? |
+| Metodología | Qué hace con los meses que faltan | ¿Estima? |
 |---|---|---|
-| Todo el período está publicado | Cociente entre los dos índices | No |
-| El destino ya pasó o está pasando, pero no salió | Usa la inflación de los últimos N meses publicados, con N = meses del período pedido | No |
-| El destino es un mes futuro | Repite la última variación mensual publicada | Sí, y se marca |
+| **No estimar ninguno** (default) | Usa la inflación de los últimos N meses publicados, con N = meses del período pedido | No |
+| Inflación del último mes | Repite la última variación mensual publicada sobre los meses que pediste | Sí, marcado |
+| REM del BCRA | Reparte la expectativa del REM en doce meses iguales | Sí, marcado |
 
-El segundo caso es el que resuelve el uso dominante —traer un monto de mayo a hoy—
-sin inventar ningún número: de mayo a agosto pasan tres meses, así que se aplica la
-inflación acumulada de los últimos tres meses publicados. **No es la inflación del
-período pedido**, sino la del período publicado más reciente de igual duración; por
-eso la interfaz nombra siempre los meses concretos que usó.
+La primera resuelve el uso dominante —traer un monto de mayo a hoy— sin inventar
+ningún número: de mayo a agosto pasan tres meses, así que se aplica la inflación
+acumulada de los últimos tres meses publicados. **No es la inflación del período
+pedido**, sino la del período publicado más reciente de igual duración; por eso la
+interfaz nombra siempre los meses concretos que usó.
 
-El tercer caso repite el último valor conocido en lugar de promediar. Es menos
-sofisticado a propósito: se explica en una oración y no esconde que es una
-estimación.
+Las otras dos muestran los meses que pediste de verdad y completan los que faltan con
+una tasa mensual constante, marcada como estimación en la tabla y con trama diagonal
+en el gráfico.
+
+Sobre el REM, una limitación que vale la pena conocer: el relevamiento completo
+publica una senda mes a mes, pero la única serie disponible en el catálogo abierto es
+la **mediana de inflación esperada a doce meses** (`bcra:29`), un número por encuesta.
+El sitio lo reparte parejo entre los doce meses. Los analistas no dijeron que cada mes
+vaya a dar eso; es un promedio calculado a partir de lo que sí dijeron, y la página
+`/datos` lo aclara.
+
+Cuando el período pedido está enteramente publicado, las tres dan el mismo número.
+
+Para un mes futuro no hay período publicado equivalente, así que incluso el default
+proyecta — y en ese caso coincide exactamente con la segunda metodología.
 
 ### Sobre la precisión
 

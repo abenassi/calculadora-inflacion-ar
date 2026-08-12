@@ -37,10 +37,32 @@ export type FuenteSerie = {
   rango: string;
 };
 
+/**
+ * Expectativa de inflación del REM (Relevamiento de Expectativas de Mercado) del
+ * BCRA, que releva a consultoras y bancos todos los meses.
+ *
+ * OJO con qué es este número: el REM completo publica una senda mes a mes, pero la
+ * única serie del relevamiento que expone el catálogo es la **mediana de la
+ * variación interanual esperada para los próximos 12 meses**. O sea, un solo número
+ * por encuesta. Todo lo que el sitio puede hacer con eso es repartirlo parejo entre
+ * los doce meses; no hay forma de saber cuánto de ese total esperan los analistas
+ * para cada mes en particular. La interfaz tiene que decirlo.
+ */
+export type ExpectativaRem = {
+  /** Mediana de inflación esperada para los próximos 12 meses, en porcentaje. */
+  expectativaAnualPct: number;
+  /** Mes de la encuesta de la que sale el número. */
+  mes: Mes;
+  serie: string;
+  organismo: string;
+};
+
 export type SerieIndice = {
   serie: string;
   base: string;
   fuentes: FuenteSerie[];
+  /** Ausente si el pipeline no pudo traer el REM; el sitio esconde esa opción. */
+  rem?: ExpectativaRem;
   /** Último mes con dato oficial publicado. Todo lo posterior es proyección. */
   ultimo_oficial: Mes;
   /** ISO 8601 de cuándo corrió el pipeline. */
@@ -94,18 +116,37 @@ export type Metodo =
       mesesSinPublicar: Mes[];
     }
   /**
-   * El destino es un mes futuro. Acá no queda otra que estimar, y se hace de la
-   * forma más simple que existe: repitiendo la última variación mensual publicada.
+   * Los meses que faltan se estiman con una tasa mensual constante, y el desglose
+   * muestra los meses que se pidieron de verdad.
+   *
+   * De dónde sale la tasa lo dice `base`. Las dos variantes comparten toda la
+   * maquinaria porque la diferencia entre ellas es un número: qué tasa se repite.
+   * Lo que cambia de una a otra es cómo se explica, y eso vive en la interfaz.
    */
   | {
-      tipo: "repite_ultimo";
-      /** Tasa mensual repetida, en porcentaje. */
+      tipo: "proyeccion";
+      /** Tasa mensual aplicada a cada mes estimado, en porcentaje. */
       tasaMensualPct: number;
-      /** El mes publicado del que sale esa tasa. */
-      mesBase: Mes;
-      /** Los meses futuros que se estimaron. */
+      /** Los meses sin publicar que se estimaron. */
       mesesEstimados: Mes[];
+      base: BaseProyeccion;
     };
+
+export type BaseProyeccion =
+  /** Se repite la última variación mensual publicada por el INDEC. */
+  | { fuente: "ultimo_mes"; mes: Mes }
+  /**
+   * Se reparte la expectativa del REM en doce meses iguales. `tasaMensualPct` es
+   * la tasa mensual equivalente, no un dato que el REM publique por separado.
+   */
+  | { fuente: "rem"; mesEncuesta: Mes; expectativaAnualPct: number };
+
+/**
+ * Qué hacer con los meses que el INDEC todavía no publicó. La elige la persona; el
+ * default nunca estima nada, que es lo que la mayoría necesita y lo único que se
+ * explica sin hablar de métodos.
+ */
+export type Metodologia = "sin_proyectar" | "repite_ultimo" | "rem";
 
 export type Resultado = {
   monto: number;

@@ -72,8 +72,8 @@
       <p>
         El IPC se publica con varias semanas de retraso. El mes en curso nunca tiene dato, y a veces
         el anterior tampoco: hoy, por ejemplo, el último publicado es junio. Como el uso más común
-        es justamente traer un monto de antes hasta hoy, el hueco aparece casi siempre. Hay tres
-        caminos, y la calculadora te dice cuál usó.
+        es justamente traer un monto de antes hasta hoy, el hueco aparece casi siempre. La calculadora
+        siempre te dice qué hizo con él, y podés elegir entre tres formas de resolverlo.
       </p>
       <p>
         <strong>Si todo el período ya está publicado</strong>, no hay nada que resolver: el
@@ -93,14 +93,75 @@
         explicarle a otra persona de dónde sale el número.
       </p>
       <p>
-        <strong>Si pedís un mes futuro</strong>, más allá del mes en curso, ahí sí hay que estimar.
-        Se hace de la forma más simple que existe: repitiendo la última variación mensual publicada,
-        tantas veces como haga falta. Nada de promedios ni modelos. Esas filas aparecen marcadas
-        como <strong>estimado</strong> y el resultado lleva un rótulo de estimación.
+        <strong>Si pedís un mes futuro</strong>, más allá del mes en curso, ahí sí hay que estimar:
+        no existe ningún período publicado equivalente que sirva de referencia. Esas filas aparecen
+        marcadas como <strong>estimado</strong> y el resultado lleva un rótulo de estimación.
+      </p>
+
+      <h2 id="metodologias">Las tres metodologías, y cuál te conviene</h2>
+      <p>
+        Debajo del resultado hay un selector con tres formas de tratar los meses que faltan. Si no
+        lo tocás, siempre estás en la primera. Cambiarlo no cambia los datos: cambia qué se hace con
+        los meses que todavía no existen.
+      </p>
+
+      <h3>1. No estimar ninguno <em>(el default, y el recomendado)</em></h3>
+      <p>
+        Es lo que está descripto arriba: en vez de inventar los meses que faltan, se usa la
+        inflación de los últimos meses publicados, tantos como tenga el período que pediste. El
+        resultado no contiene ningún número estimado y se explica en una oración. Por eso es el
+        default.
+      </p>
+      <p>
+        Su límite: el número que da <em>no</em> es la inflación de tu período, sino la del período
+        publicado más reciente de la misma duración. Si la inflación viene cambiando rápido, las dos
+        cosas se separan.
+      </p>
+
+      <h3>2. Estimarlos con la inflación del último mes</h3>
+      <p>
+        Acá el desglose muestra <strong>los meses que pediste de verdad</strong>, y los que el INDEC
+        todavía no publicó se completan repitiendo la última variación mensual conocida. Si junio dio
+        1,89%, se asume 1,89% para julio y para agosto.
+      </p>
+      <p>
+        Es la proyección más simple que existe y no pretende ser un pronóstico: nadie sabe si julio
+        va a dar lo mismo que junio. Sirve cuando necesitás que el cuadro hable de tus meses y no de
+        otros. Las filas proyectadas van resaltadas en la tabla, con <strong>estimado</strong> en la
+        columna de origen y con trama diagonal en el gráfico.
+      </p>
+
+      <h3>3. Estimarlos con el REM del BCRA</h3>
+      <p>
+        El REM (Relevamiento de Expectativas de Mercado) es una encuesta mensual que el Banco
+        Central les hace a consultoras, bancos y centros de investigación. Es la mejor referencia
+        pública que hay sobre qué inflación se espera hacia adelante, porque no sale de un modelo
+        nuestro sino del consenso de quienes se dedican a proyectarla.
+      </p>
+      <p>
+        <strong>Con una limitación importante que conviene tener presente.</strong> El REM completo
+        publica una senda mes a mes, pero la única serie del relevamiento disponible en el catálogo
+        de datos abiertos es la <em>mediana de la inflación esperada para los próximos doce
+        meses</em>: un solo número por encuesta. La calculadora lo reparte en doce meses iguales.
+        En la encuesta de julio de 2026 los analistas esperaban 21,8% a doce meses, lo que equivale
+        a 1,66% por mes. Los analistas no dijeron que julio y agosto vayan a dar 1,66% cada uno:
+        eso es un promedio parejo calculado por nosotros a partir de lo que sí dijeron.
+      </p>
+      <p>
+        La otra consecuencia: si pedís más de doce meses hacia adelante, la tasa se sigue aplicando
+        más allá del horizonte que el REM cubre.
+      </p>
+
+      <h3>Cuándo cambia algo elegir una u otra</h3>
+      <p>
+        Sólo cuando hay meses sin publicar de por medio. Si el período que pediste está enteramente
+        publicado, las tres dan exactamente el mismo número. Y para un período de un solo mes, la
+        primera y la segunda coinciden siempre, porque correr la ventana un mes hacia atrás devuelve
+        justamente el último mes publicado, que es la tasa que la segunda repetiría.
       </p>
       <p>
         Una estimación no es un pronóstico. Cuanto más lejos en el futuro está el mes que pedís,
-        menos vale el número.
+        menos vale el número, elijas la metodología que elijas.
       </p>
 
       <h2>Meses o días</h2>

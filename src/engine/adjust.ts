@@ -12,14 +12,28 @@
  *   directo           todo publicado, no hay nada que resolver
  *   ventana_reciente  el destino ya pasó pero no se publicó → se usa la inflación
  *                     de los últimos N meses publicados, sin inventar ningún número
- *   repite_ultimo     el destino es futuro → se repite la última variación publicada
+ *   proyeccion        se estiman los meses que faltan con una tasa mensual fija,
+ *                     que sale del último mes publicado o del REM del BCRA
+ *
+ * Cuál de las tres sale depende de la metodología elegida (`OpcionesAjuste`) y de si
+ * el período llega o no más allá del mes en curso. `sin_proyectar` es el default y
+ * sólo proyecta cuando le piden un mes futuro, donde no hay alternativa.
  *
  * La regla que gobierna el archivo sigue siendo la misma: nunca devolver un número
  * sin poder decir exactamente de qué meses salió. Por eso el desglose muestra
  * siempre los meses que se usaron de verdad, no los que se pidieron.
  */
 
-import type { Fila, Mes, Metodo, Punto, Resultado, SerieIndice } from "./types.js";
+import type {
+  BaseProyeccion,
+  Fila,
+  Mes,
+  Metodo,
+  Metodologia,
+  Punto,
+  Resultado,
+  SerieIndice,
+} from "./types.js";
 import {
   aOrdinal,
   compararMeses,
@@ -40,7 +54,14 @@ export class RangoError extends RangeError {}
 export type OpcionesAjuste = {
   /** Mes en curso. Parametrizable para poder testear sin depender del reloj. */
   hoy?: Mes;
+  /** Qué hacer con los meses sin publicar. Default: no estimar nada. */
+  metodologia?: Metodologia;
 };
+
+/** El REM da una expectativa a 12 meses; acá se la reparte en doce meses iguales. */
+export function tasaMensualDelRem(expectativaAnualPct: number): number {
+  return (Math.pow(1 + expectativaAnualPct / 100, 1 / 12) - 1) * 100;
+}
 
 /* ------------------------------------------------------------------- índice */
 
@@ -188,13 +209,36 @@ export function adjust(
     compararMeses(mesDe(correr(desde, desplazamiento)), idx.primerMes) >= 0 &&
     compararMeses(mesDe(correr(hasta, desplazamiento)), idx.primerMes) >= 0;
 
+  // Sin meses faltantes las tres metodologías coinciden: no hay nada que estimar.
   if (desplazamiento === 0) {
     return calcularDirecto(monto, desde, hasta, idx);
   }
-  if (!esFuturo && cabeLaVentana) {
+
+  const metodologia = opciones.metodologia ?? "sin_proyectar";
+
+  // La ventana corrida sólo sirve como referencia de un período que ya transcurrió.
+  // Para un mes futuro no existe equivalente publicado, así que aun con la
+  // metodología que no estima nada hay que proyectar.
+  if (metodologia === "sin_proyectar" && !esFuturo && cabeLaVentana) {
     return calcularVentanaReciente(monto, desde, hasta, idx, desplazamiento);
   }
-  return calcularRepitiendoUltimo(monto, desde, hasta, idx, serie);
+
+  if (metodologia === "rem") {
+    const rem = serie.rem;
+    if (!rem) {
+      throw new RangoError("No hay datos del REM en este snapshot.");
+    }
+    return calcularProyectando(monto, desde, hasta, idx, serie, tasaMensualDelRem(rem.expectativaAnualPct), {
+      fuente: "rem",
+      mesEncuesta: rem.mes,
+      expectativaAnualPct: rem.expectativaAnualPct,
+    });
+  }
+
+  return calcularProyectando(monto, desde, hasta, idx, serie, idx.ultimaVariacionPct, {
+    fuente: "ultimo_mes",
+    mes: idx.ultimoOficial,
+  });
 }
 
 /** Arma el desglose y el resultado a partir de una lista de puntos ya calculables. */
@@ -280,20 +324,26 @@ function calcularVentanaReciente(
 }
 
 /**
- * Extiende la serie repitiendo la última variación mensual publicada.
+ * Extiende la serie aplicando una tasa mensual constante a los meses sin publicar.
  *
- * Es deliberadamente la proyección más simple que existe. Un promedio de varios
- * meses, o cualquier modelo, obliga a explicar el modelo; repetir el último dato se
- * cuenta en media oración y no pretende ser un pronóstico.
+ * La tasa entra por parámetro porque las dos proyecciones que ofrece el sitio se
+ * diferencian sólo en ese número: repetir la última variación del INDEC, o repartir
+ * la expectativa del REM entre doce meses. Todo lo demás —qué filas quedan marcadas,
+ * cómo se interpola un día, qué meses se declaran estimados— es idéntico, y tenerlo
+ * escrito una sola vez evita que las dos variantes se vayan separando.
+ *
+ * Ninguna de las dos pretende ser un pronóstico. La constancia de la tasa es
+ * deliberada: cualquier cosa más sofisticada obliga a explicar un modelo.
  */
-function calcularRepitiendoUltimo(
+function calcularProyectando(
   monto: number,
   desde: Punto,
   hasta: Punto,
   idx: Indice,
   serie: SerieIndice,
+  tasa: number,
+  base: BaseProyeccion,
 ): Resultado {
-  const tasa = idx.ultimaVariacionPct;
   const ultimoIndice = serie.datos.at(-1)!.indice;
   const ultimoOficial = idx.ultimoOficial;
 
@@ -339,10 +389,10 @@ function calcularRepitiendoUltimo(
     puntos,
     extendido,
     {
-      tipo: "repite_ultimo",
+      tipo: "proyeccion",
       tasaMensualPct: tasa,
-      mesBase: ultimoOficial,
       mesesEstimados: estimados,
+      base,
     },
     esProyeccion,
   );

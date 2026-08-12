@@ -406,6 +406,33 @@ button:focus-visible {
   outline-offset: -1px;
 }
 
+/*
+ * El selector de metodología tiene que verse como una nota al pie, no como un
+ * campo del formulario: quien no sabe que existe no tiene que sentir que se
+ * salteó un paso.
+ */
+.metodologia {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.metodologia select {
+  /* Los selects del formulario llevan `flex: 1` para repartirse la fila; acá eso
+     estiraría el control a media pantalla y dejaría de leerse como una nota. */
+  flex: 0 1 auto;
+  padding: 0.15rem 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font: inherit;
+}
+
 .acciones {
   display: flex;
   gap: 0.5rem;
@@ -542,6 +569,17 @@ button:focus-visible {
 .prosa h2 {
   margin-top: 2rem;
   font-size: 1.1rem;
+}
+
+.prosa h3 {
+  margin-top: 1.6rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.98rem;
+}
+
+/* Ancla de enlaces profundos: sin esto el título queda pegado al borde. */
+.prosa :target {
+  scroll-margin-top: 1.5rem;
 }
 
 .prosa code,

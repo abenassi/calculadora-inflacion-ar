@@ -135,8 +135,8 @@ y se testea aislada.
 - `adjust.ts` — la API pública:
 
 ```ts
-adjust(monto: number, desde: Punto, hasta: Punto,
-       serie: SerieIndice, opciones?: { hoy?: Mes }): Resultado
+adjust(monto: number, desde: Punto, hasta: Punto, serie: SerieIndice,
+       opciones?: { hoy?: Mes; metodologia?: Metodologia }): Resultado
 
 type Resultado = {
   monto: number; desde: Punto; hasta: Punto;
@@ -148,8 +148,14 @@ type Metodo =
   | { tipo: "directo" }
   | { tipo: "ventana_reciente"; mesesDelPeriodo: number;
       desplazamiento: number; mesesSinPublicar: Mes[] }
-  | { tipo: "repite_ultimo"; tasaMensualPct: number;
-      mesBase: Mes; mesesEstimados: Mes[] };
+  | { tipo: "proyeccion"; tasaMensualPct: number;
+      mesesEstimados: Mes[]; base: BaseProyeccion };
+
+type BaseProyeccion =
+  | { fuente: "ultimo_mes"; mes: Mes }
+  | { fuente: "rem"; mesEncuesta: Mes; expectativaAnualPct: number };
+
+type Metodologia = "sin_proyectar" | "repite_ultimo" | "rem";
 
 type Fila = {
   punto: Punto; indice: number; varMensualPct: number | null;
@@ -183,16 +189,41 @@ por el desplazamiento necesario y por si el destino supera el mes en curso:
 | `metodo.tipo` | Cuándo | Qué hace |
 |---|---|---|
 | `directo` | Todo el período está publicado | `idx(hasta) / idx(desde)` |
-| `ventana_reciente` | El destino no se publicó pero no es futuro | Corre la ventana hacia atrás: aplica la inflación de los últimos *N* meses publicados, con *N* = meses del período pedido |
-| `repite_ultimo` | El destino supera el mes en curso | Extrapola repitiendo la última variación mensual publicada |
+| `ventana_reciente` | El destino no se publicó pero no es futuro, y la metodología es `sin_proyectar` | Corre la ventana hacia atrás: aplica la inflación de los últimos *N* meses publicados, con *N* = meses del período pedido |
+| `proyeccion` | El destino supera el mes en curso, o la metodología pide proyectar | Extrapola con una tasa mensual constante sobre los meses pedidos |
+
+**Metodología elegible** (`OpcionesAjuste.metodologia`, expuesta como un `select`
+discreto debajo del resultado):
+
+| `Metodologia` | Tasa de proyección | Default |
+|---|---|---|
+| `sin_proyectar` | — sólo proyecta si el destino es futuro, y ahí repite el último mes | ✅ |
+| `repite_ultimo` | Última variación mensual publicada | |
+| `rem` | `(1 + REM/100)^(1/12) − 1`, con REM = mediana a 12 meses de `bcra:29` | |
+
+`proyeccion.base` discrimina de dónde salió la tasa (`ultimo_mes` | `rem`); las dos
+comparten toda la maquinaria de extrapolación porque la única diferencia real entre
+ellas es el número, y duplicarla las dejaría separarse.
+
+El default nunca se persiste entre visitas: quien entra de cero ve siempre la
+metodología que no estima nada. Un link con `?metodo=` sí se respeta, porque es una
+elección explícita de quien compartió.
+
+**Limitación del REM, asumida a conciencia.** El relevamiento publica una senda mes a
+mes, pero la única serie del REM en el catálogo es la mediana de inflación esperada a
+doce meses: un número por encuesta. El sitio lo reparte parejo. No es lo que los
+analistas proyectaron para cada mes, y `/datos` lo dice con esas palabras. Si alguna
+vez aparece la senda mensual en el catálogo, `BaseProyeccion` es el lugar donde
+entraría una tercera variante sin tocar el resto.
 
 `ventana_reciente` **no estima nada**: todos los números son del INDEC. Tampoco es la
 inflación del período pedido, sino la del período publicado más reciente de igual
 duración, así que la UI nombra siempre los meses concretos que entraron. El desglose
 muestra esos meses, no los del período pedido.
 
-`repite_ultimo` repite en lugar de promediar a propósito: la explicación cabe en una
-oración, y para el usuario objetivo eso vale más que la sofisticación.
+`proyeccion` usa una tasa mensual constante en lugar de promediar o modelar, a
+propósito: la explicación cabe en una oración, y para el usuario objetivo eso vale
+más que la sofisticación.
 
 **Test de oro:** `(520000, 2026-05, 2026-08)` con `hoy = 2026-08` resuelve por
 `ventana_reciente` con `mesesDelPeriodo = 3`, desglose `mar–jun 2026` y `+6,76%`.
@@ -226,7 +257,7 @@ elegido bien.
 
 **Resultado.** Un solo número grande, con el mes de destino dicho en palabras y un
 párrafo que nombra los meses concretos que se usaron. Chip `ESTIMADO` sólo cuando el
-método es `repite_ultimo`; prefijo `~` en `ventana_reciente` y `repite_ultimo`.
+método es `proyeccion`; prefijo `~` en todo lo que no sea `directo`.
 
 **Desglose.** Tabla mes a mes: índice, variación mensual, acumulado desde el
 origen, monto, y origen del dato (`INDEC ✓` / `BCRA ✓` / `estimado`). Las filas
@@ -243,7 +274,7 @@ La versión original graficaba la evolución del monto, y se descartó: un monto
 ajustado por inflación siempre sube, así que la curva tenía la misma forma para
 cualquier consulta y no aportaba nada a la pregunta "¿por qué ese porcentaje?". La
 variación mensual sí: muestra la desinflación del período y hace visible que en
-`repite_ultimo` todas las barras estimadas valen lo mismo. Las barras estimadas van
+`proyeccion` todas las barras estimadas valen lo mismo. Las barras estimadas van
 con trama diagonal, nunca por color solo.
 
 **Compartir.** URL que reproduce la consulta (`?monto=&desde=&hasta=`) y
@@ -275,7 +306,11 @@ como un anuncio. La conversión viene de que el cálculo esté bien hecho.
 - Hiperinflación 1990 (79,2% / 61,6% / 95,5% mensual) sin pérdida de precisión.
 - Destino sin publicar pero no futuro → `ventana_reciente`, desglose corrido, sin
   ninguna fila estimada.
-- Destino futuro → `repite_ultimo`, todas las filas faltantes a la misma tasa.
+- Destino futuro → `proyeccion`, todas las filas faltantes a la misma tasa.
+- Las tres metodologías: distintas entre sí con meses faltantes, idénticas sin
+  ellos; `sin_proyectar` y `repite_ultimo` coinciden en períodos de un mes y con
+  destino futuro; `rem` sin datos del REM lanza error en vez de inventar una tasa.
+- `tasaMensualDelRem` compone de vuelta la expectativa anual.
 - Destino dentro del rango publicado → `directo`.
 - Modo por día: un día posterior al 1 del último mes publicado fuerza el
   desplazamiento aunque su propio mes ya esté publicado.

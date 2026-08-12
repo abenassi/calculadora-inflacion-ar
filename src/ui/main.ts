@@ -22,7 +22,7 @@ import {
   nombrarPunto,
   primerDia,
 } from "../engine/mes.js";
-import type { Mes, Punto, Resultado, SerieIndice } from "../engine/types.js";
+import type { Mes, Metodologia, Punto, Resultado, SerieIndice } from "../engine/types.js";
 import { dibujar } from "./chart.js";
 import { fechaLarga, indice, pesos, pesosRedondo, porcentaje } from "./format.js";
 
@@ -47,6 +47,17 @@ const HORIZONTE_MESES = 24;
 
 function usaDias(): boolean {
   return el<HTMLInputElement>("usar-dias").checked;
+}
+
+const METODOLOGIAS: Metodologia[] = ["sin_proyectar", "repite_ultimo", "rem"];
+
+function esMetodologia(v: string | null): v is Metodologia {
+  return v !== null && (METODOLOGIAS as string[]).includes(v);
+}
+
+function leerMetodologia(): Metodologia {
+  const v = el<HTMLSelectElement>("metodologia").value;
+  return esMetodologia(v) ? v : "sin_proyectar";
 }
 
 function poblarSelects(): void {
@@ -205,14 +216,25 @@ function explicarMetodo(r: Resultado): string {
       );
     }
 
-    case "repite_ultimo": {
-      const { mesesEstimados, tasaMensualPct, mesBase } = r.metodo;
+    case "proyeccion": {
+      const { mesesEstimados, tasaMensualPct, base } = r.metodo;
       const n = mesesEstimados.length;
+      const faltan =
+        `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, así que ` +
+        `${plural(n, "ese mes se estima", "esos meses se estiman")} `;
+
+      if (base.fuente === "rem") {
+        return (
+          `${faltan}con el REM del BCRA: en la encuesta de ${nombrarMes(base.mesEncuesta)}, ` +
+          `los analistas esperaban ${porcentaje(base.expectativaAnualPct, false)} de inflación ` +
+          `para los doce meses siguientes, que repartido mes a mes da ` +
+          `${porcentaje(tasaMensualPct)} por mes.`
+        );
+      }
+
       return (
-        `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, ` +
-        `y el período llega más allá del mes en curso, así que ` +
-        `${plural(n, "ese mes se estima", "esos meses se estiman")} repitiendo la última ` +
-        `inflación publicada, la de ${nombrarMes(mesBase)} (${porcentaje(tasaMensualPct)}).`
+        `${faltan}repitiendo la última inflación publicada, la de ` +
+        `${nombrarMes(base.mes)} (${porcentaje(tasaMensualPct)}).`
       );
     }
   }
@@ -233,19 +255,25 @@ function explicarTabla(r: Resultado): string {
         `Estos son los últimos meses que publicó el INDEC. Los usamos como referencia porque ` +
         `el período que pediste tiene la misma cantidad de meses y los últimos todavía no salieron.`
       );
-    case "repite_ultimo": {
+    case "proyeccion": {
+      const { base, tasaMensualPct } = r.metodo;
       const proyectadas = r.desglose.filter((f) => f.esProyeccion).length;
+      const de =
+        base.fuente === "rem"
+          ? `el REM del BCRA de ${nombrarMes(base.mesEncuesta)}`
+          : `la inflación de ${nombrarMes(base.mes)}`;
       return (
-        `Las filas resaltadas (${proyectadas}) son meses sin publicar, estimados repitiendo la ` +
-        `inflación de ${nombrarMes(r.metodo.mesBase)} (${porcentaje(r.metodo.tasaMensualPct)}). ` +
-        `El resto son datos oficiales.`
+        `Estos son los meses que pediste. ${plural(proyectadas, "La fila resaltada", `Las ${proyectadas} filas resaltadas`)} ` +
+        `${plural(proyectadas, "es un mes proyectado", "son meses proyectados")}, no publicado${plural(proyectadas, "", "s")} ` +
+        `por el INDEC: ${plural(proyectadas, "se estimó", "se estimaron")} con ${de}, a ` +
+        `${porcentaje(tasaMensualPct)} por mes. El resto son datos oficiales.`
       );
     }
   }
 }
 
 function pintarResultado(r: Resultado): void {
-  const esProyeccion = r.metodo.tipo === "repite_ultimo";
+  const esProyeccion = r.metodo.tipo === "proyeccion";
 
   el("chip-estimado").hidden = !esProyeccion;
   // Anunciar "estimado" en la leyenda cuando no hay ninguna fila estimada hace
@@ -264,7 +292,7 @@ function pintarResultado(r: Resultado): void {
 
   // Cuanto más lejos se proyecta, menos es una cuenta y más un pronóstico.
   const aviso = el("aviso-largo");
-  const meses = r.metodo.tipo === "repite_ultimo" ? r.metodo.mesesEstimados.length : 0;
+  const meses = r.metodo.tipo === "proyeccion" ? r.metodo.mesesEstimados.length : 0;
   aviso.hidden = meses < MESES_PROYECCION_LARGA;
   if (!aviso.hidden) {
     aviso.textContent =
@@ -348,12 +376,13 @@ function calcular(): void {
     if (!Number.isFinite(monto)) throw new RangoError("Escribí un monto para calcular.");
     if (monto <= 0) throw new RangoError("El monto tiene que ser mayor que cero.");
 
-    const r = adjust(monto, leerPunto("desde"), leerPunto("hasta"), serie);
+    const metodologia = leerMetodologia();
+    const r = adjust(monto, leerPunto("desde"), leerPunto("hasta"), serie, { metodologia });
     ultimoResultado = r;
     error.hidden = true;
     el("bloque-principal").hidden = false;
     pintarResultado(r);
-    sincronizarUrl(monto, r.desde, r.hasta);
+    sincronizarUrl(monto, r.desde, r.hasta, metodologia);
   } catch (e) {
     ultimoResultado = null;
     error.textContent = e instanceof RangeError ? e.message : "No se pudo calcular.";
@@ -366,13 +395,29 @@ function calcular(): void {
 
 /* ------------------------------------------------------------ URL compartible */
 
-function sincronizarUrl(monto: number, desde: Punto, hasta: Punto): void {
+function sincronizarUrl(
+  monto: number,
+  desde: Punto,
+  hasta: Punto,
+  metodologia: Metodologia,
+): void {
   const p = new URLSearchParams({ monto: String(monto), desde, hasta });
+  // La metodología default no viaja en la URL: el link más compartido tiene que
+  // ser el más corto, y quien lo abra tiene que ver lo mismo que vería entrando
+  // de cero.
+  if (metodologia !== "sin_proyectar") p.set("metodo", metodologia);
   history.replaceState(null, "", `?${p}`);
 }
 
 function leerUrl(): void {
   const p = new URLSearchParams(location.search);
+
+  // Sólo desde un link explícito: nunca se recuerda entre visitas. Quien llega
+  // de cero ve siempre la metodología que no estima nada.
+  const metodo = p.get("metodo");
+  if (esMetodologia(metodo) && !(metodo === "rem" && !serie.rem)) {
+    el<HTMLSelectElement>("metodologia").value = metodo;
+  }
 
   const monto = Number(p.get("monto"));
   if (Number.isFinite(monto) && monto > 0) {
@@ -444,11 +489,15 @@ function descargarCsv(): void {
       ["# meses_sin_publicar", r.metodo.mesesSinPublicar.join(" ")],
       ["# ventana_corrida_meses", String(r.metodo.desplazamiento)],
     );
-  } else if (r.metodo.tipo === "repite_ultimo") {
+  } else if (r.metodo.tipo === "proyeccion") {
+    const { base } = r.metodo;
     filas.push(
-      ["# mes_base", r.metodo.mesBase],
-      ["# tasa_mensual_repetida_pct", r.metodo.tasaMensualPct.toFixed(2)],
+      ["# base_proyeccion", base.fuente],
+      ["# tasa_mensual_aplicada_pct", r.metodo.tasaMensualPct.toFixed(4)],
       ["# meses_estimados", r.metodo.mesesEstimados.join(" ")],
+      base.fuente === "rem"
+        ? ["# rem_encuesta", `${base.mesEncuesta} ${base.expectativaAnualPct}% a 12 meses`]
+        : ["# mes_base", base.mes],
     );
   }
 
@@ -470,6 +519,9 @@ async function iniciar(): Promise<void> {
 
   poblarSelects();
   el("actualizado").textContent = fechaLarga(serie.actualizado);
+  // Si el pipeline no pudo traer el REM, la opción no existe: es preferible una
+  // opción menos a una que falla al elegirla.
+  if (!serie.rem) el("opcion-rem").remove();
 
   escribirPunto("desde", deOrdinal(aOrdinal(serie.ultimo_oficial) - 1));
   escribirPunto("hasta", mesActual());
@@ -482,6 +534,7 @@ async function iniciar(): Promise<void> {
   });
   el("formulario").addEventListener("submit", (ev) => ev.preventDefault());
   el("usar-dias").addEventListener("change", alternarModo);
+  el("metodologia").addEventListener("change", calcular);
 
   el<HTMLButtonElement>("copiar").addEventListener("click", (ev) =>
     copiar(ev.currentTarget as HTMLButtonElement, location.href, "Copiá de la barra ↑"),

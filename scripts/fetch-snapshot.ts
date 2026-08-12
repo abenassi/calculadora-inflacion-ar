@@ -1,7 +1,7 @@
 /**
  * Baja las series de Argentina Data MCP y escribe el snapshot que consume el sitio.
  *
- * Corre en GitHub Actions una vez por día. Cuatro llamadas de quota.
+ * Corre en GitHub Actions una vez por día. Cinco llamadas de quota.
  *
  * Invariante que este script protege: **un snapshot nunca puede encoger ni perder
  * meses**. Si el MCP responde raro, o el INDEC revisa la serie hacia atrás, o una
@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 
 import { empalmar, type PuntoCrudo } from "../src/engine/splice.js";
 import { aMes, nombrarMes } from "../src/engine/mes.js";
-import type { SerieIndice } from "../src/engine/types.js";
+import type { ExpectativaRem, SerieIndice } from "../src/engine/types.js";
 import { traerSerie } from "./mcp-client.js";
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -26,6 +26,10 @@ const DIR_DATOS = resolve(RAIZ, "public", "data");
 
 const ID_BCRA_INFLACION = "bcra:27";
 const ID_INDEC_IPC = "indec:148.3_INIVELNAL_DICI_M_26";
+// Mediana de la inflación interanual esperada para los próximos 12 meses, del
+// Relevamiento de Expectativas de Mercado. Es la única serie del REM en el
+// catálogo: no hay senda mes a mes.
+const ID_REM = "bcra:29";
 
 function aPuntos(datos: { fecha: string; valor: number }[]): PuntoCrudo[] {
   return datos
@@ -74,11 +78,41 @@ async function escribirSiMejora(archivo: string, contenido: unknown, minimoDatos
   console.log(`  ${archivo}: escrito (${cantidad} puntos)`);
 }
 
+/**
+ * La expectativa del REM más reciente.
+ *
+ * Devuelve `undefined` en vez de romper si la serie no viene: el REM es una opción
+ * secundaria del sitio, y quedarnos sin snapshot de IPC porque el BCRA no respondió
+ * sería cambiar un problema chico por uno grande. Sin este campo, la interfaz
+ * esconde la opción.
+ */
+async function traerRem(): Promise<ExpectativaRem | undefined> {
+  try {
+    const serie = await traerSerie(ID_REM, { fecha_desde: "2024-01-01" });
+    const ultimo = serie.datos.at(-1);
+    if (!ultimo || !Number.isFinite(ultimo.valor)) {
+      console.warn("  REM: la serie vino vacía, se omite");
+      return undefined;
+    }
+    console.log(`  REM: ${ultimo.valor}% esperado a 12 meses (encuesta de ${aMes(ultimo.fecha)})`);
+    return {
+      expectativaAnualPct: ultimo.valor,
+      mes: aMes(ultimo.fecha),
+      serie: ID_REM,
+      organismo: serie.fuente,
+    };
+  } catch (e: unknown) {
+    console.warn(`  REM: no se pudo traer (${(e as Error).message}), se omite`);
+    return undefined;
+  }
+}
+
 async function construirIpc(): Promise<SerieIndice> {
-  console.log("IPC: bajando bcra:27 e índice INDEC…");
-  const [bcra, indec] = await Promise.all([
+  console.log("IPC: bajando bcra:27, índice INDEC y REM…");
+  const [bcra, indec, rem] = await Promise.all([
     traerSerie(ID_BCRA_INFLACION, { fecha_desde: "1990-01-01" }),
     traerSerie(ID_INDEC_IPC, { fecha_desde: "2016-12-01" }),
+    traerRem(),
   ]);
 
   const puntosBcra = aPuntos(bcra.datos);
@@ -108,6 +142,7 @@ async function construirIpc(): Promise<SerieIndice> {
         rango: `${primerIndec}/${ultimoOficial}`,
       },
     ],
+    ...(rem ? { rem } : {}),
     ultimo_oficial: ultimoOficial,
     actualizado: new Date().toISOString(),
     datos,

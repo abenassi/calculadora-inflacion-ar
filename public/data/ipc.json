@@ -13,8 +13,14 @@
       "rango": "2016-12/2026-06"
     }
   ],
+  "rem": {
+    "expectativaAnualPct": 21.8,
+    "mes": "2026-07",
+    "serie": "bcra:29",
+    "organismo": "BCRA"
+  },
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-12T05:52:04.139Z",
+  "actualizado": "2026-08-12T15:49:35.606Z",
   "datos": [
     {
       "mes": "1990-01",
