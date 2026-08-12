@@ -1,0 +1,50 @@
+name: Actualizar snapshot de datos
+
+# Una vez por día. El INDEC publica el IPC con semanas de retraso, así que no hace
+# falta más frecuencia: lo que importa es no perderse el día que sale.
+on:
+  schedule:
+    - cron: "0 12 * * *" # 09:00 ART
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Bajar series de Argentina Data MCP
+        env:
+          ARGENTINA_DATA_API_KEY: ${{ secrets.ARGENTINA_DATA_API_KEY }}
+        run: npm run snapshot
+
+      # Los tests corren contra el snapshot recién bajado. Si el INDEC revisó la
+      # serie hacia atrás o cambió de base, esto lo caza antes de publicar.
+      - name: Verificar el snapshot nuevo
+        run: npm test
+
+      - name: Commitear si cambió
+        run: |
+          if [ -z "$(git status --porcelain public/data)" ]; then
+            echo "Sin cambios en los datos."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data
+          git commit -m "chore(datos): snapshot al $(date -u +%Y-%m-%d)"
+          git push

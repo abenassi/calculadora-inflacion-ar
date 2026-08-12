@@ -19,7 +19,10 @@ import type { SerieIndice } from "../src/engine/types.js";
 import { traerSerie } from "./mcp-client.js";
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const DIR_DATOS = resolve(RAIZ, "data");
+// Vive bajo `public/` porque Vite sirve ese directorio en la raíz del sitio: así el
+// browser lo pide como `/data/ipc.json` tanto en desarrollo como en producción, y
+// además queda versionado y visible en el repo público.
+const DIR_DATOS = resolve(RAIZ, "public", "data");
 
 const ID_BCRA_INFLACION = "bcra:27";
 const ID_INDEC_IPC = "indec:148.3_INIVELNAL_DICI_M_26";

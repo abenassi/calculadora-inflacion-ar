@@ -1,0 +1,484 @@
+/*
+ * Paleta tomada de la referencia del skill de dataviz y validada con su script en
+ * ambos modos (slot categórico 1, superficies #fcfcfb / #1a1a19).
+ *
+ * El modo oscuro está *elegido*, no invertido: usa los pasos propios de cada rol
+ * para la superficie oscura.
+ */
+
+:root {
+  color-scheme: light;
+
+  --surface-1: #fcfcfb;
+  --plane: #f9f9f7;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --muted: #898781;
+  --gridline: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.1);
+
+  --series-1: #2a78d6;
+  --warning: #fab219;
+  --critical: #d03b3b;
+
+  --wash-estimado: #fdf4e0;
+  --wash-hover: #f2f1ed;
+
+  --radio: 10px;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+
+    --surface-1: #1a1a19;
+    --plane: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --muted: #898781;
+    --gridline: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.1);
+
+    --series-1: #3987e5;
+
+    --wash-estimado: #2a2415;
+    --wash-hover: #242422;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/*
+ * `[hidden]` vive en la hoja del navegador y pierde por especificidad contra
+ * cualquier `display` puesto desde una clase (`.campo { display: flex }`). Sin esta
+ * regla, ocultar algo desde JS no oculta nada.
+ */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: var(--plane);
+  color: var(--text-primary);
+  font-family: var(--sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--series-1);
+}
+
+.contenido {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ---------------------------------------------------------------- cabecera */
+
+.cabecera {
+  padding: 2.5rem 0 1.5rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
+  letter-spacing: -0.02em;
+}
+
+.bajada {
+  margin: 0.5rem 0 0;
+  color: var(--text-secondary);
+  max-width: 46rem;
+}
+
+/* ----------------------------------------------------------------- presets */
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.preset {
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.preset:hover {
+  background: var(--wash-hover);
+}
+
+.preset--activo {
+  background: var(--series-1);
+  border-color: var(--series-1);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- tarjetas */
+
+.tarjeta {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radio);
+  padding: 1.25rem;
+}
+
+.formulario {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.campo label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.entrada-monto {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--baseline);
+  border-radius: 8px;
+  padding: 0 0.6rem;
+  background: var(--plane);
+}
+
+.entrada-monto span {
+  color: var(--muted);
+}
+
+.entrada-monto input {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0.5rem 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.entrada-fecha {
+  display: flex;
+  gap: 0.4rem;
+}
+
+select {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--baseline);
+  border-radius: 8px;
+  background: var(--plane);
+  color: inherit;
+  font: inherit;
+  padding: 0.55rem 0.5rem;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
+}
+
+.advertencia {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid var(--warning);
+  background: var(--wash-estimado);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------- resultados */
+
+.resultados {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.resultado__rotulo {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.resultado__cifra {
+  margin: 0.25rem 0;
+  font-size: clamp(2rem, 7vw, 3.25rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.resultado__detalle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/*
+ * El bloque estimado se separa del oficial por borde discontinuo, fondo propio y
+ * el chip. La distinción nunca queda en manos del color solo.
+ */
+.resultado--estimado {
+  border-style: dashed;
+  border-color: var(--warning);
+  background: var(--wash-estimado);
+}
+
+.resultado--estimado .resultado__cifra {
+  font-size: clamp(1.5rem, 5vw, 2.25rem);
+  color: var(--text-secondary);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--warning);
+  color: #0b0b0b;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.badge {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.error {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--critical);
+  border-radius: var(--radio);
+  color: var(--critical);
+  background: var(--surface-1);
+}
+
+/* ------------------------------------------------------------------ paneles */
+
+.panel {
+  margin-bottom: 1.25rem;
+}
+
+.panel__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.leyenda-inline {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.muestra {
+  display: inline-block;
+  width: 18px;
+  height: 0;
+  border-top: 2px solid var(--series-1);
+}
+
+.muestra--estimado {
+  border-top-style: dashed;
+  margin-left: 0.6rem;
+}
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.acciones button {
+  border: 1px solid var(--border);
+  background: var(--plane);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.acciones button:hover {
+  background: var(--wash-hover);
+}
+
+.grafico {
+  position: relative;
+  height: 18rem;
+}
+
+/* ------------------------------------------------------------------- tabla */
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.desglose {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.desglose th,
+.desglose td {
+  padding: 0.55rem 0.6rem;
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--gridline);
+}
+
+.desglose thead th {
+  text-align: right;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.desglose th[scope="row"],
+.desglose thead th:first-child,
+.desglose td:last-child,
+.desglose thead th:last-child {
+  text-align: left;
+}
+
+.desglose tbody tr:hover {
+  background: var(--wash-hover);
+}
+
+.fila--estimada {
+  background: var(--wash-estimado);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.origen {
+  font-size: 0.72rem;
+  font-style: normal;
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.origen--proyeccion {
+  border-color: var(--warning);
+  background: var(--wash-estimado);
+}
+
+/* --------------------------------------------------------------------- pie */
+
+.pie {
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+  padding: 1.5rem 0 3rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.pie p {
+  margin: 0 0 0.4rem;
+}
+
+/* ------------------------------------------------------- página de fuentes */
+
+.prosa {
+  max-width: 44rem;
+  padding-bottom: 3rem;
+}
+
+.prosa h2 {
+  margin-top: 2rem;
+  font-size: 1.1rem;
+}
+
+.prosa code,
+.prosa pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+.prosa pre {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radio);
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.prosa table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin: 1rem 0;
+}
+
+.prosa th,
+.prosa td {
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--gridline);
+  vertical-align: top;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -6,7 +6,7 @@ import { adjust, MESES_PROMEDIO_PROYECCION, RangoError } from "../src/engine/adj
 import type { SerieIndice } from "../src/engine/types.js";
 
 const serie = JSON.parse(
-  readFileSync(resolve(import.meta.dirname, "../data/ipc.json"), "utf8"),
+  readFileSync(resolve(import.meta.dirname, "../public/data/ipc.json"), "utf8"),
 ) as SerieIndice;
 
 /** Serie sintética chica: 100 → 110 → 121 → 133.1 (10% mensual clavado). */

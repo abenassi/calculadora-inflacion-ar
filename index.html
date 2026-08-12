@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de inflación de Argentina</title>
+    <meta
+      name="description"
+      content="Calculadora de inflación argentina que muestra el cálculo mes a mes y distingue el dato oficial del INDEC de la proyección. Datos desde 1990."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <header class="cabecera">
+      <div class="contenido">
+        <h1 id="titulo">Calculadora de inflación</h1>
+        <p class="bajada" id="bajada">
+          Cuánto valdría hoy un monto del pasado, según el IPC del INDEC.
+        </p>
+      </div>
+    </header>
+
+    <main class="contenido">
+      <nav class="presets" id="presets" aria-label="Casos de uso"></nav>
+
+      <form class="tarjeta formulario" id="formulario">
+        <div class="campo campo--monto">
+          <label for="monto" id="etiqueta-monto">Monto</label>
+          <div class="entrada-monto">
+            <span aria-hidden="true">$</span>
+            <input
+              type="text"
+              id="monto"
+              name="monto"
+              inputmode="decimal"
+              autocomplete="off"
+              value="520.000"
+            />
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="desde-mes" id="etiqueta-desde">en</label>
+          <div class="entrada-fecha">
+            <select id="desde-mes" aria-label="Mes de origen"></select>
+            <select id="desde-anio" aria-label="Año de origen"></select>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="hasta-mes" id="etiqueta-hasta">equivale, en</label>
+          <div class="entrada-fecha">
+            <select id="hasta-mes" aria-label="Mes de destino"></select>
+            <select id="hasta-anio" aria-label="Año de destino"></select>
+          </div>
+        </div>
+
+        <div class="campo campo--periodicidad" id="campo-periodicidad" hidden>
+          <label for="periodicidad">Se actualiza cada</label>
+          <select id="periodicidad"></select>
+        </div>
+      </form>
+
+      <p class="advertencia" id="advertencia" hidden></p>
+
+      <section class="resultados" id="resultados" aria-live="polite">
+        <p class="error" id="error" hidden></p>
+
+        <div class="tarjeta resultado resultado--oficial" id="bloque-oficial">
+          <p class="resultado__rotulo" id="rotulo-oficial"></p>
+          <p class="resultado__cifra" id="cifra-oficial"></p>
+          <p class="resultado__detalle" id="detalle-oficial"></p>
+        </div>
+
+        <div class="tarjeta resultado resultado--estimado" id="bloque-estimado" hidden>
+          <p class="resultado__rotulo">
+            <span class="chip chip--estimado">
+              <svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12">
+                <path
+                  d="M6 1.2 11.2 10.5H0.8L6 1.2Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.3"
+                  stroke-linejoin="round"
+                />
+                <path d="M6 4.6v2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                <circle cx="6" cy="8.8" r="0.7" fill="currentColor" />
+              </svg>
+              ESTIMADO
+            </span>
+          </p>
+          <p class="resultado__cifra" id="cifra-estimado"></p>
+          <p class="resultado__detalle" id="detalle-estimado"></p>
+        </div>
+
+        <p class="badge">
+          Datos vía
+          <a href="https://argentinadata.mymcps.dev" rel="noopener">Argentina Data MCP</a>
+          · actualizado <span id="actualizado">—</span> ·
+          <a href="/datos.html">de dónde salen estos números</a>
+        </p>
+      </section>
+
+      <section class="tarjeta panel" id="panel-grafico">
+        <div class="panel__cabecera">
+          <h2>Evolución del monto</h2>
+          <p class="leyenda-inline">
+            <span class="muestra muestra--oficial" aria-hidden="true"></span> dato oficial
+            <span class="muestra muestra--estimado" aria-hidden="true"></span> estimado
+          </p>
+        </div>
+        <div class="grafico">
+          <canvas id="grafico" role="img" aria-label="Evolución del monto ajustado por inflación"></canvas>
+        </div>
+      </section>
+
+      <section class="tarjeta panel">
+        <div class="panel__cabecera">
+          <h2>El cálculo, mes a mes</h2>
+          <div class="acciones">
+            <button type="button" id="copiar">Copiar link</button>
+            <button type="button" id="csv">Descargar CSV</button>
+          </div>
+        </div>
+        <div class="tabla-scroll">
+          <table class="desglose">
+            <thead>
+              <tr>
+                <th scope="col">Mes</th>
+                <th scope="col">Índice IPC</th>
+                <th scope="col">Var. mensual</th>
+                <th scope="col">Acumulado</th>
+                <th scope="col">Monto</th>
+                <th scope="col">Origen</th>
+              </tr>
+            </thead>
+            <tbody id="cuerpo-desglose"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="pie">
+      <div class="contenido">
+        <p>
+          Cálculo orientativo basado en el IPC del INDEC. No constituye asesoramiento contable,
+          financiero ni legal.
+        </p>
+        <p>
+          Datos vía <a href="https://argentinadata.mymcps.dev" rel="noopener">Argentina Data MCP</a>
+          · <a href="/datos.html">Fuentes y metodología</a> ·
+          <a href="https://github.com/abenassi/calculadora-inflacion-ar" rel="noopener">Código en GitHub</a>
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/ui/main.ts"></script>
+  </body>
+</html>

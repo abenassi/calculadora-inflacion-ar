@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fuentes y metodología — Calculadora de inflación</title>
+    <meta
+      name="description"
+      content="De dónde salen los datos de la calculadora de inflación: series del INDEC y del BCRA vía Argentina Data MCP, cómo se empalman y cómo se proyectan los meses sin publicar."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <header class="cabecera">
+      <div class="contenido">
+        <h1>De dónde salen estos números</h1>
+        <p class="bajada">
+          Todo el contenido de esta calculadora viene de
+          <a href="https://argentinadata.mymcps.dev" rel="noopener">Argentina Data MCP</a>, que
+          republica datos oficiales del INDEC y del BCRA. Nada está cargado a mano.
+        </p>
+      </div>
+    </header>
+
+    <main class="contenido prosa">
+      <p>
+        <strong>Última actualización:</strong> <span id="actualizado">—</span> ·
+        <strong>Último dato oficial del INDEC:</strong> <span id="ultimo-oficial">—</span> ·
+        <strong>Cobertura:</strong> <span id="cobertura">—</span>
+      </p>
+
+      <h2>Las series</h2>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Serie</th>
+            <th scope="col">Identificador</th>
+            <th scope="col">Organismo</th>
+            <th scope="col">Qué aporta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Índice de precios al consumidor, nivel general nacional</td>
+            <td><code>indec:148.3_INIVELNAL_DICI_M_26</code></td>
+            <td>INDEC</td>
+            <td>El índice oficial, desde diciembre de 2016.</td>
+          </tr>
+          <tr>
+            <td>Inflación mensual</td>
+            <td><code>bcra:27</code></td>
+            <td>BCRA</td>
+            <td>La variación mensual para todo lo anterior a diciembre de 2016.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Cómo se arma un índice único</h2>
+      <p>
+        El INDEC publica un índice de nivel sólo desde diciembre de 2016. Para atrás, lo que existe
+        es la serie de variación mensual del BCRA, que arranca en enero de 1990. La calculadora
+        <em>retropola</em>: fija diciembre de 2016 en 100 y camina hacia atrás dividiendo por cada
+        variación mensual, hasta reconstruir un índice continuo de 1990 a hoy.
+      </p>
+      <p>
+        En la tabla del cálculo, cada mes indica de qué fuente salió: <strong>INDEC ✓</strong> para
+        el tramo del índice oficial y <strong>BCRA ✓</strong> para el tramo reconstruido.
+      </p>
+
+      <h2>Los meses que el INDEC todavía no publicó</h2>
+      <p>
+        El IPC se publica con varias semanas de retraso. Si pedís un período que llega más allá del
+        último dato publicado, la calculadora te muestra <strong>dos resultados separados</strong>:
+        primero el que sale de datos oficiales, y aparte —marcado como estimado— el que incluye la
+        proyección.
+      </p>
+      <p>
+        La proyección usa el promedio de las últimas tres variaciones mensuales publicadas. Es el
+        mismo método que aplica la herramienta <code>ajuste_por_inflacion</code> de Argentina Data
+        MCP, para que preguntar desde acá o desde tu propio agente de IA dé el mismo número.
+      </p>
+      <p>
+        Una estimación no es un pronóstico. Si el mes que te interesa todavía no salió, el número
+        oficial es el de arriba.
+      </p>
+
+      <h2>Sobre la precisión</h2>
+      <p>
+        El ajuste se calcula como el cociente entre los índices de los dos meses, que es el método
+        exacto. Otras calculadoras componen variaciones mensuales redondeadas, lo que acumula una
+        deriva de fracciones de punto porcentual en períodos de décadas. Por eso, sobre plazos muy
+        largos, podés ver diferencias chicas contra otras herramientas.
+      </p>
+
+      <h2>Consultar estos mismos datos desde tu agente de IA</h2>
+      <p>
+        Los datos no son exclusivos de este sitio. Argentina Data MCP es un servidor
+        <a href="https://modelcontextprotocol.io" rel="noopener">MCP</a>: podés conectarlo a Claude,
+        a ChatGPT o a cualquier agente compatible y preguntarle lo mismo en lenguaje natural, además
+        de otras 32.000 series económicas argentinas, padrón de ARCA, precios de supermercados y más.
+      </p>
+      <pre><code>{
+  "mcpServers": {
+    "argentina-data": {
+      "type": "http",
+      "url": "https://argentinadata.mymcps.dev/mcp",
+      "headers": { "Authorization": "Bearer TU_API_KEY" }
+    }
+  }
+}</code></pre>
+      <p>
+        Podés sacar una API key gratis en
+        <a href="https://argentinadata.mymcps.dev" rel="noopener">argentinadata.mymcps.dev</a>.
+      </p>
+
+      <h2>El código</h2>
+      <p>
+        El sitio entero es
+        <a href="https://github.com/abenassi/calculadora-inflacion-ar" rel="noopener">código abierto</a>.
+        El snapshot de datos se actualiza solo, una vez por día, y queda versionado en el repo: podés
+        ver exactamente qué números se usaron en cada momento.
+      </p>
+
+      <p><a href="/">← Volver a la calculadora</a></p>
+    </main>
+
+    <footer class="pie">
+      <div class="contenido">
+        <p>
+          Cálculo orientativo basado en el IPC del INDEC. No constituye asesoramiento contable,
+          financiero ni legal.
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/ui/datos.ts"></script>
+  </body>
+</html>
