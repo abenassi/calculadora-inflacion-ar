@@ -43,6 +43,9 @@ let ultimoResultado: Resultado | null = null;
 /** Hasta cuántos meses más allá del último dato oficial se puede pedir. */
 const HORIZONTE_MESES = 24;
 
+/** Largo del período que se muestra al entrar, en meses. */
+const MESES_DEL_DEFAULT = 3;
+
 /* ---------------------------------------------------------------- formulario */
 
 function usaDias(): boolean {
@@ -523,8 +526,16 @@ async function iniciar(): Promise<void> {
   // opción menos a una que falla al elegirla.
   if (!serie.rem) el("opcion-rem").remove();
 
-  escribirPunto("desde", deOrdinal(aOrdinal(serie.ultimo_oficial) - 1));
-  escribirPunto("hasta", mesActual());
+  // El default se corre solo con el calendario: siempre el mes en curso como
+  // destino y tres meses antes como origen. En diciembre va a decir septiembre a
+  // diciembre sin que nadie lo toque.
+  //
+  // Va anclado a `mesActual()` y no al último mes publicado a propósito: si el
+  // INDEC se atrasa un mes, anclarlo al dato estiraría el período a cuatro meses
+  // sin que eso signifique nada para quien entra.
+  const hoy = mesActual();
+  escribirPunto("desde", deOrdinal(aOrdinal(hoy) - MESES_DEL_DEFAULT));
+  escribirPunto("hasta", hoy);
 
   leerUrl();
 
