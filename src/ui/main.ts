@@ -265,7 +265,7 @@ function explicarMetodo(r: Resultado): string {
         return (
           `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}. Hasta ` +
           `${nombrarMes(mesesDeLaSenda.at(-1)!)} se usa el pronóstico mes a mes del ${rem}. ` +
-          `De ahí en adelante el REM ya no llega, así que ${frasearMeses(mesesExtrapolados)} ` +
+          `De ahí en adelante el REM mensual ya no llega, así que ${frasearMeses(mesesExtrapolados)} ` +
           `${plural(mesesExtrapolados.length, "sale", "salen")} de repartir pareja su expectativa ` +
           `a doce meses (${porcentaje(base.expectativaAnualPct, false)}), o sea ` +
           `${porcentaje(tasaMensualDelRem(base.expectativaAnualPct))} por mes.`
