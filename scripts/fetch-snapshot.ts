@@ -14,7 +14,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { empalmar, type PuntoCrudo } from "../src/engine/splice.js";
-import { aMes, nombrarMes } from "../src/engine/mes.js";
+import { aMes, diffMeses, nombrarMes } from "../src/engine/mes.js";
 import type { ExpectativaRem, SerieIndice } from "../src/engine/types.js";
 import { traerSerie } from "./mcp-client.js";
 
@@ -110,6 +110,19 @@ async function traerRem(): Promise<ExpectativaRem | undefined> {
       .map((d) => ({ mes: aMes(d.fecha), tasaPct: d.valor }))
       .filter((p) => Number.isFinite(p.tasaPct))
       .sort((a, b) => a.mes.localeCompare(b.mes));
+
+    // La fecha de la encuesta sale de `bcra:29` y la senda de `rem:ipc_mensual`:
+    // dos series que se actualizan por caminos distintos. Si una queda un mes
+    // atrás de la otra, el sitio nombraría una encuesta equivocada, que es
+    // justo la clase de inexactitud silenciosa que acá no puede pasar. El REM
+    // pronostica t..t+6, así que el horizonte tiene que dar 6.
+    const horizonte = senda.length > 0 ? diffMeses(encuesta, senda.at(-1)!.mes) : 0;
+    if (horizonte !== 6) {
+      console.warn(
+        `  REM: OJO, el horizonte da ${horizonte} meses y deberían ser 6. ` +
+          `Puede que bcra:29 y rem:ipc_mensual vengan de encuestas distintas.`,
+      );
+    }
 
     console.log(
       `  REM: ${ultimo.valor}% a 12 meses y senda de ${senda.length} meses ` +
