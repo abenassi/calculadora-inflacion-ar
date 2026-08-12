@@ -33,6 +33,12 @@ function aPuntos(datos: { fecha: string; valor: number }[]): PuntoCrudo[] {
     .sort((a, b) => a.mes.localeCompare(b.mes));
 }
 
+/** Serializa ignorando `actualizado`, para comparar datos contra datos. */
+function huella(contenido: unknown): string {
+  const { actualizado: _descartado, ...resto } = contenido as Record<string, unknown>;
+  return JSON.stringify(resto);
+}
+
 async function escribirSiMejora(archivo: string, contenido: unknown, minimoDatos = 0): Promise<void> {
   const ruta = resolve(DIR_DATOS, archivo);
   const nuevo = JSON.stringify(contenido, null, 2) + "\n";
@@ -48,7 +54,12 @@ async function escribirSiMejora(archivo: string, contenido: unknown, minimoDatos
           `Un snapshot no puede encoger — abortando sin escribir.`,
       );
     }
-    if (previo === nuevo) {
+    // La comparación ignora `actualizado` a propósito. Ese campo cambia en cada
+    // corrida, así que compararlo haría que el snapshot "difiera" todos los días
+    // aunque el INDEC no publique nada: 365 commits y 365 deploys al año de puro
+    // ruido. `actualizado` significa "cuándo cambiaron los datos", no "cuándo
+    // miramos"; para lo segundo está el historial de corridas del workflow.
+    if (huella(JSON.parse(previo)) === huella(contenido)) {
       console.log(`  ${archivo}: sin cambios`);
       return;
     }
@@ -134,22 +145,14 @@ async function main(): Promise<void> {
   const dolar = await construirAuxiliar("dolar_oficial", "dolar_oficial");
   await escribirSiMejora("dolar.json", dolar, 100);
 
-  await writeFile(
-    resolve(DIR_DATOS, "meta.json"),
-    JSON.stringify(
-      {
-        actualizado: ipc.actualizado,
-        ultimo_oficial: ipc.ultimo_oficial,
-        primer_mes: ipc.datos[0]!.mes,
-        meses: ipc.datos.length,
-        fuente: "Argentina Data MCP · https://argentinadata.mymcps.dev",
-      },
-      null,
-      2,
-    ) + "\n",
-    "utf8",
-  );
-  console.log(`  meta.json: escrito (último oficial ${nombrarMes(ipc.ultimo_oficial)})`);
+  await escribirSiMejora("meta.json", {
+    actualizado: ipc.actualizado,
+    ultimo_oficial: ipc.ultimo_oficial,
+    primer_mes: ipc.datos[0]!.mes,
+    meses: ipc.datos.length,
+    fuente: "Argentina Data MCP · https://argentinadata.mymcps.dev",
+  });
+  console.log(`  último dato oficial: ${nombrarMes(ipc.ultimo_oficial)}`);
 }
 
 main().catch((e: unknown) => {
