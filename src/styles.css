@@ -630,6 +630,182 @@ button:focus-visible {
   vertical-align: top;
 }
 
+/* ------------------------------------------------- preguntas frecuentes (home) */
+
+/*
+ * El bloque de preguntas es lo único de la home que un buscador puede leer sin
+ * ejecutar JavaScript: el resultado, la tabla y el gráfico los arma el motor
+ * después de cargar. Va al final y cerrado, para no meterse entre la persona y el
+ * formulario, que es a lo que vino.
+ */
+.preguntas {
+  max-width: 44rem;
+  margin: 2.5rem 0 0;
+}
+
+.preguntas h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+}
+
+.preguntas details {
+  border-bottom: 1px solid var(--gridline);
+  padding: 0.15rem 0;
+}
+
+.preguntas summary {
+  cursor: pointer;
+  padding: 0.7rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.preguntas summary:hover {
+  color: var(--series-1);
+}
+
+.preguntas details > *:not(summary) {
+  margin: 0 0 0.8rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* ------------------------------------------------------- páginas por año (SEO) */
+
+/* Visible sólo para lectores de pantalla: los `<caption>` de las tablas generadas. */
+.sr-solo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.migas {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+
+.migas a {
+  color: var(--text-secondary);
+}
+
+/*
+ * Las tres cifras que contestan "¿y eso es mucho?" sin tener que leer la tabla.
+ * `auto-fit` y no un número fijo de columnas: son cuatro en escritorio, dos en un
+ * celular, y ninguna se parte a mitad de número.
+ */
+.datos-clave {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+}
+
+.datos-clave li {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radio);
+  padding: 0.8rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.datos-clave__rotulo {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.datos-clave__valor {
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.datos-clave__nota {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/*
+ * El aviso de los años del INDEC intervenido. Lleva el color de advertencia porque
+ * no es una nota al pie: es la diferencia entre un número que se puede defender y
+ * uno que te van a discutir.
+ */
+.aviso-serie {
+  margin-top: 1.25rem;
+  border-color: var(--warning);
+  background: var(--wash-estimado);
+}
+
+.aviso-serie h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.aviso-serie p {
+  margin: 0 0 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.aviso-serie p:last-child {
+  margin-bottom: 0;
+}
+
+.equivalencia {
+  margin: 0 0 1rem;
+}
+
+/*
+ * El puente de una página por año de vuelta a la calculadora.
+ *
+ * Clase propia y no `.boton--principal`: aquella hereda el padding y el radio de
+ * `.acciones button`, así que aplicada a un `<a>` suelto pinta el fondo azul sobre
+ * un texto sin margen y queda como un enlace seleccionado.
+ */
+.boton-enlace {
+  display: inline-block;
+  background: var(--series-1);
+  border: 1px solid var(--series-1);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.boton-enlace:hover {
+  text-decoration: underline;
+}
+
+/* La daga de los años del INDEC intervenido, en la tabla del índice. */
+.cuestionado {
+  color: var(--warning);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.navegacion-anios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  justify-content: space-between;
+  margin: 1.75rem 0 0;
+  padding-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
 /*
  * En pantallas chicas se cae el índice de precios. Es la columna que nadie sabe
  * explicar, y su lugar lo necesitan el monto y el origen del dato, que son las dos

@@ -15,10 +15,20 @@ export default defineConfig({
   base: "./",
   build: {
     outDir: "dist",
+    /*
+     * `scripts/generar-paginas.ts` corre después del build y necesita saber cómo
+     * quedaron los nombres con hash del CSS y del entry de las páginas generadas.
+     * Leerlos del manifest es lo único que no se rompe cuando cambia la estrategia
+     * de nombres de Rollup; la alternativa era buscar el `<link>` con una regex
+     * sobre `dist/index.html`.
+     */
+    manifest: true,
     rollupOptions: {
       input: {
         main: resolve(raiz, "index.html"),
         datos: resolve(raiz, "datos.html"),
+        // Entry propio de las páginas por año: sólo analytics, sin motor ni gráfico.
+        paginas: resolve(raiz, "src/ui/paginas.ts"),
       },
     },
   },

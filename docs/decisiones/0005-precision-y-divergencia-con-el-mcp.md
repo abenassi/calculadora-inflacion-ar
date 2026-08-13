@@ -23,6 +23,27 @@ lugar:
 - **El sitio** toma el cociente entre los índices de nivel de los dos meses. Es el
   método exacto: no hay redondeo intermedio porque no hay paso intermedio.
 
+### Corrección (2026-08-13): esa última frase valía sólo para la mitad de la serie
+
+Salió en la revisión de las páginas por año, y era una afirmación absoluta sobre un caso
+que varía — el defecto que este repo comete más seguido.
+
+"No hay paso intermedio" es cierto **de diciembre de 2016 en adelante**, que es desde
+cuando el INDEC publica un índice de nivel y el sitio simplemente lo divide. Para atrás
+el índice de nivel **no existe**: lo construye `splice.ts` encadenando las variaciones
+mensuales de `bcra:27`, y esas vienen publicadas **con un solo decimal**. O sea que en
+todo el tramo 1990–2016 el índice del sitio *es* un producto de variaciones redondeadas
+—exactamente lo que este documento le señala al MCP— y el redondeo se acumula igual.
+
+La diferencia con el MCP se mantiene y la decisión no cambia: el MCP redondea también el
+tramo moderno, el sitio no. Lo que cambia es el alcance de la frase. Medido: un acumulado
+anual de los años viejos puede quedar unas décimas de la cifra oficial que circula, y el
+efecto crece con la inflación del año.
+
+No es corregible desde acá: el redondeo viene de la fuente, no lo introduce el sitio. Lo
+que sí corresponde es **decirlo**, y por eso está en `/datos`, en el README y en las
+preguntas frecuentes de la home.
+
 ## Decisión
 
 **No replicar la imprecisión del MCP.** El sitio se queda con el cociente de índices.

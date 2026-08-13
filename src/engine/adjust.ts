@@ -24,6 +24,9 @@
  * siempre los meses que se usaron de verdad, no los que se pidieron.
  */
 
+// El motor mira cómo se imprime un porcentaje en un solo lugar: la frase que promete el
+// resultado de sumar una columna tiene que dar lo que da sumar esa columna en pantalla.
+import { comoSeMuestra } from "../ui/format.js";
 import type {
   BaseProyeccion,
   Fila,
@@ -314,6 +317,33 @@ function evaluarPeriodo(desde: Punto, hasta: Punto, idx: Indice, hoy?: Mes) {
  * `false` significa que las tres metodologías van a proyectar sí o sí, así que ofrecer
  * "sin estimación" en la interfaz sería ofrecer algo que no se puede cumplir.
  */
+/**
+ * La suma llana de la columna «Subió», que **no** es la inflación del período.
+ *
+ * Existe para poder decir la diferencia con números en vez de con un adjetivo. Sumar esa
+ * columna con la calculadora del celular es lo primero que hace cualquiera que desconfía
+ * del resultado, y el sitio decía "el acumulado siempre da un poco más que la suma": en
+ * 2024 la brecha son 36 puntos (81,94% contra 117,76%), o sea que "un poco" pierde a la
+ * persona justo cuando estaba comprobando.
+ *
+ * Y "siempre" era directamente falso. Con meses negativos el acumulado queda **por
+ * debajo** de la suma: de enero de 1999 a diciembre de 2001 la suma da −4,60% y el
+ * acumulado −4,52%. Por eso lo que se muestra son los dos números y no una relación entre
+ * ellos.
+ *
+ * Sale de una sola función porque la calculadora y las páginas por año afirman lo mismo:
+ * dos copias es cómo terminan diciendo cosas distintas (regla 4).
+ *
+ * Suma **lo que está impreso en la columna**, no el flotante que hay detrás. La frase
+ * promete el resultado de una cuenta que la persona puede rehacer a mano, y sumando los
+ * valores redondeados no da lo mismo: en 2017 el flotante da 22,38% y la pantalla 22,37%.
+ * Un centésimo de diferencia en la única cifra que el sitio invita a comprobar es
+ * exactamente el tipo de detalle que hace desconfiar de todo lo demás.
+ */
+export function sumaDeVariaciones(filas: Fila[]): number {
+  return filas.reduce((suma, f) => suma + comoSeMuestra(f.varMensualPct ?? 0), 0);
+}
+
 export function sePuedeEvitarEstimar(
   desde: Punto,
   hasta: Punto,

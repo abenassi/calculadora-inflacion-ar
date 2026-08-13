@@ -3,13 +3,141 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calculadora de inflación de Argentina</title>
+    <title>Calculadora de inflación de Argentina · IPC del INDEC</title>
     <meta
       name="description"
-      content="Calculadora de inflación argentina que muestra el cálculo mes a mes y distingue el dato oficial del INDEC de la proyección. Datos desde 1990."
+      content="Actualizá un monto por la inflación argentina con el IPC del INDEC, desde 1990. Mostramos el cálculo mes a mes y qué parte es dato oficial y qué parte, estimación."
     />
+    <link rel="canonical" href="https://inflacion.mymcps.dev/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Calculadora de inflación de Argentina" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:url" content="https://inflacion.mymcps.dev/" />
+    <meta property="og:title" content="Calculadora de inflación de Argentina · IPC del INDEC" />
+    <meta
+      property="og:description"
+      content="Cuánto vale hoy un monto de otra fecha, con el cálculo mes a mes a la vista y el dato oficial siempre separado de la estimación."
+    />
+    <meta property="og:image" content="https://inflacion.mymcps.dev/img/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Calculadora de inflación de Argentina, con datos del IPC del INDEC"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Calculadora de inflación de Argentina · IPC del INDEC" />
+    <meta
+      name="twitter:description"
+      content="Cuánto vale hoy un monto de otra fecha, con el cálculo mes a mes a la vista y el dato oficial siempre separado de la estimación."
+    />
+    <meta name="twitter:image" content="https://inflacion.mymcps.dev/img/og.png" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./src/styles.css" />
+    <!--
+      El JSON-LD describe lo que la página es (una calculadora) y contesta las mismas
+      preguntas que están escritas abajo. Tiene que coincidir con el texto visible: un
+      FAQPage que promete respuestas que en la página no están es motivo de penalización,
+      además de ser mentira. Si se edita una pregunta, se edita también acá.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://inflacion.mymcps.dev/#sitio",
+            "url": "https://inflacion.mymcps.dev/",
+            "name": "Calculadora de inflación de Argentina",
+            "description": "Calculadora de inflación argentina con el IPC del INDEC, que muestra el cálculo mes a mes y separa el dato oficial de la estimación.",
+            "inLanguage": "es-AR"
+          },
+          {
+            "@type": "WebApplication",
+            "name": "Calculadora de inflación de Argentina",
+            "url": "https://inflacion.mymcps.dev/",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Navegador web",
+            "browserRequirements": "Requiere JavaScript",
+            "inLanguage": "es-AR",
+            "isAccessibleForFree": true,
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ARS" },
+            "description": "Actualiza cualquier monto por la inflación argentina usando el IPC Nivel General Nacional del INDEC, con datos desde enero de 1990. Muestra el cálculo mes a mes y distingue siempre el dato publicado de la proyección.",
+            "isBasedOn": "https://argentinadata.mymcps.dev",
+            "author": { "@type": "Person", "name": "Agustín Benassi" }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "¿De dónde salen los datos de esta calculadora?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Del IPC Nivel General Nacional del INDEC, que publica un índice de nivel desde diciembre de 2016. Para atrás, la serie se reconstruye con las variaciones mensuales que publica el BCRA, hasta enero de 1990. Todo llega vía Argentina Data MCP y nada está cargado a mano."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Qué pasa con los meses que el INDEC todavía no publicó?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "El IPC sale con semanas de retraso, así que el mes en curso nunca tiene dato. Por defecto la calculadora no estima nada: usa la inflación de los últimos meses ya publicados, tantos como meses tenga el período que pediste, y te dice cuáles son. Si preferís estimar, podés elegir repetir la última variación conocida o usar la senda del REM del BCRA. Lo que se estima siempre aparece marcado."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Por qué si sumo los porcentajes de la tabla no me da el total?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Porque los porcentajes mensuales no se suman: cada mes se aplica sobre el nivel de precios que dejó el anterior. La diferencia no es chica y crece con la inflación —en 2024 la columna suma 81,94% y el año cerró en 117,76%—, así que si te dio distinto no te equivocaste vos ni se equivocó la tabla. El número que vale es el acumulado, que es el que sale del cociente entre los índices de las dos puntas."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Desde qué año hay datos?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Desde enero de 1990. Dos cosas para tener en cuenta si vas tan atrás: entre 2007 y 2016 el INDEC estuvo intervenido —en 2016 el Poder Ejecutivo declaró por Decreto 55/2016 la emergencia del sistema estadístico— y los números oficiales de esos años están cuestionados; y antes de 1992 la moneda era el austral, así que un monto de esa época no se puede leer en pesos."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Por qué el resultado no coincide con el de otra calculadora?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Por dos motivos. Uno es la aritmética: acá el resultado sale del cociente entre los índices de las dos puntas, que es el método exacto, y no de multiplicar variaciones mensuales ya redondeadas. Eso vale de diciembre de 2016 en adelante, que es desde cuando el INDEC publica un índice de nivel. Para atrás el índice se reconstruye encadenando las variaciones mensuales del BCRA, que vienen con un solo decimal: ahí el redondeo lo heredamos de la fuente y se acumula, así que un año viejo puede quedar unas décimas de la cifra oficial que circula. El otro motivo es qué se hace con los meses sin publicar, donde cada sitio elige distinto y casi ninguno lo dice. Por eso esta calculadora muestra el cálculo entero y no solamente el número."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Sirve para actualizar un alquiler, un sueldo o un contrato?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sirve para saber cuánto se movieron los precios, que suele ser el punto de partida de esa conversación. Pero es orientativo: muchos contratos se ajustan por otro índice —el ICL, el CER, las UVA— y esos no dan lo mismo que el IPC. Si el número va a un papel que se firma, revisá qué índice pide ese papel."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Cómo le explico este número a un cliente?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Con el botón Copiar explicación. Arma un texto que se entiende solo: el monto de partida, el resultado, la inflación acumulada, los meses concretos que se usaron con el porcentaje de cada uno, y la fuente. Está pensado para pegarlo en un mensaje sin editar nada. Si preferís mandar algo que la otra persona pueda abrir y revisar, usá Copiar link: el link reproduce exactamente esta consulta."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Cuál fue la inflación de cada año en Argentina?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Hay una página por año con la inflación anual y el detalle mes a mes: inflación en Argentina, año por año."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <header class="cabecera">
@@ -164,10 +292,12 @@
           celular y no le dio. El número del sitio está bien, pero nada lo explicaba,
           y su reacción fue desconfiar: "si a mí no me dan, al cliente tampoco".
         -->
-        <p class="pie-tabla" id="nota-compuesto" hidden>
-          Los porcentajes de <strong>Subió</strong> no se suman entre sí: cada mes se aplica sobre
-          el monto ya actualizado. Por eso el acumulado siempre da un poco más que la suma.
-        </p>
+        <!--
+          El texto lo arma `explicarCompuesto()` con los dos números del cálculo. Acá decía
+          "el acumulado siempre da un poco más que la suma", y las dos mitades fallaban:
+          en 2024 "un poco" son 36 puntos, y con meses negativos el acumulado da menos.
+        -->
+        <p class="pie-tabla" id="nota-compuesto" hidden></p>
       </section>
 
       <section class="tarjeta panel" id="panel-grafico">
@@ -190,17 +320,139 @@
           ></canvas>
         </div>
       </section>
+
+      <!--
+        Lo único de esta página que se puede leer sin ejecutar el JS. El resultado, la
+        tabla y el gráfico los arma el motor después de cargar, así que para un buscador
+        —o para alguien que llega con la conexión a medio andar— la home era un puñado de
+        `<select>` vacíos. Las respuestas de acá son las mismas que están en el JSON-LD
+        del `<head>`: si se edita una, se edita la otra.
+      -->
+      <section class="preguntas" id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+
+        <details>
+          <summary>¿De dónde salen los datos de esta calculadora?</summary>
+          <p>
+            Del IPC Nivel General Nacional del INDEC, que publica un índice de nivel desde
+            diciembre de 2016. Para atrás, la serie se reconstruye con las variaciones mensuales
+            que publica el BCRA, hasta enero de 1990. Todo llega vía
+            <a href="https://argentinadata.mymcps.dev" rel="noopener">Argentina Data MCP</a> y nada
+            está cargado a mano: el detalle del empalme está en
+            <a href="./datos.html">fuentes y metodología</a>.
+          </p>
+        </details>
+
+        <details>
+          <summary>¿Qué pasa con los meses que el INDEC todavía no publicó?</summary>
+          <p>
+            El IPC sale con semanas de retraso, así que el mes en curso nunca tiene dato. Por
+            defecto la calculadora <strong>no estima nada</strong>: usa la inflación de los últimos
+            meses ya publicados, tantos como meses tenga el período que pediste, y te dice cuáles
+            son.
+          </p>
+          <p>
+            Si preferís estimar, podés elegir repetir la última variación conocida o usar la senda
+            del REM del BCRA. Lo que se estima siempre aparece marcado, en la tabla y en el
+            gráfico. <a href="./datos.html#metodologias">Cuál conviene en cada caso</a>.
+          </p>
+        </details>
+
+        <details>
+          <summary>¿Por qué si sumo los porcentajes de la tabla no me da el total?</summary>
+          <p>
+            Porque los porcentajes mensuales no se suman: cada mes se aplica sobre el nivel de
+            precios que dejó el anterior. La diferencia no es chica y crece con la inflación —en
+            2024 la columna suma 81,94% y el año cerró en 117,76%—, así que si te dio distinto no
+            te equivocaste vos ni se equivocó la tabla.
+          </p>
+          <p>
+            El número que vale es el acumulado, que es el que sale del cociente entre los índices
+            de las dos puntas.
+          </p>
+        </details>
+
+        <details>
+          <summary>¿Desde qué año hay datos?</summary>
+          <p>
+            Desde enero de 1990. Dos cosas para tener en cuenta si vas tan atrás: entre 2007 y 2016
+            el INDEC estuvo intervenido —en 2016 el Poder Ejecutivo declaró por Decreto 55/2016 la
+            emergencia del sistema estadístico— y los números oficiales de esos años están
+            cuestionados; y antes de 1992 la moneda era el austral, así que un monto de esa época
+            no se puede leer en pesos.
+          </p>
+          <p>
+            Las dos cosas están explicadas en
+            <a href="./datos.html#indec-intervenido">fuentes y metodología</a>.
+          </p>
+        </details>
+
+        <details>
+          <summary>¿Por qué el resultado no coincide con el de otra calculadora?</summary>
+          <p>
+            Por dos motivos. Uno es la aritmética: acá el resultado sale del cociente entre los
+            índices de las dos puntas, que es el método exacto, y no de multiplicar variaciones
+            mensuales ya redondeadas.
+          </p>
+          <p>
+            Eso vale de diciembre de 2016 en adelante, que es desde cuando el INDEC publica un
+            índice de nivel. Para atrás el índice se reconstruye encadenando las variaciones
+            mensuales del BCRA, que vienen con un solo decimal: ahí el redondeo lo heredamos de la
+            fuente y se acumula, así que un año viejo puede quedar unas décimas de la cifra oficial
+            que circula.
+          </p>
+          <p>
+            El otro motivo es qué se hace con los meses sin publicar, donde cada sitio elige
+            distinto y casi ninguno lo dice. Por eso esta calculadora muestra el cálculo entero y
+            no solamente el número.
+          </p>
+        </details>
+
+        <details>
+          <summary>¿Sirve para actualizar un alquiler, un sueldo o un contrato?</summary>
+          <p>
+            Sirve para saber cuánto se movieron los precios, que suele ser el punto de partida de
+            esa conversación. Pero es orientativo: muchos contratos se ajustan por otro índice —el
+            ICL, el CER, las UVA— y esos no dan lo mismo que el IPC. Si el número va a un papel que
+            se firma, revisá qué índice pide ese papel.
+          </p>
+        </details>
+
+        <details>
+          <summary>¿Cómo le explico este número a un cliente?</summary>
+          <p>
+            Con el botón <strong>Copiar explicación</strong>. Arma un texto que se entiende solo:
+            el monto de partida, el resultado, la inflación acumulada, los meses concretos que se
+            usaron con el porcentaje de cada uno, y la fuente. Está pensado para pegarlo en un
+            mensaje sin editar nada.
+          </p>
+          <p>
+            Si preferís mandar algo que la otra persona pueda abrir y revisar, usá
+            <strong>Copiar link</strong>: el link reproduce exactamente esta consulta.
+          </p>
+        </details>
+
+        <details>
+          <summary>¿Cuál fue la inflación de cada año en Argentina?</summary>
+          <p>
+            Hay una página por año con la inflación anual y el detalle mes a mes:
+            <a href="./inflacion-por-anio/">inflación en Argentina, año por año</a>.
+          </p>
+        </details>
+      </section>
     </main>
 
     <footer class="pie">
       <div class="contenido">
         <p>
-          Cálculo orientativo basado en el IPC del INDEC. No constituye asesoramiento contable,
-          financiero ni legal.
+          Cálculo orientativo basado en índices oficiales de precios: el IPC del INDEC y, para lo
+          anterior a diciembre de 2016, la serie de inflación mensual del BCRA. No constituye
+          asesoramiento contable, financiero ni legal.
         </p>
         <p>
           Datos vía <a href="https://argentinadata.mymcps.dev" rel="noopener">Argentina Data MCP</a>
           · <a href="./datos.html">Fuentes y metodología</a> ·
+          <a href="./inflacion-por-anio/">Inflación año por año</a> ·
           <a href="https://github.com/abenassi/calculadora-inflacion-ar" rel="noopener">Código en GitHub</a>
         </p>
       </div>

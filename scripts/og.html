@@ -1,0 +1,94 @@
+<!doctype html>
+<!--
+  Fuente de `public/img/og.png`, la imagen que se ve al compartir el sitio.
+
+  Se genera a mano y se commitea el PNG: son 1200×630 y no cambia salvo que cambie
+  la marca, así que meterlo en el build sería pagar un browser headless en cada
+  deploy para producir siempre el mismo archivo.
+
+  Para regenerarla: servir este archivo (`python -m http.server`), abrirlo en un
+  browser con el viewport en 1200×630 y guardar la captura en `public/img/og.png`.
+
+  TODOS LOS NÚMEROS DE ACÁ SON REALES Y ESTÁN PUBLICADOS. $100.000 de diciembre de
+  2023 son $217.764 de diciembre de 2024 —la inflación de 2024, 117,76%— y las barras
+  son las doce variaciones mensuales de ese año. Es un tramo cerrado del INDEC, así
+  que no envejece. Si algún día hay que cambiar el ejemplo, sacá los números del motor
+  (`adjust`), no de la cabeza: este sitio no muestra cifras inventadas ni en una
+  tarjeta para compartir.
+-->
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        width: 1200px; height: 630px; overflow: hidden;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: #fcfcfb; color: #0b0b0b;
+        display: flex; flex-direction: column; justify-content: space-between;
+        padding: 62px 72px;
+        border-bottom: 14px solid #2a78d6;
+      }
+      .kicker {
+        font-size: 22px; letter-spacing: 0.14em; text-transform: uppercase;
+        color: #898781; font-weight: 600;
+      }
+      h1 { font-size: 76px; line-height: 1.03; letter-spacing: -0.03em; margin-top: 18px; }
+      h1 em { font-style: normal; color: #2a78d6; }
+      p.sub { font-size: 30px; color: #52514e; margin-top: 22px; max-width: 30ch; line-height: 1.35; }
+
+      .demo { display: flex; align-items: flex-end; gap: 34px; }
+      .monto { display: flex; flex-direction: column; gap: 6px; }
+      .monto span { font-size: 20px; color: #898781; letter-spacing: 0.04em; text-transform: uppercase; }
+      .monto strong { font-size: 46px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+      .flecha { font-size: 40px; color: #898781; padding-bottom: 8px; }
+      .monto--fin strong { color: #2a78d6; }
+
+      .barras { display: flex; align-items: flex-end; gap: 7px; height: 120px; margin-left: auto; }
+      .barras i { width: 20px; background: #2a78d6; border-radius: 3px 3px 0 0; display: block; }
+      .barras i.est { background: #fab219; }
+
+      footer { display: flex; justify-content: space-between; align-items: center;
+               font-size: 22px; color: #52514e; border-top: 1px solid #e1e0d9; padding-top: 26px; }
+      footer b { color: #0b0b0b; }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="kicker">Argentina · IPC del INDEC</div>
+      <h1>Calculadora<br />de <em>inflación</em></h1>
+      <p class="sub">Cuánto vale hoy un monto de otra fecha, con el cálculo mes a mes a la vista.</p>
+    </div>
+
+    <div class="demo">
+      <div class="monto">
+        <span>diciembre 2023</span>
+        <strong>$ 100.000</strong>
+      </div>
+      <div class="flecha">→</div>
+      <div class="monto monto--fin">
+        <span>diciembre 2024</span>
+        <strong>$ 217.764</strong>
+      </div>
+      <div class="barras" title="Inflación mensual de 2024">
+        <i style="height: 100%"></i>
+        <i style="height: 64%"></i>
+        <i style="height: 53%"></i>
+        <i style="height: 43%"></i>
+        <i style="height: 20%"></i>
+        <i style="height: 22%"></i>
+        <i style="height: 20%"></i>
+        <i style="height: 20%"></i>
+        <i style="height: 17%"></i>
+        <i style="height: 13%"></i>
+        <i style="height: 12%"></i>
+        <i style="height: 13%"></i>
+      </div>
+    </div>
+
+    <footer>
+      <span><b>inflacion.mymcps.dev</b></span>
+      <span>Datos vía Argentina Data MCP</span>
+    </footer>
+  </body>
+</html>

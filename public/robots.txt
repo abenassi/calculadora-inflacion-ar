@@ -1,0 +1,14 @@
+# robots.txt de inflacion.mymcps.dev
+#
+# El sitio es estático y no tiene nada que esconder: se rastrea entero. Lo único
+# que hace este archivo es declarar el sitemap, que es lo que le dice a Google que
+# existen las 30 y pico de páginas por año además de la calculadora.
+#
+# Ojo: hasta que existió este archivo, Cloudflare servía uno generado con sus
+# "content signals". Al existir el nuestro, Cloudflare le agrega esos comentarios
+# al final; las reglas de acá siguen valiendo.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://inflacion.mymcps.dev/sitemap.xml

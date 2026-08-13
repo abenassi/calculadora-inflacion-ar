@@ -39,7 +39,9 @@ explicable, va para atrás.
 |---|---|
 | `src/engine/` | Toda la aritmética. Meses como strings `YYYY-MM`, sin `Date` ni zonas horarias |
 | `src/ui/` | Orquestación y pintado. **Acá no se hace ninguna cuenta** |
+| `src/ui/explicaciones.ts` | Las frases que explican un resultado. Sin `document` a propósito: son la parte que puede mentir, y así se pueden testear |
 | `scripts/fetch-snapshot.ts` | Lo único que sabe de qué se trata el proyecto en el pipeline |
+| `scripts/generar-paginas.ts` | Las páginas por año (`/inflacion-2024/`), que se arman en el build. **No hacen ninguna cuenta propia**: salen de `resumenAnual()`, que llama a `adjust()` |
 | `scripts/mcp-client.ts` | Cliente del MCP. Reusable tal cual en otro proyecto |
 | `public/data/*.json` | El snapshot, versionado. **No hace falta la API key para desarrollar** |
 | `docs/decisiones/` | El porqué de cada decisión, con la evidencia que la produjo |

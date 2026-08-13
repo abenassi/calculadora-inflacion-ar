@@ -31,6 +31,16 @@ describe("formato de porcentajes", () => {
   it("puede omitir el signo, para cuando el texto ya lo dice", () => {
     expect(porcentaje(2.2067, false)).toBe("2,21%");
   });
+
+  it("lo que redondeado da cero se muestra como cero, sin signo", () => {
+    // El promedio mensual de 1996 es −0,00047%: mostrarlo como "-0,00%" se lee "menos
+    // cero por ciento" y hace dudar del resto de la página.
+    expect(porcentaje(-0.00047)).toBe("0,00%");
+    expect(porcentaje(0.0012)).toBe("0,00%");
+    expect(porcentaje(-0.00047, false)).toBe("0,00%");
+    // Pero no se traga un valor que sí se ve: la inflación de 1996 fue −0,0056%.
+    expect(porcentaje(-0.0056)).toBe("-0,01%");
+  });
 });
 
 describe("formato de índices", () => {

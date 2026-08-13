@@ -71,6 +71,24 @@ export function nombrarMes(mes: Mes): string {
   return `${NOMBRES[o % 12]} ${Math.floor(o / 12)}`;
 }
 
+/**
+ * `2026-08` → `"agosto"`. Para cuando el año ya está en el título o en la columna.
+ *
+ * Vive acá y no en quien lo necesita porque estaba escrito dos veces afuera, las dos como
+ * `nombrarMes(m).replace(/ \d{4}$/, "")`: una regex que depende del formato exacto que
+ * devuelve la función de al lado. Cambiar `nombrarMes` a `"agosto de 2026"` —que es
+ * justo la forma que después hizo falta— dejaba las dos copias devolviendo `"agosto de"`,
+ * en silencio y sin que ningún test lo agarrara.
+ */
+export function soloMes(mes: Mes): string {
+  return NOMBRES[aOrdinal(mes) % 12]!;
+}
+
+/** `2026-08` → `"agosto de 2026"`. La forma que pide el texto corrido. */
+export function mesConAnio(mes: Mes): string {
+  return `${soloMes(mes)} de ${mes.slice(0, 4)}`;
+}
+
 /** `2026-08` → `"ago 2026"`. Para celdas de tabla. */
 export function abreviarMes(mes: Mes): string {
   const o = aOrdinal(mes);

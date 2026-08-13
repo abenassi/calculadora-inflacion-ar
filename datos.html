@@ -8,6 +8,21 @@
       name="description"
       content="De dónde salen los datos de la calculadora de inflación: series del INDEC y del BCRA vía Argentina Data MCP, cómo se empalman y cómo se proyectan los meses sin publicar."
     />
+    <link rel="canonical" href="https://inflacion.mymcps.dev/datos.html" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Calculadora de inflación de Argentina" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:url" content="https://inflacion.mymcps.dev/datos.html" />
+    <meta property="og:title" content="Fuentes y metodología — Calculadora de inflación" />
+    <meta
+      property="og:description"
+      content="De dónde salen los datos: series del INDEC y del BCRA vía Argentina Data MCP, cómo se empalman y qué se hace con los meses que todavía no se publicaron."
+    />
+    <meta property="og:image" content="https://inflacion.mymcps.dev/img/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://inflacion.mymcps.dev/img/og.png" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./src/styles.css" />
   </head>
@@ -66,6 +81,29 @@
       <p>
         En la tabla del cálculo, cada mes indica de qué fuente salió: <strong>INDEC ✓</strong> para
         el tramo del índice oficial y <strong>BCRA ✓</strong> para el tramo reconstruido.
+      </p>
+
+      <h2 id="indec-intervenido">Los años del INDEC intervenido (2007–2016)</h2>
+      <p>
+        Entre 2007 y 2015 el INDEC estuvo intervenido, y en 2016 el Poder Ejecutivo declaró por
+        <strong>Decreto 55/2016</strong> la emergencia administrativa del Sistema Estadístico
+        Nacional. La calculadora usa los números de ese período porque son los que la serie oficial
+        publica y no existe otra serie nacional continua, pero <strong>están cuestionados</strong>:
+        en general se los considera bastante por debajo de la inflación que se vivió esos años.
+      </p>
+      <p>
+        <strong>2016 es un caso aparte dentro de ese tramo.</strong> Entre enero y mayo no hubo IPC
+        nacional del INDEC —el índice nuevo empezó a publicarse a mitad de año—, así que esos meses
+        salen de la serie del BCRA, que no declara de dónde los toma. Y diciembre de 2016 es el mes
+        del empalme: es el ancla del índice del INDEC.
+      </p>
+      <p>
+        No lo escondemos en la letra chica porque cambia qué se puede hacer con el resultado. Un
+        cálculo que atraviesa 2007–2016 es tan discutible como esa serie, y si el número va a algo
+        que se firma, quien lo reciba lo va a discutir. La página de cada uno de esos años lo repite
+        arriba de todo — por ejemplo,
+        <a href="./inflacion-2011/">la inflación de 2011</a> o
+        <a href="./inflacion-2016/">la de 2016</a>.
       </p>
 
       <h2>Los meses que el INDEC todavía no publicó</h2>
@@ -210,6 +248,30 @@
         deriva de fracciones de punto porcentual en períodos de décadas. Por eso, sobre plazos muy
         largos, podés ver diferencias chicas contra otras herramientas.
       </p>
+      <p>
+        <strong>Con una salvedad que conviene decir:</strong> eso vale mientras las dos puntas
+        estén en el tramo del índice del INDEC, o sea de diciembre de 2016 en adelante. Para atrás
+        el índice no viene dado, se reconstruye encadenando las variaciones mensuales del BCRA, y
+        <em>esas</em> vienen publicadas con un solo decimal. Ahí el redondeo sí está, no lo
+        introducimos nosotros pero lo heredamos, y se acumula: en los años de inflación alta un
+        acumulado anual puede quedar unas décimas por debajo o por encima de la cifra oficial que
+        circula. Cuanto más viejo el tramo, más se nota.
+      </p>
+
+      <h2 id="monedas">El austral, y por qué un monto de 1990 no se puede escribir con $</h2>
+      <p>
+        El índice de precios es continuo desde 1990: mide precios, no billetes. Los
+        <strong>montos</strong> no lo son. En enero de 1990 la moneda era el austral, y el peso
+        convertible lo reemplazó el 1 de enero de 1992 a razón de 1 peso = 10.000 australes
+        (Ley 23.928).
+      </p>
+      <p>
+        Así que si ajustás un monto desde antes de 1992, el resultado te dice cuánto se movieron
+        los precios —eso es correcto— pero el signo <code>$</code> de la punta vieja está sobre una
+        cantidad que en esa fecha era de australes. Leelo como una comparación de poder
+        adquisitivo, no como una conversión de moneda. Por eso las páginas por año anteriores a
+        1992 no muestran el bloque de equivalencia en pesos.
+      </p>
 
       <h2>Consultar estos mismos datos desde tu agente de IA</h2>
       <p>
@@ -268,14 +330,18 @@
         y podés leerlo entero en dos minutos.
       </p>
 
-      <p><a href="./">← Volver a la calculadora</a></p>
+      <p>
+        <a href="./">← Volver a la calculadora</a> ·
+        <a href="./inflacion-por-anio/">Inflación en Argentina, año por año</a>
+      </p>
     </main>
 
     <footer class="pie">
       <div class="contenido">
         <p>
-          Cálculo orientativo basado en el IPC del INDEC. No constituye asesoramiento contable,
-          financiero ni legal.
+          Cálculo orientativo basado en índices oficiales de precios: el IPC del INDEC y, para lo
+          anterior a diciembre de 2016, la serie de inflación mensual del BCRA. No constituye
+          asesoramiento contable, financiero ni legal.
         </p>
       </div>
     </footer>

@@ -9,14 +9,18 @@
  * si había elegido bien.
  */
 
-import { adjust, mesActual, RangoError, sePuedeEvitarEstimar, tasaMensualDelRem } from "../engine/adjust.js";
+import {
+  adjust,
+  mesActual,
+  RangoError,
+  sePuedeEvitarEstimar,
+  sumaDeVariaciones,
+} from "../engine/adjust.js";
 import * as analytics from "./analytics.js";
 import {
   abreviarPunto,
   aOrdinal,
   deOrdinal,
-  esFecha,
-  diasEntre,
   esFechaValida,
   esMesValido,
   mesDe,
@@ -24,10 +28,22 @@ import {
   nombrarPunto,
   primerDia,
 } from "../engine/mes.js";
-import type { Mes, Metodologia, Punto, Resultado, SerieIndice } from "../engine/types.js";
+import type { Metodologia, Punto, Resultado, SerieIndice } from "../engine/types.js";
 import { dibujar } from "./chart.js";
-import { rotularFila } from "./etiquetas.js";
-import { fechaLarga, indice, pesos, pesosRedondo, porcentaje } from "./format.js";
+import { fuenteDe, rotularFila } from "./etiquetas.js";
+import {
+  esAproximado,
+  explicar,
+  explicarCompuesto,
+  explicarMetodo,
+  explicarTabla,
+  frasearMeses,
+  fuenteDelTexto,
+  hayAlgoEstimado,
+  hayDatoOficial,
+  MESES_PROYECCION_LARGA,
+} from "./explicaciones.js";
+import { fechaLarga, indice, pesos, pesosRedondo, porcentaje, seVenDistintos } from "./format.js";
 
 const NOMBRES_MES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -144,261 +160,6 @@ function alternarModo(): void {
 
 /* ------------------------------------------------------------------ resultado */
 
-/** A partir de cuántos meses proyectados dejamos de tratarlo como una cuenta razonable. */
-const MESES_PROYECCION_LARGA = 4;
-
-function listar(nombres: string[], union = "y"): string {
-  if (nombres.length <= 1) return nombres[0] ?? "";
-  return `${nombres.slice(0, -1).join(", ")} ${union} ${nombres.at(-1)}`;
-}
-
-/**
- * Nombra una lista de meses en castellano legible: hasta tres los enumera
- * colapsando el año repetido ("julio y agosto de 2026"); de ahí en más los resume
- * como rango, porque enumerar doce meses produce una oración que nadie lee.
- */
-function frasearMeses(meses: Mes[], union = "y"): string {
-  if (meses.length === 0) return "";
-  if (meses.length > 3) {
-    return `los ${meses.length} meses que van de ${nombrarMes(meses[0]!)} a ${nombrarMes(meses.at(-1)!)}`;
-  }
-  const anios = new Set(meses.map((m) => m.slice(0, 4)));
-  if (anios.size === 1) {
-    const soloMeses = meses.map((m) => nombrarMes(m).replace(/ \d{4}$/, ""));
-    return `${listar(soloMeses, union)} de ${meses[0]!.slice(0, 4)}`;
-  }
-  return listar(meses.map(nombrarMes), union);
-}
-
-/** "un aumento de 11,53%" / "una baja de 10,34%". El signo no se lee en una frase. */
-function frasearVariacion(pct: number): string {
-  return `${pct < 0 ? "una baja" : "un aumento"} de ${porcentaje(Math.abs(pct), false)}`;
-}
-
-function plural(n: number, singular: string, plural: string): string {
-  return n === 1 ? singular : plural;
-}
-
-/** El resultado dicho en una línea, antes de explicar de dónde sale. */
-function resumir(r: Resultado): string {
-  return `${pesos(r.monto)} de ${nombrarPunto(r.desde)}, con ${frasearVariacion(r.variacionPct)}.`;
-}
-
-/**
- * Por qué el número es ese y con qué meses se calculó.
- *
- * Es lo único que separa un resultado defendible de un número que apareció solo.
- * Tiene que nombrar los meses concretos que se usaron, siempre.
- *
- * Va separado de `resumir` porque el texto que se copia ya trae el monto y el
- * porcentaje en sus primeras dos líneas: repetirlos ahí lee como un error.
- */
-function explicarMetodo(r: Resultado): string {
-  switch (r.metodo.tipo) {
-    case "directo":
-      return "Todos los meses del cálculo son datos oficiales ya publicados por el INDEC.";
-
-    case "ventana_reciente": {
-      const { mesesDelPeriodo, mesesSinPublicar } = r.metodo;
-      // Con fechas exactas el período casi nunca son meses redondos: del 15 de mayo
-      // al 10 de agosto no pasaron 3 meses, pasaron 87 días. Decir "3 meses" es
-      // falso y lo detecta cualquiera que mire el calendario.
-      const largo = esFecha(r.desde) || esFecha(r.hasta)
-        ? `pasaron ${diasEntre(r.desde, r.hasta)} días`
-        : plural(mesesDelPeriodo, "pasó 1 mes", `pasaron ${mesesDelPeriodo} meses`);
-      const contexto =
-        `De ${nombrarPunto(r.desde)} a ${nombrarPunto(r.hasta)} ${largo}, y el INDEC ` +
-        `todavía no publicó ${frasearMeses(mesesSinPublicar, "ni")}. `;
-      // El resultado se muestra con "~" y antes esta frase decía que no había
-      // ninguna estimación. Las dos cosas son ciertas y juntas se contradicen, así
-      // que la aproximación tiene que quedar atribuida a su causa real.
-      const cierre =
-        "Son todos datos publicados por el INDEC; el ~ está porque el tramo que se usó " +
-        "no es exactamente el tuyo.";
-
-      // En modo por día las filas son fechas, no meses: enumerar sus meses
-      // duplicaría el del extremo. Se nombra el tramo por sus puntas, que además
-      // es lo que efectivamente se calculó.
-      if (esFecha(r.desglose[0]!.punto)) {
-        return (
-          `${contexto}Así que usamos el tramo equivalente más reciente que sí está publicado: ` +
-          `del ${nombrarPunto(r.desglose[0]!.punto)} al ${nombrarPunto(r.desglose.at(-1)!.punto)} ` +
-          `(${diasEntre(r.desglose[0]!.punto, r.desglose.at(-1)!.punto)} días). ${cierre}`
-        );
-      }
-
-      const usados = frasearMeses(r.desglose.slice(1).map((f) => mesDe(f.punto)));
-      return (
-        `${contexto}Así que usamos la inflación de ` +
-        `${plural(mesesDelPeriodo, "el último mes publicado", `los últimos ${mesesDelPeriodo} meses publicados`)} ` +
-        `(${usados}). ${cierre}`
-      );
-    }
-
-    case "proyeccion": {
-      const { mesesEstimados, tasaMensualPct, base } = r.metodo;
-      const n = mesesEstimados.length;
-
-      // Se puede pedir una metodología de estimación sobre un período que ya está
-      // publicado entero: no queda nada que estimar y la frase salía con la lista de
-      // meses vacía — "El INDEC todavía no publicó ," con la coma colgando.
-      if (n === 0) {
-        return "Todos los meses del cálculo son datos oficiales ya publicados por el INDEC.";
-      }
-
-      // Acá había una aclaración para el caso "elegiste no estimar ninguno y aun así
-      // estás viendo filas estimadas". Ya no puede pasar: cuando el período obliga a
-      // proyectar, esa opción queda deshabilitada en el selector y el desplegable pasa
-      // solo a la metodología que se está usando. El motivo se explica al lado del
-      // control, que es donde se toma la decisión, en vez de acá abajo.
-      const faltan =
-        `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, así que ` +
-        `${plural(n, "ese mes se estima", "esos meses se estiman")} `;
-
-      if (base.fuente === "rem") {
-        const { mesesDeLaSenda, mesesExtrapolados } = base;
-        const rem = `REM del BCRA (encuesta de ${nombrarMes(base.mesEncuesta)})`;
-
-        // La senda llega hasta unos seis meses; más allá no hay pronóstico mes a mes
-        // y hay que repartir el número a doce meses. Esa parte es una cuenta
-        // nuestra, no algo que los analistas hayan dicho, así que va nombrada aparte.
-        if (mesesExtrapolados.length === 0) {
-          return (
-            `${faltan}con el ${rem}: los analistas pronosticaron un valor para cada uno de ` +
-            `esos meses, y son los que ves en la columna Subió.`
-          );
-        }
-        if (mesesDeLaSenda.length === 0) {
-          return (
-            `${faltan}con el ${rem}. Su pronóstico mes a mes no llega tan lejos, así que se ` +
-            `reparte pareja su expectativa a doce meses ` +
-            `(${porcentaje(base.expectativaAnualPct, false)}), o sea ` +
-            `${porcentaje(tasaMensualDelRem(base.expectativaAnualPct))} por mes.`
-          );
-        }
-        return (
-          `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}. Hasta ` +
-          `${nombrarMes(mesesDeLaSenda.at(-1)!)} se usa el pronóstico mes a mes del ${rem}. ` +
-          `De ahí en adelante el REM mensual ya no llega, así que ${frasearMeses(mesesExtrapolados)} ` +
-          `${plural(mesesExtrapolados.length, "sale", "salen")} de repartir pareja su expectativa ` +
-          `a doce meses (${porcentaje(base.expectativaAnualPct, false)}), o sea ` +
-          `${porcentaje(tasaMensualDelRem(base.expectativaAnualPct))} por mes.`
-        );
-      }
-
-      return (
-        `${faltan}repitiendo la última inflación publicada, la de ` +
-        `${nombrarMes(base.mes)} (${porcentaje(tasaMensualPct ?? 0)}).`
-      );
-    }
-  }
-}
-
-/** El párrafo completo de la tarjeta: el resultado más su justificación. */
-function explicar(r: Resultado): string {
-  return `${resumir(r)} ${explicarMetodo(r)}`;
-}
-
-/**
- * Las filas de las puntas, en modo por día, son días sueltos: llevan la parte
- * proporcional de la inflación de su mes, no un número que el INDEC haya publicado.
- * Mezcladas con meses completos en la misma columna, hay que decirlo.
- */
-function aclararParciales(r: Resultado): string {
-  const parciales = r.desglose.filter((f) => f.esParcial).length;
-  if (parciales === 0) return "";
-  return (
-    ` ${plural(parciales, "La fila marcada como prorrateada no es un mes entero", "Las filas marcadas como prorrateadas no son meses enteros")}: ` +
-    `${plural(parciales, "es un tramo", "son tramos")} de días sueltos, y ` +
-    `${plural(parciales, "le toca", "les toca")} la parte proporcional de la inflación de su mes.`
-  );
-}
-
-/**
- * Si en la tabla hay algún dato oficial que la persona pueda señalar con el dedo.
- *
- * Mira **todas** las filas, incluida la de partida: con un origen ya publicado, esa fila
- * lleva su sello del INDEC impreso, así que decir "acá no hay ningún dato oficial" la
- * contradice a dos centímetros. Y sale de una sola función porque el pie de la tabla y la
- * referencia del gráfico afirman lo mismo y se leen juntos: dos copias del predicado es
- * exactamente cómo terminan diciendo cosas distintas (regla 4).
- */
-function hayDatoOficial(r: Resultado): boolean {
-  return r.desglose.some((f) => !f.esProyeccion);
-}
-
-/** Si algo de lo que se muestra es efectivamente una estimación. */
-function hayAlgoEstimado(r: Resultado): boolean {
-  return r.desglose.some((f) => f.esProyeccion);
-}
-
-/**
- * Si el resultado se muestra con `~`.
- *
- * Con `ventana_reciente` el `~` no es por estimar —son todos datos publicados— sino
- * porque el tramo que se usó no es exactamente el pedido. Con `proyeccion` es por
- * estimar, y entonces depende de que haya algo estimado de verdad.
- */
-function esAproximado(r: Resultado): boolean {
-  return r.metodo.tipo === "ventana_reciente" || hayAlgoEstimado(r);
-}
-
-/** El pie de la tabla, que dice qué está mirando el lector. */
-function explicarTabla(r: Resultado): string {
-  switch (r.metodo.tipo) {
-    case "directo":
-      return (
-        "Todas las filas salen de datos oficiales publicados por el INDEC. Acá no hay nada estimado." +
-        aclararParciales(r)
-      );
-    case "ventana_reciente":
-      return (
-        `Este es el tramo publicado más reciente del mismo largo que el que pediste. Lo usamos ` +
-        `como referencia porque los últimos meses del tuyo todavía no salieron.` +
-        aclararParciales(r)
-      );
-    case "proyeccion": {
-      const { base, tasaMensualPct } = r.metodo;
-      // Se cuentan los tramos, no las filas. La fila de partida también sale resaltada
-      // —su índice está estimado— pero no muestra ningún porcentaje, así que llamarla
-      // "tramo proyectado" daba un número que no coincidía con lo que se puede contar
-      // en la tabla: decía 8 donde había 7 porcentajes.
-      const tramos = r.desglose.slice(1);
-      const proyectadas = tramos.filter((f) => f.esProyeccion).length;
-      // Pedir una metodología de estimación no obliga a que haya algo estimado: si el
-      // período pedido está enteramente publicado, no hay ningún tramo proyectado y el
-      // pie decía "Los 0 porcentajes resaltados son tramos proyectados" sobre una tabla
-      // con todas las filas selladas por el INDEC.
-      if (proyectadas === 0) {
-        return (
-          "Todas las filas salen de datos oficiales publicados por el INDEC: el período " +
-          "que pediste ya está publicado entero, así que no hubo nada que estimar." +
-          aclararParciales(r)
-        );
-      }
-      const de =
-        base.fuente === "rem"
-          ? `el REM del BCRA de ${nombrarMes(base.mesEncuesta)}`
-          : `la inflación de ${nombrarMes(base.mes)}`;
-      // Con la senda del REM cada mes tiene su propia tasa y está en su fila, así
-      // que nombrar "una" tasa sería inventar un promedio que no se usó.
-      const aQueTasa = tasaMensualPct === null ? "" : `, a ${porcentaje(tasaMensualPct)} por mes`;
-      // "El resto son datos oficiales" prometía una parte oficial que muchas veces no
-      // existe: cuando el destino todavía no llegó, la tabla entera está estimada y esa
-      // frase mandaba a buscar un dato del INDEC que no se puede señalar en ningún lado.
-      const cierre = hayDatoOficial(r)
-        ? " El resto son datos oficiales."
-        : " En esta tabla no hay ningún dato oficial: el INDEC todavía no publicó ninguno de estos meses.";
-      return (
-        `Estos son los meses que pediste. ${plural(proyectadas, "El porcentaje resaltado", `Los ${proyectadas} porcentajes resaltados`)} ` +
-        `${plural(proyectadas, "es un tramo proyectado", "son tramos proyectados")}, que el INDEC ` +
-        `todavía no publicó: ${plural(proyectadas, "se estimó", "se estimaron")} con ${de}` +
-        `${aQueTasa}.${cierre}` + aclararParciales(r)
-      );
-    }
-  }
-}
-
 function pintarResultado(r: Resultado): void {
   // Se anuncia estimación cuando hay algo estimado, no cuando se pidió una metodología
   // que estima. Elegir "repetir el último mes" sobre un período ya publicado entero no
@@ -472,7 +233,10 @@ function pintarResultado(r: Resultado): void {
             ? "INDEC ✓"
             : "BCRA ✓";
       if (f.esParcial && !f.esProyeccion) {
-        marca.title = `Parte proporcional de la inflación de ${nombrarMes(mesDe(f.punto))}, según el INDEC.`;
+        // El organismo sale del origen de la propia fila: en el tramo reconstruido el
+        // dato de fondo es del BCRA, y decir INDEC acá contradice el sello de al lado.
+        const organismo = f.origen === "indec" ? "INDEC" : "BCRA";
+        marca.title = `Parte proporcional de la inflación de ${nombrarMes(mesDe(f.punto))}, según el ${organismo}.`;
       }
       tdOrigen.append(marca);
 
@@ -495,8 +259,10 @@ function pintarResultado(r: Resultado): void {
       ? "El cálculo, paso a paso (sobre el tramo de referencia)"
       : "El cálculo, paso a paso";
   el("pie-tabla").textContent = explicarTabla(r);
-  // Con una sola variación no hay nada que sumar mal.
-  el("nota-compuesto").hidden = r.desglose.length < 3;
+  // Solo cuando los dos números que la nota contrapone se ven distintos. Con una sola
+  // variación son el mismo número, y en tramos cortos caen en el mismo redondeo.
+  el("nota-compuesto").hidden = !seVenDistintos(sumaDeVariaciones(r.desglose), r.variacionPct);
+  el("nota-compuesto").textContent = explicarCompuesto(r);
   dibujar(el<HTMLCanvasElement>("grafico"), r);
 }
 
@@ -529,18 +295,26 @@ function armarExplicacion(r: Resultado): string {
       `en ${nombrarPunto(r.hasta)}.`,
     estimado
       ? `Inflación acumulada estimada: ${porcentaje(r.variacionPct)}.`
-      : `Inflación acumulada: ${porcentaje(r.variacionPct)} (IPC del INDEC).`,
+      : `Inflación acumulada: ${porcentaje(r.variacionPct)} (${fuenteDe(r.desglose).corta}).`,
     "",
     r.metodo.tipo === "ventana_reciente" ? "Meses usados:" : "Mes a mes:",
   );
 
   for (const f of r.desglose.slice(1)) {
-    const etiqueta = f.origen === "proyeccion" ? "estimado" : "oficial INDEC";
+    // La etiqueta de cada línea tiene que ser el mismo sello que la persona ve en la tabla.
+    // Decía "oficial INDEC" en filas selladas "BCRA ✓", así que el texto que se manda por
+    // mensaje contradecía a la pantalla que el destinatario podía abrir.
+    const etiqueta =
+      f.origen === "proyeccion"
+        ? "estimado"
+        : f.esParcial
+          ? `prorrateado sobre el dato de ${f.origen === "indec" ? "INDEC" : "BCRA"}`
+          : `oficial ${f.origen === "indec" ? "INDEC" : "BCRA"}`;
     lineas.push(`- ${abreviarPunto(f.punto)}: ${porcentaje(f.varMensualPct ?? 0)} (${etiqueta})`);
   }
 
   lineas.push("", explicarMetodo(r));
-  lineas.push("", `Fuente: IPC Nivel General Nacional, INDEC. Calculado en ${location.href}`);
+  lineas.push("", `Fuente: ${fuenteDelTexto(r)}. Calculado en ${location.href}`);
   return lineas.join("\n");
 }
 
@@ -710,7 +484,9 @@ function descargarCsv(): void {
   if (!r) return;
 
   const filas: string[][] = [
-    ["# Calculadora de inflacion - IPC Nivel General Nacional, INDEC"],
+    // La cabecera declara la fuente de lo que hay abajo, así que sale de las filas y no
+    // de una constante: un CSV de 1999 decía "INDEC" con la columna origen llena de "bcra".
+    [`# Calculadora de inflacion - fuente: ${fuenteDe(r.desglose).corta}`],
     [`# Periodo: ${r.desde} a ${r.hasta}`],
     [`# Datos via Argentina Data MCP, actualizados al ${serie.actualizado.slice(0, 10)}`],
     [`# Ultimo mes publicado por el INDEC: ${serie.ultimo_oficial}`],

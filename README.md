@@ -105,6 +105,28 @@ honrar: queda deshabilitado y el selector pasa a la segunda metodología, que es
 efectivamente se aplica. Un control que no puede cumplir lo que ofrece no lo ofrece
 (regla 3).
 
+### Una página por año
+
+Además de la calculadora hay **una página por año** desde 1991
+([`/inflacion-2024/`](https://inflacion.mymcps.dev/inflacion-2024/), y así), más un
+índice en [`/inflacion-por-anio/`](https://inflacion.mymcps.dev/inflacion-por-anio/).
+Cada una trae la inflación anual, el mes a mes, el promedio mensual y el mes más alto
+y el más bajo.
+
+Sólo se publican los años que se pueden medir de **diciembre a diciembre**. 1990 queda
+afuera: la serie arranca en enero, así que lo que se puede calcular es la variación de
+once meses, y titular con ese número una página que la gente busca por "inflación 1990"
+sería publicar algo que el lector sabe que está mal.
+
+Existen porque la calculadora contesta una pregunta que hay que saber formular, y lo
+que la gente busca es más chato: *inflación 2024 argentina*. Se generan en el build
+(`scripts/generar-paginas.ts`) desde el mismo snapshot, con los números saliendo del
+mismo `adjust()` que responde el formulario —hay un test que exige que coincidan— y
+**sin estimar nada**: todas terminan en el último mes publicado.
+
+El porqué completo, y las dos cosas incómodas que esto obligó a escribir, están en
+[`docs/decisiones/0009`](docs/decisiones/0009-paginas-por-anio-y-seo.md).
+
 ### Sobre la precisión
 
 El ajuste se calcula como cociente entre los índices de los dos meses, que es el
@@ -112,13 +134,20 @@ método exacto. Otras calculadoras componen variaciones mensuales redondeadas, l
 acumula deriva sobre plazos largos. Por eso, en períodos de décadas, podés ver
 diferencias de fracciones de punto contra otras herramientas.
 
+Con una salvedad: eso vale mientras las dos puntas estén en el tramo del índice del
+INDEC, de diciembre de 2016 en adelante. Para atrás el índice no viene dado, se
+reconstruye encadenando las variaciones del BCRA, y esas se publican con **un solo
+decimal**. Ahí el redondeo existe —no lo introduce el sitio, lo hereda de la fuente— y
+se acumula: un acumulado anual de los años viejos puede quedar unas décimas de la cifra
+oficial que circula.
+
 ## Desarrollo
 
 ```bash
 npm install
 npm run dev        # servidor de desarrollo
 npm test           # motor de cálculo y formateo
-npm run build      # build de producción
+npm run build      # build de producción + páginas por año + sitemap
 npm run snapshot   # baja los datos (necesita ARGENTINA_DATA_API_KEY)
 ```
 
@@ -127,7 +156,7 @@ npm run snapshot   # baja los datos (necesita ARGENTINA_DATA_API_KEY)
 ```
 src/engine/     motor de cálculo — TypeScript puro, sin DOM ni red
 src/ui/         interfaz
-scripts/        pipeline de datos y cliente MCP
+scripts/        pipeline de datos, cliente MCP y generador de páginas por año
 public/data/    snapshot versionado
 tests/
 ```
@@ -284,8 +313,18 @@ cambiar de uno a otro.
 
 ## Aviso
 
-Cálculo orientativo basado en el IPC del INDEC. No constituye asesoramiento
-contable, financiero ni legal.
+Cálculo orientativo basado en índices oficiales de precios: el IPC del INDEC y, para
+lo anterior a diciembre de 2016, la serie de inflación mensual del BCRA. No constituye
+asesoramiento contable, financiero ni legal.
+
+Entre 2007 y 2015 el INDEC estuvo intervenido, y en 2016 el Poder Ejecutivo declaró
+por Decreto 55/2016 la emergencia administrativa del Sistema Estadístico Nacional
+—entre enero y mayo de 2016 no hubo IPC nacional. El sitio usa los números oficiales de
+ese período porque son los que existen, y lo dice en cada lugar donde aparecen.
+
+Antes de 1992 la moneda era el austral (1 peso = 10.000 australes, Ley 23.928). El
+índice es continuo a través de esa redenominación porque mide precios; los **montos**
+no, así que un importe anterior a 1992 no se puede leer en pesos.
 
 ## Licencia
 
