@@ -1,0 +1,1268 @@
+{
+  "serie": "san-luis",
+  "base": "Índice base 100",
+  "fuentes": [
+    {
+      "id": "dpeyc-san-luis",
+      "serie": "indec:197.1_NIVEL_GENERAL_2014_0_13",
+      "organismo": "Dirección Provincial de Estadística y Censos de San Luis",
+      "organismoCorto": "DPEyC San Luis",
+      "url": "https://www.estadistica.sanluis.gov.ar/",
+      "rango": "2005-10/2026-06",
+      "etiqueta": {
+        "corta": "IPC de San Luis",
+        "larga": "el IPC de la Provincia de San Luis",
+        "publicadosPor": "la dirección de estadística de San Luis"
+      }
+    }
+  ],
+  "ultimo_oficial": "2026-06",
+  "actualizado": "2026-08-13T23:26:54.096Z",
+  "datos": [
+    {
+      "mes": "2005-10",
+      "indice": 116.16,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2005-11",
+      "indice": 117.45,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2005-12",
+      "indice": 117.92,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-01",
+      "indice": 119.32,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-02",
+      "indice": 119.55,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-03",
+      "indice": 120.53,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-04",
+      "indice": 121.21,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-05",
+      "indice": 121.62,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-06",
+      "indice": 122.25,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-07",
+      "indice": 122.62,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-08",
+      "indice": 122.86,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-09",
+      "indice": 123.38,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-10",
+      "indice": 123.99,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-11",
+      "indice": 125.28,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2006-12",
+      "indice": 127.32,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-01",
+      "indice": 128.74,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-02",
+      "indice": 129.59,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-03",
+      "indice": 130.94,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-04",
+      "indice": 133.91,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-05",
+      "indice": 136.7,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-06",
+      "indice": 140.33,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-07",
+      "indice": 143.91,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-08",
+      "indice": 148.69,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-09",
+      "indice": 151.67,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-10",
+      "indice": 153.84,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-11",
+      "indice": 153.22,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2007-12",
+      "indice": 154.72,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-01",
+      "indice": 157.85,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-02",
+      "indice": 161.38,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-03",
+      "indice": 167.94,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-04",
+      "indice": 172.96,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-05",
+      "indice": 173.39,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-06",
+      "indice": 177.59,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-07",
+      "indice": 180.08,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-08",
+      "indice": 181.55,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-09",
+      "indice": 183.51,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-10",
+      "indice": 184.58,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-11",
+      "indice": 185.76,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2008-12",
+      "indice": 186.59,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-01",
+      "indice": 188.75,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-02",
+      "indice": 188.73,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-03",
+      "indice": 193.14,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-04",
+      "indice": 196.66,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-05",
+      "indice": 198.36,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-06",
+      "indice": 199.41,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-07",
+      "indice": 201.41,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-08",
+      "indice": 205.15,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-09",
+      "indice": 208.31,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-10",
+      "indice": 211.77,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-11",
+      "indice": 214.2,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2009-12",
+      "indice": 221.06,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-01",
+      "indice": 225.96,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-02",
+      "indice": 235.8,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-03",
+      "indice": 242,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-04",
+      "indice": 245.31,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-05",
+      "indice": 249.19,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-06",
+      "indice": 251.9,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-07",
+      "indice": 255.59,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-08",
+      "indice": 258.3,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-09",
+      "indice": 262.4,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-10",
+      "indice": 270.97,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-11",
+      "indice": 276.11,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2010-12",
+      "indice": 280.81,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-01",
+      "indice": 283.9,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-02",
+      "indice": 286.96,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-03",
+      "indice": 294.59,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-04",
+      "indice": 302.24,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-05",
+      "indice": 307.5,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-06",
+      "indice": 312.13,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-07",
+      "indice": 317.56,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-08",
+      "indice": 325.28,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-09",
+      "indice": 331.52,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-10",
+      "indice": 335.17,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-11",
+      "indice": 339.83,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2011-12",
+      "indice": 346.17,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-01",
+      "indice": 350.17,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-02",
+      "indice": 355.32,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-03",
+      "indice": 367.36,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-04",
+      "indice": 374.71,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-05",
+      "indice": 381.86,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-06",
+      "indice": 386.96,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-07",
+      "indice": 396.57,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-08",
+      "indice": 400.62,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-09",
+      "indice": 406.92,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-10",
+      "indice": 413,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-11",
+      "indice": 420.84,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2012-12",
+      "indice": 425.81,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-01",
+      "indice": 432.91,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-02",
+      "indice": 443.76,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-03",
+      "indice": 454.75,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-04",
+      "indice": 462.18,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-05",
+      "indice": 471.01,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-06",
+      "indice": 482.06,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-07",
+      "indice": 492.97,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-08",
+      "indice": 502.33,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-09",
+      "indice": 511.88,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-10",
+      "indice": 529.01,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-11",
+      "indice": 544.12,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2013-12",
+      "indice": 561.83,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-01",
+      "indice": 585.34,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-02",
+      "indice": 627.32,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-03",
+      "indice": 652.39,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-04",
+      "indice": 665.85,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-05",
+      "indice": 682.84,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-06",
+      "indice": 695.13,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-07",
+      "indice": 708.81,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-08",
+      "indice": 726.63,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-09",
+      "indice": 749.11,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-10",
+      "indice": 758.51,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-11",
+      "indice": 769.64,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2014-12",
+      "indice": 780.99,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-01",
+      "indice": 792.74,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-02",
+      "indice": 808.61,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-03",
+      "indice": 825.24,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-04",
+      "indice": 840.29,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-05",
+      "indice": 856.74,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-06",
+      "indice": 866.25,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-07",
+      "indice": 886.21,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-08",
+      "indice": 903.18,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-09",
+      "indice": 925.23,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-10",
+      "indice": 938.03,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-11",
+      "indice": 964.96,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2015-12",
+      "indice": 1027.54,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-01",
+      "indice": 1070.62,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-02",
+      "indice": 1099.66,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-03",
+      "indice": 1132.39,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-04",
+      "indice": 1170.83,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-05",
+      "indice": 1219.86,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-06",
+      "indice": 1237.74,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-07",
+      "indice": 1265.75,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-08",
+      "indice": 1273.8,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-09",
+      "indice": 1295.28,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-10",
+      "indice": 1321.6,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-11",
+      "indice": 1339.02,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2016-12",
+      "indice": 1350.48,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-01",
+      "indice": 1366.86,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-02",
+      "indice": 1390.12,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-03",
+      "indice": 1433.32,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-04",
+      "indice": 1467.76,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-05",
+      "indice": 1492.43,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-06",
+      "indice": 1507.73,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-07",
+      "indice": 1530.15,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-08",
+      "indice": 1552.09,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-09",
+      "indice": 1580.79,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-10",
+      "indice": 1606.59,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-11",
+      "indice": 1630.3,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2017-12",
+      "indice": 1678.94,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-01",
+      "indice": 1703.2,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-02",
+      "indice": 1745.32,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-03",
+      "indice": 1794.98,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-04",
+      "indice": 1839.8545,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-05",
+      "indice": 1886.48,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-06",
+      "indice": 1963.53,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-07",
+      "indice": 2034.03,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-08",
+      "indice": 2102.36,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-09",
+      "indice": 2264.68,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-10",
+      "indice": 2382.64,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-11",
+      "indice": 2466.45,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2018-12",
+      "indice": 2517.89,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-01",
+      "indice": 2609.62,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-02",
+      "indice": 2708.13,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-03",
+      "indice": 2835.66,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-04",
+      "indice": 2933.41,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-05",
+      "indice": 3035.33,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-06",
+      "indice": 3104.39,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-07",
+      "indice": 3151.61,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-08",
+      "indice": 3302.07,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-09",
+      "indice": 3506.25,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-10",
+      "indice": 3610.36,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-11",
+      "indice": 3784.74,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2019-12",
+      "indice": 3968.36,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-01",
+      "indice": 4089.1,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-02",
+      "indice": 4200.69,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-03",
+      "indice": 4316.58,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-04",
+      "indice": 4401.06,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-05",
+      "indice": 4461.56,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-06",
+      "indice": 4533.16,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-07",
+      "indice": 4641.94,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-08",
+      "indice": 4782.91,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-09",
+      "indice": 4929.68,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-10",
+      "indice": 5103,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-11",
+      "indice": 5293.17,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2020-12",
+      "indice": 5626.75,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-01",
+      "indice": 5907.94,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-02",
+      "indice": 6123.9,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-03",
+      "indice": 6361.08,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-04",
+      "indice": 6615,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-05",
+      "indice": 6834.62,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-06",
+      "indice": 7065.63,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-07",
+      "indice": 7245.04,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-08",
+      "indice": 7433.88,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-09",
+      "indice": 7648.23,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-10",
+      "indice": 7865.47,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-11",
+      "indice": 8110.43,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2021-12",
+      "indice": 8480.7,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-01",
+      "indice": 8808.77,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-02",
+      "indice": 9327.88,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-03",
+      "indice": 9962.61,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-04",
+      "indice": 10472.04,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-05",
+      "indice": 11054.95,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-06",
+      "indice": 11531.78,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-07",
+      "indice": 12323.61,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-08",
+      "indice": 13207.47,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-09",
+      "indice": 14057.96,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-10",
+      "indice": 14826.58,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-11",
+      "indice": 15585.2,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2022-12",
+      "indice": 16324.57,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-01",
+      "indice": 17243.86,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-02",
+      "indice": 18772.65,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-03",
+      "indice": 20072.27,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-04",
+      "indice": 21489.61,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-05",
+      "indice": 22820.29,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-06",
+      "indice": 23896.48,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-07",
+      "indice": 25316.84,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-08",
+      "indice": 29093.99,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-09",
+      "indice": 33432.33,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-10",
+      "indice": 35930.62,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-11",
+      "indice": 40491.64,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2023-12",
+      "indice": 53118.57,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-01",
+      "indice": 62715.09,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-02",
+      "indice": 70851.76,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-03",
+      "indice": 76971.61,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-04",
+      "indice": 81868.81,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-05",
+      "indice": 84852.87,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-06",
+      "indice": 88123.58,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-07",
+      "indice": 91508.25,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-08",
+      "indice": 95037.61,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-09",
+      "indice": 97575.73,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-10",
+      "indice": 99821.34,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-11",
+      "indice": 102155.89,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2024-12",
+      "indice": 105092.73,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-01",
+      "indice": 106460.75,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-02",
+      "indice": 110310.89,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-03",
+      "indice": 113734.43,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-04",
+      "indice": 116767.17,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-05",
+      "indice": 118563.84,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-06",
+      "indice": 120376.09,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-07",
+      "indice": 122244.18,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-08",
+      "indice": 124568.58,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-09",
+      "indice": 126857.18,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-10",
+      "indice": 129863.99,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-11",
+      "indice": 134798.57,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2025-12",
+      "indice": 138793.28,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2026-01",
+      "indice": 142217.55,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2026-02",
+      "indice": 147062.95,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2026-03",
+      "indice": 151824.16,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2026-04",
+      "indice": 155434.99,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2026-05",
+      "indice": 157552.52,
+      "origen": "dpeyc-san-luis"
+    },
+    {
+      "mes": "2026-06",
+      "indice": 160062.46,
+      "origen": "dpeyc-san-luis"
+    }
+  ]
+}

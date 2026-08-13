@@ -3,16 +3,37 @@
   "base": "2016-12=100",
   "fuentes": [
     {
-      "id": "bcra:27",
+      "id": "bcra",
+      "serie": "bcra:27",
       "organismo": "Banco Central de la República Argentina",
-      "rango": "1990-01/2016-11"
+      "organismoCorto": "BCRA",
+      "url": "https://www.bcra.gob.ar/",
+      "rango": "1990-01/2016-11",
+      "etiqueta": {
+        "corta": "serie de inflación mensual del BCRA",
+        "larga": "la serie de inflación mensual del BCRA, que para ese tramo republica el IPC que publicaba el INDEC",
+        "publicadosPor": "el BCRA, que republica el IPC que publicaba el INDEC"
+      }
     },
     {
-      "id": "indec:148.3_INIVELNAL_DICI_M_26",
+      "id": "indec",
+      "serie": "indec:148.3_INIVELNAL_DICI_M_26",
       "organismo": "Instituto Nacional de Estadística y Censos (INDEC)",
-      "rango": "2016-12/2026-06"
+      "organismoCorto": "INDEC",
+      "url": "https://www.indec.gob.ar/",
+      "rango": "2016-12/2026-06",
+      "etiqueta": {
+        "corta": "IPC del INDEC",
+        "larga": "el IPC Nivel General Nacional del INDEC",
+        "publicadosPor": "el INDEC"
+      }
     }
   ],
+  "etiquetaCombinada": {
+    "corta": "IPC del INDEC y serie del BCRA",
+    "larga": "el IPC Nivel General Nacional del INDEC y, para los meses anteriores a diciembre de 2016, la serie de inflación mensual del BCRA",
+    "publicadosPor": "el INDEC y el BCRA"
+  },
   "rem": {
     "senda": [
       {
@@ -53,7 +74,7 @@
     "organismo": "BCRA"
   },
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-12T17:43:55.794Z",
+  "actualizado": "2026-08-13T23:23:57.588Z",
   "datos": [
     {
       "mes": "1990-01",

@@ -76,7 +76,7 @@ export function resumir(r: Resultado): string {
 export function explicarMetodo(r: Resultado): string {
   switch (r.metodo.tipo) {
     case "directo":
-      return `Todos los meses del cálculo son datos oficiales ya publicados por ${fuenteDe(r.desglose).publicadosPor}.`;
+      return `Todos los meses del cálculo son datos oficiales ya publicados por ${fuenteDe(r.desglose, r).publicadosPor}.`;
 
     case "ventana_reciente": {
       const { mesesDelPeriodo, mesesSinPublicar } = r.metodo;
@@ -93,7 +93,7 @@ export function explicarMetodo(r: Resultado): string {
       // ninguna estimación. Las dos cosas son ciertas y juntas se contradicen, así
       // que la aproximación tiene que quedar atribuida a su causa real.
       const cierre =
-        `Son todos datos publicados por ${fuenteDe(r.desglose).publicadosPor}; el ~ está porque ` +
+        `Son todos datos publicados por ${fuenteDe(r.desglose, r).publicadosPor}; el ~ está porque ` +
         `el tramo que se usó no es exactamente el tuyo.`;
 
       // En modo por día las filas son fechas, no meses: enumerar sus meses
@@ -133,7 +133,7 @@ export function explicarMetodo(r: Resultado): string {
         return hayAlgoEstimado(r)
           ? `El período empieza y termina en el mismo punto, así que el monto no cambia. ` +
               `La fila igual queda marcada como estimada: el INDEC todavía no publicó ese mes.`
-          : `Todos los meses del cálculo son datos oficiales ya publicados por ${fuenteDe(r.desglose).publicadosPor}.`;
+          : `Todos los meses del cálculo son datos oficiales ya publicados por ${fuenteDe(r.desglose, r).publicadosPor}.`;
       }
 
       // Acá había una aclaración para el caso "elegiste no estimar ninguno y aun así
@@ -241,7 +241,7 @@ export function explicarTabla(r: Resultado): string {
   switch (r.metodo.tipo) {
     case "directo":
       return (
-        `Todas las filas salen de datos oficiales publicados por ${fuenteDe(r.desglose).publicadosPor}. ` +
+        `Todas las filas salen de datos oficiales publicados por ${fuenteDe(r.desglose, r).publicadosPor}. ` +
         `Acá no hay nada estimado.` + aclararParciales(r)
       );
     case "ventana_reciente":
@@ -270,7 +270,7 @@ export function explicarTabla(r: Resultado): string {
           ? `La tabla tiene una sola fila y su índice todavía no está publicado, así que ` +
               `sale marcada como estimada. Como el período empieza y termina en el mismo ` +
               `punto, el monto no cambia y esa estimación no entra en ninguna cuenta.`
-          : `Todas las filas salen de datos oficiales publicados por ${fuenteDe(r.desglose).publicadosPor}: ` +
+          : `Todas las filas salen de datos oficiales publicados por ${fuenteDe(r.desglose, r).publicadosPor}: ` +
               `el período que pediste ya está publicado entero, así que no hubo nada que estimar.` +
               aclararParciales(r);
       }
@@ -326,12 +326,12 @@ export function explicarCompuesto(r: Resultado): string {
  * el lugar donde una atribución equivocada más caro sale.
  */
 export function fuenteDelTexto(r: Resultado): string {
-  if (hayDatoOficial(r) || r.metodo.tipo !== "proyeccion") return fuenteDe(r.desglose).larga;
+  if (hayDatoOficial(r) || r.metodo.tipo !== "proyeccion") return fuenteDe(r.desglose, r).larga;
 
   const { base } = r.metodo;
   const origen =
     base.fuente === "rem"
       ? `el REM del BCRA (encuesta de ${nombrarMes(base.mesEncuesta)})`
-      : `la inflación de ${nombrarMes(base.mes)}, publicada por ${fuenteDe(r.desglose).publicadosPor}, repetida hacia adelante`;
+      : `la inflación de ${nombrarMes(base.mes)}, publicada por ${fuenteDe(r.desglose, r).publicadosPor}, repetida hacia adelante`;
   return `${origen}. Ningún mes de este cálculo está publicado todavía: son todas estimaciones`;
 }

@@ -36,7 +36,10 @@ import type {
   Punto,
   Resultado,
   SerieIndice,
+  Origen,
+  FuentesDeSerie,
 } from "./types.js";
+import { PROYECCION } from "./types.js";
 import {
   aOrdinal,
   compararMeses,
@@ -79,7 +82,9 @@ type Indice = {
   ultimoOficial: Mes;
   /** Variación mensual del último mes publicado, en porcentaje. */
   ultimaVariacionPct: number;
-  origenDe(mes: Mes): "indec" | "bcra";
+  origenDe(mes: Mes): Origen;
+  /** Se copia al resultado para que explicarlo no necesite volver a la serie. */
+  fuentes: FuentesDeSerie;
 };
 
 function armarIndice(serie: SerieIndice): Indice {
@@ -89,7 +94,7 @@ function armarIndice(serie: SerieIndice): Indice {
   }
 
   const porMes = new Map<Mes, number>();
-  const origenPorMes = new Map<Mes, "indec" | "bcra">();
+  const origenPorMes = new Map<Mes, Origen>();
   for (const p of datos) {
     porMes.set(p.mes, p.indice);
     origenPorMes.set(p.mes, p.origen);
@@ -97,6 +102,14 @@ function armarIndice(serie: SerieIndice): Indice {
 
   const primerMes = datos[0]!.mes;
   const ultimoOficial = serie.ultimo_oficial;
+  /*
+   * Quién publica esta serie hoy: el organismo del tramo más reciente, que es el que va a
+   * publicar los meses que todavía faltan. Se toma su `publicadosPor` porque ya viene con
+   * el artículo puesto ("el INDEC", "la dirección de estadística de Córdoba") y el género
+   * de una sigla no se puede adivinar: "El DEIE" está mal y "La INDEC" también.
+   */
+  const publicaAhora = serie.fuentes.at(-1)?.etiqueta.publicadosPor ?? "el organismo";
+  const organismoCorto = publicaAhora.charAt(0).toUpperCase() + publicaAhora.slice(1);
   const ultimo = datos.at(-1)!;
   const penultimo = datos.at(-2)!;
 
@@ -106,7 +119,7 @@ function armarIndice(serie: SerieIndice): Indice {
     throw new RangoError(
       compararMeses(mes, primerMes) < 0
         ? `No hay datos de inflación anteriores a ${nombrarMes(primerMes)}. Pediste ${nombrarMes(mes)}.`
-        : `El INDEC todavía no publicó ${nombrarMes(mes)}.`,
+        : `${organismoCorto} todavía no publicó ${nombrarMes(mes)}.`,
     );
   }
 
@@ -114,7 +127,10 @@ function armarIndice(serie: SerieIndice): Indice {
     primerMes,
     ultimoOficial,
     ultimaVariacionPct: (ultimo.indice / penultimo.indice - 1) * 100,
-    origenDe: (mes) => origenPorMes.get(mes) ?? "indec",
+    // Un mes sin origen conocido sólo puede ser uno proyectado, y ésos no llegan acá. El
+    // respaldo es la fuente del tramo más reciente, que es la que publica lo que sigue.
+    origenDe: (mes) => origenPorMes.get(mes) ?? serie.fuentes.at(-1)?.id ?? PROYECCION,
+    fuentes: { fuentes: serie.fuentes, etiquetaCombinada: serie.etiquetaCombinada },
 
     /**
      * Para un mes, su índice. Para un día, la parte proporcional de la inflación de
@@ -392,6 +408,7 @@ function armarResultado(
     variacionPct: (factor - 1) * 100,
     metodo,
     desglose,
+    ...idx.fuentes,
   };
 }
 

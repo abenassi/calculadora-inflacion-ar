@@ -1,0 +1,638 @@
+{
+  "serie": "mendoza",
+  "base": "Índice base 100",
+  "fuentes": [
+    {
+      "id": "deie-mendoza",
+      "serie": "indec:195.1_NIVEL_GENERAL_0_0_13",
+      "organismo": "Dirección de Estadísticas e Investigaciones Económicas de Mendoza (DEIE)",
+      "organismoCorto": "DEIE",
+      "url": "https://deie.mendoza.gov.ar/",
+      "rango": "2016-04/2026-06",
+      "etiqueta": {
+        "corta": "IPC de Mendoza",
+        "larga": "el IPC de la Provincia de Mendoza",
+        "publicadosPor": "la DEIE, la dirección de estadística de Mendoza"
+      }
+    }
+  ],
+  "ultimo_oficial": "2026-06",
+  "actualizado": "2026-08-13T23:26:44.320Z",
+  "datos": [
+    {
+      "mes": "2016-04",
+      "indice": 453.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2016-05",
+      "indice": 477.1,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2016-06",
+      "indice": 486.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2016-07",
+      "indice": 497.9,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2016-08",
+      "indice": 491.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2016-09",
+      "indice": 488.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2016-10",
+      "indice": 511.1,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2016-11",
+      "indice": 518.9,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2016-12",
+      "indice": 522.1,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-01",
+      "indice": 528.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-02",
+      "indice": 536.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-03",
+      "indice": 555.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-04",
+      "indice": 573.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-05",
+      "indice": 582.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-06",
+      "indice": 587.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-07",
+      "indice": 598.95,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-08",
+      "indice": 611,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-09",
+      "indice": 619.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-10",
+      "indice": 626.7,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-11",
+      "indice": 635,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2017-12",
+      "indice": 650.7,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-01",
+      "indice": 675,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-02",
+      "indice": 692.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-03",
+      "indice": 708.1,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-04",
+      "indice": 731.7,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-05",
+      "indice": 756.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-06",
+      "indice": 781,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-07",
+      "indice": 804.4,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-08",
+      "indice": 829.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-09",
+      "indice": 892.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-10",
+      "indice": 946.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-11",
+      "indice": 973.4,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2018-12",
+      "indice": 1000.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-01",
+      "indice": 1027.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-02",
+      "indice": 1068.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-03",
+      "indice": 1110.4,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-04",
+      "indice": 1152.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-05",
+      "indice": 1186.4,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-06",
+      "indice": 1217.7,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-07",
+      "indice": 1246.3,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-08",
+      "indice": 1298.64,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-09",
+      "indice": 1372,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-10",
+      "indice": 1417.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-11",
+      "indice": 1483.4,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2019-12",
+      "indice": 1538.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-01",
+      "indice": 1577,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-02",
+      "indice": 1613.9,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-03",
+      "indice": 1665.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-04",
+      "indice": 1673.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-05",
+      "indice": 1694.9,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-06",
+      "indice": 1739.7,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-07",
+      "indice": 1776.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-08",
+      "indice": 1822.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-09",
+      "indice": 1872,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-10",
+      "indice": 1938.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-11",
+      "indice": 1996.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2020-12",
+      "indice": 2092.4,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-01",
+      "indice": 2156.9,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-02",
+      "indice": 2255.4,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-03",
+      "indice": 2342.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-04",
+      "indice": 2454.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-05",
+      "indice": 2542.3,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-06",
+      "indice": 2640.4,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-07",
+      "indice": 2735.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-08",
+      "indice": 2805.896435,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-09",
+      "indice": 2889.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-10",
+      "indice": 2986.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-11",
+      "indice": 3063.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2021-12",
+      "indice": 3177.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-01",
+      "indice": 3311.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-02",
+      "indice": 3462.3,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-03",
+      "indice": 3690.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-04",
+      "indice": 3932.3,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-05",
+      "indice": 4144.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-06",
+      "indice": 4390.9,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-07",
+      "indice": 4699.3,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-08",
+      "indice": 5025.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-09",
+      "indice": 5351.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-10",
+      "indice": 5681.3,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-11",
+      "indice": 5961.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2022-12",
+      "indice": 6256.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-01",
+      "indice": 6574.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-02",
+      "indice": 6984.4,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-03",
+      "indice": 7561.9,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-04",
+      "indice": 8235.1,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-05",
+      "indice": 8763.9,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-06",
+      "indice": 9414.7,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-07",
+      "indice": 9798.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-08",
+      "indice": 10994.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-09",
+      "indice": 12855.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-10",
+      "indice": 13874.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-11",
+      "indice": 15800.3,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2023-12",
+      "indice": 19798.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-01",
+      "indice": 23651.435371,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-02",
+      "indice": 26533.9,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-03",
+      "indice": 28964.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-04",
+      "indice": 31096,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-05",
+      "indice": 32472.2,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-06",
+      "indice": 34265,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-07",
+      "indice": 35639.1,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-08",
+      "indice": 37266.7,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-09",
+      "indice": 38276.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-10",
+      "indice": 39252.462065,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-11",
+      "indice": 40016.257819,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2024-12",
+      "indice": 41085.037947,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-01",
+      "indice": 41515.033236,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-02",
+      "indice": 42536.1,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-03",
+      "indice": 43858,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-04",
+      "indice": 45209.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-05",
+      "indice": 45992.9,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-06",
+      "indice": 46476.001482,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-07",
+      "indice": 47351.5,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-08",
+      "indice": 48304.133721,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-09",
+      "indice": 49372.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-10",
+      "indice": 50539.3,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-11",
+      "indice": 51881.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2025-12",
+      "indice": 53359.6,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2026-01",
+      "indice": 54960.8,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2026-02",
+      "indice": 56317.800712,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2026-03",
+      "indice": 58349.057975,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2026-04",
+      "indice": 59686.693018,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2026-05",
+      "indice": 60815.187216,
+      "origen": "deie-mendoza"
+    },
+    {
+      "mes": "2026-06",
+      "indice": 61698.727675,
+      "origen": "deie-mendoza"
+    }
+  ]
+}

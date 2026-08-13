@@ -1,0 +1,2263 @@
+{
+  "serie": "tucuman",
+  "base": "Índice base 100",
+  "fuentes": [
+    {
+      "id": "de-tucuman",
+      "serie": "indec:199.1_NIVEL_GENERAL_2014_0_13",
+      "organismo": "Dirección de Estadística de la Provincia de Tucumán",
+      "organismoCorto": "DE Tucumán",
+      "url": "https://estadistica.tucuman.gov.ar/",
+      "rango": "1989-03/2026-06",
+      "etiqueta": {
+        "corta": "IPC de Tucumán",
+        "larga": "el IPC de la Provincia de Tucumán",
+        "publicadosPor": "la dirección de estadística de Tucumán"
+      }
+    }
+  ],
+  "ultimo_oficial": "2026-06",
+  "actualizado": "2026-08-13T23:26:55.148Z",
+  "datos": [
+    {
+      "mes": "1989-03",
+      "indice": 0.011057,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1989-04",
+      "indice": 0.016559,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1989-05",
+      "indice": 0.033051,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1989-06",
+      "indice": 0.065456,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1989-07",
+      "indice": 0.181679,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1989-08",
+      "indice": 0.213244,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1989-09",
+      "indice": 0.23384,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1989-10",
+      "indice": 0.2493,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1989-11",
+      "indice": 0.264281,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1989-12",
+      "indice": 0.421611,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-01",
+      "indice": 0.632951,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-02",
+      "indice": 1.198545,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-03",
+      "indice": 1.90631,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-04",
+      "indice": 2.121205,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-05",
+      "indice": 2.439008,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-06",
+      "indice": 2.781839,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-07",
+      "indice": 3.109685,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-08",
+      "indice": 3.580625,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-09",
+      "indice": 3.976313,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-10",
+      "indice": 4.20602,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-11",
+      "indice": 4.356029,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1990-12",
+      "indice": 4.469154,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-01",
+      "indice": 4.913418,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-02",
+      "indice": 6.064751,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-03",
+      "indice": 6.554956,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-04",
+      "indice": 6.951633,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-05",
+      "indice": 7.176399,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-06",
+      "indice": 7.404953,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-07",
+      "indice": 7.625274,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-08",
+      "indice": 7.637459,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-09",
+      "indice": 7.771331,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-10",
+      "indice": 7.897135,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-11",
+      "indice": 7.808381,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1991-12",
+      "indice": 7.830117,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-01",
+      "indice": 8.104447,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-02",
+      "indice": 8.287554,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-03",
+      "indice": 8.503594,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-04",
+      "indice": 8.617871,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-05",
+      "indice": 8.631538,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-06",
+      "indice": 8.686371,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-07",
+      "indice": 8.782041,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-08",
+      "indice": 8.877546,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-09",
+      "indice": 9.011912,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-10",
+      "indice": 9.173119,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-11",
+      "indice": 9.235856,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1992-12",
+      "indice": 9.270271,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-01",
+      "indice": 9.414352,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-02",
+      "indice": 9.543119,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-03",
+      "indice": 9.613596,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-04",
+      "indice": 9.738576,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-05",
+      "indice": 9.843467,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-06",
+      "indice": 9.949675,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-07",
+      "indice": 9.928104,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-08",
+      "indice": 9.884962,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-09",
+      "indice": 9.892043,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-10",
+      "indice": 9.962519,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-11",
+      "indice": 10.002203,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1993-12",
+      "indice": 10.096062,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-01",
+      "indice": 10.078443,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-02",
+      "indice": 10.145626,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-03",
+      "indice": 10.214785,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-04",
+      "indice": 10.253152,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-05",
+      "indice": 10.345858,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-06",
+      "indice": 10.357714,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-07",
+      "indice": 10.473308,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-08",
+      "indice": 10.456512,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-09",
+      "indice": 10.45009,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-10",
+      "indice": 10.456183,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-11",
+      "indice": 10.541808,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1994-12",
+      "indice": 10.606686,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-01",
+      "indice": 10.750603,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-02",
+      "indice": 10.777509,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-03",
+      "indice": 10.798685,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-04",
+      "indice": 10.845285,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-05",
+      "indice": 10.933874,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-06",
+      "indice": 10.929593,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-07",
+      "indice": 10.97998,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-08",
+      "indice": 11.093269,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-09",
+      "indice": 11.133612,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-10",
+      "indice": 11.162263,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-11",
+      "indice": 11.161605,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1995-12",
+      "indice": 11.141186,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-01",
+      "indice": 11.172472,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-02",
+      "indice": 11.165392,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-03",
+      "indice": 11.208863,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-04",
+      "indice": 11.185316,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-05",
+      "indice": 11.171978,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-06",
+      "indice": 11.193879,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-07",
+      "indice": 11.183834,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-08",
+      "indice": 11.167697,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-09",
+      "indice": 11.1565,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-10",
+      "indice": 11.213968,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-11",
+      "indice": 11.192068,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1996-12",
+      "indice": 11.204417,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-01",
+      "indice": 11.153042,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-02",
+      "indice": 11.129166,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-03",
+      "indice": 11.09788,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-04",
+      "indice": 11.125872,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-05",
+      "indice": 11.14909,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-06",
+      "indice": 11.137399,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-07",
+      "indice": 11.114181,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-08",
+      "indice": 11.100844,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-09",
+      "indice": 11.07071,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-10",
+      "indice": 11.054079,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-11",
+      "indice": 11.031685,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1997-12",
+      "indice": 11.03399,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-01",
+      "indice": 11.037777,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-02",
+      "indice": 11.028556,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-03",
+      "indice": 11.068405,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-04",
+      "indice": 11.087835,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-05",
+      "indice": 11.103149,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-06",
+      "indice": 11.080425,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-07",
+      "indice": 11.071039,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-08",
+      "indice": 11.055067,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-09",
+      "indice": 11.044528,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-10",
+      "indice": 11.035966,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-11",
+      "indice": 11.007479,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1998-12",
+      "indice": 11.00715,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-01",
+      "indice": 10.976851,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-02",
+      "indice": 10.949682,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-03",
+      "indice": 10.916584,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-04",
+      "indice": 10.86455,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-05",
+      "indice": 10.85961,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-06",
+      "indice": 10.822561,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-07",
+      "indice": 10.799837,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-08",
+      "indice": 10.788475,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-09",
+      "indice": 10.751591,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-10",
+      "indice": 10.726726,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-11",
+      "indice": 10.693464,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "1999-12",
+      "indice": 10.749285,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-01",
+      "indice": 10.711248,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-02",
+      "indice": 10.72014,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-03",
+      "indice": 10.719316,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-04",
+      "indice": 10.725903,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-05",
+      "indice": 10.707955,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-06",
+      "indice": 10.667282,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-07",
+      "indice": 10.678974,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-08",
+      "indice": 10.636655,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-09",
+      "indice": 10.606521,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-10",
+      "indice": 10.662836,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-11",
+      "indice": 10.632374,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2000-12",
+      "indice": 10.614755,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-01",
+      "indice": 10.604051,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-02",
+      "indice": 10.641924,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-03",
+      "indice": 10.618377,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-04",
+      "indice": 10.611626,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-05",
+      "indice": 10.624799,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-06",
+      "indice": 10.62167,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-07",
+      "indice": 10.60224,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-08",
+      "indice": 10.558439,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-09",
+      "indice": 10.542138,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-10",
+      "indice": 10.546748,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-11",
+      "indice": 10.533246,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2001-12",
+      "indice": 10.556463,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-01",
+      "indice": 10.779419,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-02",
+      "indice": 11.200465,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-03",
+      "indice": 11.782224,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-04",
+      "indice": 12.868679,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-05",
+      "indice": 13.641449,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-06",
+      "indice": 14.391495,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-07",
+      "indice": 14.648206,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-08",
+      "indice": 15.214652,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-09",
+      "indice": 15.383762,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-10",
+      "indice": 15.58317,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-11",
+      "indice": 15.660233,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2002-12",
+      "indice": 15.775992,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-01",
+      "indice": 15.944279,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-02",
+      "indice": 16.112237,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-03",
+      "indice": 16.231618,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-04",
+      "indice": 16.288098,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-05",
+      "indice": 16.250884,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-06",
+      "indice": 16.19391,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-07",
+      "indice": 16.122611,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-08",
+      "indice": 15.91464,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-09",
+      "indice": 15.793611,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-10",
+      "indice": 15.833295,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-11",
+      "indice": 15.886976,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2003-12",
+      "indice": 15.932094,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-01",
+      "indice": 15.99549,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-02",
+      "indice": 16.025623,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-03",
+      "indice": 16.124751,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-04",
+      "indice": 16.213505,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-05",
+      "indice": 16.36582,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-06",
+      "indice": 16.494423,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-07",
+      "indice": 16.583341,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-08",
+      "indice": 16.720013,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-09",
+      "indice": 16.748006,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-10",
+      "indice": 16.845157,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-11",
+      "indice": 16.825398,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2004-12",
+      "indice": 16.960422,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-01",
+      "indice": 17.075688,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-02",
+      "indice": 17.276578,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-03",
+      "indice": 17.535101,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-04",
+      "indice": 17.796917,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-05",
+      "indice": 17.84961,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-06",
+      "indice": 17.915475,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-07",
+      "indice": 18.124599,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-08",
+      "indice": 18.287617,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-09",
+      "indice": 18.498387,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-10",
+      "indice": 18.644938,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-11",
+      "indice": 18.852415,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2005-12",
+      "indice": 18.995673,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-01",
+      "indice": 19.244316,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-02",
+      "indice": 19.329942,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-03",
+      "indice": 19.488019,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-04",
+      "indice": 19.642804,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-05",
+      "indice": 19.672443,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-06",
+      "indice": 19.754776,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-07",
+      "indice": 19.911207,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-08",
+      "indice": 20.074224,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-09",
+      "indice": 20.212542,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-10",
+      "indice": 20.34098,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-11",
+      "indice": 20.551751,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2006-12",
+      "indice": 20.890959,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-01",
+      "indice": 21.152775,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-02",
+      "indice": 21.333906,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-03",
+      "indice": 21.584196,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-04",
+      "indice": 21.794966,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-05",
+      "indice": 21.997503,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-06",
+      "indice": 22.260966,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-07",
+      "indice": 22.573828,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-08",
+      "indice": 22.801065,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-09",
+      "indice": 23.016775,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-10",
+      "indice": 23.17156,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-11",
+      "indice": 23.077701,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2007-12",
+      "indice": 23.248952,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-01",
+      "indice": 23.495948,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-02",
+      "indice": 23.6425,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-03",
+      "indice": 24.111793,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-04",
+      "indice": 24.73566,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-05",
+      "indice": 24.874179,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-06",
+      "indice": 25.032487,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-07",
+      "indice": 25.124009,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-08",
+      "indice": 25.242741,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-09",
+      "indice": 25.371366,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-10",
+      "indice": 25.480203,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-11",
+      "indice": 25.566778,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2008-12",
+      "indice": 25.653352,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-01",
+      "indice": 25.789399,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-02",
+      "indice": 25.900709,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-03",
+      "indice": 26.066438,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-04",
+      "indice": 26.153013,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-05",
+      "indice": 26.239588,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-06",
+      "indice": 26.350898,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-07",
+      "indice": 26.514153,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-08",
+      "indice": 26.734301,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-09",
+      "indice": 26.932186,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-10",
+      "indice": 27.147386,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-11",
+      "indice": 27.372481,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2009-12",
+      "indice": 27.627258,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-01",
+      "indice": 27.914192,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-02",
+      "indice": 28.262965,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-03",
+      "indice": 28.584528,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-04",
+      "indice": 28.82199,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-05",
+      "indice": 29.037191,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-06",
+      "indice": 29.249917,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-07",
+      "indice": 29.484906,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-08",
+      "indice": 29.70258,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-09",
+      "indice": 29.91778,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-10",
+      "indice": 30.170084,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-11",
+      "indice": 30.390231,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2010-12",
+      "indice": 30.645009,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-01",
+      "indice": 30.86763,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-02",
+      "indice": 31.095198,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-03",
+      "indice": 31.357396,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-04",
+      "indice": 31.619594,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-05",
+      "indice": 31.852109,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-06",
+      "indice": 32.079677,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-07",
+      "indice": 32.334454,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-08",
+      "indice": 32.604073,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-09",
+      "indice": 32.876165,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-10",
+      "indice": 33.083945,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-11",
+      "indice": 33.279356,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2011-12",
+      "indice": 33.558869,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-01",
+      "indice": 33.865591,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-02",
+      "indice": 34.115422,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-03",
+      "indice": 34.434512,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-04",
+      "indice": 34.721445,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-05",
+      "indice": 35.003432,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-06",
+      "indice": 35.255736,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-07",
+      "indice": 35.535248,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-08",
+      "indice": 35.851865,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-09",
+      "indice": 36.168481,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-10",
+      "indice": 36.47273,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-11",
+      "indice": 36.814082,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2012-12",
+      "indice": 37.197485,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-01",
+      "indice": 37.620465,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-02",
+      "indice": 37.805982,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-03",
+      "indice": 38.080548,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-04",
+      "indice": 38.357587,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-05",
+      "indice": 38.622259,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-06",
+      "indice": 38.943822,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-07",
+      "indice": 39.304963,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-08",
+      "indice": 39.633947,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-09",
+      "indice": 39.962932,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-10",
+      "indice": 40.319125,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-11",
+      "indice": 40.692633,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2013-12",
+      "indice": 41.268974,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-01",
+      "indice": 42.795926,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-02",
+      "indice": 44.257955,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-03",
+      "indice": 45.404113,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-04",
+      "indice": 46.216352,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-05",
+      "indice": 46.879679,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-06",
+      "indice": 47.488858,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-07",
+      "indice": 48.165723,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-08",
+      "indice": 48.806489,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-09",
+      "indice": 49.478842,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-10",
+      "indice": 50.092533,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-11",
+      "indice": 50.656587,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2014-12",
+      "indice": 51.16198,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-01",
+      "indice": 51.724761,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-02",
+      "indice": 52.190284,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-03",
+      "indice": 52.868758,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-04",
+      "indice": 53.450314,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-05",
+      "indice": 53.984817,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-06",
+      "indice": 54.524665,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-07",
+      "indice": 55.233486,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-08",
+      "indice": 55.896288,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-09",
+      "indice": 56.567043,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-10",
+      "indice": 57.193613,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-11",
+      "indice": 58.337485,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2015-12",
+      "indice": 60.612647,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-01",
+      "indice": 63.097765,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-02",
+      "indice": 64.801405,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-03",
+      "indice": 66.745447,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-04",
+      "indice": 69.014793,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-05",
+      "indice": 71.913414,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-06",
+      "indice": 74.14273,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-07",
+      "indice": 75.625584,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-08",
+      "indice": 75.776835,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-09",
+      "indice": 76.610381,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-10",
+      "indice": 78.44903,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-11",
+      "indice": 79.704214,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2016-12",
+      "indice": 80.660665,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-01",
+      "indice": 81.709253,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-02",
+      "indice": 83.751985,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-03",
+      "indice": 85.762032,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-04",
+      "indice": 87.991845,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-05",
+      "indice": 89.135739,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-06",
+      "indice": 90.205368,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-07",
+      "indice": 91.738859,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-08",
+      "indice": 93.023203,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-09",
+      "indice": 94.790644,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-10",
+      "indice": 96.591666,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-11",
+      "indice": 97.847358,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2017-12",
+      "indice": 100,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-01",
+      "indice": 101.951386,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-02",
+      "indice": 105.106237,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-03",
+      "indice": 107.829787,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-04",
+      "indice": 110.906013,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-05",
+      "indice": 114.834634,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-06",
+      "indice": 118.250637,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-07",
+      "indice": 122.837758,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-08",
+      "indice": 128.119472,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-09",
+      "indice": 136.691409,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-10",
+      "indice": 143.997395,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-11",
+      "indice": 148.532191,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2018-12",
+      "indice": 151.39885,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-01",
+      "indice": 156.039483,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-02",
+      "indice": 164.240759,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-03",
+      "indice": 171.803433,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-04",
+      "indice": 177.020558,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-05",
+      "indice": 182.136452,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-06",
+      "indice": 187.691306,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-07",
+      "indice": 191.607656,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-08",
+      "indice": 199.560288,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-09",
+      "indice": 212.471331,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-10",
+      "indice": 217.933991,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-11",
+      "indice": 224.867027,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2019-12",
+      "indice": 232.187422,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-01",
+      "indice": 238.531083,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-02",
+      "indice": 244.057726,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-03",
+      "indice": 251.18002,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-04",
+      "indice": 256.901051,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-05",
+      "indice": 259.563683,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-06",
+      "indice": 263.952496,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-07",
+      "indice": 268.296077,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-08",
+      "indice": 276.108461,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-09",
+      "indice": 282.20215,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-10",
+      "indice": 293.212142,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-11",
+      "indice": 298.341317,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2020-12",
+      "indice": 310.906664,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-01",
+      "indice": 330.1753,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-02",
+      "indice": 339.971054,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-03",
+      "indice": 349.99359,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-04",
+      "indice": 365.448417,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-05",
+      "indice": 380.670484,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-06",
+      "indice": 392.122881,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-07",
+      "indice": 401.06197,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-08",
+      "indice": 411.136366,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-09",
+      "indice": 423.492957,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-10",
+      "indice": 437.072755,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-11",
+      "indice": 446.482803,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2021-12",
+      "indice": 464.966406,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-01",
+      "indice": 482.017007,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-02",
+      "indice": 500.755596,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-03",
+      "indice": 538.472349,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-04",
+      "indice": 566.67258,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-05",
+      "indice": 594.004339,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-06",
+      "indice": 630.154312,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-07",
+      "indice": 670.360947,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-08",
+      "indice": 716.960916,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-09",
+      "indice": 765.249714,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-10",
+      "indice": 806.637228,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-11",
+      "indice": 847.979899,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2022-12",
+      "indice": 885.057339,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-01",
+      "indice": 936.637015,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-02",
+      "indice": 1011.558949,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-03",
+      "indice": 1081.860806,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-04",
+      "indice": 1162.16401,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-05",
+      "indice": 1251.216824,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-06",
+      "indice": 1332.884616,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-07",
+      "indice": 1427.509366,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-08",
+      "indice": 1631.531153,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-09",
+      "indice": 1836.609141,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-10",
+      "indice": 1993.472593,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-11",
+      "indice": 2235.932366,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2023-12",
+      "indice": 2784.224629,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-01",
+      "indice": 3454.146966,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-02",
+      "indice": 3826.773385,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-03",
+      "indice": 4141.494843,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-04",
+      "indice": 4469.451234,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-05",
+      "indice": 4681.073462,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-06",
+      "indice": 4898.732206,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-07",
+      "indice": 5104.407296,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-08",
+      "indice": 5346.820763,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-09",
+      "indice": 5557.381018,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-10",
+      "indice": 5723.601308,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-11",
+      "indice": 5836.021923,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2024-12",
+      "indice": 5989.586856,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-01",
+      "indice": 6118.691914,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-02",
+      "indice": 6295.359899,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-03",
+      "indice": 6514.344328,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-04",
+      "indice": 6688.674341,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-05",
+      "indice": 6796.884171,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-06",
+      "indice": 6853.796503,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-07",
+      "indice": 6955.487868,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-08",
+      "indice": 7066.892493,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-09",
+      "indice": 7212.549727,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-10",
+      "indice": 7391.892241,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-11",
+      "indice": 7589.361136,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2025-12",
+      "indice": 7812.487416,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2026-01",
+      "indice": 8027.910683,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2026-02",
+      "indice": 8303.697147,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2026-03",
+      "indice": 8564.60195,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2026-04",
+      "indice": 8798.740974,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2026-05",
+      "indice": 8996.314467,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2026-06",
+      "indice": 9121.252327,
+      "origen": "de-tucuman"
+    }
+  ]
+}

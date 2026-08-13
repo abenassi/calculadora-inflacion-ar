@@ -295,7 +295,7 @@ function armarExplicacion(r: Resultado): string {
       `en ${nombrarPunto(r.hasta)}.`,
     estimado
       ? `Inflación acumulada estimada: ${porcentaje(r.variacionPct)}.`
-      : `Inflación acumulada: ${porcentaje(r.variacionPct)} (${fuenteDe(r.desglose).corta}).`,
+      : `Inflación acumulada: ${porcentaje(r.variacionPct)} (${fuenteDe(r.desglose, r).corta}).`,
     "",
     r.metodo.tipo === "ventana_reciente" ? "Meses usados:" : "Mes a mes:",
   );
@@ -486,7 +486,7 @@ function descargarCsv(): void {
   const filas: string[][] = [
     // La cabecera declara la fuente de lo que hay abajo, así que sale de las filas y no
     // de una constante: un CSV de 1999 decía "INDEC" con la columna origen llena de "bcra".
-    [`# Calculadora de inflacion - fuente: ${fuenteDe(r.desglose).corta}`],
+    [`# Calculadora de inflacion - fuente: ${fuenteDe(r.desglose, r).corta}`],
     [`# Periodo: ${r.desde} a ${r.hasta}`],
     [`# Datos via Argentina Data MCP, actualizados al ${serie.actualizado.slice(0, 10)}`],
     [`# Ultimo mes publicado por el INDEC: ${serie.ultimo_oficial}`],

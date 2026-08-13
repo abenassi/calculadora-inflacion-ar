@@ -26,9 +26,9 @@ describe("la fuente que se nombra es la de las filas que se muestran", () => {
   for (const c of casos) {
     it(`${c.que} se atribuye a quien publicó sus filas`, () => {
       const r = adjust(1000, c.desde, c.hasta, serie, { metodologia: "sin_proyectar" });
-      const f = fuenteDe(r.desglose);
-      expect(f.hayIndec).toBe(c.indec);
-      expect(f.hayBcra).toBe(c.bcra);
+      const f = fuenteDe(r.desglose, r);
+      expect(f.presentes.some((p) => p.organismoCorto === "INDEC")).toBe(c.indec);
+      expect(f.presentes.some((p) => p.organismoCorto === "BCRA")).toBe(c.bcra);
 
       /*
        * La etiqueta de atribución —la que va en un título o un pie— nombra exactamente a
@@ -45,16 +45,17 @@ describe("la fuente que se nombra es la de las filas que se muestran", () => {
   it("nunca nombra al BCRA en un tramo sin ninguna fila del BCRA", () => {
     const r = adjust(1000, "2017-01", "2024-12", serie, { metodologia: "sin_proyectar" });
     expect(r.desglose.some((f) => f.origen === "bcra")).toBe(false);
-    expect(fuenteDe(r.desglose).corta).not.toContain("BCRA");
+    expect(fuenteDe(r.desglose, r).corta).not.toContain("BCRA");
   });
 
   it("con todas las filas estimadas declara que no hay nada publicado", () => {
     // Un período enteramente futuro: no hay dato de nadie todavía.
     const r = adjust(1000, "2026-12", "2027-05", serie, { metodologia: "repite_ultimo" });
     expect(r.desglose.every((f) => f.origen === "proyeccion")).toBe(true);
-    const f = fuenteDe(r.desglose);
-    expect(f.hayIndec).toBe(false);
-    expect(f.hayBcra).toBe(false);
+    const f = fuenteDe(r.desglose, r);
+    expect(f.presentes).toHaveLength(0);
+    // Y contesta igual quién lo va a publicar, que es la fuente del tramo más reciente.
+    expect(f.publicadosPor).toBe("el INDEC");
   });
 });
 

@@ -20,21 +20,67 @@ export type Fecha = string;
  */
 export type Punto = Mes | Fecha;
 
-/** De dónde salió el valor del índice de un mes dado. */
-export type Origen = "indec" | "bcra" | "proyeccion";
+/**
+ * De dónde salió el valor del índice de un mes dado: el `id` de una de las `fuentes` de
+ * su serie, o `"proyeccion"` si no lo publicó nadie.
+ *
+ * Antes era `"indec" | "bcra" | "proyeccion"`. Nombrar dos organismos concretos alcanzaba
+ * mientras el único índice era el nacional, que se arma justo con esos dos; con el IPC de
+ * Mendoza elegido no hay ningún valor del tipo que sea cierto. Ahora el punto dice de cuál
+ * de las fuentes de SU serie salió, y quién lo publicó se lee de ahí.
+ *
+ * `"proyeccion"` se queda como estaba: no es una fuente, es la ausencia de una.
+ */
+export type Origen = string;
+
+/** El origen de una fila que no publicó nadie. Nunca es el `id` de una fuente. */
+export const PROYECCION = "proyeccion";
 
 export type PuntoIndice = {
   mes: Mes;
-  /** Índice de precios, base dic-2016 = 100. */
+  /** Índice de precios. La base la declara `SerieIndice.base`. */
   indice: number;
-  origen: Exclude<Origen, "proyeccion">;
+  origen: Origen;
+};
+
+/**
+ * Cómo se nombra una fuente en las tres formas que el sitio necesita.
+ *
+ * Viaja en el snapshot, no en el código de la interfaz, porque es lo que hace que sumar
+ * una jurisdicción sea una entrada en una tabla del pipeline y no una rama nueva en cada
+ * frase. Antes estas tres cadenas eran constantes de `src/ui/etiquetas.ts` con "INDEC" y
+ * "BCRA" escritos adentro.
+ */
+export type EtiquetaFuente = {
+  /** Para un título o una etiqueta. Sin subordinadas. */
+  corta: string;
+  /** Entra después de "según". */
+  larga: string;
+  /** Entra después de "publicados por". */
+  publicadosPor: string;
 };
 
 export type FuenteSerie = {
+  /**
+   * Con qué se compara `PuntoIndice.origen`.
+   *
+   * Es un slug corto (`"indec"`, `"bcra"`, `"idecba"`) y no el id de la serie del MCP,
+   * que va aparte en `serie`: el snapshot repite este valor en cada uno de sus cientos de
+   * puntos, y además cambiar de serie del MCP sin cambiar de organismo no debería
+   * invalidar los orígenes ya escritos.
+   */
   id: string;
+  /** La serie del catálogo del MCP de la que salió este tramo. */
+  serie: string;
+  /** Nombre completo del organismo, para las citas y la página de datos. */
   organismo: string;
+  /** La sigla que entra en una oración y en el sello de la tabla. Ej: `"INDEC"`. */
+  organismoCorto: string;
+  /** Sitio del organismo. Lo usa el JSON-LD de las páginas por año. */
+  url: string;
   /** Rango que aporta esta fuente al empalme, `YYYY-MM/YYYY-MM`. */
   rango: string;
+  etiqueta: EtiquetaFuente;
 };
 
 /**
@@ -65,6 +111,15 @@ export type SerieIndice = {
   serie: string;
   base: string;
   fuentes: FuenteSerie[];
+  /**
+   * Cómo se nombra el conjunto cuando el período usa más de una fuente.
+   *
+   * Sólo la serie nacional la necesita, y no es la concatenación de las dos etiquetas
+   * sueltas: dice *dónde* corta el empalme ("para los meses anteriores a diciembre de
+   * 2016"), que es justo lo que alguien va a querer verificar. Una serie de una sola
+   * fuente no la trae y nunca hace falta.
+   */
+  etiquetaCombinada?: EtiquetaFuente;
   /** Ausente si el pipeline no pudo traer el REM; el sitio esconde esa opción. */
   rem?: ExpectativaRem;
   /** Último mes con dato oficial publicado. Todo lo posterior es proyección. */
@@ -183,7 +238,21 @@ export type BaseProyeccion =
  */
 export type Metodologia = "sin_proyectar" | "repite_ultimo" | "rem";
 
-export type Resultado = {
+/**
+ * Con qué fuentes se calculó algo, para poder decirlo sin volver a mirar la serie.
+ *
+ * Viaja pegado al resultado y no se pasa aparte porque **quien explica un número no
+ * siempre tiene la serie a mano**: las páginas por año, el texto que se copia y el pie de
+ * la tabla salen de funciones que reciben el resultado y nada más. Cuando el organismo
+ * estaba escrito a mano eso no importaba; desde que se puede calcular con el IPC de una
+ * provincia, un resultado que no sabe de dónde salió no se puede explicar.
+ */
+export type FuentesDeSerie = {
+  fuentes: FuenteSerie[];
+  etiquetaCombinada?: EtiquetaFuente;
+};
+
+export type Resultado = FuentesDeSerie & {
   /**
    * La metodología que se pidió, que no siempre es la que terminó aplicándose.
    *

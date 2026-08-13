@@ -1,0 +1,133 @@
+{
+  "indices": [
+    {
+      "slug": "nacional",
+      "nombre": "Nacional (INDEC)",
+      "tipo": "nacional",
+      "cubre": "El IPC Nivel General Nacional del INDEC.",
+      "primerMes": "1990-01",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "caba",
+      "nombre": "Ciudad de Buenos Aires",
+      "tipo": "provincia",
+      "cubre": "Mide precios en la Ciudad de Buenos Aires, no en el conurbano. Para el aglomerado completo está la región Gran Buenos Aires.",
+      "primerMes": "2012-07",
+      "ultimoOficial": "2026-07"
+    },
+    {
+      "slug": "chaco",
+      "nombre": "Chaco",
+      "tipo": "provincia",
+      "cubre": "Se releva en el Gran Resistencia y se publica como índice provincial.",
+      "primerMes": "1988-08",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "cordoba",
+      "nombre": "Córdoba",
+      "tipo": "provincia",
+      "cubre": "Índice provincial de Córdoba, con la serie empalmada que publica la provincia.",
+      "primerMes": "1990-03",
+      "ultimoOficial": "2026-07"
+    },
+    {
+      "slug": "mendoza",
+      "nombre": "Mendoza",
+      "tipo": "provincia",
+      "cubre": "Índice provincial de Mendoza.",
+      "primerMes": "2016-04",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "neuquen",
+      "nombre": "Neuquén",
+      "tipo": "provincia",
+      "cubre": "Índice provincial del Neuquén.",
+      "primerMes": "2001-11",
+      "ultimoOficial": "2026-01"
+    },
+    {
+      "slug": "rio-negro",
+      "nombre": "Río Negro",
+      "tipo": "provincia",
+      "cubre": "Se releva en Viedma y se publica como referencia provincial.",
+      "primerMes": "1989-09",
+      "ultimoOficial": "2026-07"
+    },
+    {
+      "slug": "san-luis",
+      "nombre": "San Luis",
+      "tipo": "provincia",
+      "cubre": "Índice provincial de San Luis.",
+      "primerMes": "2005-10",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "santa-fe",
+      "nombre": "Santa Fe",
+      "tipo": "provincia",
+      "cubre": "Índice provincial de Santa Fe.",
+      "primerMes": "2013-12",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "tucuman",
+      "nombre": "Tucumán",
+      "tipo": "provincia",
+      "cubre": "Índice provincial de Tucumán.",
+      "primerMes": "1989-03",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "gba",
+      "nombre": "Región Gran Buenos Aires",
+      "tipo": "region",
+      "cubre": "Cubre la Ciudad de Buenos Aires y los 24 partidos del conurbano bonaerense. No es el índice de ninguna de ellas por separado.",
+      "primerMes": "2016-12",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "pampeana",
+      "nombre": "Región Pampeana",
+      "tipo": "region",
+      "cubre": "Cubre Buenos Aires, Córdoba, Entre Ríos, La Pampa y Santa Fe. No es el índice de ninguna de ellas por separado.",
+      "primerMes": "2016-12",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "noroeste",
+      "nombre": "Región Noroeste",
+      "tipo": "region",
+      "cubre": "Cubre Catamarca, Jujuy, La Rioja, Salta, Santiago del Estero y Tucumán. No es el índice de ninguna de ellas por separado.",
+      "primerMes": "2016-12",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "noreste",
+      "nombre": "Región Noreste",
+      "tipo": "region",
+      "cubre": "Cubre Corrientes, Chaco, Formosa y Misiones. No es el índice de ninguna de ellas por separado.",
+      "primerMes": "2016-12",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "cuyo",
+      "nombre": "Región Cuyo",
+      "tipo": "region",
+      "cubre": "Cubre Mendoza, San Juan y San Luis. No es el índice de ninguna de ellas por separado.",
+      "primerMes": "2016-12",
+      "ultimoOficial": "2026-06"
+    },
+    {
+      "slug": "patagonia",
+      "nombre": "Región Patagónica",
+      "tipo": "region",
+      "cubre": "Cubre Chubut, Neuquén, Río Negro, Santa Cruz y Tierra del Fuego. No es el índice de ninguna de ellas por separado.",
+      "primerMes": "2016-12",
+      "ultimoOficial": "2026-06"
+    }
+  ],
+  "actualizado": "2026-08-13T23:26:56.657Z"
+}

@@ -20,12 +20,12 @@
 import { comoSeMuestra } from "../ui/format.js";
 import { adjust, sumaDeVariaciones } from "./adjust.js";
 import { aOrdinal, compararMeses } from "./mes.js";
-import type { Fila, Mes, SerieIndice } from "./types.js";
+import type { Fila, FuentesDeSerie, Mes, SerieIndice } from "./types.js";
 
 /** Monto de referencia para pedirle el desglose al motor. No se muestra. */
 const MONTO_TESTIGO = 100;
 
-export type ResumenAnual = {
+export type ResumenAnual = FuentesDeSerie & {
   anio: number;
   /**
    * Punto de partida de la variación: el cierre de diciembre del año anterior.
@@ -187,6 +187,10 @@ export function resumenAnual(serie: SerieIndice, anio: number): ResumenAnual {
     variacionPct: resultado.variacionPct,
     filas,
     conVariacion,
+    // Las páginas por año también nombran a su fuente, y las arma un script que sólo
+    // recibe el resumen. Viajan acá por lo mismo que en `Resultado`.
+    fuentes: serie.fuentes,
+    ...(serie.etiquetaCombinada ? { etiquetaCombinada: serie.etiquetaCombinada } : {}),
     mesesMasAltos: conVariacion.filter((f) => impreso(f) === alto),
     mesesMasBajos: conVariacion.filter((f) => impreso(f) === bajo),
     promedioMensualPct: (Math.pow(factor, 1 / conVariacion.length) - 1) * 100,

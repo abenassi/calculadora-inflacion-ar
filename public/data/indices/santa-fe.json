@@ -1,0 +1,778 @@
+{
+  "serie": "santa-fe",
+  "base": "Índice base 100",
+  "fuentes": [
+    {
+      "id": "ipec-santa-fe",
+      "serie": "indec:198.1_NIVEL_GENERAL_2014_0_13",
+      "organismo": "Instituto Provincial de Estadística y Censos de Santa Fe (IPEC)",
+      "organismoCorto": "IPEC Santa Fe",
+      "url": "https://www.santafe.gob.ar/index.php/web/content/view/full/113239",
+      "rango": "2013-12/2026-06",
+      "etiqueta": {
+        "corta": "IPC de Santa Fe",
+        "larga": "el IPC de la Provincia de Santa Fe",
+        "publicadosPor": "el IPEC, el instituto de estadística de Santa Fe"
+      }
+    }
+  ],
+  "ultimo_oficial": "2026-06",
+  "actualizado": "2026-08-13T23:26:54.342Z",
+  "datos": [
+    {
+      "mes": "2013-12",
+      "indice": 82.96,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-01",
+      "indice": 85.24,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-02",
+      "indice": 90.29,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-03",
+      "indice": 93.38,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-04",
+      "indice": 95.22,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-05",
+      "indice": 96.98,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-06",
+      "indice": 99.06,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-07",
+      "indice": 100.69,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-08",
+      "indice": 102.79,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-09",
+      "indice": 105.74,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-10",
+      "indice": 108.08,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-11",
+      "indice": 110.39,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2014-12",
+      "indice": 112.15,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-01",
+      "indice": 113.47,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-02",
+      "indice": 115.42,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-03",
+      "indice": 117.34,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-04",
+      "indice": 120.17,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-05",
+      "indice": 122.29,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-06",
+      "indice": 123.72,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-07",
+      "indice": 126.38,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-08",
+      "indice": 129.51,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-09",
+      "indice": 131.77,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-10",
+      "indice": 133.87,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-11",
+      "indice": 136.29,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2015-12",
+      "indice": 144.36,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-01",
+      "indice": 149.93,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-02",
+      "indice": 154.84,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-03",
+      "indice": 158.72,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-04",
+      "indice": 165.74,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-05",
+      "indice": 171.96,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-06",
+      "indice": 177.22,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-07",
+      "indice": 180.85,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-08",
+      "indice": 181.5,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-09",
+      "indice": 182.75,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-10",
+      "indice": 187.34,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-11",
+      "indice": 188.79,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2016-12",
+      "indice": 191.84,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-01",
+      "indice": 195.82,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-02",
+      "indice": 201.09,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-03",
+      "indice": 206.76,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-04",
+      "indice": 211.72,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-05",
+      "indice": 215.74,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-06",
+      "indice": 218.52,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-07",
+      "indice": 222.94,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-08",
+      "indice": 226.03,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-09",
+      "indice": 229.52,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-10",
+      "indice": 232.41,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-11",
+      "indice": 235.93,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2017-12",
+      "indice": 241.85,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-01",
+      "indice": 246.14,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-02",
+      "indice": 253.15,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-03",
+      "indice": 258.49,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-04",
+      "indice": 265.59,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-05",
+      "indice": 272.76,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-06",
+      "indice": 282.82,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-07",
+      "indice": 292.44,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-08",
+      "indice": 303.97,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-09",
+      "indice": 323.05,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-10",
+      "indice": 341.07,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-11",
+      "indice": 351.87,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2018-12",
+      "indice": 361.06,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-01",
+      "indice": 373.42,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-02",
+      "indice": 387.85,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-03",
+      "indice": 402.8,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-04",
+      "indice": 416.66,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-05",
+      "indice": 430.02,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-06",
+      "indice": 441.97,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-07",
+      "indice": 452.05,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-08",
+      "indice": 468.85,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-09",
+      "indice": 495.63,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-10",
+      "indice": 511.1,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-11",
+      "indice": 532.26,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2019-12",
+      "indice": 552.72,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-01",
+      "indice": 568.46,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-02",
+      "indice": 578.71,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-03",
+      "indice": 592.48,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-04",
+      "indice": 604.75,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-05",
+      "indice": 614.51,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-06",
+      "indice": 625.88,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-07",
+      "indice": 641.44,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-08",
+      "indice": 659.44,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-09",
+      "indice": 677.39,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-10",
+      "indice": 702.55,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-11",
+      "indice": 728.13,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2020-12",
+      "indice": 755.18,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-01",
+      "indice": 791.8,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-02",
+      "indice": 821.11,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-03",
+      "indice": 856.2,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-04",
+      "indice": 893.23,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-05",
+      "indice": 925.21,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-06",
+      "indice": 954.95,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-07",
+      "indice": 983.49,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-08",
+      "indice": 1010.55,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-09",
+      "indice": 1041,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-10",
+      "indice": 1073.9,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-11",
+      "indice": 1104.28,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2021-12",
+      "indice": 1138.2,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-01",
+      "indice": 1184.14,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-02",
+      "indice": 1242.3,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-03",
+      "indice": 1317.2,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-04",
+      "indice": 1395.48,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-05",
+      "indice": 1468.73,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-06",
+      "indice": 1543.16,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-07",
+      "indice": 1655.37,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-08",
+      "indice": 1765.53,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-09",
+      "indice": 1873.76,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-10",
+      "indice": 1981.79,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-11",
+      "indice": 2079.18,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2022-12",
+      "indice": 2192.67,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-01",
+      "indice": 2317.64,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-02",
+      "indice": 2467.56,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-03",
+      "indice": 2658.86,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-04",
+      "indice": 2884.85,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-05",
+      "indice": 3093.976958,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-06",
+      "indice": 3269.51,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-07",
+      "indice": 3495.51,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-08",
+      "indice": 3931.68,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-09",
+      "indice": 4424.31,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-10",
+      "indice": 4807.5,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-11",
+      "indice": 5407.62,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2023-12",
+      "indice": 6915.57,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-01",
+      "indice": 8345.61,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-02",
+      "indice": 9373.47,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-03",
+      "indice": 10535.81,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-04",
+      "indice": 11280.8,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-05",
+      "indice": 11826.08,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-06",
+      "indice": 12331.8,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-07",
+      "indice": 12886.62,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-08",
+      "indice": 13397.73,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-09",
+      "indice": 13832.32,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-10",
+      "indice": 14195.72,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-11",
+      "indice": 14492.47,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2024-12",
+      "indice": 14839.11,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-01",
+      "indice": 15306.31,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-02",
+      "indice": 15699.35,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-03",
+      "indice": 16252.62,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-04",
+      "indice": 16717.68,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-05",
+      "indice": 16959.85,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-06",
+      "indice": 17277.9,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-07",
+      "indice": 17600.2,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-08",
+      "indice": 17889.8,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-09",
+      "indice": 18303.77,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-10",
+      "indice": 18802.67,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-11",
+      "indice": 19246.74,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2025-12",
+      "indice": 19742.97,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2026-01",
+      "indice": 20262.47,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2026-02",
+      "indice": 20816.73,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2026-03",
+      "indice": 21571.18,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2026-04",
+      "indice": 22225.55,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2026-05",
+      "indice": 22740.66,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2026-06",
+      "indice": 23127.43,
+      "origen": "ipec-santa-fe"
+    }
+  ]
+}

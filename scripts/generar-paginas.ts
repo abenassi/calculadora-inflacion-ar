@@ -40,6 +40,16 @@ import { aniosDisponibles, resumenAnual, type ResumenAnual } from "../src/engine
 import { compararMeses, mesConAnio, mesDe, soloMes } from "../src/engine/mes.js";
 import type { Fila, Mes, SerieIndice } from "../src/engine/types.js";
 import { fuenteDe } from "../src/ui/etiquetas.js";
+
+/**
+ * El id de la fuente del índice del INDEC dentro de la serie nacional.
+ *
+ * Estas páginas son siempre nacionales —son `/inflacion-2024/`, no hay una por provincia—
+ * así que nombrar acá una fuente concreta es legítimo. Se usa para una sola cosa: el
+ * "IPC Nivel General Nacional" no existía antes de diciembre de 2016, y en los años
+ * reconstruidos el JSON-LD no puede decir que eso es lo que se midió.
+ */
+const ID_INDICE_INDEC = "indec";
 import {
   comoSeMuestra,
   indice as fIndice,
@@ -464,7 +474,7 @@ function paginaAnio(
   const ruta = `/inflacion-${r.anio}/`;
   const subioOBajo = r.variacionPct >= 0 ? "subieron" : "bajaron";
   const cifra = pct(r.variacionPct);
-  const fuente = fuenteDe(r.filas);
+  const fuente = fuenteDe(r.filas, r);
 
   /*
    * Dos titulares distintos porque son dos cosas distintas: un año completo tiene
@@ -475,9 +485,8 @@ function paginaAnio(
   const titular = r.completo
     ? `Inflación de ${r.anio} en Argentina: ${cifra} anual`
     : `Inflación de ${r.anio} en Argentina: ${cifra} hasta ${soloMes(r.hasta)}`;
-  const sufijo = " · IPC del INDEC";
-  const title =
-    fuente.hayIndec && titular.length + sufijo.length <= 60 ? `${titular}${sufijo}` : titular;
+  const sufijo = ` · ${fuente.corta}`;
+  const title = titular.length + sufijo.length <= 60 ? `${titular}${sufijo}` : titular;
 
   /*
    * En los años intervenidos la salvedad viaja en la propia description, no sólo en la
@@ -603,30 +612,15 @@ function paginaAnio(
     spatialCoverage: { "@type": "Place", name: "Argentina" },
     // El "IPC Nivel General Nacional" no existía antes de diciembre de 2016: para los
     // años reconstruidos lo que se mide es la variación mensual de precios al consumidor.
-    variableMeasured: fuente.hayIndec
+    variableMeasured: fuente.presentes.some((f) => f.id === ID_INDICE_INDEC)
       ? "Índice de Precios al Consumidor, Nivel General Nacional"
       : "Variación mensual de precios al consumidor",
     isAccessibleForFree: true,
-    creator: [
-      ...(fuente.hayIndec
-        ? [
-            {
-              "@type": "GovernmentOrganization",
-              name: "Instituto Nacional de Estadística y Censos (INDEC)",
-              url: "https://www.indec.gob.ar/",
-            },
-          ]
-        : []),
-      ...(fuente.hayBcra
-        ? [
-            {
-              "@type": "GovernmentOrganization",
-              name: "Banco Central de la República Argentina (BCRA)",
-              url: "https://www.bcra.gob.ar/",
-            },
-          ]
-        : []),
-    ],
+    creator: fuente.presentes.map((f) => ({
+      "@type": "GovernmentOrganization",
+      name: f.organismo,
+      url: f.url,
+    })),
     isBasedOn: "https://argentinadata.mymcps.dev",
     dateModified: serie.actualizado.slice(0, 10),
   };

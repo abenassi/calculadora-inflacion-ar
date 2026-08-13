@@ -1,0 +1,2238 @@
+{
+  "serie": "rio-negro",
+  "base": "Índice",
+  "fuentes": [
+    {
+      "id": "deyc-rio-negro",
+      "serie": "ipc:rio_negro",
+      "organismo": "Dirección de Estadística y Censos de la Provincia de Río Negro",
+      "organismoCorto": "DEyC Río Negro",
+      "url": "https://estadisticaycensos.rionegro.gov.ar/",
+      "rango": "1989-09/2026-07",
+      "etiqueta": {
+        "corta": "IPC de Río Negro",
+        "larga": "el IPC de Viedma, que Río Negro publica como referencia provincial",
+        "publicadosPor": "la dirección de estadística de Río Negro"
+      }
+    }
+  ],
+  "ultimo_oficial": "2026-07",
+  "actualizado": "2026-08-13T23:26:44.747Z",
+  "datos": [
+    {
+      "mes": "1989-09",
+      "indice": 159832921.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1989-10",
+      "indice": 168480825.6,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1989-11",
+      "indice": 173949382.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1989-12",
+      "indice": 259166748.8,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-01",
+      "indice": 436831021.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-02",
+      "indice": 753469242.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-03",
+      "indice": 1488177832.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-04",
+      "indice": 1486164743,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-05",
+      "indice": 1590750099.4,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-06",
+      "indice": 1769070793.7,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-07",
+      "indice": 1912182153.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-08",
+      "indice": 2146331298.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-09",
+      "indice": 2427735363.8,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-10",
+      "indice": 2594636127.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-11",
+      "indice": 2716217939.6,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1990-12",
+      "indice": 2785359018.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-01",
+      "indice": 2957045336.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-02",
+      "indice": 3970395373.8,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-03",
+      "indice": 4323616331.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-04",
+      "indice": 4503339967.8,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-05",
+      "indice": 4618282566,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-06",
+      "indice": 4707950860.4,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-07",
+      "indice": 4842768849.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-08",
+      "indice": 4939644278.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-09",
+      "indice": 4970331037,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-10",
+      "indice": 4992506851.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-11",
+      "indice": 5037457069.7,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1991-12",
+      "indice": 5017983915.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-01",
+      "indice": 5103963671.6,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-02",
+      "indice": 5198829985.7,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-03",
+      "indice": 5316838222.8,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-04",
+      "indice": 5453850861.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-05",
+      "indice": 5482189936.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-06",
+      "indice": 5525096892.7,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-07",
+      "indice": 5526846119.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-08",
+      "indice": 5638188558.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-09",
+      "indice": 5629490573.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-10",
+      "indice": 5703496909.7,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-11",
+      "indice": 5754239098.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1992-12",
+      "indice": 5746429622.7,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-01",
+      "indice": 5709342162,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-02",
+      "indice": 5760831528.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-03",
+      "indice": 5816848658.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-04",
+      "indice": 5919700359.4,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-05",
+      "indice": 5974518421.6,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-06",
+      "indice": 6022762497.54,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-07",
+      "indice": 6091070354.18,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-08",
+      "indice": 6143496357.57,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-09",
+      "indice": 6143258547.98,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-10",
+      "indice": 6163316166.41,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-11",
+      "indice": 6163237496.77,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1993-12",
+      "indice": 6053412531.53,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-01",
+      "indice": 6067195483.6,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-02",
+      "indice": 5997201357.33,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-03",
+      "indice": 6029399893.08,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-04",
+      "indice": 6035762959.52,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-05",
+      "indice": 6035929866.21,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-06",
+      "indice": 6052196464.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-07",
+      "indice": 6106751727.35,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-08",
+      "indice": 6134410263.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-09",
+      "indice": 6113043028.4,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-10",
+      "indice": 6077482948.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-11",
+      "indice": 6108242967.18,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1994-12",
+      "indice": 6168227566.81,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-01",
+      "indice": 6201690748.21,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-02",
+      "indice": 6172906705.95,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-03",
+      "indice": 6170243536.38,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-04",
+      "indice": 6329236166.74,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-05",
+      "indice": 6345206845.68,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-06",
+      "indice": 6348382211.72,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-07",
+      "indice": 6423179907.03,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-08",
+      "indice": 6457818241.98,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-09",
+      "indice": 6519739688.35,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-10",
+      "indice": 6466332328.01,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-11",
+      "indice": 6422975873.55,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1995-12",
+      "indice": 6438001964.27,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-01",
+      "indice": 6407065277.86,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-02",
+      "indice": 6379098353.44,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-03",
+      "indice": 6332970292.78,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-04",
+      "indice": 6342933406.87,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-05",
+      "indice": 6353978161.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-06",
+      "indice": 6381430292.6,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-07",
+      "indice": 6375939874.86,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-08",
+      "indice": 6374677909.23,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-09",
+      "indice": 6363437030.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-10",
+      "indice": 6416124323.06,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-11",
+      "indice": 6425287214.85,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1996-12",
+      "indice": 6367302394.62,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-01",
+      "indice": 6314236177.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-02",
+      "indice": 6283935677.23,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-03",
+      "indice": 6268340798.15,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-04",
+      "indice": 6228568793.69,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-05",
+      "indice": 6210087332.59,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-06",
+      "indice": 6230836708.68,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-07",
+      "indice": 6243821535.67,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-08",
+      "indice": 6247261480.86,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-09",
+      "indice": 6268592606.09,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-10",
+      "indice": 6262469854.78,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-11",
+      "indice": 6252632424.02,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1997-12",
+      "indice": 6243681633.24,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-01",
+      "indice": 6203132973.72,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-02",
+      "indice": 6201139592.43,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-03",
+      "indice": 6229642231.64,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-04",
+      "indice": 6180998834.05,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-05",
+      "indice": 6191185855.15,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-06",
+      "indice": 6209951081.82,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-07",
+      "indice": 6259845222.15,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-08",
+      "indice": 6258577511.33,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-09",
+      "indice": 6251196520.05,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-10",
+      "indice": 6301162640.55,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-11",
+      "indice": 6353542101.03,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1998-12",
+      "indice": 6308353145.73,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-01",
+      "indice": 6299610572.57,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-02",
+      "indice": 6198333653.95,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-03",
+      "indice": 6153889575.92,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-04",
+      "indice": 6142202384.16,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-05",
+      "indice": 6135983676.8,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-06",
+      "indice": 6116293971.03,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-07",
+      "indice": 6116706470.23,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-08",
+      "indice": 6114483160.59,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-09",
+      "indice": 6103360866.68,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-10",
+      "indice": 6069934556.91,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-11",
+      "indice": 6052895003.14,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "1999-12",
+      "indice": 6030281014.94,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-01",
+      "indice": 6019176356.71,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-02",
+      "indice": 6035519134.23,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-03",
+      "indice": 6042408867.02,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-04",
+      "indice": 6019734450.48,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-05",
+      "indice": 5982348755.38,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-06",
+      "indice": 5976864922.24,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-07",
+      "indice": 5976614953.08,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-08",
+      "indice": 5981648034.36,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-09",
+      "indice": 5954031622.98,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-10",
+      "indice": 6011020810.98,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-11",
+      "indice": 6017225318.76,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2000-12",
+      "indice": 5968845103,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-01",
+      "indice": 5962047314.59,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-02",
+      "indice": 5890518989.12,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-03",
+      "indice": 5855074544.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-04",
+      "indice": 5858360344.38,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-05",
+      "indice": 5882942945.65,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-06",
+      "indice": 5814459751.52,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-07",
+      "indice": 5863723103.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-08",
+      "indice": 5890134168.98,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-09",
+      "indice": 5878600120.88,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-10",
+      "indice": 5818060333.22,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-11",
+      "indice": 5815455311.41,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2001-12",
+      "indice": 5826261050.22,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-01",
+      "indice": 5903203113.73,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-02",
+      "indice": 6240119374.47,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-03",
+      "indice": 6702825650.54,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-04",
+      "indice": 7604789366.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-05",
+      "indice": 8208492887.97,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-06",
+      "indice": 8687800318.36,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-07",
+      "indice": 8961109364.35,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-08",
+      "indice": 9188821871.59,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-09",
+      "indice": 9319084677.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-10",
+      "indice": 9436937131.67,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-11",
+      "indice": 9531965270.84,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2002-12",
+      "indice": 9539469918.92,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-01",
+      "indice": 9513726127.63,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-02",
+      "indice": 9659759969.09,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-03",
+      "indice": 9708244765.86,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-04",
+      "indice": 9749266881.82,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-05",
+      "indice": 9802392042.58,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-06",
+      "indice": 9816154676.02,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-07",
+      "indice": 9759473374.84,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-08",
+      "indice": 9771781983.58,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-09",
+      "indice": 9851180127.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-10",
+      "indice": 9858583174.12,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-11",
+      "indice": 9973696249.73,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2003-12",
+      "indice": 9971625913.06,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-01",
+      "indice": 10010457872.57,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-02",
+      "indice": 10054534019.65,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-03",
+      "indice": 10112724650.05,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-04",
+      "indice": 10149967211.13,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-05",
+      "indice": 10167106906.46,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-06",
+      "indice": 10249914971.89,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-07",
+      "indice": 10278689301.14,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-08",
+      "indice": 10410083350.92,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-09",
+      "indice": 10508719688.69,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-10",
+      "indice": 10479466037.31,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-11",
+      "indice": 10500002647.6,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2004-12",
+      "indice": 10533772127.08,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-01",
+      "indice": 10528691186.36,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-02",
+      "indice": 10483029783.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-03",
+      "indice": 10642143574.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-04",
+      "indice": 10665185636.82,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-05",
+      "indice": 10689110981.61,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-06",
+      "indice": 10740128434.44,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-07",
+      "indice": 10868998440.99,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-08",
+      "indice": 11008915508.27,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-09",
+      "indice": 11146536413.91,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-10",
+      "indice": 11237647469.78,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-11",
+      "indice": 11326169557.78,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2005-12",
+      "indice": 11372602526.35,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-01",
+      "indice": 11404197475.72,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-02",
+      "indice": 11433029140.14,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-03",
+      "indice": 11516924665.14,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-04",
+      "indice": 11602670929.76,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-05",
+      "indice": 11755177558.48,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-06",
+      "indice": 11816984666.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-07",
+      "indice": 11853558318.83,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-08",
+      "indice": 11911715757.06,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-09",
+      "indice": 11891487577.28,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-10",
+      "indice": 11956105642.14,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-11",
+      "indice": 12020286896.67,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2006-12",
+      "indice": 12282459890.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-01",
+      "indice": 12450978072.22,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-02",
+      "indice": 12467400828.16,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-03",
+      "indice": 12471405618.53,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-04",
+      "indice": 12723303873.53,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-05",
+      "indice": 12912056097.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-06",
+      "indice": 13343212304.34,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-07",
+      "indice": 13858992254.49,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-08",
+      "indice": 14623930538.61,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-09",
+      "indice": 14955121907.14,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-10",
+      "indice": 15418933484.07,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-11",
+      "indice": 15559392947.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2007-12",
+      "indice": 15673047798.68,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-01",
+      "indice": 15803152099.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-02",
+      "indice": 16326891642.63,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-03",
+      "indice": 16925582137.62,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-04",
+      "indice": 17655195359.06,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-05",
+      "indice": 17858814327.46,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-06",
+      "indice": 18004178422.57,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-07",
+      "indice": 18189072545.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-08",
+      "indice": 18301265595.05,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-09",
+      "indice": 18440341104.33,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-10",
+      "indice": 18729475134.53,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-11",
+      "indice": 18744693032.42,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2008-12",
+      "indice": 18696723076.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-01",
+      "indice": 18669087903.94,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-02",
+      "indice": 18952841084.75,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-03",
+      "indice": 19272575775.59,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-04",
+      "indice": 19473880379.97,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-05",
+      "indice": 19860468476.33,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-06",
+      "indice": 20017159075.73,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-07",
+      "indice": 20496197517.24,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-08",
+      "indice": 20891466668.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-09",
+      "indice": 21313079711.61,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-10",
+      "indice": 21678128872.89,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-11",
+      "indice": 22127428770.16,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2009-12",
+      "indice": 22378430988.77,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-01",
+      "indice": 22498677771.19,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-02",
+      "indice": 23136699868.7,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-03",
+      "indice": 23587376845.59,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-04",
+      "indice": 24137445307.38,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-05",
+      "indice": 24645703464.59,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-06",
+      "indice": 25318347530.18,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-07",
+      "indice": 25842577438.55,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-08",
+      "indice": 26256280699.663,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-09",
+      "indice": 26646741158.64,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-10",
+      "indice": 27399494273.53,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-11",
+      "indice": 27751162331.88,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2010-12",
+      "indice": 28158270912.74,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-01",
+      "indice": 28779448511.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-02",
+      "indice": 29030577043.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-03",
+      "indice": 29440852264.25,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-04",
+      "indice": 30031814895.74,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-05",
+      "indice": 30622239561.32,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-06",
+      "indice": 31295627867.53,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-07",
+      "indice": 31986669264.64,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-08",
+      "indice": 32474034446.53,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-09",
+      "indice": 33082887028.39,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-10",
+      "indice": 33634515416.57,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-11",
+      "indice": 34103106354.42,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2011-12",
+      "indice": 34948375657.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-01",
+      "indice": 35488364171.57,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-02",
+      "indice": 35555645492.29,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-03",
+      "indice": 36525298049.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-04",
+      "indice": 37776666774.39,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-05",
+      "indice": 38335861491.26,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-06",
+      "indice": 38873204998.29,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-07",
+      "indice": 39451474681.94,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-08",
+      "indice": 40472297777,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-09",
+      "indice": 41619274494.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-10",
+      "indice": 42218041253.99,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-11",
+      "indice": 42924942003.36,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2012-12",
+      "indice": 43657758511.59,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-01",
+      "indice": 44153910982.32,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-02",
+      "indice": 44679520609.68,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-03",
+      "indice": 45073545445.37,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-04",
+      "indice": 45729647439.91,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-05",
+      "indice": 46407130000.12,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-06",
+      "indice": 48232840603.76,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-07",
+      "indice": 49136219493.03,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-08",
+      "indice": 49866311114.33,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-09",
+      "indice": 51177172215.92,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-10",
+      "indice": 52834121851.28,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-11",
+      "indice": 55065618933.46,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2013-12",
+      "indice": 56673850639.98,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-01",
+      "indice": 58704493657.24,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-02",
+      "indice": 61557059795.74,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-03",
+      "indice": 63632006416.22,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-04",
+      "indice": 65025821867.31,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-05",
+      "indice": 67234849112,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-06",
+      "indice": 68706105136.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-07",
+      "indice": 70210476462.32,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-08",
+      "indice": 71265490871.51,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-09",
+      "indice": 72968736103.33908,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-10",
+      "indice": 74698095148.98822,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-11",
+      "indice": 77006266289.0919,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2014-12",
+      "indice": 78492487228.47139,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-01",
+      "indice": 80346873594.51,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-02",
+      "indice": 81361426981.65,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-03",
+      "indice": 82659358727.23,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-04",
+      "indice": 84369311445.79,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-05",
+      "indice": 85722195852.58,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-06",
+      "indice": 87359177804.23,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-07",
+      "indice": 89426595083.83,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-08",
+      "indice": 91809124971.97,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-09",
+      "indice": 93442801992.13,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-10",
+      "indice": 95227413792.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-11",
+      "indice": 96965758359.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2015-12",
+      "indice": 100122021876,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-01",
+      "indice": 103249444440.6,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-02",
+      "indice": 107187097154,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-03",
+      "indice": 110393514233.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-04",
+      "indice": 113316066393.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-05",
+      "indice": 118316606895.92,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-06",
+      "indice": 122438823821.69,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-07",
+      "indice": 126360876636.48,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-08",
+      "indice": 128817893584.21,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-09",
+      "indice": 129863577790.31,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-10",
+      "indice": 132246393834.61,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-11",
+      "indice": 139523502258.73,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2016-12",
+      "indice": 139836748840.81,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-01",
+      "indice": 141569875178.79,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-02",
+      "indice": 143727889202.59,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-03",
+      "indice": 146843784839.67,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-04",
+      "indice": 150299053479.82,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-05",
+      "indice": 153293707882.68,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-06",
+      "indice": 154910731635.33,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-07",
+      "indice": 155856455899.6,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-08",
+      "indice": 158685658200.77,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-09",
+      "indice": 161647762781.74,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-10",
+      "indice": 164387910909.82,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-11",
+      "indice": 168405387113.28,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2017-12",
+      "indice": 173343582338.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-01",
+      "indice": 174820112005.83,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-02",
+      "indice": 178642477588.29,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-03",
+      "indice": 181755515855.85,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-04",
+      "indice": 189188577038.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-05",
+      "indice": 194588836654.41,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-06",
+      "indice": 200774376914.45,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-07",
+      "indice": 205972968571.29,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-08",
+      "indice": 212649926987.53,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-09",
+      "indice": 224680003488.79,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-10",
+      "indice": 245960148963.08,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-11",
+      "indice": 258171564351.35,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2018-12",
+      "indice": 262723124852.29,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-01",
+      "indice": 267761963533.69,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-02",
+      "indice": 278735568656.14,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-03",
+      "indice": 289039541528.76,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-04",
+      "indice": 299784726373.0901,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-05",
+      "indice": 313263899777.7201,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-06",
+      "indice": 321763988157.9999,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-07",
+      "indice": 329308151617.21,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-08",
+      "indice": 344090281485.07996,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-09",
+      "indice": 364511958974.36,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-10",
+      "indice": 378500157561.14996,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-11",
+      "indice": 396538504176.9301,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2019-12",
+      "indice": 407325615615.10986,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-01",
+      "indice": 420373492438.0801,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-02",
+      "indice": 429246605144.57996,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-03",
+      "indice": 434528525720.74005,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-04",
+      "indice": 442572638625.3798,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-05",
+      "indice": 451570007615.69006,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-06",
+      "indice": 464906372899.98004,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-07",
+      "indice": 477105898286.26,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-08",
+      "indice": 492039518568.7599,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-09",
+      "indice": 507560075107.72986,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-10",
+      "indice": 520551464264.13983,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-11",
+      "indice": 530514388681.7197,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2020-12",
+      "indice": 540778757708.1699,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-01",
+      "indice": 575130385848.2402,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-02",
+      "indice": 606044179192.32,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-03",
+      "indice": 630070701337.09,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-04",
+      "indice": 655536937660.94,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-05",
+      "indice": 666686473830.12,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-06",
+      "indice": 688059454563.74,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-07",
+      "indice": 709357822189.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-08",
+      "indice": 727323561530.7,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-09",
+      "indice": 742250277706.13,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-10",
+      "indice": 768922460180.33,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-11",
+      "indice": 787982113862.11,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2021-12",
+      "indice": 812511287857.19,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-01",
+      "indice": 837531020964.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-02",
+      "indice": 879453533928.65,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-03",
+      "indice": 935363451779.64,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-04",
+      "indice": 996139957121.66,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-05",
+      "indice": 1061108353243.55,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-06",
+      "indice": 1112542911022.05,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-07",
+      "indice": 1197197609878.17,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-08",
+      "indice": 1293577965211.67,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-09",
+      "indice": 1403076723739.31,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-10",
+      "indice": 1487971831354.15,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-11",
+      "indice": 1593669357396.36,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2022-12",
+      "indice": 1667314678591.65,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-01",
+      "indice": 1776892086648.04,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-02",
+      "indice": 1893314837269.65,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-03",
+      "indice": 2045226147865.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-04",
+      "indice": 2188776673751.56,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-05",
+      "indice": 2366376023096.95,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-06",
+      "indice": 2547101851176.93,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-07",
+      "indice": 2693130094252.78,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-08",
+      "indice": 3017100210226.16,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-09",
+      "indice": 3457656725736.37,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-10",
+      "indice": 3706807674025.91,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-11",
+      "indice": 4150841743025.17,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2023-12",
+      "indice": 5541955135137.18,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-01",
+      "indice": 6711974596114.57,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-02",
+      "indice": 7517716913635.06,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-03",
+      "indice": 8270324582605.48,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-04",
+      "indice": 9059481776797.91,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-05",
+      "indice": 9482557386554.02,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-06",
+      "indice": 9912564467865.77,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-07",
+      "indice": 10308131404420.4,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-08",
+      "indice": 10834224844942.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-09",
+      "indice": 11119857641636.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-10",
+      "indice": 11266496919006.4,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-11",
+      "indice": 11552433467668.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2024-12",
+      "indice": 11803282619031.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-01",
+      "indice": 11991253557074.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-02",
+      "indice": 12280853793718.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-03",
+      "indice": 12540531323436.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-04",
+      "indice": 12767342353012.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-05",
+      "indice": 12866314122638.4,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-06",
+      "indice": 12967035315145.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-07",
+      "indice": 13094599296831.1,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-08",
+      "indice": 13346997622854.4,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-09",
+      "indice": 13522798775593.2,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-10",
+      "indice": 13820204583158.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-11",
+      "indice": 14061216082952.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2025-12",
+      "indice": 14398565175862.7,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2026-01",
+      "indice": 14731160658873.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2026-02",
+      "indice": 15169331348201.3,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2026-03",
+      "indice": 15453870656992.5,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2026-04",
+      "indice": 15780585027098.7,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2026-05",
+      "indice": 16043600311910.9,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2026-06",
+      "indice": 16319411277607.4,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2026-07",
+      "indice": 16746051448071.4,
+      "origen": "deyc-rio-negro"
+    }
+  ]
+}

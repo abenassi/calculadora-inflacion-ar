@@ -1,0 +1,1478 @@
+{
+  "serie": "neuquen",
+  "base": "Índice base 100",
+  "fuentes": [
+    {
+      "id": "dpeyc-neuquen",
+      "serie": "indec:196.1_NIVEL_GENERAL_2014_0_13",
+      "organismo": "Dirección Provincial de Estadística y Censos del Neuquén",
+      "organismoCorto": "DPEyC Neuquén",
+      "url": "https://www.estadisticaneuquen.gob.ar/",
+      "rango": "2001-11/2026-01",
+      "etiqueta": {
+        "corta": "IPC del Neuquén",
+        "larga": "el IPC de la Provincia del Neuquén",
+        "publicadosPor": "la dirección de estadística del Neuquén"
+      }
+    }
+  ],
+  "ultimo_oficial": "2026-01",
+  "actualizado": "2026-08-13T23:26:44.573Z",
+  "datos": [
+    {
+      "mes": "2001-11",
+      "indice": 43.974612,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2001-12",
+      "indice": 43.540929,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-01",
+      "indice": 44.997086,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-02",
+      "indice": 49.123221,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-03",
+      "indice": 50.122741,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-04",
+      "indice": 55.718598,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-05",
+      "indice": 61.216938,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-06",
+      "indice": 67.933252,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-07",
+      "indice": 70.828794,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-08",
+      "indice": 72.947796,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-09",
+      "indice": 74.01122,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-10",
+      "indice": 73.304875,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-11",
+      "indice": 73.72753,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2002-12",
+      "indice": 73.743791,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-01",
+      "indice": 75.401819,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-02",
+      "indice": 75.569223,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-03",
+      "indice": 75.945779,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-04",
+      "indice": 76.155922,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-05",
+      "indice": 76.49598,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-06",
+      "indice": 75.020211,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-07",
+      "indice": 75.366388,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-08",
+      "indice": 75.776413,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-09",
+      "indice": 75.921925,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-10",
+      "indice": 75.83065,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-11",
+      "indice": 75.804758,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2003-12",
+      "indice": 76.366292,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-01",
+      "indice": 77.339817,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-02",
+      "indice": 77.186233,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-03",
+      "indice": 77.32858,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-04",
+      "indice": 77.6227,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-05",
+      "indice": 77.751686,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-06",
+      "indice": 79.008374,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-07",
+      "indice": 79.630124,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-08",
+      "indice": 80.844917,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-09",
+      "indice": 81.896954,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-10",
+      "indice": 81.815826,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-11",
+      "indice": 81.637227,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2004-12",
+      "indice": 81.680966,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-01",
+      "indice": 82.002738,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-02",
+      "indice": 83.257163,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-03",
+      "indice": 83.733984,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-04",
+      "indice": 83.385591,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-05",
+      "indice": 84.493588,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-06",
+      "indice": 85.212529,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-07",
+      "indice": 85.135288,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-08",
+      "indice": 86.125878,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-09",
+      "indice": 88.019183,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-10",
+      "indice": 89.182215,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-11",
+      "indice": 89.67466,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2005-12",
+      "indice": 89.295968,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-01",
+      "indice": 90.376373,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-02",
+      "indice": 90.451911,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-03",
+      "indice": 91.69504,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-04",
+      "indice": 91.991756,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-05",
+      "indice": 92.350819,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-06",
+      "indice": 92.873293,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-07",
+      "indice": 93.292386,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-08",
+      "indice": 93.427577,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-09",
+      "indice": 94.212574,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-10",
+      "indice": 96.117428,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-11",
+      "indice": 96.788903,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2006-12",
+      "indice": 98.488541,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-01",
+      "indice": 100,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-02",
+      "indice": 101.166971,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-03",
+      "indice": 101.239681,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-04",
+      "indice": 103.903188,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-05",
+      "indice": 105.596252,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-06",
+      "indice": 109.179209,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-07",
+      "indice": 112.687661,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-08",
+      "indice": 117.863925,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-09",
+      "indice": 120.983755,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-10",
+      "indice": 124.572517,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-11",
+      "indice": 125.663803,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2007-12",
+      "indice": 127.281083,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-01",
+      "indice": 128.674814,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-02",
+      "indice": 133.460794,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-03",
+      "indice": 136.271177,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-04",
+      "indice": 139.099408,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-05",
+      "indice": 142.74665,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-06",
+      "indice": 146.15438,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-07",
+      "indice": 147.949784,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-08",
+      "indice": 150.45858,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-09",
+      "indice": 152.349709,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-10",
+      "indice": 153.949749,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-11",
+      "indice": 154.826317,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2008-12",
+      "indice": 155.304575,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-01",
+      "indice": 155.630432,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-02",
+      "indice": 157.406606,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-03",
+      "indice": 159.515762,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-04",
+      "indice": 161.642385,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-05",
+      "indice": 162.634528,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-06",
+      "indice": 163.690534,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-07",
+      "indice": 167.870559,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-08",
+      "indice": 171.852543,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-09",
+      "indice": 173.115205,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-10",
+      "indice": 175.664658,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-11",
+      "indice": 177.499499,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2009-12",
+      "indice": 180.743727,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-01",
+      "indice": 183.718272,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-02",
+      "indice": 188.515883,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-03",
+      "indice": 194.462431,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-04",
+      "indice": 199.054819,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-05",
+      "indice": 202.813233,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-06",
+      "indice": 207.066056,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-07",
+      "indice": 212.006775,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-08",
+      "indice": 216.648804,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-09",
+      "indice": 217.130955,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-10",
+      "indice": 222.729781,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-11",
+      "indice": 226.200263,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2010-12",
+      "indice": 228.946738,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-01",
+      "indice": 235.887483,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-02",
+      "indice": 237.979757,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-03",
+      "indice": 245.039064,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-04",
+      "indice": 251.35101,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-05",
+      "indice": 257.673035,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-06",
+      "indice": 261.676645,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-07",
+      "indice": 269.764344,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-08",
+      "indice": 275.595344,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-09",
+      "indice": 281.601114,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-10",
+      "indice": 284.531192,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-11",
+      "indice": 289.946775,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2011-12",
+      "indice": 294.702438,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-01",
+      "indice": 300.430148,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-02",
+      "indice": 302.793305,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-03",
+      "indice": 311.314454,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-04",
+      "indice": 320.758168,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-05",
+      "indice": 326.54475,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-06",
+      "indice": 336.116891,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-07",
+      "indice": 346.842878,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-08",
+      "indice": 351.775388,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-09",
+      "indice": 359.676012,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-10",
+      "indice": 364.452752,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-11",
+      "indice": 367.85042,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2012-12",
+      "indice": 373.400356,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-01",
+      "indice": 379.689637,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-02",
+      "indice": 385.031435,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-03",
+      "indice": 386.57746,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-04",
+      "indice": 390.546256,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-05",
+      "indice": 398.955655,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-06",
+      "indice": 409.747983,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-07",
+      "indice": 422.870892,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-08",
+      "indice": 431.776829,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-09",
+      "indice": 434.954272,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-10",
+      "indice": 451.413673,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-11",
+      "indice": 464.878271,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2013-12",
+      "indice": 479.074683,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-01",
+      "indice": 499.837742,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-02",
+      "indice": 529.639301,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-03",
+      "indice": 539.335641,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-04",
+      "indice": 559.181742,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-05",
+      "indice": 573.473691,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-06",
+      "indice": 580.969104,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-07",
+      "indice": 595.186816,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-08",
+      "indice": 607.881475,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-09",
+      "indice": 620.770079,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-10",
+      "indice": 629.857276,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-11",
+      "indice": 647.675809,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2014-12",
+      "indice": 657.212828,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-01",
+      "indice": 670.611545,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-02",
+      "indice": 676.92707,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-03",
+      "indice": 691.557357,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-04",
+      "indice": 700.186094,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-05",
+      "indice": 713.483475,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-06",
+      "indice": 729.044054,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-07",
+      "indice": 743.033965,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-08",
+      "indice": 757.180566,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-09",
+      "indice": 772.974115,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-10",
+      "indice": 785.027452,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-11",
+      "indice": 797.820685,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2015-12",
+      "indice": 819.648067,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-01",
+      "indice": 867.812831,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-02",
+      "indice": 891.163689,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-03",
+      "indice": 924.71113,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-04",
+      "indice": 948.386728,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-05",
+      "indice": 984.702818,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-06",
+      "indice": 1007.593549,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-07",
+      "indice": 1051.716821,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-08",
+      "indice": 1065.792871,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-09",
+      "indice": 1083.428597,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-10",
+      "indice": 1104.88553,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-11",
+      "indice": 1117.572413,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2016-12",
+      "indice": 1128.185431,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-01",
+      "indice": 1148.224336,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-02",
+      "indice": 1163.451474,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-03",
+      "indice": 1181.431662,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-04",
+      "indice": 1206.978576,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-05",
+      "indice": 1227.607721,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-06",
+      "indice": 1240.047064,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-07",
+      "indice": 1256.481154,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-08",
+      "indice": 1277.11025,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-09",
+      "indice": 1299.853034,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-10",
+      "indice": 1312.643499,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-11",
+      "indice": 1343.285594,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2017-12",
+      "indice": 1369.482426,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-01",
+      "indice": 1382.823322,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-02",
+      "indice": 1417.495553,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-03",
+      "indice": 1444.919674,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-04",
+      "indice": 1483.631605,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-05",
+      "indice": 1523.326059,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-06",
+      "indice": 1591.215123,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-07",
+      "indice": 1637.972633,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-08",
+      "indice": 1683.052892,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-09",
+      "indice": 1848.180972,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-10",
+      "indice": 1943.861355,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-11",
+      "indice": 2043.402121,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2018-12",
+      "indice": 2079.533218,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-01",
+      "indice": 2141.37689,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-02",
+      "indice": 2220.873922,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-03",
+      "indice": 2280.656037,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-04",
+      "indice": 2364.128048,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-05",
+      "indice": 2427.250267,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-06",
+      "indice": 2488.174249,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-07",
+      "indice": 2590.43821,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-08",
+      "indice": 2743.274065,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-09",
+      "indice": 2932.414579,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-10",
+      "indice": 3069.313631,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-11",
+      "indice": 3273.19234,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2019-12",
+      "indice": 3350.766998,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-01",
+      "indice": 3503.561973,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-02",
+      "indice": 3546.30543,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-03",
+      "indice": 3622.905627,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-04",
+      "indice": 3684.980037,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-05",
+      "indice": 3742.14314,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-06",
+      "indice": 3823.347646,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-07",
+      "indice": 3963.28217,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-08",
+      "indice": 4019.957105,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-09",
+      "indice": 4139.349831,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-10",
+      "indice": 4251.940146,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-11",
+      "indice": 4408.411543,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2020-12",
+      "indice": 4546.835666,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-01",
+      "indice": 4668.690862,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-02",
+      "indice": 4833.962518,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-03",
+      "indice": 5066.476115,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-04",
+      "indice": 5279.77476,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-05",
+      "indice": 5415.464971,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-06",
+      "indice": 5609.338617,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-07",
+      "indice": 5779.862511,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-08",
+      "indice": 5781.262864,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-09",
+      "indice": 5950.075739,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-10",
+      "indice": 6169.633534,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-11",
+      "indice": 6294.877095,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2021-12",
+      "indice": 6487.624259,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-01",
+      "indice": 6723.773783,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-02",
+      "indice": 7124.856862,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-03",
+      "indice": 7540.236017,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-04",
+      "indice": 7997.928343,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-05",
+      "indice": 8439.413988,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-06",
+      "indice": 8879.107457,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-07",
+      "indice": 9583.220678,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-08",
+      "indice": 10371.91974,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-09",
+      "indice": 11008.755612,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-10",
+      "indice": 11793.679887,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-11",
+      "indice": 12503.659416,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2022-12",
+      "indice": 12948.789692,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-01",
+      "indice": 13842.25618,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-02",
+      "indice": 14797.371857,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-03",
+      "indice": 15921.972118,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-04",
+      "indice": 17339.027636,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-05",
+      "indice": 18570.098599,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-06",
+      "indice": 19851.435402,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-07",
+      "indice": 21320.441622,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-08",
+      "indice": 23580.408433,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-09",
+      "indice": 26433.637854,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-10",
+      "indice": 28786.231623,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-11",
+      "indice": 32368.731333,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2023-12",
+      "indice": 39883.075849,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-01",
+      "indice": 49654.429432,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-02",
+      "indice": 56457.086264,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-03",
+      "indice": 62385.080322,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-04",
+      "indice": 67687.812149,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-05",
+      "indice": 71004.514945,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-06",
+      "indice": 75619.808416,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-07",
+      "indice": 79552.038454,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-08",
+      "indice": 83529.640377,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-09",
+      "indice": 86787.296351,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-10",
+      "indice": 89477.702538,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-11",
+      "indice": 92698.899829,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2024-12",
+      "indice": 95294.469025,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-01",
+      "indice": 98629.775441,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-02",
+      "indice": 101588.668704,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-03",
+      "indice": 105652.215452,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-04",
+      "indice": 108716.1297,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-05",
+      "indice": 110781.736164,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-06",
+      "indice": 113108.152624,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-07",
+      "indice": 115483.423829,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-08",
+      "indice": 118716.959696,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-09",
+      "indice": 122041.034568,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-10",
+      "indice": 125336.142501,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-11",
+      "indice": 128344.209921,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2025-12",
+      "indice": 131681.159379,
+      "origen": "dpeyc-neuquen"
+    },
+    {
+      "mes": "2026-01",
+      "indice": 135113.720331,
+      "origen": "dpeyc-neuquen"
+    }
+  ]
+}

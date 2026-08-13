@@ -13,7 +13,7 @@
  */
 
 import { abreviarMes, abreviarPunto, compararMeses, esFecha, mesDe } from "../engine/mes.js";
-import type { Fila } from "../engine/types.js";
+import type { EtiquetaFuente, Fila, FuentesDeSerie, FuenteSerie } from "../engine/types.js";
 
 /* ------------------------------------------------------------- de quién es el dato */
 
@@ -31,63 +31,81 @@ import type { Fila } from "../engine/types.js";
  * Es la regla 4 de `AGENTS.md` aplicada a un texto en vez de a un número: si dos partes
  * del sistema tienen que estar de acuerdo, salen de la misma función.
  *
+ * **Las frases ya no viven acá.** Vienen en el snapshot, en la `etiqueta` de cada fuente,
+ * porque desde que se puede calcular con el IPC de una provincia el conjunto de organismos
+ * posibles dejó de ser cerrado. Lo que queda acá es la única parte que sigue siendo
+ * criterio y no dato: **cuáles de las fuentes declaradas aportaron de verdad alguna fila
+ * publicada en este cálculo**.
+ *
  * Las filas estimadas no cuentan: su `origen` es `proyeccion` y no las publicó nadie.
  */
-export type Fuente = {
-  hayIndec: boolean;
-  hayBcra: boolean;
-  /** Para un título o una etiqueta. Sin subordinadas. */
-  corta: string;
-  /** Entra después de "según". */
-  larga: string;
-  /** Entra después de "publicados por". */
-  publicadosPor: string;
-};
-
-/*
- * El BCRA no es una fuente alternativa al INDEC: republica el IPC que el INDEC publicaba,
- * y lo dice la propia serie `bcra:27`. Decirlo importa porque si no la atribución honesta
- * ("esto lo publica el BCRA") deja a la persona preguntándose de dónde salió un índice de
- * precios de un banco central, y peor, sin poder conectar el aviso del INDEC intervenido
- * con la página que le acaba de mostrar puros sellos del BCRA.
- */
-const SOLO_INDEC: Omit<Fuente, "hayIndec" | "hayBcra"> = {
-  corta: "IPC del INDEC",
-  larga: "el IPC Nivel General Nacional del INDEC",
-  publicadosPor: "el INDEC",
-};
-
-const SOLO_BCRA: Omit<Fuente, "hayIndec" | "hayBcra"> = {
-  corta: "serie de inflación mensual del BCRA",
-  larga:
-    "la serie de inflación mensual del BCRA, que para ese tramo republica el IPC que " +
-    "publicaba el INDEC",
-  publicadosPor: "el BCRA, que republica el IPC que publicaba el INDEC",
-};
-
-const MIXTO: Omit<Fuente, "hayIndec" | "hayBcra"> = {
-  corta: "IPC del INDEC y serie del BCRA",
-  larga:
-    "el IPC Nivel General Nacional del INDEC y, para los meses anteriores a diciembre de " +
-    "2016, la serie de inflación mensual del BCRA",
-  publicadosPor: "el INDEC y el BCRA",
+export type Fuente = EtiquetaFuente & {
+  /**
+   * Las fuentes que aportaron al menos una fila publicada, en el orden en que la serie
+   * las declara. Vacío cuando el período está enteramente proyectado.
+   */
+  presentes: FuenteSerie[];
 };
 
 /**
  * Con **ninguna** fila publicada —un período enteramente proyectado, como pedir de
- * diciembre de 2026 a mayo de 2027— la respuesta es el INDEC, y es una decisión, no un
- * default por descarte: los meses que todavía no salieron son todos posteriores a
- * diciembre de 2016, así que el organismo que los va a publicar es el INDEC. Las frases
- * que usan esto en ese caso hablan en futuro ("el INDEC todavía no publicó…"), nunca
- * afirman que haya un dato publicado.
+ * diciembre de 2026 a mayo de 2027— se contesta con la **última** fuente de la serie, y es
+ * una decisión, no un default por descarte: los meses que todavía no salieron son
+ * posteriores a todo lo publicado, así que el organismo que los va a publicar es el del
+ * tramo más reciente. Las frases que usan esto en ese caso hablan en futuro ("el INDEC
+ * todavía no publicó…"), nunca afirman que haya un dato publicado.
  *
- * Quien necesite distinguir el caso tiene `hayIndec` y `hayBcra`, los dos en `false`.
+ * Quien necesite distinguir el caso tiene `presentes` vacío.
  */
-export function fuenteDe(filas: Fila[]): Fuente {
-  const hayIndec = filas.some((f) => f.origen === "indec");
-  const hayBcra = filas.some((f) => f.origen === "bcra");
-  const cuerpo = hayIndec && hayBcra ? MIXTO : hayBcra ? SOLO_BCRA : SOLO_INDEC;
-  return { hayIndec, hayBcra, ...cuerpo };
+export function fuenteDe(filas: Fila[], serie: FuentesDeSerie): Fuente {
+  const presentes = serie.fuentes.filter((f) => filas.some((fila) => fila.origen === f.id));
+
+  if (presentes.length === 1) return { presentes, ...presentes[0]!.etiqueta };
+  if (presentes.length === 0) {
+    const ultima = serie.fuentes.at(-1);
+    if (!ultima) throw new Error("El cálculo no declara ninguna fuente");
+    return { presentes, ...ultima.etiqueta };
+  }
+
+  // Más de una fuente. La serie nacional trae escrito cómo se nombra su empalme, porque
+  // decir dónde corta —"para los meses anteriores a diciembre de 2016"— es justo lo que
+  // alguien va a querer verificar, y eso no sale de concatenar las dos etiquetas sueltas.
+  // El pegado genérico es el respaldo para una serie futura que empalme sin declararlo:
+  // queda largo, pero nombra a los dos organismos y no le atribuye a ninguno lo del otro.
+  if (serie.etiquetaCombinada) return { presentes, ...serie.etiquetaCombinada };
+  const unir = (partes: string[]) => partes.slice(0, -1).join(", ") + " y " + partes.at(-1);
+  return {
+    presentes,
+    corta: unir(presentes.map((f) => f.etiqueta.corta)),
+    larga: unir(presentes.map((f) => f.etiqueta.larga)),
+    publicadosPor: unir(presentes.map((f) => f.etiqueta.publicadosPor)),
+  };
+}
+
+/**
+ * El sello que va en la fila: `"INDEC ✓"`, `"IDECBA ✓"`.
+ *
+ * Sale de la fuente de **la fila** y no de la del índice, porque una serie empalmada tiene
+ * filas de dos organismos y cada una tiene que decir cuál la respalda.
+ *
+ * Devuelve `null` cuando la fila no lleva sello, que son dos casos y los dos importan: la
+ * estimada, que no la publicó nadie, y la prorrateada, cuyo número es la parte
+ * proporcional que le toca a unos días —una cuenta nuestra sobre un dato ajeno—. Sellarla
+ * sería atribuirle al organismo una cifra que nunca publicó.
+ */
+export function selloDeFila(fila: Fila, serie: FuentesDeSerie): string | null {
+  if (fila.esProyeccion || fila.esParcial) return null;
+  return organismoDeFila(fila, serie);
+}
+
+/**
+ * La sigla del organismo que publicó el dato de fondo de una fila, sin el ✓.
+ *
+ * La necesita el `title` de una fila prorrateada y la línea que esa fila aporta al texto
+ * que se copia: las dos hablan del dato sobre el que se prorrateó, que sí tiene dueño.
+ */
+export function organismoDeFila(fila: Fila, serie: FuentesDeSerie): string | null {
+  return serie.fuentes.find((f) => f.id === fila.origen)?.organismoCorto ?? null;
 }
 
 /** El mes calendario que cubre un tramo completo: el más viejo de sus dos extremos. */

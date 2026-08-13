@@ -15,7 +15,9 @@ import { fileURLToPath } from "node:url";
 
 import { empalmar, type PuntoCrudo } from "../src/engine/splice.js";
 import { aMes, diffMeses, nombrarMes } from "../src/engine/mes.js";
+import { SLUG_NACIONAL, type CatalogoIndices, type EntradaCatalogo } from "../src/engine/indices.js";
 import type { ExpectativaRem, SerieIndice } from "../src/engine/types.js";
+import { INDICES, type IndiceDeclarado } from "./indices-declarados.js";
 import { traerSerie } from "./mcp-client.js";
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -73,13 +75,16 @@ async function escribirSiMejora(archivo: string, contenido: unknown, minimoDatos
     }
   }
 
-  const cantidad = (contenido as { datos?: unknown[] }).datos?.length ?? 0;
+  const c = contenido as { datos?: unknown[]; indices?: unknown[] };
+  // El catálogo no tiene `datos` sino `indices`. Contar sólo `datos` lo hacía informar
+  // "escrito (0 puntos)" en cada corrida, que se lee como que salió vacío.
+  const cantidad = c.datos?.length ?? c.indices?.length ?? 0;
   if (cantidad < minimoDatos) {
     throw new Error(`${archivo}: sólo ${cantidad} puntos, se esperaban al menos ${minimoDatos}`);
   }
 
   await writeFile(ruta, nuevo, "utf8");
-  console.log(`  ${archivo}: escrito (${cantidad} puntos)`);
+  console.log(`  ${archivo}: escrito (${cantidad} ${c.indices ? "entradas" : "puntos"})`);
 }
 
 /**
@@ -166,16 +171,49 @@ async function construirIpc(): Promise<SerieIndice> {
     base: "2016-12=100",
     fuentes: [
       {
-        id: ID_BCRA_INFLACION,
+        id: "bcra",
+        serie: ID_BCRA_INFLACION,
         organismo: "Banco Central de la República Argentina",
+        organismoCorto: "BCRA",
+        url: "https://www.bcra.gob.ar/",
         rango: `${primerMes}/${datos.filter((d) => d.origen === "bcra").at(-1)?.mes ?? primerMes}`,
+        // El BCRA no es una fuente alternativa al INDEC: republica el IPC que el INDEC
+        // publicaba, y lo dice la propia serie `bcra:27`. Decirlo importa porque si no la
+        // atribución honesta ("esto lo publica el BCRA") deja a la persona preguntándose
+        // de dónde salió un índice de precios de un banco central, y peor, sin poder
+        // conectar el aviso del INDEC intervenido con una página de puros sellos BCRA.
+        etiqueta: {
+          corta: "serie de inflación mensual del BCRA",
+          larga:
+            "la serie de inflación mensual del BCRA, que para ese tramo republica el IPC " +
+            "que publicaba el INDEC",
+          publicadosPor: "el BCRA, que republica el IPC que publicaba el INDEC",
+        },
       },
       {
-        id: ID_INDEC_IPC,
+        id: "indec",
+        serie: ID_INDEC_IPC,
         organismo: "Instituto Nacional de Estadística y Censos (INDEC)",
+        organismoCorto: "INDEC",
+        url: "https://www.indec.gob.ar/",
         rango: `${primerIndec}/${ultimoOficial}`,
+        etiqueta: {
+          corta: "IPC del INDEC",
+          larga: "el IPC Nivel General Nacional del INDEC",
+          publicadosPor: "el INDEC",
+        },
       },
     ],
+    // El nacional es la única serie empalmada, y su combinación dice dónde corta el
+    // empalme: es lo primero que alguien va a querer verificar si ve dos sellos distintos
+    // en la misma tabla.
+    etiquetaCombinada: {
+      corta: "IPC del INDEC y serie del BCRA",
+      larga:
+        "el IPC Nivel General Nacional del INDEC y, para los meses anteriores a diciembre " +
+        "de 2016, la serie de inflación mensual del BCRA",
+      publicadosPor: "el INDEC y el BCRA",
+    },
     // La senda del REM arranca en 2024 porque incluye los nowcasts de cada
     // encuesta pasada. El sitio sólo proyecta hacia adelante, así que se guardan
     // los meses que el INDEC todavía no publicó y nada más: lo demás engorda el
@@ -188,6 +226,146 @@ async function construirIpc(): Promise<SerieIndice> {
           },
         }
       : {}),
+    ultimo_oficial: ultimoOficial,
+    actualizado: new Date().toISOString(),
+    datos,
+  };
+}
+
+/**
+ * El valor más chico que el MCP guarda sin perder las cifras que hacen falta.
+ *
+ * `series_data.valor` es `numeric(20,6)`. Un índice encadenado hacia atrás a través de los
+ * cambios de moneda cae por debajo de una millonésima y **queda guardado como cero**.
+ * Medido contra producción el 2026-08-13: Chaco tiene 256 puntos en cero, Tucumán 167 y
+ * Mendoza 148, y bastantes más quedan con dos o tres cifras significativas.
+ *
+ * Un cero no es un dato impreciso: es una división por cero en el único cálculo que hace
+ * este sitio. El umbral está en 1e-2 y no en 1e-6 porque el límite no es "que no sea cero"
+ * sino "que queden cifras significativas": con 1e-2 el peor caso conserva cuatro.
+ *
+ * Es un problema del lado del MCP —82 series de nivel de índice, 1.888 puntos, la peor es
+ * el IPC histórico del propio INDEC— y hay que arreglarlo allá. Mientras tanto el sitio no
+ * puede confiar en lo que le llega: publicar un índice en cero rompe la página.
+ */
+const VALOR_MINIMO_REPRESENTABLE = 0.01;
+
+/** Cuántos puntos devuelve la tool `series` cuando no se le acota el rango. */
+const LIMITE_IMPLICITO = 365;
+
+/**
+ * Recorta la serie al tramo final que se puede usar, y explota si no queda nada.
+ *
+ * Se corta desde el **último** valor demasiado chico y no desde el primero grande: si
+ * apareciera uno chico después de uno grande, lo anterior queda bajo sospecha y lo único
+ * que garantiza precisión pareja es quedarse con lo que viene después.
+ *
+ * Se recorta y no se reescala. Reescalar preservaría los cocientes, pero nuestros números
+ * dejarían de coincidir con la tabla que publica el organismo, y eso es justo lo que
+ * alguien cruza cuando quiere verificar. Menos historia con los números de la fuente.
+ */
+export function recortarRepresentable(puntos: PuntoCrudo[], slug: string): PuntoCrudo[] {
+  let inicio = 0;
+  for (let i = puntos.length - 1; i >= 0; i--) {
+    if (!(puntos[i]!.valor >= VALOR_MINIMO_REPRESENTABLE)) {
+      inicio = i + 1;
+      break;
+    }
+  }
+
+  const out = puntos.slice(inicio);
+  if (out.length === 0) {
+    throw new Error(
+      `${slug}: no quedó ningún valor representable, todos caen por debajo de ` +
+        `${VALOR_MINIMO_REPRESENTABLE}. El MCP los está sirviendo truncados a cero.`,
+    );
+  }
+  if (out.length < puntos.length) {
+    console.log(
+      `  ${slug}: se descartaron ${puntos.length - out.length} punto(s) del arranque que el ` +
+        `MCP sirve truncados; la serie arranca en ${out[0]!.mes}`,
+    );
+  }
+  return out;
+}
+
+/**
+ * Recorta la serie a su tramo continuo más reciente.
+ *
+ * Un hueco no se puede dejar pasar: el motor lee los puntos como meses contiguos, así que
+ * un salto de 2012 a 2016 le haría calcular una "variación mensual" de cuatro años. Y
+ * tampoco se puede rellenar, porque cualquier relleno es un número que no publicó nadie.
+ * Queda recortar: menos historia, toda cierta.
+ *
+ * Se conserva el tramo que **llega hasta el dato más nuevo** y no el más largo, aunque a
+ * veces sea más corto. Un tramo que termina en 2012 no sirve para lo único que hace este
+ * sitio, que es traer un monto hasta hoy.
+ *
+ * Pasa de verdad: Mendoza dejó de publicar entre marzo de 2012 y abril de 2016 —los años
+ * del apagón estadístico— así que se sirve desde 2016 y no desde 1988.
+ */
+function recortarContinuo(puntos: PuntoCrudo[], slug: string): PuntoCrudo[] {
+  let inicio = 0;
+  for (let i = puntos.length - 1; i > 0; i--) {
+    if (diffMeses(puntos[i - 1]!.mes, puntos[i]!.mes) !== 1) {
+      inicio = i;
+      break;
+    }
+  }
+
+  const out = puntos.slice(inicio);
+  if (out.length < puntos.length) {
+    console.log(
+      `  ${slug}: la serie tiene un hueco antes de ${out[0]!.mes}; se descartaron ` +
+        `${puntos.length - out.length} punto(s) previos al último tramo continuo`,
+    );
+  }
+  return out;
+}
+
+/**
+ * Una serie jurisdiccional: una sola fuente, sin empalme y **sin REM**.
+ *
+ * El REM del BCRA pronostica el IPC nacional del INDEC. No existe un REM provincial y no
+ * lo vamos a inventar promediando nada, así que la serie no trae el campo y la interfaz
+ * esconde esa opción sola — el mismo camino que ya recorre cuando el REM no se pudo bajar.
+ */
+async function construirIndice(decl: IndiceDeclarado): Promise<SerieIndice> {
+  // `fecha_desde` no es cosmético: **sin él el MCP devuelve los últimos 365 puntos y no
+  // avisa**. Medido — Mendoza tiene 654 meses y llegaban 365, arrancando en 1992 en vez
+  // de 1968. `limit` no lo cambia. El corte era invisible porque una serie de 365 meses
+  // sigue pareciendo completa; se notó sólo porque cinco jurisdicciones dieron 365 justo.
+  const serie = await traerSerie(decl.serie, { fecha_desde: "1900-01-01" });
+  if (serie.datos.length === LIMITE_IMPLICITO) {
+    console.warn(
+      `  ${decl.slug}: OJO, vinieron exactamente ${LIMITE_IMPLICITO} puntos, que es el tope ` +
+        `que el MCP aplica cuando ignora fecha_desde. Puede estar recortada por arriba.`,
+    );
+  }
+  const puntos = recortarContinuo(recortarRepresentable(aPuntos(serie.datos), decl.slug), decl.slug);
+  const datos = puntos.map((p) => ({ mes: p.mes, indice: p.valor, origen: decl.origen }));
+  const primerMes = datos[0]!.mes;
+  const ultimoOficial = datos.at(-1)!.mes;
+
+  console.log(
+    `  ${decl.slug}: ${nombrarMes(primerMes)} → ${nombrarMes(ultimoOficial)} ` +
+      `(${datos.length} meses, ${decl.organismoCorto})`,
+  );
+
+  return {
+    serie: decl.slug,
+    base: serie.unidad,
+    fuentes: [
+      {
+        id: decl.origen,
+        serie: decl.serie,
+        organismo: decl.organismo,
+        organismoCorto: decl.organismoCorto,
+        url: decl.url,
+        rango: `${primerMes}/${ultimoOficial}`,
+        etiqueta: decl.etiqueta,
+      },
+    ],
     ultimo_oficial: ultimoOficial,
     actualizado: new Date().toISOString(),
     datos,
@@ -212,6 +390,74 @@ async function construirAuxiliar(id: string, nombre: string) {
   };
 }
 
+/**
+ * Los quince índices jurisdiccionales, cada uno a su archivo, y el catálogo.
+ *
+ * Dos reglas que importan más que el código:
+ *
+ * **Un índice que falla no puede voltear a los otros.** Se avisa, se lo saca del catálogo
+ * de esta corrida y se sigue. El nacional es la excepción y va aparte, en `main()`: si ese
+ * falla hay que cortar todo, porque es el que ve quien no toca el selector.
+ *
+ * **El catálogo se escribe último**, con los rangos que salieron de verdad. Escribirlo
+ * antes lo dejaría anunciando en el desplegable un índice cuyo archivo no existe, y
+ * elegirlo daría un 404 en vez de un número.
+ */
+async function construirCatalogo(nacional: SerieIndice): Promise<void> {
+  await mkdir(resolve(DIR_DATOS, "indices"), { recursive: true });
+
+  const anterior = (await readFile(resolve(DIR_DATOS, "indices.json"), "utf8")
+    .then((t) => JSON.parse(t) as CatalogoIndices)
+    .catch(() => null)) as CatalogoIndices | null;
+
+  const entradas: EntradaCatalogo[] = [
+    {
+      slug: SLUG_NACIONAL,
+      nombre: "Nacional (INDEC)",
+      tipo: "nacional",
+      cubre: "El IPC Nivel General Nacional del INDEC.",
+      primerMes: nacional.datos[0]!.mes,
+      ultimoOficial: nacional.ultimo_oficial,
+    },
+  ];
+
+  console.log(`Índices jurisdiccionales: bajando ${INDICES.length} series…`);
+  for (const decl of INDICES) {
+    try {
+      const serie = await construirIndice(decl);
+      // 12 meses: por debajo de eso no se puede calcular casi nada y seguro se rompió algo.
+      await escribirSiMejora(`indices/${decl.slug}.json`, serie, 12);
+      entradas.push({
+        slug: decl.slug,
+        nombre: decl.nombre,
+        tipo: decl.tipo,
+        cubre: decl.cubre,
+        primerMes: serie.datos[0]!.mes,
+        ultimoOficial: serie.ultimo_oficial,
+      });
+    } catch (e: unknown) {
+      // Que la bajada de hoy falle no es razón para que el índice desaparezca del
+      // desplegable: su archivo sigue en el repo con los datos de ayer, que es
+      // exactamente el mismo trato que reciben las demás series cuando el MCP no
+      // responde. Se conserva la entrada anterior y se avisa fuerte.
+      const previa = anterior?.indices.find((i) => i.slug === decl.slug);
+      console.warn(
+        `  ${decl.slug}: NO se pudo actualizar (${(e as Error).message}) — ` +
+          (previa ? "queda el dato de la corrida anterior" : "no está en el catálogo"),
+      );
+      if (previa) entradas.push(previa);
+    }
+  }
+
+  const faltantes = INDICES.length + 1 - entradas.length;
+  if (faltantes > 0) console.warn(`  OJO: ${faltantes} índice(s) quedaron fuera del catálogo`);
+
+  await escribirSiMejora("indices.json", {
+    indices: entradas,
+    actualizado: new Date().toISOString(),
+  });
+}
+
 async function main(): Promise<void> {
   await mkdir(DIR_DATOS, { recursive: true });
 
@@ -224,6 +470,8 @@ async function main(): Promise<void> {
 
   const dolar = await construirAuxiliar("dolar_oficial", "dolar_oficial");
   await escribirSiMejora("dolar.json", dolar, 100);
+
+  await construirCatalogo(ipc);
 
   await escribirSiMejora("meta.json", {
     actualizado: ipc.actualizado,
