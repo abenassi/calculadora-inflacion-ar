@@ -174,3 +174,18 @@ ninguno de los cuatro. Lo reemplazó una grilla {mes, día} × {adelante, atrás
 todo estimado} sobre el invariante que la interfaz necesita de verdad: **la cantidad de
 meses nombrados tiene que ser igual a la de tramos proyectados en la tabla.** Es la regla
 4 aplicada a un texto y una tabla que la persona lee juntos.
+
+## Un hallazgo que se rechazó, y por qué
+
+La fila de partida sale con `estimado` en la columna Origen y con guiones en Subió y
+Acumulado. La revisora usuaria lo marcó: *"ese mes no subió nada todavía, es el punto de
+partida, no sé por qué figura como estimado si no le estoy estimando nada"*.
+
+**No se cambió.** Esa fila sí muestra un dato estimado: el índice IPC de su última columna,
+que cuando el mes de partida no está publicado es una cuenta nuestra. Sacarle el sello
+dejaría un número estimado sin marcar, que es exactamente lo que prohíbe la regla 2. El
+guion en Subió y Acumulado es correcto —esa fila no representa ningún tramo, por eso el pie
+cuenta porcentajes y no filas— y el sello corresponde a lo único que esa fila afirma.
+
+Queda anotado igual porque la observación es razonable y va a volver: la fila se lee como
+"estimado" a secas cuando en realidad quiere decir "el índice de este mes es estimado".

@@ -209,6 +209,12 @@ que acá ya se pagaron.
   casi no se superponen. Encontraron un sesgo de medio punto en el anclaje del índice y,
   del otro lado, que la tabla no se le podía mostrar a un cliente.
 
+Los tres tienen `mcp__playwright__*` en su definición y **abren el sitio de verdad**: casi
+todo lo que revisan —el pie de la tabla, la leyenda del gráfico, el texto que se copia— lo
+arma el JS y en `index.html` no existe, así que un revisor que sólo lee el diff entrega
+sospechas con tono de certeza. Para que los agentes se registren hay que abrir el asistente
+**adentro de este directorio**, no en el padre.
+
 Si forkeás esto para otro dominio, **el patrón de los tres revisores y el loop se llevan
 tal cual**: cambiale la especialidad al primero y el oficio a la segunda; el de código y la
 mecánica del loop van casi sin tocar. `docs/decisiones/0007` cuenta por qué funciona, qué

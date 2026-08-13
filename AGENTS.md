@@ -51,8 +51,10 @@ npm run verificar   # typecheck + tests + build
 npm run dev         # servidor local
 ```
 
-**Y miralo en un browser.** El gráfico estuvo roto en producción pasando todos los tests,
-porque nadie lo había abierto.
+**Y miralo en un browser** — con `mcp__playwright__*` si lo tenés, y si no con cualquier
+otra herramienta de browser. El gráfico estuvo roto en producción pasando todos los tests,
+porque nadie lo había abierto. Los tres revisores también abren el sitio: casi todo lo que
+revisan lo arma el JS y en `index.html` no existe.
 
 ## Desarrollar acá es un loop, no una checklist
 
@@ -62,7 +64,12 @@ rechazás con la razón escrita, o el **techo de tres vueltas** que encuentran c
 tercera, el cambio es demasiado grande y hay que partirlo. El paso a paso está en la skill;
 acá va el mapa.
 
-Los tres revisores viven en `.claude/agents/` y van **en paralelo y sin verse entre sí**:
+Los tres revisores viven en `.claude/agents/` y van **en paralelo y sin verse entre sí**.
+
+> **Abrí el asistente adentro de este directorio.** Los agentes de `.claude/agents/` se
+> registran por proyecto: si abrís Claude Code en el directorio padre y trabajás desde ahí,
+> no aparecen y `revisora-usuaria` no existe como tipo de agente. Se nota rápido —
+> "Agent type not found"— pero es fácil confundirlo con que el repo no los trae.
 
 - **`revisor-economista`** — audita el método contra el código y los datos reales.
 - **`revisora-usuaria`** — una persona que necesita el número para trabajar y no maneja

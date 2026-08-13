@@ -108,8 +108,14 @@ npm run verificar     # typecheck + tests + build, todo junto
 
 Y después, **miralo en un browser de verdad**. No es opcional y no es ceremonia: el gráfico
 de barras estuvo roto en producción —las barras se quedaban en cero— pasando todos los
-tests, porque nadie lo había mirado. Si tenés una herramienta de browser disponible, usala;
-si no, `npm run dev` y abrilo vos.
+tests, porque nadie lo había mirado.
+
+**Usá `mcp__playwright__*`.** Es el browser que corresponde en este repo. Si no lo tenés,
+cualquier otra herramienta de browser sirve; si no tenés ninguna, `npm run dev` y abrilo a
+mano — pero entonces decílo, porque cambia cuánto vale lo que verificaste.
+
+**Dejá el servidor levantado en un puerto fijo y anotá la URL**: la vas a necesitar en el
+paso 4. Si cada revisor levanta el suyo chocan de puerto cuando corren en paralelo.
 
 Si vas a verificar en producción después de deployar, agregá un parámetro de cache-busting
 (`?v=algo`): ya pasó de comparar el hash del bundle, ver que era idéntico, y estar mirando
@@ -160,6 +166,15 @@ tocar.
 
 **Dales el caso concreto**, con montos y fechas reales, no "revisá el sitio". El del paso
 1, el mismo en todas las vueltas.
+
+**Y dales la URL del servidor que levantaste en el paso 3**, con el caso ya adentro
+(`?monto=&desde=&hasta=&metodo=`). Los tres tienen `mcp__playwright__*` en su definición y
+tienen que abrir el sitio: casi todo lo que revisan —el pie de la tabla, la leyenda del
+gráfico, el chip, el texto que se copia— lo arma el JS y en `index.html` no existe. Un
+revisor que sólo leyó el diff entrega sospechas con tono de certeza, y ya pasó: los cuatro
+hallazgos que rompieron la vuelta 2 se confirmaron abriendo el sitio, no leyendo el código.
+
+Pediles que **listen las URLs que abrieron**.
 
 **Y a partir de la segunda vuelta, dales también:**
 
@@ -225,6 +240,12 @@ termina cuando se cumple una de estas dos:
    para pasar a ser una trampa. Ya pasó que un hallazgo del tipo "nadie deflacta desde un
    mes futuro" se rechazara por inverosímil y fuera un bug real.
 2. **Lo único que trae son hallazgos que rechazás, y la razón está escrita.**
+
+**Ninguna de las dos cuenta si nadie abrió el browser.** Una vuelta cuyos revisores sólo
+leyeron el diff no cierra el loop: no vio la mitad de lo que el loop existe para mirar. Si
+un revisor avisa que no tuvo herramienta de browser, esa parte queda sin revisar — o lo
+volvés a despachar con una, o abrís vos los casos y se los pegás, pero no se da por
+cerrada.
 
 Que una vuelta no traiga nada nuevo es información, no una formalidad: es la única
 evidencia de que los arreglos de la vuelta anterior no rompieron otra cosa. Arreglar el
