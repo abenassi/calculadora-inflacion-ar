@@ -182,6 +182,27 @@ sola llamada de red a nadie: lee un JSON que está commiteado en el repo.
 - El build usa `base: "./"`, así que el mismo artefacto sirve desde un dominio propio
   y desde un subpath de `github.io`. No hay que recompilar para cambiar de uno a otro.
 - `src/ui/analytics.ts` — medición de uso que no guarda IP ni usa cookies. Ver abajo.
+- `.claude/` y `AGENTS.md` — el andamiaje para desarrollar con IA. Ver abajo.
+
+### Está preparado para desarrollarse con IA
+
+No como adorno: el repo trae el contexto que un asistente necesita para no repetir errores
+que acá ya se pagaron.
+
+- **`AGENTS.md`** (y `CLAUDE.md`, que lo referencia) — lo que hay que saber antes de tocar
+  nada: la promesa del sitio, las cinco reglas que no se negocian, dónde está cada cosa.
+- **`.claude/skills/cambiar-la-calculadora/`** — el orden de trabajo para cualquier cambio,
+  con las trampas ya pagadas y el gate de revisión.
+- **`.claude/agents/`** — **los dos revisores**, que son la parte más reusable de todo esto.
+  Un especialista del dominio que audita contra el código y los datos, y una usuaria que
+  necesita el número para trabajar y no maneja porcentajes. No es redundancia: el número
+  puede estar mal (lo ve quien sabe) o estar bien y no entenderse (lo ve quien no sabe), y
+  sus listas de hallazgos casi no se superponen. Encontraron un sesgo de medio punto en el
+  anclaje del índice y, del otro lado, que la tabla no se le podía mostrar a un cliente.
+
+Si forkeás esto para otro dominio, **el patrón de los dos revisores se lleva tal cual**:
+cambiale la especialidad al primero y el oficio a la segunda. `docs/decisiones/0007` cuenta
+por qué funciona y qué reglas hay que respetar para que siga funcionando.
 
 ### El analytics no se copia prendido
 

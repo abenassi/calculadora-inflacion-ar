@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Calculadora de inflación argentina con datos vía Argentina Data MCP",
+  "description": "Calculadora de inflaci\u00f3n argentina con datos v\u00eda Argentina Data MCP",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "snapshot": "tsx scripts/fetch-snapshot.ts"
+    "snapshot": "tsx scripts/fetch-snapshot.ts",
+    "verificar": "tsc --noEmit && vitest run && vite build"
   },
   "devDependencies": {
     "@types/node": "^22.20.1",

@@ -13,7 +13,13 @@ Un solo revisor no encuentra las dos.
 ## Decisión
 
 Cada vez que se toca la metodología o la explicación, se revisa con **dos perfiles
-opuestos, en paralelo y sin que se vean entre sí**:
+opuestos, en paralelo y sin que se vean entre sí**.
+
+> **Los dos están escritos y versionados** en [`.claude/agents/`](../../.claude/agents/):
+> `revisor-economista` y `revisora-usuaria`. Dejaron de ser un prompt que había que
+> reconstruir de memoria cada vez — que era la forma más fácil de que el método se perdiera
+> o se degradara sin que nadie lo notara. El paso a paso para invocarlos está en la skill
+> [`cambiar-la-calculadora`](../../.claude/skills/cambiar-la-calculadora/SKILL.md).
 
 - **Un economista especialista en índices de precios.** Audita contra el código y los
   datos reales, no contra la descripción. Se le pide explícitamente que sea exigente y
