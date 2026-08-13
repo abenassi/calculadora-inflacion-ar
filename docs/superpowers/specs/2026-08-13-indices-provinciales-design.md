@@ -243,8 +243,46 @@ Además de `npm run verificar`:
   alternativa para una provincia que no mide se sostiene metodológicamente; a Vanina,
   si el tercer campo en el formulario le mete ruido cuando ella no quiere elegir nada.
 
+## Se evaluó agregar núcleo, estacionales y regulados, y se decidió que no
+
+Vale dejarlo escrito porque la idea es razonable, los datos están ahí y va a volver.
+
+El INDEC publica un grid completo de nivel de índice, base dic-2016, todo fresco a
+2026-06: **18 categorías × 7 geografías = 126 series**. Las categorías son nivel
+general, núcleo, estacionales, regulados, bienes, servicios y las 12 divisiones
+(alimentos, vivienda, salud, transporte, educación…). Existen y se bajarían con el
+mismo pipeline.
+
+**Quedan afuera igual. La razón no es de esfuerzo, es de qué pregunta contesta el
+sitio.** El núcleo excluye a propósito los precios regulados y los estacionales: es
+una medida analítica de tendencia, no un índice de costo de vida. Nadie indexa un
+alquiler al núcleo, y el CER usa nivel general. Estacionales son sólo frutas,
+verduras, turismo e indumentaria. Regulados, sólo tarifas y transporte. Los tres
+contestan "hacia dónde va la inflación", no "cuánto vale hoy este monto", que es lo
+único que este sitio promete. Ofrecerlos invitaba a que alguien eligiera "núcleo"
+creyendo que era una inflación más fina y se llevara un número que no puede defender.
+
+Las 12 divisiones sí contestan preguntas legítimas ("cuánto subió lo que gasto en
+comida", contratos indexados a un capítulo), pero entran o no entran junto con el
+resto de la dimensión: media dimensión es peor que ninguna. Si alguna vez se agregan,
+hay dos cosas ya averiguadas que conviene no volver a averiguar:
+
+- **La dimensión "qué precios" sólo puede existir para las geografías del INDEC.** Las
+  provincias también publican divisiones, pero con nomenclaturas incompatibles entre
+  sí: Mendoza usa el esquema viejo (esparcimiento, indumentaria, transporte *y*
+  comunicaciones), CABA uno moderno con categorías propias (seguros y servicios
+  financieros, información y comunicación), INDEC un tercero. "Transporte" no
+  significa lo mismo en las tres.
+- **Trampa del catálogo:** las familias `345.1`, `346.1` y `347.1` declaran unidad
+  "Índice" pero son **incidencia absoluta**, en puntos porcentuales de contribución, y
+  `348.1` son precios en pesos de productos sueltos. Ninguna es un nivel de índice y
+  ninguna sirve para ajustar un monto. Las de nivel son sólo `146.3` (divisiones),
+  `147.3` (bienes/servicios) y `148.3` (nivel general, núcleo, estacionales,
+  regulados).
+
 ## Lo que este trabajo NO hace
 
+- No agrega categorías: un solo índice por geografía, siempre nivel general.
 - No compara dos índices entre sí. Un solo índice por cálculo.
 - No inventa un REM provincial ni proyecta con expectativas regionales.
 - No promedia regiones para fabricarle un índice a una provincia que no mide.
