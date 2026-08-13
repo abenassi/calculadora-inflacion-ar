@@ -476,9 +476,20 @@ function calcularProyectando(
     .sort()
     .at(-1);
 
-  const estimados = mesTope
-    ? rangoMeses(sumarMeses(ultimoOficial, 1), compararMeses(mesTope, ultimoOficial) > 0 ? mesTope : sumarMeses(ultimoOficial, 1))
-    : [];
+  // Los meses anteriores al punto de partida no se nombran aunque haya que estimarlos
+  // para construir el índice: el resultado es el cociente índice(hasta)/índice(desde),
+  // así que todo lo que está antes de `desde` se cancela y no mueve el número ni un
+  // peso. Nombrarlos le hacía decir al sitio "el INDEC no publicó los 11 meses desde
+  // julio" a alguien que había pedido octubre, y quedaba contra las 7 filas con
+  // porcentaje que tenía en pantalla. Los meses que se nombran son los que la persona
+  // puede contar en la tabla.
+  const primeroQueMueveElNumero = sumarMeses(mesTopeNecesario(puntos[0]!), 1);
+  const piso =
+    compararMeses(primeroQueMueveElNumero, sumarMeses(ultimoOficial, 1)) > 0
+      ? primeroQueMueveElNumero
+      : sumarMeses(ultimoOficial, 1);
+
+  const estimados = mesTope && compararMeses(mesTope, piso) >= 0 ? rangoMeses(piso, mesTope) : [];
 
   return armarResultado(
     monto,

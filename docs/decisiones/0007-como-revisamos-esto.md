@@ -69,3 +69,26 @@ funcionaban.
 **Darle a la usuaria el material completo.** Vanina pidió un botón de "copiar
 explicación" que ya existía: no se lo habíamos mostrado. Ese hallazgo era artefacto del
 prompt, no del producto, y confundirlo habría costado trabajo al pedo.
+
+## La primera corrida con los agentes ya versionados
+
+Apenas quedaron escritos en `.claude/agents/`, se despachó a `revisora-usuaria` contra
+producción con un caso concreto, para ver si un agente versionado rinde lo mismo que el
+prompt reconstruido a mano. Rindió: encontró que tres partes de la pantalla decían
+7, 8 y 11 para la misma cantidad de meses, que el pie prometía "el resto son datos
+oficiales" sin haber ninguno, y que el texto que se copia le atribuía al INDEC un
+porcentaje que el INDEC no publicó. Todo eso está en
+[0003](0003-los-meses-que-el-indec-no-publico.md).
+
+Dos cosas que confirma el método más que el hallazgo:
+
+- **Encontró regresiones del cambio que la había motivado.** La opción deshabilitada
+  seguía diciendo "(recomendado)" y `datos.html` seguía describiendo el comportamiento
+  viejo. Cambiar un comportamiento y no barrer los textos que lo describen es el modo
+  de falla más repetido de este repo.
+- **Confirmó explícitamente lo que estaba bien**, y eso evitó trabajo: el cartel que
+  explica por qué la opción está en gris quedó intacto.
+
+Se verificó cada hallazgo contra el código antes de tocar nada, y uno cambió de forma al
+verificarlo: los "11 meses" no eran un error de conteo sino que el rango arrancaba antes
+del punto de partida. El diagnóstico correcto salió de la verificación, no del reporte.

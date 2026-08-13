@@ -21,7 +21,10 @@ explicable, va para atrás.
    público.
 2. **Dato y estimación nunca se mezclan sin decirlo.** Cada fila declara si es un dato
    publicado por el INDEC o una cuenta nuestra. Las filas prorrateadas no llevan el sello
-   del INDEC.
+   del INDEC. Y al revés, que es la mitad que se olvida: **no prometas dato oficial donde
+   no lo hay.** Un pie que dice "el resto son datos oficiales" sin haber resto, o una
+   referencia de "dato oficial" con todas las barras rayadas, hace desconfiar de lo que sí
+   es cierto.
 3. **Un control no ofrece lo que no puede cumplir.** Si una opción no se puede honrar para
    el período elegido, se deshabilita y se explica al lado.
 4. **Un criterio se escribe una sola vez.** Si la interfaz y el motor tienen que coincidir,

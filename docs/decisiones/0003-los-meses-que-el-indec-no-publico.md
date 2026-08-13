@@ -96,3 +96,47 @@ ninguno" es la que **más se aleja** de lo razonable, porque arrastra meses de o
 régimen: 7,32% contra 5,60% de la que se declara estimativa. Es cierto. La respuesta
 por ahora es de rotulado —el título de la tabla, el `~`, el párrafo que nombra los
 meses— y no de método. Queda anotado acá porque es una tensión real, no resuelta.
+
+## Lo que encontró la revisión al deshabilitar la opción
+
+Deshabilitar "no estimar ninguno" para períodos futuros dejó a la vista un conjunto de
+textos que ya venían mal y que, juntos, hacían desconfiar del número aunque el número
+estuviera bien. Los encontró la revisora usuaria sobre el sitio en producción, con un
+caso concreto: $520.000 de octubre 2026 a mayo 2027.
+
+**Tres números distintos para la misma cosa.** El párrafo decía "el INDEC todavía no
+publicó los **11 meses** que van de julio 2026 a mayo 2027", el pie de la tabla decía
+"las **8 filas** resaltadas", y en pantalla había **7** porcentajes. Los tres eran
+ciertos en su propia lógica y ninguno era verificable mirando la tabla.
+
+- Los **11** salían de que `mesesEstimados` arrancaba siempre en el mes siguiente al
+  último publicado, sin mirar desde dónde se pedía el cálculo. Pero el resultado es el
+  cociente `índice(hasta)/índice(desde)`: **todo lo anterior a `desde` se cancela y no
+  mueve el número ni un peso.** Nombrar julio a alguien que pidió octubre era además el
+  caso exacto que ya había fallado antes — el texto nombrando meses que la persona no
+  pidió. Ahora el rango arranca en el primer mes que efectivamente entra en la cuenta.
+- Las **8** salían de contar filas en vez de tramos. La fila de partida sale resaltada
+  —su índice está estimado— pero no muestra ningún porcentaje, así que llamarla "tramo
+  proyectado" sumaba uno que no se puede contar. El pie cuenta porcentajes.
+
+**"El resto son datos oficiales" cuando no hay resto.** La frase era incondicional. Con
+el destino en el futuro la tabla entera está estimada, así que mandaba a buscar un dato
+del INDEC imposible de señalar. Lo mismo hacía la referencia del gráfico, que anunciaba
+"dato oficial" con todas las barras rayadas. Las dos ahora dependen de que exista al
+menos un tramo oficial. Es la regla 2 aplicada al revés de como se suele leer: no
+prometer dato oficial donde no lo hay es tan importante como marcar lo estimado.
+
+**El texto que se copia arrancaba diciendo "IPC del INDEC".** En pantalla el cartel de
+ESTIMADO está pegado al número y se ve de lejos; pegado en un mensaje eso desaparece y
+quedan dos renglones que le atribuyen al INDEC un porcentaje que el INDEC no publicó.
+Quien lo recibe lee el primer renglón y el monto. El aviso ahora va **antes** del
+número, y el acumulado dice "estimada" en vez de citar la fuente.
+
+**Y el propio cambio dejó dos mentiras nuevas**, que es lo que pasa cuando se cambia un
+comportamiento sin barrer sus textos: la opción deshabilitada seguía diciendo
+"(recomendado)" —recomendando justo la única que no se podía elegir— y `datos.html`
+seguía afirmando "si no lo tocás, siempre estás en la primera". Las dos corregidas.
+
+Vale la pena registrar qué **no** se tocó: el cartel que explica por qué la opción está
+en gris quedó tal cual. Fue lo único de todo el flujo que la revisión confirmó que se
+entendía a la primera.

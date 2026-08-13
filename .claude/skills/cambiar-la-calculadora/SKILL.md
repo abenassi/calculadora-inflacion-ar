@@ -37,7 +37,16 @@ la key en el cliente, el diseño está mal — no hay que ofuscarla.
 
 **2. Dato y estimación nunca se mezclan sin decirlo.** Cada fila y cada porcentaje declara
 si es un dato publicado o una cuenta nuestra. Las filas prorrateadas van marcadas y **no
-llevan el sello del organismo**: ese porcentaje no lo publicó nadie.
+llevan el sello del organismo**: ese porcentaje no lo publicó nadie. La mitad que se
+olvida es la simétrica: **no prometas dato oficial donde no lo hay.** Si un texto o una
+referencia anuncia una parte oficial que en ese caso no existe, la persona la sale a
+buscar, no la encuentra y deja de creerle al resto. Los textos que hablan de "el resto",
+"las filas resaltadas" o cantidades de meses tienen que ser **contables en pantalla**.
+
+**2 bis. Si cambiás un comportamiento, barré los textos que lo describen.** Es el modo de
+falla más repetido acá: la opción quedó deshabilitada pero seguía diciendo "(recomendado)",
+y `datos.html` seguía explicando el comportamiento viejo. Buscá el nombre de lo que
+cambiaste en `*.html`, en `src/ui/` y en `docs/`.
 
 **3. Un control no ofrece lo que no puede cumplir.** Si una opción no se puede honrar para
 el período elegido, se deshabilita y se explica al lado — no se ofrece y después se aclara

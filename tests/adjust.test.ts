@@ -136,6 +136,32 @@ describe("proyección — el destino es un mes futuro", () => {
     expect(r.montoAjustado).toBeCloseTo(1000 * 1.1 * 1.1, 6);
   });
 
+  /**
+   * Cuando el punto de partida ya cae después del último mes publicado, hay que estimar
+   * meses sólo para poder construir el índice de la partida — pero esos meses se
+   * cancelan en el cociente índice(hasta)/índice(desde) y no mueven el resultado ni un
+   * peso. Nombrarlos hacía que el sitio dijera "el INDEC no publicó los 11 meses desde
+   * julio" a alguien que había pedido octubre, y que ese número no coincidiera con los
+   * porcentajes que tenía en la tabla.
+   */
+  it("no nombra como estimados los meses anteriores a la partida, que no mueven el número", () => {
+    const r = adjust(1000, "2020-07", "2020-09", sintetica, {
+      hoy: "2020-07",
+      metodologia: "repite_ultimo",
+    });
+    if (r.metodo.tipo !== "proyeccion") throw new Error("tipo inesperado");
+
+    // Publicado hasta abril; se estima mayo y junio para llegar a julio, pero el
+    // resultado sólo depende de agosto y septiembre.
+    expect(r.metodo.mesesEstimados).toEqual(["2020-08", "2020-09"]);
+    expect(r.montoAjustado).toBeCloseTo(1000 * 1.1 * 1.1, 6);
+
+    // La cantidad de meses nombrados coincide con la de porcentajes de la tabla.
+    const tramos = r.desglose.slice(1);
+    expect(r.metodo.mesesEstimados).toHaveLength(tramos.length);
+    expect(tramos.every((f) => f.varMensualPct !== null)).toBe(true);
+  });
+
   it("repite el último valor, no el promedio de varios", () => {
     // Últimas variaciones: +5%, +2%, +3%. Repetir el último da 3%, no 3,33%.
     const r = adjust(1000, "2020-04", "2020-05", irregular, { hoy: "2020-04" });

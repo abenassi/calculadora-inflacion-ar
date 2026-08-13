@@ -323,7 +323,13 @@ function explicarTabla(r: Resultado): string {
       );
     case "proyeccion": {
       const { base, tasaMensualPct } = r.metodo;
-      const proyectadas = r.desglose.filter((f) => f.esProyeccion).length;
+      // Se cuentan los tramos, no las filas. La fila de partida también sale resaltada
+      // —su índice está estimado— pero no muestra ningún porcentaje, así que llamarla
+      // "tramo proyectado" daba un número que no coincidía con lo que se puede contar
+      // en la tabla: decía 8 donde había 7 porcentajes.
+      const tramos = r.desglose.slice(1);
+      const proyectadas = tramos.filter((f) => f.esProyeccion).length;
+      const todos = proyectadas === tramos.length;
       const de =
         base.fuente === "rem"
           ? `el REM del BCRA de ${nombrarMes(base.mesEncuesta)}`
@@ -331,11 +337,17 @@ function explicarTabla(r: Resultado): string {
       // Con la senda del REM cada mes tiene su propia tasa y está en su fila, así
       // que nombrar "una" tasa sería inventar un promedio que no se usó.
       const aQueTasa = tasaMensualPct === null ? "" : `, a ${porcentaje(tasaMensualPct)} por mes`;
+      // "El resto son datos oficiales" prometía una parte oficial que muchas veces no
+      // existe: cuando el destino todavía no llegó, la tabla entera está estimada y esa
+      // frase mandaba a buscar un dato del INDEC que no se puede señalar en ningún lado.
+      const cierre = todos
+        ? " En esta tabla no hay ningún dato oficial: el INDEC todavía no publicó ninguno de estos meses."
+        : " El resto son datos oficiales.";
       return (
-        `Estos son los meses que pediste. ${plural(proyectadas, "La fila resaltada", `Las ${proyectadas} filas resaltadas`)} ` +
+        `Estos son los meses que pediste. ${plural(proyectadas, "El porcentaje resaltado", `Los ${proyectadas} porcentajes resaltados`)} ` +
         `${plural(proyectadas, "es un tramo proyectado", "son tramos proyectados")}, que el INDEC ` +
         `todavía no publicó: ${plural(proyectadas, "se estimó", "se estimaron")} con ${de}` +
-        `${aQueTasa}. El resto son datos oficiales.` + aclararParciales(r)
+        `${aQueTasa}.${cierre}` + aclararParciales(r)
       );
     }
   }
@@ -346,8 +358,11 @@ function pintarResultado(r: Resultado): void {
 
   el("chip-estimado").hidden = !esProyeccion;
   // Anunciar "estimado" en la leyenda cuando no hay ninguna fila estimada hace
-  // dudar de un resultado que es enteramente oficial.
+  // dudar de un resultado que es enteramente oficial. Y al revés: anunciar "dato
+  // oficial" cuando todas las barras están rayadas manda a buscar una barra oficial
+  // que no está, que es peor todavía porque hace desconfiar de lo que sí es cierto.
   el("leyenda-estimado").hidden = !esProyeccion;
+  el("leyenda-oficial").hidden = r.desglose.slice(1).every((f) => f.esProyeccion);
   // Con `ventana_reciente` el eje del gráfico son los meses de referencia, no los
   // del período pedido: el título lo dice para que nadie lea mal las fechas.
   el("titulo-grafico").textContent =
@@ -442,14 +457,31 @@ function pintarResultado(r: Resultado): void {
  * explicación que se lea sola y que traiga la fuente adentro.
  */
 function armarExplicacion(r: Resultado): string {
-  const lineas: string[] = [
+  const estimado = r.metodo.tipo === "proyeccion";
+
+  // En pantalla el cartel de ESTIMADO está pegado al número grande y se ve de lejos.
+  // Pegado en un mensaje eso desaparece: quedaba arrancando con el monto y con "(IPC
+  // del INDEC)" al lado de un porcentaje que el INDEC no publicó, y quien lo recibe
+  // lee el primer renglón y nada más. El aviso va antes del número, no después.
+  const lineas: string[] =
+    r.metodo.tipo === "proyeccion"
+      ? [
+          `OJO: esto es una estimación, no un dato publicado. El INDEC todavía no publicó ` +
+            `${frasearMeses(r.metodo.mesesEstimados, "ni")}.`,
+          "",
+        ]
+      : [];
+
+  lineas.push(
     `${pesos(r.monto)} de ${nombrarPunto(r.desde)} equivalen a ` +
       `${r.metodo.tipo === "directo" ? "" : "unos "}${pesosRedondo(r.montoAjustado)} ` +
       `en ${nombrarPunto(r.hasta)}.`,
-    `Inflación acumulada: ${porcentaje(r.variacionPct)} (IPC del INDEC).`,
+    estimado
+      ? `Inflación acumulada estimada: ${porcentaje(r.variacionPct)}.`
+      : `Inflación acumulada: ${porcentaje(r.variacionPct)} (IPC del INDEC).`,
     "",
     r.metodo.tipo === "ventana_reciente" ? "Meses usados:" : "Mes a mes:",
-  ];
+  );
 
   for (const f of r.desglose.slice(1)) {
     const etiqueta = f.origen === "proyeccion" ? "estimado" : "oficial INDEC";
@@ -507,6 +539,12 @@ function sincronizarOpcionesDeMetodologia(desde: Punto, hasta: Punto): void {
 
   const sePuede = sePuedeEvitarEstimar(desde, hasta, serie);
   opcion.disabled = !sePuede;
+  // Dejarle el "(recomendado)" a la opción gris es recomendar justo la única que no se
+  // puede elegir. La etiqueta tiene que decir por qué está gris, que es lo que la
+  // persona va a buscar apenas la vea.
+  opcion.textContent = sePuede
+    ? "no estimar ninguno (recomendado)"
+    : "no estimar ninguno (no disponible para este período)";
   el("nota-metodologia").hidden = sePuede;
 
   if (!sePuede && select.value === "sin_proyectar") {
