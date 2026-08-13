@@ -38,8 +38,8 @@ import { fileURLToPath } from "node:url";
 import { adjust } from "../src/engine/adjust.js";
 import { aniosDisponibles, resumenAnual, type ResumenAnual } from "../src/engine/anual.js";
 import { compararMeses, mesConAnio, mesDe, soloMes } from "../src/engine/mes.js";
-import type { Fila, Mes, SerieIndice } from "../src/engine/types.js";
-import { fuenteDe } from "../src/ui/etiquetas.js";
+import type { Fila, FuentesDeSerie, Mes, SerieIndice } from "../src/engine/types.js";
+import { fuenteDe, organismoDeFila } from "../src/ui/etiquetas.js";
 
 /**
  * El id de la fuente del índice del INDEC dentro de la serie nacional.
@@ -356,15 +356,15 @@ ${p.cuerpo}
  * dato entra al markup como texto: la calculadora se protege armando nodos del DOM
  * (regla 9), y ese camino no existe cuando el HTML se escribe a un archivo.
  */
-function sello(f: Fila): string {
-  if (f.origen !== "indec" && f.origen !== "bcra") {
+function sello(f: Fila, serie: FuentesDeSerie): string {
+  const organismo = organismoDeFila(f, serie);
+  if (organismo === null) {
     throw new Error(
       `Origen desconocido en ${String(f.punto)}: "${f.origen}". ` +
-        "El generador sólo sabe sellar datos publicados por INDEC o BCRA.",
+        `La serie declara ${serie.fuentes.map((x) => x.id).join(", ")}.`,
     );
   }
-  const texto = f.origen === "indec" ? "INDEC ✓" : "BCRA ✓";
-  return `<span class="origen origen--${esc(f.origen)}">${texto}</span>`;
+  return `<span class="origen origen--publicado">${esc(organismo)} ✓</span>`;
 }
 
 function tablaDelAnio(r: ResumenAnual, fuenteLarga: string): string {
@@ -377,7 +377,7 @@ function tablaDelAnio(r: ResumenAnual, fuenteLarga: string): string {
               <td>${esc(sub)}</td>
               <td>${esc(acum)}</td>
               <td class="col-tecnica">${esc(fIndice(f.indice))}</td>
-              <td>${sello(f)}</td>
+              <td>${sello(f, r)}</td>
             </tr>`;
     })
     .join("\n");

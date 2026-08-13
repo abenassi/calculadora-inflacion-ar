@@ -83,6 +83,36 @@ export function fuenteDe(filas: Fila[], serie: FuentesDeSerie): Fuente {
 }
 
 /**
+ * Quién publica esta serie **de acá en adelante**.
+ *
+ * Es la fuente del tramo más reciente, y hace falta como concepto propio porque las
+ * frases que hablan en futuro —"todavía no publicó julio"— no pueden usar la atribución
+ * del período mostrado: en un cálculo del nacional que cruza el empalme ésa dice "el
+ * INDEC y el BCRA", y el BCRA no va a publicar julio de 2026.
+ */
+export function quienPublicaAhora(serie: FuentesDeSerie): string {
+  const ultima = serie.fuentes.at(-1);
+  if (!ultima) throw new Error("La serie no declara ninguna fuente");
+  return ultima.etiqueta.publicadosPor;
+}
+
+/**
+ * Cómo se nombra la serie **entera**, sin mirar qué período se está mostrando.
+ *
+ * Es distinto de `fuenteDe()` y la diferencia importa: `fuenteDe()` contesta "quién
+ * publicó lo que estás viendo", y ésta contesta "de qué está hecho este índice". La nota
+ * legal del pie es del segundo tipo — habla del índice, no del cálculo— así que para el
+ * nacional tiene que nombrar al BCRA aunque el período elegido sea de 2024 y no tenga
+ * ninguna fila suya.
+ */
+export function fuenteDeLaSerie(serie: FuentesDeSerie): EtiquetaFuente {
+  if (serie.fuentes.length > 1 && serie.etiquetaCombinada) return serie.etiquetaCombinada;
+  const primera = serie.fuentes[0];
+  if (!primera) throw new Error("La serie no declara ninguna fuente");
+  return primera.etiqueta;
+}
+
+/**
  * El sello que va en la fila: `"INDEC ✓"`, `"IDECBA ✓"`.
  *
  * Sale de la fuente de **la fila** y no de la del índice, porque una serie empalmada tiene

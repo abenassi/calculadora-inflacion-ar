@@ -15,7 +15,10 @@
 import { sumaDeVariaciones, tasaMensualDelRem } from "../engine/adjust.js";
 import { diasEntre, esFecha, mesDe, nombrarMes, nombrarPunto, soloMes } from "../engine/mes.js";
 import type { Mes, Resultado } from "../engine/types.js";
-import { fuenteDe } from "./etiquetas.js";
+import { fuenteDe, quienPublicaAhora } from "./etiquetas.js";
+
+/** Para arrancar una oración con el organismo, que viene con el artículo en minúscula. */
+const capitalizar = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 import { comoSeMuestra, pesos, porcentaje } from "./format.js";
 
 /** A partir de cuántos meses proyectados dejamos de tratarlo como una cuenta razonable. */
@@ -87,8 +90,8 @@ export function explicarMetodo(r: Resultado): string {
         ? `pasaron ${diasEntre(r.desde, r.hasta)} días`
         : plural(mesesDelPeriodo, "pasó 1 mes", `pasaron ${mesesDelPeriodo} meses`);
       const contexto =
-        `De ${nombrarPunto(r.desde)} a ${nombrarPunto(r.hasta)} ${largo}, y el INDEC ` +
-        `todavía no publicó ${frasearMeses(mesesSinPublicar, "ni")}. `;
+        `De ${nombrarPunto(r.desde)} a ${nombrarPunto(r.hasta)} ${largo}, y ` +
+        `${quienPublicaAhora(r)} todavía no publicó ${frasearMeses(mesesSinPublicar, "ni")}. `;
       // El resultado se muestra con "~" y antes esta frase decía que no había
       // ninguna estimación. Las dos cosas son ciertas y juntas se contradicen, así
       // que la aproximación tiene que quedar atribuida a su causa real.
@@ -132,7 +135,8 @@ export function explicarMetodo(r: Resultado): string {
       if (n === 0) {
         return hayAlgoEstimado(r)
           ? `El período empieza y termina en el mismo punto, así que el monto no cambia. ` +
-              `La fila igual queda marcada como estimada: el INDEC todavía no publicó ese mes.`
+              `La fila igual queda marcada como estimada: ${quienPublicaAhora(r)} todavía no ` +
+              `publicó ese mes.`
           : `Todos los meses del cálculo son datos oficiales ya publicados por ${fuenteDe(r.desglose, r).publicadosPor}.`;
       }
 
@@ -142,7 +146,8 @@ export function explicarMetodo(r: Resultado): string {
       // solo a la metodología que se está usando. El motivo se explica al lado del
       // control, que es donde se toma la decisión, en vez de acá abajo.
       const faltan =
-        `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, así que ` +
+        `${capitalizar(quienPublicaAhora(r))} todavía no publicó ` +
+        `${frasearMeses(mesesEstimados, "ni")}, así que ` +
         `${plural(n, "ese mes se estima", "esos meses se estiman")} `;
 
       if (base.fuente === "rem") {
@@ -167,7 +172,8 @@ export function explicarMetodo(r: Resultado): string {
           );
         }
         return (
-          `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}. Hasta ` +
+          `${capitalizar(quienPublicaAhora(r))} todavía no publicó ` +
+          `${frasearMeses(mesesEstimados, "ni")}. Hasta ` +
           `${nombrarMes(mesesDeLaSenda.at(-1)!)} se usa el pronóstico mes a mes del ${rem}. ` +
           `De ahí en adelante el REM mensual ya no llega, así que ${frasearMeses(mesesExtrapolados)} ` +
           `${plural(mesesExtrapolados.length, "sale", "salen")} de repartir pareja su expectativa ` +
@@ -286,11 +292,13 @@ export function explicarTabla(r: Resultado): string {
       // frase mandaba a buscar un dato del INDEC que no se puede señalar en ningún lado.
       const cierre = hayDatoOficial(r)
         ? " El resto son datos oficiales."
-        : " En esta tabla no hay ningún dato oficial: el INDEC todavía no publicó ninguno de estos meses.";
+        : ` En esta tabla no hay ningún dato oficial: ${quienPublicaAhora(r)} todavía no ` +
+          `publicó ninguno de estos meses.`;
       return (
         `Estos son los meses que pediste. ${plural(proyectadas, "El porcentaje resaltado", `Los ${proyectadas} porcentajes resaltados`)} ` +
-        `${plural(proyectadas, "es un tramo proyectado", "son tramos proyectados")}, que el INDEC ` +
-        `todavía no publicó: ${plural(proyectadas, "se estimó", "se estimaron")} con ${de}` +
+        `${plural(proyectadas, "es un tramo proyectado", "son tramos proyectados")}, que ` +
+        `${quienPublicaAhora(r)} todavía no publicó: ` +
+        `${plural(proyectadas, "se estimó", "se estimaron")} con ${de}` +
         `${aQueTasa}.${cierre}` + aclararParciales(r)
       );
     }

@@ -126,7 +126,10 @@ export const INDICES: IndiceDeclarado[] = [
     slug: "mendoza",
     nombre: "Mendoza",
     tipo: "provincia",
-    cubre: "Índice provincial de Mendoza.",
+    cubre:
+      "Índice provincial de Mendoza. La provincia no publicó entre marzo de 2012 y abril " +
+      "de 2016, así que la serie arranca después de ese corte: rellenar el hueco sería " +
+      "inventar números que no publicó nadie.",
     serie: "indec:195.1_NIVEL_GENERAL_0_0_13",
     origen: "deie-mendoza",
     organismo: "Dirección de Estadísticas e Investigaciones Económicas de Mendoza (DEIE)",
@@ -220,12 +223,24 @@ export const INDICES: IndiceDeclarado[] = [
   },
 
   /* ── Las seis regiones del INDEC ──────────────────────────────────────────── */
-  region(
-    "gba",
-    "Región Gran Buenos Aires",
-    "indec:148.3_INIVELGBA_DICI_M_21",
-    "la Ciudad de Buenos Aires y los 24 partidos del conurbano bonaerense",
-  ),
+  {
+    // El GBA es la única región que no lleva la coletilla: sí es el índice del aglomerado
+    // que nombra, entero. Lo que hay que decir acá es la otra cosa —que incluye la Ciudad
+    // y el conurbano juntos— porque quien busca sólo la Ciudad tiene el IPCBA al lado.
+    slug: "gba",
+    nombre: "Región Gran Buenos Aires",
+    tipo: "region",
+    cubre:
+      "Cubre la Ciudad de Buenos Aires y los 24 partidos del conurbano bonaerense juntos. " +
+      "Si buscás sólo la Ciudad, está el IPCBA del IDECBA.",
+    serie: "indec:148.3_INIVELGBA_DICI_M_21",
+    ...INDEC,
+    etiqueta: {
+      corta: "IPC Región Gran Buenos Aires del INDEC",
+      larga: "el IPC de la Región Gran Buenos Aires del INDEC",
+      publicadosPor: "el INDEC",
+    },
+  },
   region(
     "pampeana",
     "Región Pampeana",

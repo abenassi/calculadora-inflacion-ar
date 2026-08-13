@@ -193,6 +193,17 @@
           <label for="hasta-dia">equivale, al día</label>
           <input type="date" id="hasta-dia" aria-label="Fecha de destino" />
         </div>
+
+        <!--
+          Va último y no primero para que el formulario se siga leyendo como una oración:
+          "$520.000 de mayo 2026 equivale, en agosto 2026, según el IPC Nacional". Quien
+          entra y no lo toca ve exactamente lo que veía antes: dice Nacional (INDEC) y
+          nada más aparece en pantalla.
+        -->
+        <div class="campo campo--indice">
+          <label for="indice">según el IPC</label>
+          <select id="indice" aria-label="Índice de precios a usar"></select>
+        </div>
       </form>
 
       <label class="opcion-dias">
@@ -200,6 +211,14 @@
         <span>Usar fechas exactas en lugar de meses</span>
         <small>Opcional. Sirve si tu período no arranca ni termina a principio de mes.</small>
       </label>
+
+      <!--
+        Qué mide el índice elegido y quién lo publica. Aparece SÓLO cuando no es el
+        nacional: con el default la pantalla queda igual que antes de que existiera el
+        selector. Es un solo párrafo y no dos avisos separados porque quien elige Neuquén
+        necesita leer las dos cosas —qué cubre y que va atrasado— de una sola vez.
+      -->
+      <p class="nota-indice" id="nota-indice" hidden></p>
 
       <section class="resultados" id="resultados" aria-live="polite">
         <p class="error" id="error" hidden></p>
@@ -231,7 +250,8 @@
           decisión previa al cálculo.
         -->
         <p class="metodologia">
-          <label for="metodologia">Meses que el INDEC no publicó:</label>
+          <!-- El organismo lo pone main.ts: con Córdoba elegida acá no publica el INDEC. -->
+          <label for="metodologia" id="rotulo-metodologia">Meses que el INDEC no publicó:</label>
           <select id="metodologia">
             <option value="sin_proyectar">no estimar ninguno</option>
             <option value="repite_ultimo">estimarlos con la inflación del último mes</option>
@@ -444,7 +464,12 @@
 
     <footer class="pie">
       <div class="contenido">
-        <p>
+        <!--
+          Nombra al índice que se está usando, no al del default: alguien que calcula con
+          Córdoba y baja hasta el pie no puede leer ahí que el número salió del INDEC.
+          Lo completa main.ts; el contenido de acá es el que se ve sin JavaScript.
+        -->
+        <p id="nota-legal">
           Cálculo orientativo basado en índices oficiales de precios: el IPC del INDEC y, para lo
           anterior a diciembre de 2016, la serie de inflación mensual del BCRA. No constituye
           asesoramiento contable, financiero ni legal.

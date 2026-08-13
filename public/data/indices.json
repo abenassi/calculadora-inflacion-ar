@@ -36,7 +36,7 @@
       "slug": "mendoza",
       "nombre": "Mendoza",
       "tipo": "provincia",
-      "cubre": "Índice provincial de Mendoza.",
+      "cubre": "Índice provincial de Mendoza. La provincia no publicó entre marzo de 2012 y abril de 2016, así que la serie arranca después de ese corte: rellenar el hueco sería inventar números que no publicó nadie.",
       "primerMes": "2016-04",
       "ultimoOficial": "2026-06"
     },
@@ -84,7 +84,7 @@
       "slug": "gba",
       "nombre": "Región Gran Buenos Aires",
       "tipo": "region",
-      "cubre": "Cubre la Ciudad de Buenos Aires y los 24 partidos del conurbano bonaerense. No es el índice de ninguna de ellas por separado.",
+      "cubre": "Cubre la Ciudad de Buenos Aires y los 24 partidos del conurbano bonaerense juntos. Si buscás sólo la Ciudad, está el IPCBA del IDECBA.",
       "primerMes": "2016-12",
       "ultimoOficial": "2026-06"
     },
@@ -129,5 +129,5 @@
       "ultimoOficial": "2026-06"
     }
   ],
-  "actualizado": "2026-08-13T23:26:56.657Z"
+  "actualizado": "2026-08-13T23:41:03.987Z"
 }

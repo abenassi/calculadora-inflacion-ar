@@ -29,8 +29,22 @@ import {
   primerDia,
 } from "../engine/mes.js";
 import type { Metodologia, Punto, Resultado, SerieIndice } from "../engine/types.js";
+import {
+  agruparParaSelector,
+  buscarIndice,
+  MESES_DE_ATRASO_TOLERADOS,
+  SLUG_NACIONAL,
+  type CatalogoIndices,
+  type EntradaCatalogo,
+} from "../engine/indices.js";
 import { dibujar } from "./chart.js";
-import { fuenteDe, rotularFila } from "./etiquetas.js";
+import {
+  fuenteDe,
+  fuenteDeLaSerie,
+  organismoDeFila,
+  rotularFila,
+  selloDeFila,
+} from "./etiquetas.js";
 import {
   esAproximado,
   explicar,
@@ -57,7 +71,18 @@ const el = <T extends HTMLElement>(id: string): T => {
 };
 
 let serie: SerieIndice;
+let catalogo: CatalogoIndices;
+let indiceActivo: EntradaCatalogo;
 let ultimoResultado: Resultado | null = null;
+
+/**
+ * Las series ya bajadas.
+ *
+ * El índice se baja recién cuando alguien lo elige, y una vez elegido no se vuelve a
+ * pedir: comparar dos provincias es ir y venir del desplegable, y sin esto cada ida y
+ * vuelta serían cien kilobytes de red.
+ */
+const seriesCargadas = new Map<string, SerieIndice>();
 
 /** Hasta cuántos meses más allá del último dato oficial se puede pedir. */
 const HORIZONTE_MESES = 24;
@@ -216,27 +241,24 @@ function pintarResultado(r: Resultado): void {
         return td;
       };
 
-      // Una fila parcial no lleva el sello del INDEC: su número es la parte
-      // proporcional que le toca a esos días, o sea una cuenta nuestra sobre un
-      // dato del INDEC. Poner "INDEC ✓" ahí sería atribuirle una cifra que nunca
-      // publicó. `estimado` gana sobre `prorrateado` porque es la advertencia que
-      // más importa.
+      // Una fila parcial no lleva sello: su número es la parte proporcional que le
+      // toca a esos días, o sea una cuenta nuestra sobre un dato ajeno. Sellarla sería
+      // atribuirle al organismo una cifra que nunca publicó. `estimado` gana sobre
+      // `prorrateado` porque es la advertencia que más importa.
       const tdOrigen = document.createElement("td");
       const marca = document.createElement("span");
-      const clase = f.esProyeccion ? "proyeccion" : f.esParcial ? "prorrateado" : f.origen;
+      const sello = selloDeFila(f, r);
+      const clase = f.esProyeccion ? "proyeccion" : f.esParcial ? "prorrateado" : "publicado";
       marca.className = `origen origen--${clase}`;
-      marca.textContent = f.esProyeccion
-        ? "estimado"
-        : f.esParcial
-          ? "prorrateado"
-          : f.origen === "indec"
-            ? "INDEC ✓"
-            : "BCRA ✓";
+      marca.textContent = f.esProyeccion ? "estimado" : f.esParcial ? "prorrateado" : `${sello} ✓`;
       if (f.esParcial && !f.esProyeccion) {
-        // El organismo sale del origen de la propia fila: en el tramo reconstruido el
-        // dato de fondo es del BCRA, y decir INDEC acá contradice el sello de al lado.
-        const organismo = f.origen === "indec" ? "INDEC" : "BCRA";
-        marca.title = `Parte proporcional de la inflación de ${nombrarMes(mesDe(f.punto))}, según el ${organismo}.`;
+        // El organismo sale del origen de la propia fila: en el tramo reconstruido del
+        // nacional el dato de fondo es del BCRA, y decir INDEC acá contradice el sello
+        // de al lado.
+        const organismo = organismoDeFila(f, r);
+        marca.title =
+          `Parte proporcional de la inflación de ${nombrarMes(mesDe(f.punto))}` +
+          (organismo ? `, según ${organismo}.` : ".");
       }
       tdOrigen.append(marca);
 
@@ -283,8 +305,8 @@ function armarExplicacion(r: Resultado): string {
   const lineas: string[] =
     estimado && r.metodo.tipo === "proyeccion"
       ? [
-          `OJO: esto es una estimación, no un dato publicado. El INDEC todavía no publicó ` +
-            `${frasearMeses(r.metodo.mesesEstimados, "ni")}.`,
+          `OJO: esto es una estimación, no un dato publicado. Todavía no publicó ` +
+            `${frasearMeses(r.metodo.mesesEstimados, "ni")} ${fuenteDe(r.desglose, r).publicadosPor}.`,
           "",
         ]
       : [];
@@ -304,12 +326,12 @@ function armarExplicacion(r: Resultado): string {
     // La etiqueta de cada línea tiene que ser el mismo sello que la persona ve en la tabla.
     // Decía "oficial INDEC" en filas selladas "BCRA ✓", así que el texto que se manda por
     // mensaje contradecía a la pantalla que el destinatario podía abrir.
-    const etiqueta =
-      f.origen === "proyeccion"
-        ? "estimado"
-        : f.esParcial
-          ? `prorrateado sobre el dato de ${f.origen === "indec" ? "INDEC" : "BCRA"}`
-          : `oficial ${f.origen === "indec" ? "INDEC" : "BCRA"}`;
+    const organismo = organismoDeFila(f, r);
+    const etiqueta = f.esProyeccion
+      ? "estimado"
+      : f.esParcial
+        ? `prorrateado sobre el dato de ${organismo}`
+        : `oficial ${organismo}`;
     lineas.push(`- ${abreviarPunto(f.punto)}: ${porcentaje(f.varMensualPct ?? 0)} (${etiqueta})`);
   }
 
@@ -332,10 +354,10 @@ function anotarCalculo(r: Resultado): void {
   temporizadorEvento = setTimeout(() => {
     // Además del debounce, no repetir una consulta idéntica: volver a la metodología anterior o
     // repintar no son consultas nuevas y contarlas infla los totales.
-    const firma = `${r.monto}|${r.desde}|${r.hasta}|${r.metodologia}`;
+    const firma = `${r.monto}|${r.desde}|${r.hasta}|${r.metodologia}|${indiceActivo.slug}`;
     if (firma === ultimoEventoEmitido) return;
     ultimoEventoEmitido = firma;
-    analytics.calculo(r);
+    analytics.calculo(r, indiceActivo.slug);
   }, 1200) as unknown as number;
 }
 
@@ -378,6 +400,201 @@ function sincronizarOpcionesDeMetodologia(desde: Punto, hasta: Punto): void {
   } else if (sePuede && metodologiaCambiadaPorNosotros) {
     select.value = "sin_proyectar";
     metodologiaCambiadaPorNosotros = false;
+  }
+}
+
+
+/* ---------------------------------------------------------------- el índice */
+
+/**
+ * Baja la serie de un índice, o la devuelve de la memoria si ya se pidió.
+ *
+ * El nacional viene en `ipc.json` como siempre; los otros quince viven en un archivo
+ * cada uno y no se piden hasta que hacen falta. Quien no toca el selector —que es casi
+ * todo el mundo— baja un kilobyte más que antes, el del catálogo, y nada más.
+ */
+async function cargarIndice(slug: string): Promise<SerieIndice> {
+  const cacheada = seriesCargadas.get(slug);
+  if (cacheada) return cacheada;
+
+  const ruta =
+    slug === SLUG_NACIONAL
+      ? `${import.meta.env.BASE_URL}data/ipc.json`
+      : `${import.meta.env.BASE_URL}data/indices/${slug}.json`;
+
+  const respuesta = await fetch(ruta);
+  if (!respuesta.ok) throw new Error(`No se pudo cargar el índice (HTTP ${respuesta.status})`);
+  const cargada = (await respuesta.json()) as SerieIndice;
+  seriesCargadas.set(slug, cargada);
+  return cargada;
+}
+
+function poblarSelectorDeIndices(): void {
+  const { nacional, provincias, regiones } = agruparParaSelector(catalogo);
+  const opcion = (i: EntradaCatalogo) =>
+    `<option value="${i.slug}">${i.nombre}</option>`;
+  const grupo = (etiqueta: string, items: EntradaCatalogo[]) =>
+    items.length === 0 ? "" : `<optgroup label="${etiqueta}">${items.map(opcion).join("")}</optgroup>`;
+
+  // Los dos grupos van rotulados por lo que son. "Provincias que miden su propia
+  // inflación" contra "Regiones del INDEC" es la diferencia que alguien tiene que poder
+  // ver ANTES de elegir: si las quince estuvieran mezcladas en una lista sola, elegir
+  // "Noreste" buscando Formosa parecería haber encontrado el índice de Formosa.
+  el<HTMLSelectElement>("indice").innerHTML =
+    opcion(nacional) +
+    grupo("Provincias que miden su propia inflación", provincias) +
+    grupo("Regiones del INDEC (para las provincias que no miden)", regiones);
+}
+
+/**
+ * La línea que dice qué mide el índice elegido, y si viene atrasado.
+ *
+ * Con el nacional no se muestra nada: la pantalla queda igual que antes de que el
+ * selector existiera, que es la condición de que esto no le meta ruido a quien no lo
+ * necesita.
+ */
+function pintarNotaDelIndice(periodoCorrido: Punto | null = null): void {
+  const nota = el("nota-indice");
+  const partes: string[] = [];
+
+  if (periodoCorrido !== null) {
+    partes.push(
+      `${indiceActivo.nombre} mide desde ${nombrarMes(indiceActivo.primerMes)}, así que se ` +
+        `corrió el período: pediste desde ${nombrarPunto(periodoCorrido)}.`,
+    );
+  }
+
+  if (indiceActivo.slug === SLUG_NACIONAL) {
+    // Con el nacional la nota sólo aparece si hubo que correr el período. Si no, la
+    // pantalla queda igual que antes de que el selector existiera.
+    nota.textContent = partes.join(" ");
+    nota.hidden = partes.length === 0;
+    return;
+  }
+
+  partes.push(`${indiceActivo.cubre} Lo publica ${fuenteDe([], serie).publicadosPor}.`);
+
+  // Un índice provincial puede ir meses detrás del nacional —el Neuquén viene atrasado
+  // desde enero— y eso cambia de verdad sobre qué ventana se calcula. Un mes de
+  // diferencia es lo normal y no se avisa: sería un cartel permanente que nadie lee.
+  const nacional = buscarIndice(catalogo, SLUG_NACIONAL);
+  const atraso = aOrdinal(nacional.ultimoOficial) - aOrdinal(indiceActivo.ultimoOficial);
+  if (atraso > MESES_DE_ATRASO_TOLERADOS) {
+    partes.push(
+      `Ojo: el último mes publicado es ${nombrarMes(indiceActivo.ultimoOficial)}, ` +
+        `${atraso} meses detrás del índice nacional.`,
+    );
+  }
+
+  nota.textContent = partes.join(" ");
+  nota.hidden = false;
+}
+
+/**
+ * Los dos textos fijos que nombraban al INDEC de arranque.
+ *
+ * El rótulo de la metodología y la nota legal del pie describen el cálculo que está en
+ * pantalla, así que tienen que seguir al índice elegido. Es la regla 2 bis: si cambia el
+ * comportamiento, hay que barrer los textos que lo describen. Que quedara "meses que el
+ * INDEC no publicó" arriba de una tabla sellada `DGEyC Córdoba ✓` es exactamente el modo
+ * de falla más repetido de este repo.
+ */
+function pintarTextosDeLaFuente(): void {
+  const fuente = fuenteDe([], serie);
+  el("rotulo-metodologia").textContent =
+    `Meses que ${fuente.publicadosPor} todavía no publicó:`;
+  // La nota legal habla del índice y no del período que está en pantalla, así que para el
+  // nacional tiene que seguir nombrando al BCRA aunque el cálculo elegido sea de 2024.
+  el("nota-legal").textContent =
+    `Cálculo orientativo basado en ${fuenteDeLaSerie(serie).larga}. No constituye ` +
+    `asesoramiento contable, financiero ni legal.`;
+}
+
+/**
+ * Cambia el índice con el que se calcula.
+ *
+ * Los años del desplegable se repueblan porque cada índice arranca donde arranca —Santa
+ * Fe mide desde diciembre de 2013 y Chaco desde 1988— y un control no puede ofrecer un
+ * año que el motor va a rechazar. Si el período que había cargado queda afuera, `calcular`
+ * lo dice nombrando el mes en vez de recalcular otra cosa en silencio.
+ */
+async function cambiarIndice(slug: string): Promise<void> {
+  const entrada = buscarIndice(catalogo, slug);
+  const cargada = await cargarIndice(entrada.slug);
+  indiceActivo = entrada;
+  serie = cargada;
+
+  // Los desplegables se rearman con el rango del índice nuevo, y `innerHTML` se lleva
+  // puesta la selección: hay que leer el período ANTES y volver a escribirlo después.
+  const antes = { desde: leerPuntoLaxo("desde"), hasta: leerPuntoLaxo("hasta") };
+  poblarSelects();
+  const corrido = escribirPeriodoAcotado(antes);
+
+  el("actualizado").textContent = fechaLarga(serie.actualizado);
+  pintarNotaDelIndice(corrido);
+  pintarTextosDeLaFuente();
+  sincronizarOpcionRem();
+  calcular();
+}
+
+/** El punto que hay en el formulario, sin validar: sólo para conservarlo al cambiar de índice. */
+function leerPuntoLaxo(prefijo: "desde" | "hasta"): Punto {
+  if (usaDias()) return el<HTMLInputElement>(`${prefijo}-dia`).value;
+  const mes = el<HTMLSelectElement>(`${prefijo}-mes`).value;
+  const anio = el<HTMLSelectElement>(`${prefijo}-anio`).value;
+  return `${anio}-${mes}`;
+}
+
+/**
+ * Devuelve el período al formulario, corriéndolo si el índice nuevo no llega tan atrás.
+ *
+ * Correrlo en silencio sería cambiarle la pregunta a la persona sin decírselo, así que
+ * devuelve el mes que se perdió para que la nota lo nombre. La alternativa —dejar el
+ * desplegable en un año que ya no existe— es peor: el control quedaría ofreciendo algo
+ * que el motor rechaza, que es justo lo que la regla 3 prohíbe.
+ */
+function escribirPeriodoAcotado(periodo: { desde: Punto; hasta: Punto }): Punto | null {
+  const primero = serie.datos[0]!.mes;
+  let corrido: Punto | null = null;
+
+  for (const [prefijo, punto] of [
+    ["desde", periodo.desde],
+    ["hasta", periodo.hasta],
+  ] as const) {
+    if (aOrdinal(mesDe(punto)) < aOrdinal(primero)) {
+      corrido ??= punto;
+      escribirPunto(prefijo, usaDias() ? primerDia(primero) : primero);
+    } else {
+      escribirPunto(prefijo, punto);
+    }
+  }
+  return corrido;
+}
+
+/**
+ * El REM sólo existe para el índice nacional.
+ *
+ * El Relevamiento de Expectativas de Mercado del BCRA pronostica el IPC nacional del
+ * INDEC. No hay un REM provincial, y repartir el nacional entre las provincias sería
+ * inventar un número y ponerlo al lado de otros que sí publicó alguien. Se deshabilita
+ * en vez de esconderse: una opción que desaparece se lee como un bug, y ésta tiene una
+ * razón que se puede escribir en una línea.
+ */
+function sincronizarOpcionRem(): void {
+  const opcion = document.getElementById("opcion-rem") as HTMLOptionElement | null;
+  if (!opcion) return;
+
+  const hayRem = Boolean(serie.rem);
+  opcion.disabled = !hayRem;
+  opcion.textContent = hayRem
+    ? "estimarlos con el REM del BCRA"
+    : "estimarlos con el REM del BCRA (sólo para el índice nacional)";
+
+  // Si estaba elegida y el índice nuevo no la soporta, el desplegable tiene que quedar en
+  // la que se va a usar de verdad. Dejarlo mostrando una opción deshabilitada pintaría un
+  // resultado que no se corresponde con lo que dice el control.
+  if (!hayRem && leerMetodologia() === "rem") {
+    el<HTMLSelectElement>("metodologia").value = "sin_proyectar";
   }
 }
 
@@ -425,12 +642,14 @@ function sincronizarUrl(
   const p = new URLSearchParams({ monto: String(monto), desde, hasta });
   // La metodología default no viaja en la URL: el link más compartido tiene que
   // ser el más corto, y quien lo abra tiene que ver lo mismo que vería entrando
-  // de cero.
+  // de cero. El índice sigue la misma regla, y por eso el link del caso común es
+  // exactamente el que era antes de que el selector existiera.
   if (metodologia !== "sin_proyectar") p.set("metodo", metodologia);
+  if (indiceActivo.slug !== SLUG_NACIONAL) p.set("indice", indiceActivo.slug);
   history.replaceState(null, "", `?${p}`);
 }
 
-function leerUrl(): void {
+function leerUrl(): Punto | null {
   const p = new URLSearchParams(location.search);
 
   // Sólo desde un link explícito: nunca se recuerda entre visitas. Quien llega
@@ -461,8 +680,14 @@ function leerUrl(): void {
     }
   }
 
-  if (valido(desde)) escribirPunto("desde", desde);
-  if (valido(hasta)) escribirPunto("hasta", hasta);
+  // Se pasan por el mismo acotado que usa el cambio de índice, y no por `escribirPunto`
+  // directo: un link con `?indice=santa-fe&desde=1995-01` pide un año que ese índice no
+  // tiene, y asignarle al desplegable un año que no está entre sus opciones lo deja en
+  // blanco sin error. El síntoma era "Mes inválido: -01" al abrir el link.
+  return escribirPeriodoAcotado({
+    desde: valido(desde) ? desde : leerPuntoLaxo("desde"),
+    hasta: valido(hasta) ? hasta : leerPuntoLaxo("hasta"),
+  });
 }
 
 /* -------------------------------------------------------------------- acciones */
@@ -489,7 +714,7 @@ function descargarCsv(): void {
     [`# Calculadora de inflacion - fuente: ${fuenteDe(r.desglose, r).corta}`],
     [`# Periodo: ${r.desde} a ${r.hasta}`],
     [`# Datos via Argentina Data MCP, actualizados al ${serie.actualizado.slice(0, 10)}`],
-    [`# Ultimo mes publicado por el INDEC: ${serie.ultimo_oficial}`],
+    [`# Ultimo mes publicado: ${serie.ultimo_oficial}`],
     [],
     ["punto", "indice_ipc", "variacion_pct", "acumulado_pct", "monto", "origen"],
     ...r.desglose.map((f) => [
@@ -532,7 +757,10 @@ function descargarCsv(): void {
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   const a = document.createElement("a");
   a.href = url;
-  a.download = `inflacion-${r.desde}-a-${r.hasta}.csv`;
+  // El nombre del archivo lleva el índice: quien compara dos provincias termina con dos
+  // CSV en la carpeta de descargas y sin esto los dos se llaman igual.
+  const sufijo = indiceActivo.slug === SLUG_NACIONAL ? "" : `-${indiceActivo.slug}`;
+  a.download = `inflacion${sufijo}-${r.desde}-a-${r.hasta}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -540,15 +768,24 @@ function descargarCsv(): void {
 /* ----------------------------------------------------------------------- init */
 
 async function iniciar(): Promise<void> {
-  const respuesta = await fetch(`${import.meta.env.BASE_URL}data/ipc.json`);
-  if (!respuesta.ok) throw new Error(`No se pudo cargar la serie (HTTP ${respuesta.status})`);
-  serie = (await respuesta.json()) as SerieIndice;
+  const respuestaCatalogo = await fetch(`${import.meta.env.BASE_URL}data/indices.json`);
+  if (!respuestaCatalogo.ok) {
+    throw new Error(`No se pudo cargar el catálogo (HTTP ${respuestaCatalogo.status})`);
+  }
+  catalogo = (await respuestaCatalogo.json()) as CatalogoIndices;
 
+  // El índice sale de la URL o es el nacional. **No se recuerda entre visitas**, igual
+  // que la metodología: quien entra de cero ve el nacional aunque la vez pasada haya
+  // mirado Tucumán. Un `?indice=` que no existe cae al nacional en vez de romper.
+  indiceActivo = buscarIndice(catalogo, new URLSearchParams(location.search).get("indice"));
+  serie = await cargarIndice(indiceActivo.slug);
+
+  poblarSelectorDeIndices();
+  el<HTMLSelectElement>("indice").value = indiceActivo.slug;
   poblarSelects();
   el("actualizado").textContent = fechaLarga(serie.actualizado);
-  // Si el pipeline no pudo traer el REM, la opción no existe: es preferible una
-  // opción menos a una que falla al elegirla.
-  if (!serie.rem) el("opcion-rem").remove();
+  pintarTextosDeLaFuente();
+  sincronizarOpcionRem();
 
   // El default se corre solo con el calendario: siempre el mes en curso como
   // destino y tres meses antes como origen. En diciembre va a decir septiembre a
@@ -561,10 +798,13 @@ async function iniciar(): Promise<void> {
   escribirPunto("desde", deOrdinal(aOrdinal(hoy) - MESES_DEL_DEFAULT));
   escribirPunto("hasta", hoy);
 
-  leerUrl();
+  const periodoCorrido = leerUrl();
+  pintarNotaDelIndice(periodoCorrido);
 
   el("formulario").addEventListener("input", (ev) => {
-    if ((ev.target as HTMLElement).id === "monto") formatearMontoEnVivo();
+    const objetivo = ev.target as HTMLElement;
+    if (objetivo.id === "indice") return; // lo atiende `cambiarIndice`, que además baja la serie
+    if (objetivo.id === "monto") formatearMontoEnVivo();
     calcular();
   });
   el("formulario").addEventListener("submit", (ev) => ev.preventDefault());
@@ -575,6 +815,13 @@ async function iniciar(): Promise<void> {
   el("metodologia").addEventListener("change", () => {
     calcular();
     analytics.cambioMetodologia(leerMetodologia());
+  });
+  el("indice").addEventListener("change", (ev) => {
+    const slug = (ev.target as HTMLSelectElement).value;
+    // El listener de `input` del formulario también dispara con este select, así que el
+    // cambio se atiende acá y allá se ignora: si no, se calcularía dos veces, una con la
+    // serie vieja, y se vería el número anterior parpadear.
+    void cambiarIndice(slug).then(() => analytics.cambioIndice(slug));
   });
 
   el<HTMLButtonElement>("copiar").addEventListener("click", (ev) => {

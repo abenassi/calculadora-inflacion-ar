@@ -118,8 +118,12 @@ function mesesAtras(desde: Punto, hasta: Punto): number {
  * tecla del monto, y sin eso una sola consulta emitiría diez eventos y la mediana de montos
  * mediría lo que la gente tipea a mitad de camino, no lo que quiso consultar.
  */
-export function calculo(r: Resultado): void {
+export function calculo(r: Resultado, indice: string): void {
   evento("calculo", {
+    // Qué índice se usó. Es la única pregunta que el sitio no podía contestar hasta
+    // ahora y la que decide si vale la pena sumar más provincias: si nadie sale del
+    // nacional, el trabajo de mantener quince colectores no se justifica.
+    indice,
     monto: Math.round(r.monto),
     modo: esFecha(r.desde) || esFecha(r.hasta) ? "fecha" : "mes",
     metodologia: r.metodologia,
@@ -135,6 +139,10 @@ export function calculo(r: Resultado): void {
 
 export function cambioMetodologia(a: Metodologia): void {
   evento("metodologia", { metodologia: a });
+}
+
+export function cambioIndice(indice: string): void {
+  evento("indice", { indice });
 }
 
 export function cambioModo(modo: "mes" | "fecha"): void {

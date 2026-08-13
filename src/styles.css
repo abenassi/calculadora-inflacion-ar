@@ -851,3 +851,28 @@ button:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * La línea que explica el índice elegido. Aparece sólo cuando NO es el nacional, así que
+ * su presencia ya es información: si está, estás mirando algo distinto de lo que ve quien
+ * entra sin tocar nada. Va con el mismo tono que la opción de fechas exactas —una nota al
+ * pie del formulario, no un cartel— porque no es una advertencia, es una aclaración.
+ */
+.nota-indice {
+  max-width: 62ch;
+  margin: -0.4rem auto 1.4rem;
+  padding: 0 0.2rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--tenue);
+  text-align: center;
+}
+
+/*
+ * El selector de índice es más ancho que los de fecha: los nombres largos —"Región
+ * Patagónica", "Ciudad de Buenos Aires"— no pueden quedar cortados, porque justamente lo
+ * que distingue una región de una provincia está en el nombre.
+ */
+.campo--indice select {
+  max-width: 100%;
+}
