@@ -49,8 +49,33 @@ Sólo cuando hay meses sin publicar de por medio.
   tasa que la segunda repetiría. Es por construcción, no casualidad, y hay un test que
   lo fija.
 - Con un destino **futuro**, la primera no tiene alternativa: no existe ningún tramo
-  publicado equivalente, así que estima igual y coincide con la segunda. La interfaz
-  lo dice con todas las letras, porque si no se lee como si el selector estuviera roto.
+  publicado equivalente, así que estimaría igual y coincidiría con la segunda. **Por eso
+  ahí deja de ser elegible** — ver abajo.
+
+### La opción que no se puede cumplir no se ofrece (2026-08-13)
+
+La primera versión dejaba «no estimar ninguno» elegible siempre y, cuando el período
+obligaba a proyectar, lo compensaba con una aclaración debajo del resultado: *"elegiste no
+estimar ningún mes, pero mayo 2027 todavía no llegó…"*.
+
+Estaba mal por dos motivos. Uno, el control decía una cosa y el cálculo hacía otra, que es
+la clase de incoherencia que hace desconfiar de todo lo demás. Dos, la aclaración llegaba
+**tarde y en el lugar equivocado**: la decisión se toma arriba, en el desplegable, y el
+texto aparecía abajo, después de que el número ya estaba pintado.
+
+Ahora, cuando no hay forma de contestar sin estimar, la opción queda **deshabilitada**, el
+selector pasa solo a la metodología que realmente se usa, y el motivo se explica al lado
+del control. Alcanza a dos situaciones: destino posterior al mes en curso, y períodos donde
+correr la ventana de referencia caería antes del inicio de la serie.
+
+**La vuelta atrás es la parte delicada.** Si el cambio de metodología lo hizo el sitio, al
+desaparecer la restricción vuelve al default; si lo eligió la persona, se respeta. Pisarle
+una elección propia al cambiar una fecha sería peor que el problema original.
+
+**Y el criterio no está escrito dos veces.** `sePuedeEvitarEstimar()` y el motor salen de la
+misma función, con un test que recorre varios períodos y exige que el predicado del
+desplegable y lo que hace `adjust()` coincidan. Sin eso, el control vuelve a mentir en
+cuanto alguien toque una de las dos copias — y esta vez sin que nadie se entere.
 
 ## Consecuencias
 
