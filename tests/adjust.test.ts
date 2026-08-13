@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { adjust, RangoError, tasaMensualDelRem } from "../src/engine/adjust.js";
+import { adjust, RangoError, sePuedeEvitarEstimar, tasaMensualDelRem } from "../src/engine/adjust.js";
 import type { SerieIndice } from "../src/engine/types.js";
 
 const serie = JSON.parse(
@@ -530,5 +530,48 @@ describe("contra la serie real", () => {
     expect(new Set(meses).size).toBe(meses.length);
     expect(meses).toEqual([...meses].sort());
     expect(meses.at(-1)).toBe(serie.ultimo_oficial);
+  });
+});
+
+describe("sePuedeEvitarEstimar — lo que gobierna el desplegable", () => {
+  // La serie sintética publica hasta abril 2020. `hoy` se inyecta para que el test no
+  // dependa de cuándo se corra.
+  it("todo publicado: se puede, no hay nada que estimar", () => {
+    expect(sePuedeEvitarEstimar("2020-01", "2020-04", sintetica, "2020-06")).toBe(true);
+  });
+
+  it("destino sin publicar pero YA transcurrido: se puede, corriendo la ventana", () => {
+    // Junio no está publicado, pero junio ya pasó: existe un tramo equivalente de tres
+    // meses ya publicados que sirve de referencia sin inventar nada.
+    expect(sePuedeEvitarEstimar("2020-03", "2020-06", sintetica, "2020-06")).toBe(true);
+  });
+
+  it("destino POSTERIOR al mes en curso: NO se puede — este es el caso del bug", () => {
+    // Estando en junio, preguntar por septiembre no tiene respuesta sin estimar: no hay
+    // ningún tramo publicado que sea "los próximos tres meses".
+    expect(sePuedeEvitarEstimar("2020-06", "2020-09", sintetica, "2020-06")).toBe(false);
+  });
+
+  it("el mes en curso NO cuenta como futuro", () => {
+    // El límite es estricto: junio estando en junio se resuelve con la ventana corrida.
+    // Si esto se pusiera en `>=` el desplegable se bloquearía en el caso más común.
+    expect(sePuedeEvitarEstimar("2020-05", "2020-06", sintetica, "2020-06")).toBe(true);
+    expect(sePuedeEvitarEstimar("2020-05", "2020-07", sintetica, "2020-06")).toBe(false);
+  });
+
+  it("no se puede si correr la ventana caería antes del inicio de la serie", () => {
+    // La serie arranca en enero 2020. Un período que pide correr dos meses desde febrero
+    // se saldría por abajo, así que tampoco hay referencia publicada.
+    expect(sePuedeEvitarEstimar("2020-01", "2020-06", sintetica, "2020-06")).toBe(false);
+  });
+
+  it("coincide con lo que hace el motor: si dice false, sin_proyectar igual proyecta", () => {
+    // Es la garantía que hace que el desplegable no pueda mentir. Si alguien cambia el
+    // criterio en un solo lado, este test se pone rojo.
+    for (const [desde, hasta] of [["2020-03", "2020-06"], ["2020-06", "2020-09"], ["2020-01", "2020-06"]] as const) {
+      const puede = sePuedeEvitarEstimar(desde, hasta, sintetica, "2020-06");
+      const r = adjust(1000, desde, hasta, sintetica, { metodologia: "sin_proyectar", hoy: "2020-06" });
+      expect(r.metodo.tipo === "proyeccion").toBe(!puede);
+    }
   });
 });

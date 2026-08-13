@@ -9,7 +9,7 @@
  * si había elegido bien.
  */
 
-import { adjust, mesActual, RangoError, tasaMensualDelRem } from "../engine/adjust.js";
+import { adjust, mesActual, RangoError, sePuedeEvitarEstimar, tasaMensualDelRem } from "../engine/adjust.js";
 import * as analytics from "./analytics.js";
 import {
   abreviarPunto,
@@ -239,18 +239,13 @@ function explicarMetodo(r: Resultado): string {
       const { mesesEstimados, tasaMensualPct, base } = r.metodo;
       const n = mesesEstimados.length;
 
-      // Elegir "no estimar ninguno" y ver la tabla llena de filas estimadas se lee
-      // como si el selector estuviera roto. No lo está: para un mes que todavía no
-      // llegó no existe ningún tramo publicado equivalente que sirva de referencia,
-      // así que no hay alternativa. Hay que decirlo donde se mira, no en /datos.
-      const forzada = r.metodologia === "sin_proyectar";
-      const porQue = forzada
-        ? `Elegiste no estimar ningún mes, pero ${nombrarPunto(r.hasta)} todavía no llegó y no ` +
-          `hay ningún tramo ya publicado que sirva de referencia. `
-        : "";
-
+      // Acá había una aclaración para el caso "elegiste no estimar ninguno y aun así
+      // estás viendo filas estimadas". Ya no puede pasar: cuando el período obliga a
+      // proyectar, esa opción queda deshabilitada en el selector y el desplegable pasa
+      // solo a la metodología que se está usando. El motivo se explica al lado del
+      // control, que es donde se toma la decisión, en vez de acá abajo.
       const faltan =
-        `${porQue}El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, así que ` +
+        `El INDEC todavía no publicó ${frasearMeses(mesesEstimados, "ni")}, así que ` +
         `${plural(n, "ese mes se estima", "esos meses se estiman")} `;
 
       if (base.fuente === "rem") {
@@ -487,6 +482,42 @@ function anotarCalculo(r: Resultado): void {
   }, 1200) as unknown as number;
 }
 
+/**
+ * Recuerda si "no estimar ninguno" lo sacamos NOSOTROS o lo cambió el usuario.
+ *
+ * Es la diferencia entre devolverle su elección y pisársela. Si el período obliga a
+ * estimar movemos el selector solos; cuando esa restricción se va, hay que volver al
+ * default — pero sólo si el que se movió fui yo. Alguien que eligió el REM a mano espera
+ * seguir en el REM al cambiar una fecha.
+ */
+let metodologiaCambiadaPorNosotros = false;
+
+/**
+ * Deshabilita "no estimar ninguno" cuando el período no admite esa respuesta.
+ *
+ * Pasa siempre que el destino es un mes posterior al actual: no existe ningún tramo ya
+ * publicado que sirva de referencia, así que las tres metodologías proyectan. Dejar la
+ * opción elegible sería ofrecer algo que no se puede cumplir, y el resultado terminaba
+ * mostrando una tabla llena de filas estimadas con el desplegable diciendo lo contrario.
+ */
+function sincronizarOpcionesDeMetodologia(desde: Punto, hasta: Punto): void {
+  const select = el<HTMLSelectElement>("metodologia");
+  const opcion = select.querySelector<HTMLOptionElement>('option[value="sin_proyectar"]');
+  if (!opcion) return;
+
+  const sePuede = sePuedeEvitarEstimar(desde, hasta, serie);
+  opcion.disabled = !sePuede;
+  el("nota-metodologia").hidden = sePuede;
+
+  if (!sePuede && select.value === "sin_proyectar") {
+    select.value = "repite_ultimo";
+    metodologiaCambiadaPorNosotros = true;
+  } else if (sePuede && metodologiaCambiadaPorNosotros) {
+    select.value = "sin_proyectar";
+    metodologiaCambiadaPorNosotros = false;
+  }
+}
+
 function calcular(): void {
   const error = el("error");
   try {
@@ -494,8 +525,16 @@ function calcular(): void {
     if (!Number.isFinite(monto)) throw new RangoError("Escribí un monto para calcular.");
     if (monto <= 0) throw new RangoError("El monto tiene que ser mayor que cero.");
 
+    const desde = leerPunto("desde");
+    const hasta = leerPunto("hasta");
+
+    // Antes de calcular, no después: si el período obliga a estimar, el selector tiene que
+    // quedar en la metodología que se va a usar de verdad. Al revés se pinta un resultado
+    // proyectado con el desplegable diciendo "no estimar ninguno".
+    sincronizarOpcionesDeMetodologia(desde, hasta);
+
     const metodologia = leerMetodologia();
-    const r = adjust(monto, leerPunto("desde"), leerPunto("hasta"), serie, { metodologia });
+    const r = adjust(monto, desde, hasta, serie, { metodologia });
     ultimoResultado = r;
     error.hidden = true;
     el("bloque-principal").hidden = false;

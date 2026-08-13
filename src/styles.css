@@ -433,6 +433,16 @@ button:focus-visible {
   font: inherit;
 }
 
+/* Una opción deshabilitada sin explicación se lee como que el sitio se rompió. Esta nota
+   sólo aparece cuando efectivamente hay una opción gris, y dice por qué. */
+.nota-metodologia {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  border-left: 2px solid var(--border);
+  padding-left: 0.6rem;
+}
+
 .acciones {
   display: flex;
   gap: 0.5rem;

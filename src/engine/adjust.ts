@@ -228,32 +228,14 @@ export function adjust(
 
   function resolver(): Resultado {
   const idx = armarIndice(serie);
-  const hoy = opciones.hoy ?? mesActual();
-  const nuevo = extremoNuevo(desde, hasta);
-
-  const desplazamiento = Math.max(
-    desplazamientoNecesario(desde, idx.ultimoOficial),
-    desplazamientoNecesario(hasta, idx.ultimoOficial),
-  );
-
-  // El destino es futuro de verdad (posterior al mes en curso): no hay ventana
-  // publicada equivalente que sirva de referencia, hay que proyectar.
-  const esFuturo = compararMeses(mesDe(nuevo), hoy) > 0;
-
-  // Correr la ventana no puede empujar el origen antes de donde arranca la serie.
-  const cabeLaVentana =
-    compararMeses(mesDe(correr(desde, desplazamiento)), idx.primerMes) >= 0 &&
-    compararMeses(mesDe(correr(hasta, desplazamiento)), idx.primerMes) >= 0;
+  const { desplazamiento, sinEstimarPosible } = evaluarPeriodo(desde, hasta, idx, opciones.hoy);
 
   // Sin meses faltantes las tres metodologías coinciden: no hay nada que estimar.
   if (desplazamiento === 0) {
     return calcularDirecto(monto, desde, hasta, idx);
   }
 
-  // La ventana corrida sólo sirve como referencia de un período que ya transcurrió.
-  // Para un mes futuro no existe equivalente publicado, así que aun con la
-  // metodología que no estima nada hay que proyectar.
-  if (metodologia === "sin_proyectar" && !esFuturo && cabeLaVentana) {
+  if (metodologia === "sin_proyectar" && sinEstimarPosible) {
     return calcularVentanaReciente(monto, desde, hasta, idx, desplazamiento);
   }
 
@@ -288,6 +270,57 @@ export function adjust(
     mes: idx.ultimoOficial,
   }));
   }
+}
+
+/**
+ * Decide si un período se puede resolver SIN estimar ningún mes, y con qué corrimiento.
+ *
+ * Vive en una función propia porque la contesta el motor y la necesita también la UI, que
+ * usa la respuesta para deshabilitar la metodología "sin estimación" cuando elegirla sería
+ * mentira. Si cada uno tuviera su copia del criterio, tarde o temprano el dropdown diría
+ * una cosa y el cálculo haría otra — que es exactamente el bug que esto vino a cerrar.
+ */
+function evaluarPeriodo(desde: Punto, hasta: Punto, idx: Indice, hoy?: Mes) {
+  const mesHoy = hoy ?? mesActual();
+  const nuevo = extremoNuevo(desde, hasta);
+
+  const desplazamiento = Math.max(
+    desplazamientoNecesario(desde, idx.ultimoOficial),
+    desplazamientoNecesario(hasta, idx.ultimoOficial),
+  );
+
+  // El destino es futuro de verdad (posterior al mes en curso): no hay ventana publicada
+  // equivalente que sirva de referencia, hay que proyectar.
+  const esFuturo = compararMeses(mesDe(nuevo), mesHoy) > 0;
+
+  // Correr la ventana no puede empujar el origen antes de donde arranca la serie.
+  const cabeLaVentana =
+    compararMeses(mesDe(correr(desde, desplazamiento)), idx.primerMes) >= 0 &&
+    compararMeses(mesDe(correr(hasta, desplazamiento)), idx.primerMes) >= 0;
+
+  return {
+    desplazamiento,
+    esFuturo,
+    // La ventana corrida sólo sirve como referencia de un período que YA transcurrió. Para
+    // un mes futuro no existe equivalente publicado, así que aun la metodología que no
+    // estima nada tiene que proyectar.
+    sinEstimarPosible: desplazamiento === 0 || (!esFuturo && cabeLaVentana),
+  };
+}
+
+/**
+ * ¿Existe alguna forma de contestar este período sin estimar?
+ *
+ * `false` significa que las tres metodologías van a proyectar sí o sí, así que ofrecer
+ * "sin estimación" en la interfaz sería ofrecer algo que no se puede cumplir.
+ */
+export function sePuedeEvitarEstimar(
+  desde: Punto,
+  hasta: Punto,
+  serie: SerieIndice,
+  hoy?: Mes,
+): boolean {
+  return evaluarPeriodo(desde, hasta, armarIndice(serie), hoy).sinEstimarPosible;
 }
 
 /** Arma el desglose y el resultado a partir de una lista de puntos ya calculables. */
