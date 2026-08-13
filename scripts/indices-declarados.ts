@@ -39,9 +39,7 @@ export type IndiceDeclarado = {
 
 const INDEC = {
   organismo: "Instituto Nacional de Estadística y Censos (INDEC)",
-  organismoCorto: "INDEC",
   url: "https://www.indec.gob.ar/",
-  origen: "indec",
 };
 
 /**
@@ -62,10 +60,15 @@ function region(
     cubre: `Cubre ${provincias}. No es el índice de ninguna de ellas por separado.`,
     serie,
     ...INDEC,
+    // El sello de la fila lleva la región adentro. Con sólo "INDEC ✓" la tabla de la
+    // Región Noreste era indistinguible de la nacional, y la tabla es lo que la gente
+    // manda por foto: sin el parrafito de arriba no hay forma de saber cuál es cuál.
+    origen: `indec-${slug}`,
+    organismoCorto: `INDEC ${nombre.replace("Región ", "")}`,
     etiqueta: {
       corta: `IPC ${nombre} del INDEC`,
       larga: `el IPC de la ${nombre} del INDEC`,
-      publicadosPor: "el INDEC",
+      publicadosPor: `el INDEC, que lo publica para la ${nombre.toLowerCase()}`,
     },
   };
 }
@@ -110,7 +113,9 @@ export const INDICES: IndiceDeclarado[] = [
     slug: "cordoba",
     nombre: "Córdoba",
     tipo: "provincia",
-    cubre: "Índice provincial de Córdoba, con la serie empalmada que publica la provincia.",
+    cubre:
+      "Índice provincial de Córdoba. La provincia lo publica encadenado desde 1968; acá " +
+      "arranca en 1990 porque más atrás los números son tan chicos que se pierden cifras.",
     serie: "ipc:cordoba",
     origen: "dgeyc-cordoba",
     organismo: "Dirección General de Estadística y Censos de la Provincia de Córdoba",
@@ -213,7 +218,7 @@ export const INDICES: IndiceDeclarado[] = [
     serie: "indec:199.1_NIVEL_GENERAL_2014_0_13",
     origen: "de-tucuman",
     organismo: "Dirección de Estadística de la Provincia de Tucumán",
-    organismoCorto: "DE Tucumán",
+    organismoCorto: "Estadística Tucumán",
     url: "https://estadistica.tucuman.gov.ar/",
     etiqueta: {
       corta: "IPC de Tucumán",
@@ -235,10 +240,12 @@ export const INDICES: IndiceDeclarado[] = [
       "Si buscás sólo la Ciudad, está el IPCBA del IDECBA.",
     serie: "indec:148.3_INIVELGBA_DICI_M_21",
     ...INDEC,
+    origen: "indec-gba",
+    organismoCorto: "INDEC Gran Buenos Aires",
     etiqueta: {
       corta: "IPC Región Gran Buenos Aires del INDEC",
       larga: "el IPC de la Región Gran Buenos Aires del INDEC",
-      publicadosPor: "el INDEC",
+      publicadosPor: "el INDEC, que lo publica para el Gran Buenos Aires",
     },
   },
   region(

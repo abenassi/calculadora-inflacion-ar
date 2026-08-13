@@ -6,7 +6,7 @@
       "id": "de-tucuman",
       "serie": "indec:199.1_NIVEL_GENERAL_2014_0_13",
       "organismo": "Dirección de Estadística de la Provincia de Tucumán",
-      "organismoCorto": "DE Tucumán",
+      "organismoCorto": "Estadística Tucumán",
       "url": "https://estadistica.tucuman.gov.ar/",
       "rango": "1989-03/2026-06",
       "etiqueta": {
@@ -17,7 +17,7 @@
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:26:55.148Z",
+  "actualizado": "2026-08-13T23:52:31.032Z",
   "datos": [
     {
       "mes": "1989-03",

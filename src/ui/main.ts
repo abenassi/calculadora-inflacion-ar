@@ -479,15 +479,22 @@ function pintarNotaDelIndice(periodoCorrido: Punto | null = null): void {
   // diferencia es lo normal y no se avisa: sería un cartel permanente que nadie lee.
   const nacional = buscarIndice(catalogo, SLUG_NACIONAL);
   const atraso = aOrdinal(nacional.ultimoOficial) - aOrdinal(indiceActivo.ultimoOficial);
-  if (atraso > MESES_DE_ATRASO_TOLERADOS) {
-    partes.push(
-      `Ojo: el último mes publicado es ${nombrarMes(indiceActivo.ultimoOficial)}, ` +
-        `${atraso} meses detrás del índice nacional.`,
-    );
-  }
-
   nota.textContent = partes.join(" ");
-  nota.hidden = false;
+  nota.hidden = partes.length === 0;
+
+  // El atraso va en su propio nodo y con su propio estilo. Iba pegado atrás de la
+  // descripción, en el mismo gris y el mismo tamaño, y Vanina lo salteó entero: lo leyó
+  // recién cuando fue a buscar por qué el número le había dado el doble. Un aviso que
+  // sólo se encuentra cuando ya sospechás no es un aviso.
+  if (atraso > MESES_DE_ATRASO_TOLERADOS) {
+    const aviso = document.createElement("strong");
+    aviso.className = "nota-indice__atraso";
+    aviso.textContent =
+      `Ojo: ${indiceActivo.nombre} publicó hasta ${nombrarMes(indiceActivo.ultimoOficial)}, ` +
+      `${atraso} meses detrás del índice nacional.`;
+    nota.append(aviso);
+    nota.hidden = false;
+  }
 }
 
 /**
@@ -503,6 +510,10 @@ function pintarTextosDeLaFuente(): void {
   const fuente = fuenteDe([], serie);
   el("rotulo-metodologia").textContent =
     `Meses que ${fuente.publicadosPor} todavía no publicó:`;
+  // La bajada del encabezado también: quien eligió Tucumán no puede seguir leyendo arriba
+  // de todo que el sitio calcula "según el IPC del INDEC".
+  el("bajada-fuente").textContent =
+    `Cuánto vale un monto de otra fecha, según ${fuenteDeLaSerie(serie).larga}.`;
   // La nota legal habla del índice y no del período que está en pantalla, así que para el
   // nacional tiene que seguir nombrando al BCRA aunque el cálculo elegido sea de 2024.
   el("nota-legal").textContent =

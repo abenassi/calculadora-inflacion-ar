@@ -864,7 +864,7 @@ button:focus-visible {
   padding: 0 0.2rem;
   font-size: 0.9rem;
   line-height: 1.5;
-  color: var(--tenue);
+  color: var(--text-secondary);
   text-align: center;
 }
 
@@ -875,4 +875,21 @@ button:focus-visible {
  */
 .campo--indice select {
   max-width: 100%;
+}
+
+/*
+ * El aviso de atraso, separado de la descripción del índice.
+ *
+ * Antes iba pegado atrás, mismo gris y mismo tamaño, y en el review se salteó entero: se
+ * leyó recién cuando el número raro obligó a buscar la causa. Va en su propio renglón y
+ * con el color de advertencia, que es el mismo que usa el chip de estimado.
+ */
+.nota-indice__atraso {
+  display: block;
+  margin: 0.55rem auto 0;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radio);
+  background: var(--wash-estimado);
+  color: var(--text-primary);
+  font-weight: 600;
 }

@@ -3,596 +3,596 @@
   "base": "Índice",
   "fuentes": [
     {
-      "id": "indec",
+      "id": "indec-patagonia",
       "serie": "indec:148.3_INIVELNIA_DICI_M_27",
       "organismo": "Instituto Nacional de Estadística y Censos (INDEC)",
-      "organismoCorto": "INDEC",
+      "organismoCorto": "INDEC Patagónica",
       "url": "https://www.indec.gob.ar/",
       "rango": "2016-12/2026-06",
       "etiqueta": {
         "corta": "IPC Región Patagónica del INDEC",
         "larga": "el IPC de la Región Patagónica del INDEC",
-        "publicadosPor": "el INDEC"
+        "publicadosPor": "el INDEC, que lo publica para la región patagónica"
       }
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:26:56.652Z",
+  "actualizado": "2026-08-13T23:52:42.325Z",
   "datos": [
     {
       "mes": "2016-12",
       "indice": 100,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-01",
       "indice": 102.5593,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-02",
       "indice": 104.2827,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-03",
       "indice": 106.5167,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-04",
       "indice": 108.6517,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-05",
       "indice": 110.4897,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-06",
       "indice": 111.7051,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-07",
       "indice": 113.3785,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-08",
       "indice": 115.3036,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-09",
       "indice": 116.7945,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-10",
       "indice": 118.7072,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-11",
       "indice": 120.4376,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2017-12",
       "indice": 123.4627,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-01",
       "indice": 126.6303,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-02",
       "indice": 129.2057,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-03",
       "indice": 133.2304,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-04",
       "indice": 136.8583,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-05",
       "indice": 139.5783,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-06",
       "indice": 144.143,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-07",
       "indice": 148.7858,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-08",
       "indice": 154.2103,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-09",
       "indice": 164.3327,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-10",
       "indice": 173.8678,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-11",
       "indice": 181.1502,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2018-12",
       "indice": 185.9051,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-01",
       "indice": 191.5466,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-02",
       "indice": 197.2864,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-03",
       "indice": 205.753,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-04",
       "indice": 212.954355,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-05",
       "indice": 220.3443,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-06",
       "indice": 226.4422,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-07",
       "indice": 232.2018,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-08",
       "indice": 242.0023,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-09",
       "indice": 254.7349,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-10",
       "indice": 262.9941,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-11",
       "indice": 274.9526,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2019-12",
       "indice": 286.376,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-01",
       "indice": 293.5954,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-02",
       "indice": 298.8202,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-03",
       "indice": 306.5854,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-04",
       "indice": 308.4722,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-05",
       "indice": 313.3862,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-06",
       "indice": 319.4097,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-07",
       "indice": 328.1311,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-08",
       "indice": 337.675,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-09",
       "indice": 345.3481,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-10",
       "indice": 357.3048,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-11",
       "indice": 367.7392,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2020-12",
       "indice": 378.8585,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-01",
       "indice": 394.4385,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-02",
       "indice": 409.6462,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-03",
       "indice": 426.2375,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-04",
       "indice": 446.4921,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-05",
       "indice": 462.1838,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-06",
       "indice": 478.1109,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-07",
       "indice": 494.1249,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-08",
       "indice": 510.9537,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-09",
       "indice": 530.0859,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-10",
       "indice": 545.2786,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-11",
       "indice": 557.2236,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2021-12",
       "indice": 574.4506,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-01",
       "indice": 595.088,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-02",
       "indice": 623.903,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-03",
       "indice": 670.3019,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-04",
       "indice": 709.7623,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-05",
       "indice": 744.3162,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-06",
       "indice": 782.142,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-07",
       "indice": 845.0397,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-08",
       "indice": 899.4604,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-09",
       "indice": 954.6011,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-10",
       "indice": 1017.5863,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-11",
       "indice": 1067.4854,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2022-12",
       "indice": 1115.8852,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-01",
       "indice": 1181.5995,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-02",
       "indice": 1249.6345,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-03",
       "indice": 1336.6514,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-04",
       "indice": 1445.0457,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-05",
       "indice": 1550.099,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-06",
       "indice": 1655.1801,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-07",
       "indice": 1784.2535,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-08",
       "indice": 2000.9692,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-09",
       "indice": 2280.9069,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-10",
       "indice": 2467.3877,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-11",
       "indice": 2762.3076,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2023-12",
       "indice": 3433.7881,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-01",
       "indice": 4264.4518,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-02",
       "indice": 4746.7686,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-03",
       "indice": 5243.3122,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-04",
       "indice": 5686.5426,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-05",
       "indice": 5943.6,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-06",
       "indice": 6238.0032,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-07",
       "indice": 6497.5651,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-08",
       "indice": 6797.2162,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-09",
       "indice": 7050.5061,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-10",
       "indice": 7278.5056,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-11",
       "indice": 7517.8953,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2024-12",
       "indice": 7717.0881,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-01",
       "indice": 7910.4797,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-02",
       "indice": 8164.2681,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-03",
       "indice": 8434.2328,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-04",
       "indice": 8659.3943,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-05",
       "indice": 8789.6656,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-06",
       "indice": 8949.9232,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-07",
       "indice": 9141.623,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-08",
       "indice": 9320.3353,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-09",
       "indice": 9543.6369,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-10",
       "indice": 9774.0954,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-11",
       "indice": 10001.4949,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2025-12",
       "indice": 10258.6285,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2026-01",
       "indice": 10554.0348,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2026-02",
       "indice": 10868.5551,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2026-03",
       "indice": 11137.8047,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2026-04",
       "indice": 11429.5989,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2026-05",
       "indice": 11622.7473,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     },
     {
       "mes": "2026-06",
       "indice": 11811.1393,
-      "origen": "indec"
+      "origen": "indec-patagonia"
     }
   ]
 }

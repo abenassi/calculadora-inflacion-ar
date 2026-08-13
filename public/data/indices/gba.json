@@ -3,596 +3,596 @@
   "base": "Índice",
   "fuentes": [
     {
-      "id": "indec",
+      "id": "indec-gba",
       "serie": "indec:148.3_INIVELGBA_DICI_M_21",
       "organismo": "Instituto Nacional de Estadística y Censos (INDEC)",
-      "organismoCorto": "INDEC",
+      "organismoCorto": "INDEC Gran Buenos Aires",
       "url": "https://www.indec.gob.ar/",
       "rango": "2016-12/2026-06",
       "etiqueta": {
         "corta": "IPC Región Gran Buenos Aires del INDEC",
         "larga": "el IPC de la Región Gran Buenos Aires del INDEC",
-        "publicadosPor": "el INDEC"
+        "publicadosPor": "el INDEC, que lo publica para el Gran Buenos Aires"
       }
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:26:55.423Z",
+  "actualizado": "2026-08-13T23:52:31.691Z",
   "datos": [
     {
       "mes": "2016-12",
       "indice": 100,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-01",
       "indice": 101.313,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-02",
       "indice": 103.8085,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-03",
       "indice": 106.2627,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-04",
       "indice": 109.0613,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-05",
       "indice": 110.4607,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-06",
       "indice": 111.9943,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-07",
       "indice": 113.9199,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-08",
       "indice": 115.6031,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-09",
       "indice": 117.9656,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-10",
       "indice": 119.4985,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-11",
       "indice": 120.8941,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2017-12",
       "indice": 125.0392,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-01",
       "indice": 127.0147,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-02",
       "indice": 130.2913,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-03",
       "indice": 133.5028,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-04",
       "indice": 136.938,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-05",
       "indice": 139.58,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-06",
       "indice": 145.0582,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-07",
       "indice": 149.1178,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-08",
       "indice": 155.1747,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-09",
       "indice": 165.4903,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-10",
       "indice": 173.8549,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-11",
       "indice": 178.877,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2018-12",
       "indice": 183.9381,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-01",
       "indice": 189.1236,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-02",
       "indice": 196.3597,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-03",
       "indice": 205.7679,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-04",
       "indice": 212.352473,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-05",
       "indice": 218.8793,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-06",
       "indice": 224.6105,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-07",
       "indice": 229.4286,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-08",
       "indice": 238.3069,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-09",
       "indice": 252.1482,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-10",
       "indice": 260.2101,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-11",
       "indice": 270.8019,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2019-12",
       "indice": 281.1775,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-01",
       "indice": 286.4913,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-02",
       "indice": 291.737,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-03",
       "indice": 302.2274,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-04",
       "indice": 306.4483,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-05",
       "indice": 311.0922,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-06",
       "indice": 317.4661,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-07",
       "indice": 322.6791,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-08",
       "indice": 331.6957,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-09",
       "indice": 340.902,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-10",
       "indice": 353.0444,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-11",
       "indice": 363.5381,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2020-12",
       "indice": 377.0507,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-01",
       "indice": 389.4454,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-02",
       "indice": 403.4854,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-03",
       "indice": 424.4539,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-04",
       "indice": 441.8955,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-05",
       "indice": 456.7856,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-06",
       "indice": 470.784,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-07",
       "indice": 485.3036,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-08",
       "indice": 497.9371,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-09",
       "indice": 517.0425,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-10",
       "indice": 536.5423,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-11",
       "indice": 548.7073,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2021-12",
       "indice": 570.9981,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-01",
       "indice": 593.4219,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-02",
       "indice": 620.5007,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-03",
       "indice": 661.8688,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-04",
       "indice": 702.829,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-05",
       "indice": 736.3637,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-06",
       "indice": 776.6701,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-07",
       "indice": 833.8894,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-08",
       "indice": 891.851,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-09",
       "indice": 945.6836,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-10",
       "indice": 1007.6275,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-11",
       "indice": 1058.0026,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2022-12",
       "indice": 1114.5359,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-01",
       "indice": 1180.967,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-02",
       "indice": 1259.9952,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-03",
       "indice": 1358.4995,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-04",
       "indice": 1475.1378,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-05",
       "indice": 1592.4496,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-06",
       "indice": 1685.1612,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-07",
       "indice": 1789.4275,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-08",
       "indice": 2008.8079,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-09",
       "indice": 2253.4785,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-10",
       "indice": 2447.565,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-11",
       "indice": 2763.435,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2023-12",
       "indice": 3456.6426,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-01",
       "indice": 4132.479,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-02",
       "indice": 4751.2725,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-03",
       "indice": 5296.8225,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-04",
       "indice": 5785.5699,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-05",
       "indice": 6034.4,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-06",
       "indice": 6297.096,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-07",
       "indice": 6551.322,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-08",
       "indice": 6822.4011,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-09",
       "indice": 7076.041,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-10",
       "indice": 7275.6042,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-11",
       "indice": 7464.8667,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2024-12",
       "indice": 7678.7745,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-01",
       "indice": 7834.1477,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-02",
       "indice": 8009.2272,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-03",
       "indice": 8317.925,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-04",
       "indice": 8547.3129,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-05",
       "indice": 8675.5948,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-06",
       "indice": 8851.2214,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-07",
       "indice": 9016.5562,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-08",
       "indice": 9185.3068,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-09",
       "indice": 9377.7681,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-10",
       "indice": 9602.5137,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-11",
       "indice": 9840.8457,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2025-12",
       "indice": 10115.6707,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2026-01",
       "indice": 10395.7458,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2026-02",
       "indice": 10667.6896,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2026-03",
       "indice": 11031.5404,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2026-04",
       "indice": 11336.5576,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2026-05",
       "indice": 11594.5499,
-      "origen": "indec"
+      "origen": "indec-gba"
     },
     {
       "mes": "2026-06",
       "indice": 11810.9464,
-      "origen": "indec"
+      "origen": "indec-gba"
     }
   ]
 }

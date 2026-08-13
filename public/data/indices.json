@@ -28,7 +28,7 @@
       "slug": "cordoba",
       "nombre": "Córdoba",
       "tipo": "provincia",
-      "cubre": "Índice provincial de Córdoba, con la serie empalmada que publica la provincia.",
+      "cubre": "Índice provincial de Córdoba. La provincia lo publica encadenado desde 1968; acá arranca en 1990 porque más atrás los números son tan chicos que se pierden cifras.",
       "primerMes": "1990-03",
       "ultimoOficial": "2026-07"
     },
@@ -129,5 +129,5 @@
       "ultimoOficial": "2026-06"
     }
   ],
-  "actualizado": "2026-08-13T23:41:03.987Z"
+  "actualizado": "2026-08-13T23:52:42.327Z"
 }

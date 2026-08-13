@@ -144,7 +144,8 @@
       <div class="contenido">
         <h1>Calculadora de inflación</h1>
         <p class="bajada">
-          Cuánto vale un monto de otra fecha, según el IPC del INDEC. Te mostramos el cálculo
+          <!-- "según el IPC del INDEC" lo reemplaza main.ts por el índice elegido. -->
+          <span id="bajada-fuente">Cuánto vale un monto de otra fecha, según el IPC del INDEC.</span> Te mostramos el cálculo
           completo, mes por mes, y te decimos siempre qué parte es dato oficial y qué parte es
           estimación.
         </p>
@@ -201,7 +202,9 @@
           nada más aparece en pantalla.
         -->
         <div class="campo campo--indice">
-          <label for="indice">según el IPC</label>
+          <!-- "según el índice" y no "según el IPC": "el IPC" hace preguntar cuál, y la
+               respuesta ya está adentro del desplegable. -->
+          <label for="indice">según el índice</label>
           <select id="indice" aria-label="Índice de precios a usar"></select>
         </div>
       </form>

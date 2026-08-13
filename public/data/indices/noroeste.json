@@ -3,596 +3,596 @@
   "base": "Índice",
   "fuentes": [
     {
-      "id": "indec",
+      "id": "indec-noroeste",
       "serie": "indec:148.3_INIVELNOA_DICI_M_21",
       "organismo": "Instituto Nacional de Estadística y Censos (INDEC)",
-      "organismoCorto": "INDEC",
+      "organismoCorto": "INDEC Noroeste",
       "url": "https://www.indec.gob.ar/",
       "rango": "2016-12/2026-06",
       "etiqueta": {
         "corta": "IPC Región Noroeste del INDEC",
         "larga": "el IPC de la Región Noroeste del INDEC",
-        "publicadosPor": "el INDEC"
+        "publicadosPor": "el INDEC, que lo publica para la región noroeste"
       }
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:26:55.924Z",
+  "actualizado": "2026-08-13T23:52:32.265Z",
   "datos": [
     {
       "mes": "2016-12",
       "indice": 100,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-01",
       "indice": 101.6014,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-02",
       "indice": 103.7115,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-03",
       "indice": 107.055,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-04",
       "indice": 109.9626,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-05",
       "indice": 111.636,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-06",
       "indice": 112.6924,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-07",
       "indice": 114.2857,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-08",
       "indice": 115.7385,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-09",
       "indice": 117.7781,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-10",
       "indice": 119.9939,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-11",
       "indice": 121.506,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2017-12",
       "indice": 124.313,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-01",
       "indice": 126.6479,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-02",
       "indice": 129.236,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-03",
       "indice": 133.248,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-04",
       "indice": 137.0205,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-05",
       "indice": 140.178,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-06",
       "indice": 144.9444,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-07",
       "indice": 149.9066,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-08",
       "indice": 155.8659,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-09",
       "indice": 165.1776,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-10",
       "indice": 173.9582,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-11",
       "indice": 179.6479,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2018-12",
       "indice": 183.718,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-01",
       "indice": 189.6231,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-02",
       "indice": 197.617,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-03",
       "indice": 207.2604,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-04",
       "indice": 214.721774,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-05",
       "indice": 223.0958,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-06",
       "indice": 229.3958,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-07",
       "indice": 233.932,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-08",
       "indice": 243.6348,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-09",
       "indice": 257.8353,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-10",
       "indice": 265.2024,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-11",
       "indice": 275.4348,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2019-12",
       "indice": 285.5958,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-01",
       "indice": 292.5465,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-02",
       "indice": 297.8973,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-03",
       "indice": 309.1808,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-04",
       "indice": 317.1934,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-05",
       "indice": 322.5045,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-06",
       "indice": 329.6326,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-07",
       "indice": 335.8753,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-08",
       "indice": 344.455,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-09",
       "indice": 352.4418,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-10",
       "indice": 366.7812,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-11",
       "indice": 378.17,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2020-12",
       "indice": 394.4702,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-01",
       "indice": 416.2149,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-02",
       "indice": 429.9182,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-03",
       "indice": 447.9105,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-04",
       "indice": 465.799,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-05",
       "indice": 480.9157,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-06",
       "indice": 496.0324,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-07",
       "indice": 510.3946,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-08",
       "indice": 522.5566,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-09",
       "indice": 539.5962,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-10",
       "indice": 556.8596,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-11",
       "indice": 571.6452,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2021-12",
       "indice": 594.7475,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-01",
       "indice": 618.7562,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-02",
       "indice": 648.7805,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-03",
       "indice": 692.6827,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-04",
       "indice": 736.7727,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-05",
       "indice": 777.6674,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-06",
       "indice": 818.411,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-07",
       "indice": 873.5624,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-08",
       "indice": 940.0434,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-09",
       "indice": 997.7785,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-10",
       "indice": 1060.4604,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-11",
       "indice": 1108.8388,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2022-12",
       "indice": 1160.5028,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-01",
       "indice": 1233.9904,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-02",
       "indice": 1323.9654,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-03",
       "indice": 1421.13,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-04",
       "indice": 1530.4512,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-05",
       "indice": 1652.2346,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-06",
       "indice": 1761.6308,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-07",
       "indice": 1868.6534,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-08",
       "indice": 2124.297,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-09",
       "indice": 2404.2327,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-10",
       "indice": 2589.8147,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-11",
       "indice": 2895.7169,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2023-12",
       "indice": 3626.27,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-01",
       "indice": 4413.6008,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-02",
       "indice": 4929.6047,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-03",
       "indice": 5361.7677,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-04",
       "indice": 5849.8004,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-05",
       "indice": 6093.7424,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-06",
       "indice": 6383.7684,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-07",
       "indice": 6612.6868,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-08",
       "indice": 6946.3272,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-09",
       "indice": 7183.8907,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-10",
       "indice": 7367.1801,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-11",
       "indice": 7509.1195,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2024-12",
       "indice": 7713.1412,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-01",
       "indice": 7912.5281,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-02",
       "indice": 8116.2881,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-03",
       "indice": 8467.6619,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-04",
       "indice": 8710.4114,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-05",
       "indice": 8816.9664,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-06",
       "indice": 8924.3327,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-07",
       "indice": 9073.9428,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-08",
       "indice": 9252.4989,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-09",
       "indice": 9455.5666,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-10",
       "indice": 9657.7445,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-11",
       "indice": 9879.6088,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2025-12",
       "indice": 10137.067,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2026-01",
       "indice": 10425.8507,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2026-02",
       "indice": 10795.0756,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2026-03",
       "indice": 11221.7466,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2026-04",
       "indice": 11506.6342,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2026-05",
       "indice": 11747.5318,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     },
     {
       "mes": "2026-06",
       "indice": 11943.1627,
-      "origen": "indec"
+      "origen": "indec-noroeste"
     }
   ]
 }
