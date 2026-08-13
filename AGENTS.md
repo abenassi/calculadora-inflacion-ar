@@ -54,20 +54,35 @@ npm run dev         # servidor local
 **Y miralo en un browser.** El gráfico estuvo roto en producción pasando todos los tests,
 porque nadie lo había abierto.
 
-## Revisión: dos perfiles opuestos
+## Desarrollar acá es un loop, no una checklist
 
-Cualquier cambio que toque el número o su explicación se revisa con los dos agentes de
-`.claude/agents/`, **en paralelo y sin que se vean entre sí**:
+Se implementa, se manda a revisar, se actúa sobre lo que vuelve, **y se manda a revisar de
+nuevo**. Tiene tres salidas: una vuelta que no trae nada nuevo, una vuelta cuyos hallazgos
+rechazás con la razón escrita, o el **techo de tres vueltas** que encuentran cosas — a la
+tercera, el cambio es demasiado grande y hay que partirlo. El paso a paso está en la skill;
+acá va el mapa.
+
+Los tres revisores viven en `.claude/agents/` y van **en paralelo y sin verse entre sí**:
 
 - **`revisor-economista`** — audita el método contra el código y los datos reales.
 - **`revisora-usuaria`** — una persona que necesita el número para trabajar y no maneja
   porcentajes.
+- **`revisor-codigo`** — busca dónde el código puede empezar a mentir aunque hoy dé bien.
+  **Va siempre**, incluso en un cambio de texto.
 
-No es redundancia: el número puede estar mal (lo ve quien sabe) o estar bien y no entenderse
-(lo ve quien no sabe). Sus listas casi no se superponen y las dos suelen ser ciertas.
-`docs/decisiones/0007` cuenta qué encontró cada uno.
+No es redundancia: el número puede estar mal (lo ve quien sabe), estar bien y no entenderse
+(lo ve quien no sabe), o estar bien hoy y mentir en tres meses (lo ve quien mira el código).
+Las tres listas casi no se superponen y las tres suelen ser ciertas.
+`docs/decisiones/0007` cuenta qué encontró cada uno y por qué el loop está armado así.
 
-**Verificá cada hallazgo antes de actuar**, incluso los del especialista.
+Dos cosas que hacen que el loop termine y no dé vueltas para siempre:
+
+- **Llevá un registro de todos los hallazgos vistos, no sólo de los arreglados.** Los
+  rechazados también se anotan, con la razón, y se les pasan a los revisores en la vuelta
+  siguiente. Sin eso vuelven a levantar lo mismo cada vez.
+- **Verificá cada hallazgo antes de actuar**, incluso los del especialista. Ya pasó dos
+  veces que el reporte tuviera razón en el fondo y el diagnóstico correcto saliera recién
+  de la verificación.
 
 ## Castellano
 

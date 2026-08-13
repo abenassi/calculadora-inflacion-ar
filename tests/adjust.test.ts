@@ -155,11 +155,67 @@ describe("proyección — el destino es un mes futuro", () => {
     // resultado sólo depende de agosto y septiembre.
     expect(r.metodo.mesesEstimados).toEqual(["2020-08", "2020-09"]);
     expect(r.montoAjustado).toBeCloseTo(1000 * 1.1 * 1.1, 6);
+  });
 
-    // La cantidad de meses nombrados coincide con la de porcentajes de la tabla.
-    const tramos = r.desglose.slice(1);
-    expect(r.metodo.mesesEstimados).toHaveLength(tramos.length);
-    expect(tramos.every((f) => f.varMensualPct !== null)).toBe(true);
+  /**
+   * El invariante que la interfaz necesita, no el caso.
+   *
+   * El pie de la tabla cuenta tramos proyectados y el párrafo cuenta meses nombrados, y
+   * la persona los lee juntos: si no dan igual, el sitio muestra dos números distintos
+   * para la misma cosa. Fijar el resultado de un caso no impide eso — la primera versión
+   * de este test fijaba un literal en modo mes hacia adelante, y el mismo commit dejaba
+   * el modo por día diciendo 7 contra 8 y el modo hacia atrás con la lista vacía y una
+   * coma colgando ("el INDEC todavía no publicó ,").
+   *
+   * Por eso la grilla: {mes, día} × {adelante, atrás} × {mixto, todo estimado}.
+   */
+  it("nombra tantos meses estimados como tramos proyectados hay en la tabla", () => {
+    const casos: Array<[string, string, string]> = [
+      ["mes · adelante · todo estimado", "2020-05", "2020-07"],
+      ["mes · adelante · mixto", "2020-03", "2020-06"],
+      ["mes · atrás · todo estimado", "2020-07", "2020-05"],
+      ["mes · atrás · mixto", "2020-06", "2020-03"],
+      ["día · adelante · mixto", "2020-03-10", "2020-05-20"],
+      ["día · atrás · mixto", "2020-05-20", "2020-03-10"],
+      ["día · adelante · arranque parcial estimado", "2020-05-15", "2020-07-20"],
+      ["día · destino el 1° del mes siguiente al último publicado", "2020-02-01", "2020-05-01"],
+    ];
+
+    for (const [nombre, desde, hasta] of casos) {
+      const r = adjust(1000, desde, hasta, sintetica, {
+        hoy: "2020-05",
+        metodologia: "repite_ultimo",
+      });
+      if (r.metodo.tipo !== "proyeccion") throw new Error(`${nombre}: tipo inesperado`);
+
+      const proyectados = r.desglose.slice(1).filter((f) => f.esProyeccion).length;
+      expect(r.metodo.mesesEstimados.length, nombre).toBe(proyectados);
+    }
+  });
+
+  /**
+   * Pedir una metodología de estimación no obliga a que haya algo que estimar. Cuando no
+   * lo hay, la lista tiene que venir vacía y no puede haber ningún tramo marcado como
+   * proyección: si no, la interfaz anuncia una estimación sobre una tabla enteramente
+   * sellada por el INDEC.
+   */
+  it("no inventa meses estimados cuando el período ya está publicado entero", () => {
+    // El disparador es un destino que cae el 1° del mes siguiente al último publicado:
+    // el desplazamiento que elige la metodología se mide sobre el mes del destino, pero
+    // la inflación de ese mes no hace falta —el índice del día 1 es el del mes anterior—,
+    // así que se entra por `proyeccion` sin tener nada que proyectar.
+    for (const [desde, hasta] of [
+      ["2020-02-01", "2020-05-01"],
+      ["2020-05-01", "2020-02-01"],
+    ] as const) {
+      const r = adjust(1000, desde, hasta, sintetica, {
+        hoy: "2020-05",
+        metodologia: "repite_ultimo",
+      });
+      if (r.metodo.tipo !== "proyeccion") throw new Error("tipo inesperado");
+      expect(r.metodo.mesesEstimados, `${desde}→${hasta}`).toEqual([]);
+      expect(r.desglose.some((f) => f.esProyeccion), `${desde}→${hasta}`).toBe(false);
+    }
   });
 
   it("repite el último valor, no el promedio de varios", () => {

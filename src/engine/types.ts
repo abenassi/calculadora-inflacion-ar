@@ -144,7 +144,15 @@ export type Metodo =
        * fila del desglose y no hay una tasa única que nombrar.
        */
       tasaMensualPct: number | null;
-      /** Los meses sin publicar que se estimaron. */
+      /**
+       * Los meses sin publicar que se estimaron **y que mueven el resultado**: van desde
+       * el extremo más viejo del período pedido, no desde el último mes publicado. Los
+       * anteriores hay que estimarlos igual para construir el índice, pero se cancelan
+       * en el cociente entre las dos puntas y nombrarlos confundía (ver 0003).
+       *
+       * Puede venir vacío: pedir una metodología de estimación no obliga a que haya algo
+       * que estimar.
+       */
       mesesEstimados: Mes[];
       base: BaseProyeccion;
     };
@@ -180,9 +188,11 @@ export type Resultado = {
    * La metodología que se pidió, que no siempre es la que terminó aplicándose.
    *
    * `sin_proyectar` con un destino futuro es el caso: no existe ningún tramo
-   * publicado equivalente, así que hay que estimar igual. Sin este dato la interfaz
-   * no puede explicar por qué eligiendo "no estimar" aparecen filas estimadas, y esa
-   * contradicción se lee como si el selector estuviera roto.
+   * publicado equivalente, así que hay que estimar igual. Eso ya no se puede pedir
+   * desde la interfaz —la opción queda deshabilitada y el selector pasa solo a la
+   * metodología en uso—, pero el dato se conserva porque `adjust()` es una API propia
+   * que se puede llamar con cualquier combinación, y porque el analytics registra qué
+   * se pidió, no qué se terminó aplicando.
    */
   metodologia: Metodologia;
   monto: number;

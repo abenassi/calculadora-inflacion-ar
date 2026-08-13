@@ -140,3 +140,37 @@ seguía afirmando "si no lo tocás, siempre estás en la primera". Las dos corre
 Vale la pena registrar qué **no** se tocó: el cartel que explica por qué la opción está
 en gris quedó tal cual. Fue lo único de todo el flujo que la revisión confirmó que se
 entendía a la primera.
+
+## Qué corrigió la vuelta 2
+
+El arreglo de arriba era correcto en el caso testigo y rompía los bordes. Lo encontró el
+revisor de código sobre los mismos cambios:
+
+**El rango se derivaba de `desde`, que no siempre es la punta vieja.** Deflactando hacia
+atrás —"cobré esto en diciembre, ¿cuánto era en agosto?"— `desde` es el extremo **nuevo**,
+el piso se iba por encima del techo y la lista quedaba vacía: *"El INDEC todavía no
+publicó ,"*, con la coma colgando, en pantalla y en el texto que se copia. Ahora se toma
+el extremo más viejo del recorrido.
+
+**En modo por día volvía el mismo 7 contra 8.** El tramo que va del 15 de octubre al 1 de
+noviembre lleva la parte de octubre que va del 15 en adelante: es un mes sin publicar y sí
+mueve el número. `mesTopeNecesario` de un día devuelve su propio mes, así que el `+1` lo
+salteaba entero. Ahora, cuando la punta vieja cae en un día que no es el 1, su mes entra.
+
+**Y la frase nueva mentía en espejo.** *"En esta tabla no hay ningún dato oficial"* se
+decidía mirando sólo los tramos, así que aparecía con una fila de partida que llevaba su
+`INDEC ✓` impreso dos centímetros más arriba. Es la misma falla que vino a corregir, dada
+vuelta. Ahora sale de `hayDatoOficial()`, que mira todas las filas — y de una sola función,
+porque el pie de la tabla y la referencia del gráfico afirman lo mismo y se leen juntos.
+
+**Pedir una metodología de estimación no obliga a que haya algo que estimar.** Con un
+destino que cae el 1° del mes siguiente al último publicado no queda nada que proyectar, y
+el sitio igual ponía el cartel ≈ ESTIMADO, el `~` y *"Los 0 porcentajes resaltados son
+tramos proyectados"* sobre una tabla enteramente sellada por el INDEC. El anuncio de
+estimación ahora depende de que haya algo estimado, no de la metodología que se pidió.
+
+El test que ataba todo esto fijaba un literal en modo mes hacia adelante y no atrapaba
+ninguno de los cuatro. Lo reemplazó una grilla {mes, día} × {adelante, atrás} × {mixto,
+todo estimado} sobre el invariante que la interfaz necesita de verdad: **la cantidad de
+meses nombrados tiene que ser igual a la de tramos proyectados en la tabla.** Es la regla
+4 aplicada a un texto y una tabla que la persona lee juntos.

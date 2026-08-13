@@ -68,7 +68,10 @@ Es el mismo empalme que hace la herramienta `ajuste_por_inflacion` del MCP.
 
 El IPC sale con retraso, así que el mes en curso nunca tiene dato y a veces el
 anterior tampoco. Hay **tres metodologías**, elegibles desde un selector debajo del
-resultado. El default no estima nada, y es al que llega siempre quien entra de cero.
+resultado. El default no estima nada, y es al que llega quien entra de cero **siempre que
+el período lo permita**: con un destino que todavía no llegó no existe ningún tramo
+publicado que sirva de referencia, así que esa opción se deshabilita y el selector pasa
+solo a la que efectivamente se usa.
 
 | Metodología | Qué hace con los meses que faltan | ¿Estima? |
 |---|---|---|
@@ -97,8 +100,10 @@ justamente para que este sitio pudiera dejar de repartir parejo.
 
 Cuando el período pedido está enteramente publicado, las tres dan el mismo número.
 
-Para un mes futuro no hay período publicado equivalente, así que incluso el default
-proyecta — y en ese caso coincide exactamente con la segunda metodología.
+Para un mes futuro no hay período publicado equivalente, así que el default no se puede
+honrar: queda deshabilitado y el selector pasa a la segunda metodología, que es la que
+efectivamente se aplica. Un control que no puede cumplir lo que ofrece no lo ofrece
+(regla 3).
 
 ### Sobre la precisión
 
@@ -191,18 +196,23 @@ que acá ya se pagaron.
 
 - **`AGENTS.md`** (y `CLAUDE.md`, que lo referencia) — lo que hay que saber antes de tocar
   nada: la promesa del sitio, las cinco reglas que no se negocian, dónde está cada cosa.
-- **`.claude/skills/cambiar-la-calculadora/`** — el orden de trabajo para cualquier cambio,
-  con las trampas ya pagadas y el gate de revisión.
-- **`.claude/agents/`** — **los dos revisores**, que son la parte más reusable de todo esto.
-  Un especialista del dominio que audita contra el código y los datos, y una usuaria que
-  necesita el número para trabajar y no maneja porcentajes. No es redundancia: el número
-  puede estar mal (lo ve quien sabe) o estar bien y no entenderse (lo ve quien no sabe), y
-  sus listas de hallazgos casi no se superponen. Encontraron un sesgo de medio punto en el
-  anclaje del índice y, del otro lado, que la tabla no se le podía mostrar a un cliente.
+- **`.claude/skills/cambiar-la-calculadora/`** — **el loop de desarrollo del repo**, que no
+  es una checklist que se recorre una vez: se implementa, se manda a revisar, se actúa
+  sobre lo que vuelve y se revisa de nuevo, hasta que una vuelta no traiga nada nuevo o lo
+  único que traiga sean cosas que rechazás con una razón escrita.
+- **`.claude/agents/`** — **los tres revisores**, que son la parte más reusable de todo
+  esto. Un especialista del dominio que audita contra el código y los datos, una usuaria
+  que necesita el número para trabajar y no maneja porcentajes, y un revisor de código que
+  busca dónde el código puede empezar a mentir aunque hoy dé bien. No es redundancia: el
+  número puede estar mal (lo ve quien sabe), estar bien y no entenderse (lo ve quien no
+  sabe), o estar bien hoy y mentir en tres meses (lo ve quien mira el código). Sus listas
+  casi no se superponen. Encontraron un sesgo de medio punto en el anclaje del índice y,
+  del otro lado, que la tabla no se le podía mostrar a un cliente.
 
-Si forkeás esto para otro dominio, **el patrón de los dos revisores se lleva tal cual**:
-cambiale la especialidad al primero y el oficio a la segunda. `docs/decisiones/0007` cuenta
-por qué funciona y qué reglas hay que respetar para que siga funcionando.
+Si forkeás esto para otro dominio, **el patrón de los tres revisores y el loop se llevan
+tal cual**: cambiale la especialidad al primero y el oficio a la segunda; el de código y la
+mecánica del loop van casi sin tocar. `docs/decisiones/0007` cuenta por qué funciona, qué
+lo hace converger y qué reglas hay que respetar para que siga funcionando.
 
 ### El analytics no se copia prendido
 

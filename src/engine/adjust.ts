@@ -476,14 +476,30 @@ function calcularProyectando(
     .sort()
     .at(-1);
 
-  // Los meses anteriores al punto de partida no se nombran aunque haya que estimarlos
-  // para construir el índice: el resultado es el cociente índice(hasta)/índice(desde),
-  // así que todo lo que está antes de `desde` se cancela y no mueve el número ni un
-  // peso. Nombrarlos le hacía decir al sitio "el INDEC no publicó los 11 meses desde
-  // julio" a alguien que había pedido octubre, y quedaba contra las 7 filas con
-  // porcentaje que tenía en pantalla. Los meses que se nombran son los que la persona
-  // puede contar en la tabla.
-  const primeroQueMueveElNumero = sumarMeses(mesTopeNecesario(puntos[0]!), 1);
+  // Los meses anteriores al extremo más viejo del recorrido no se nombran aunque haya
+  // que estimarlos para construir el índice: el resultado es un cociente entre los
+  // índices de las dos puntas, así que todo lo anterior se cancela y no mueve el número
+  // ni un peso. Nombrarlos le hacía decir al sitio "el INDEC no publicó los 11 meses
+  // desde julio" a alguien que había pedido octubre, contra las 7 filas con porcentaje
+  // que tenía en pantalla. Los meses que se nombran son los que la persona puede contar.
+  //
+  // Se toma el extremo **más viejo**, no `desde`: deflactando hacia atrás `desde` es la
+  // punta nueva, y arrancar por ahí dejaba el rango vacío y el texto decía "el INDEC
+  // todavía no publicó ," con la coma colgando.
+  //
+  // Y si esa punta cae en un día que no es el 1, su propio mes entra: el tramo que va
+  // del 15 de octubre al 1 de noviembre lleva la parte de octubre que va del 15 en
+  // adelante, que es un mes sin publicar y que sí mueve el número.
+  const extremos = [puntos[0]!, puntos.at(-1)!];
+  const puntoViejo =
+    compararMeses(mesTopeNecesario(extremos[0]!), mesTopeNecesario(extremos[1]!)) <= 0
+      ? extremos[0]!
+      : extremos[1]!;
+  const arranqueParcial = esFecha(puntoViejo) && diaDe(puntoViejo) !== 1;
+  const primeroQueMueveElNumero = arranqueParcial
+    ? mesDe(puntoViejo)
+    : sumarMeses(mesTopeNecesario(puntoViejo), 1);
+
   const piso =
     compararMeses(primeroQueMueveElNumero, sumarMeses(ultimoOficial, 1)) > 0
       ? primeroQueMueveElNumero

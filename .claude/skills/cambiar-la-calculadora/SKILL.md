@@ -1,6 +1,6 @@
 ---
 name: cambiar-la-calculadora
-description: Usar SIEMPRE antes de implementar cualquier cambio en este repo — feature nueva, corrección, cambio de textos o de metodología. Trae el orden de trabajo, las reglas que no se negocian y el gate de revisión con los dos revisores. También sirve para revisar un cambio ya hecho, entrando por el paso 4.
+description: Usar SIEMPRE antes de implementar cualquier cambio en este repo — feature nueva, corrección, cambio de textos o de metodología. Es el loop de desarrollo del repositorio: implementar, hacer revisar por los tres revisores, actuar sobre los hallazgos, y volver a revisar hasta que no aparezca nada nuevo. También sirve para revisar un cambio ya hecho, entrando por el paso 4.
 ---
 
 # Cambiar la calculadora
@@ -8,7 +8,26 @@ description: Usar SIEMPRE antes de implementar cualquier cambio en este repo —
 La promesa de este sitio no es dar un número: es dar un número que **la persona pueda
 defender ante otra persona**. Casi todas las reglas de acá salen de eso.
 
-Si venís a **revisar** algo ya implementado (tuyo o ajeno), saltá directo al paso 4.
+**Esto no es una checklist que se recorre una vez: es un loop.** Se implementa, se manda a
+revisar, se actúa sobre lo que vuelve, y se manda a revisar de nuevo. Se corta cuando una
+vuelta no trae nada nuevo, o cuando lo único que trae son cosas con las que no estás de
+acuerdo y podés decir por qué.
+
+```
+paso 1  entender el caso
+paso 2  implementar
+paso 3  verificar que anda          ←──────────────┐
+paso 4  revisar (3 revisores en paralelo)          │
+          ├─ arreglaste algo ────────────────────────┘
+          └─ no arreglaste nada (nada nuevo, o todo rechazado con razón)
+paso 5  cerrar
+```
+
+Si venís a **revisar** algo ya implementado (tuyo o ajeno), entrá por el paso 4 — pero
+antes escribí el caso concreto del paso 1 (montos y fechas), porque el paso 4 lo pide como
+insumo, y abrí el registro del 4.3 vacío. Sin caso, los revisores contestan sobre el sitio
+en general; sin registro, la segunda vuelta no puede distinguir un hallazgo nuevo de uno
+repetido.
 
 ## Paso 0 — Leé el porqué antes de tocar el qué
 
@@ -25,7 +44,7 @@ existen porque la alternativa obvia ya se probó y estaba mal.
 | Fechas exactas, prorrateo dentro del mes | 0004 |
 | Comparar contra el MCP u otra calculadora | 0005 |
 | El REM | 0006 |
-| Cómo se revisa (el paso 4 de acá) | 0007 |
+| Cómo se revisa (el loop de acá) | 0007 |
 | Analytics, privacidad, qué se mide | 0008 |
 
 ## Las reglas que no se negocian
@@ -66,6 +85,10 @@ Escribí en una línea qué le pasa a la persona que va a usar esto. Si no se pu
 probablemente el cambio no tenga un caso de uso atrás — y este sitio ya perdió una vez
 funcionalidad por eso (los presets de 0002).
 
+Anotá también **el caso concreto con montos y fechas** que vas a usar para probar. Los
+revisores lo van a necesitar y conviene que sea el mismo en todas las vueltas, así se
+puede comparar.
+
 ## Paso 2 — Implementar
 
 - La aritmética de inflación vive en `src/engine/`. La orquestación y el pintado, en
@@ -92,48 +115,151 @@ Si vas a verificar en producción después de deployar, agregá un parámetro de
 (`?v=algo`): ya pasó de comparar el hash del bundle, ver que era idéntico, y estar mirando
 el HTML viejo de caché.
 
-## Paso 4 — El gate de revisión
+**No mandes a revisar algo que no verificaste.** Los revisores cuestan, y gastarlos en
+encontrar que los tests no pasan es tirarlos.
 
-**Cualquier cambio que toque el número o su explicación pasa por acá.** Es el paso que más
-errores encontró en este repo, y los encontró porque son **dos perfiles opuestos**: el
-número puede estar mal (lo ve quien sabe) o puede estar bien y no entenderse (lo ve quien no
-sabe). Un solo revisor no encuentra las dos.
+## Paso 4 — El loop de revisión
 
-Despachá los dos **en paralelo y sin que se vean entre sí**:
+Es el paso que más errores encontró en este repo. Y los encuentra porque son **perfiles que
+no se superponen**: el número puede estar mal (lo ve quien sabe de índices), puede estar
+bien y no entenderse (lo ve quien no sabe), y puede estar bien hoy y empezar a mentir en
+tres meses (lo ve quien mira el código). Las tres listas casi no se pisan y las tres suelen
+ser ciertas.
 
-- **`revisor-economista`** — si tocaste el motor, las series, las metodologías o el
-  prorrateo.
-- **`revisora-usuaria`** — si tocaste algo que se ve o se lee: textos, tabla, gráfico,
-  explicación, el texto que se copia.
+### 4.1 — Quiénes van en esta vuelta
 
-Si el cambio toca las dos cosas, van los dos. Si sólo cambiaste un texto, alcanza con la
-usuaria; si sólo tocaste el motor sin cambiar nada visible, alcanza con el economista.
+Los tres agentes están en `.claude/agents/`. Despachalos **en paralelo y sin que se vean
+entre sí**: si uno lee lo que encontró el otro, deja de ser una tercera mirada.
 
-### Cómo pedirles la revisión
+| Agente | Va cuando el cambio toca… |
+|---|---|
+| **`revisor-economista`** | el motor, las series, el empalme, las metodologías, el prorrateo |
+| **`revisora-usuaria`** | algo que se ve o se lee: textos, tabla, gráfico, explicación, el texto que se copia |
+| **`revisor-codigo`** | **siempre** |
+
+El de código va siempre, incluso en un cambio de texto: el modo de falla más repetido del
+repo es justamente un texto que quedó describiendo un comportamiento que ya no existe, y
+eso no lo ve nadie mirando la pantalla.
+
+**Se elige sobre el diff acumulado del loop, no sobre lo que arreglaste en la última
+vuelta.** Si no, una vuelta limpia puede ser artefacto de no haber despachado a alguien:
+este mismo repo tuvo un cambio que arrancó como corrección de textos y terminó
+reescribiendo el rango de meses del motor. Despachado como "textos", el economista nunca
+habría visto el motor nuevo y la vuelta habría vuelto vacía por omisión.
+
+**Escalá al tamaño del cambio.** Cambiar una palabra en un título no necesita al
+economista. Tocar el empalme de series los necesita a los tres, y probablemente más de una
+vuelta.
+
+### 4.2 — Cómo pedirles la revisión
 
 **Dales el material completo.** Una vez se pidió un botón de "copiar explicación" que ya
-existía: no se lo habíamos mostrado. Ese hallazgo era artefacto del prompt, no del producto,
-y costó trabajo al pedo. Decile a la revisora qué hay en pantalla y qué se puede tocar.
+existía: no se lo habíamos mostrado. Ese hallazgo era artefacto del prompt, no del
+producto, y costó trabajo al pedo. Decile a cada uno qué hay en pantalla y qué se puede
+tocar.
 
-**Dales el caso concreto**, con montos y fechas reales, no "revisá el sitio".
+**Dales el caso concreto**, con montos y fechas reales, no "revisá el sitio". El del paso
+1, el mismo en todas las vueltas.
 
-### Qué hacer con lo que devuelven
+**Y a partir de la segunda vuelta, dales también:**
 
-**Verificá cada hallazgo antes de actuar.** Un revisor puede tener razón en el fondo y
-equivocarse en el número — ya pasó. El número que termina en el repo es el que verificaste
-vos.
+- **Qué cambió desde su revisión anterior**, para que no vuelvan a auditar lo que ya
+  auditaron.
+- **El registro de hallazgos rechazados, con la razón.** Sin esto el loop no termina: el
+  revisor vuelve a levantar lo mismo cada vuelta y nunca converge. Pediles que, si no están
+  de acuerdo con una razón, lo digan **una vez** y con evidencia nueva; no que repitan el
+  hallazgo original.
 
-**Lo que confirman como correcto, no se toca.** Sin esa lista se cambian por las dudas cosas
-que funcionaban.
+### 4.3 — El registro
+
+Llevá una tabla **en un archivo del cambio** (o en el cuerpo del PR), no en un mensaje de
+la conversación. Es lo que hace que el loop termine, y un loop que cruza dos sesiones —o
+una compactación de contexto— pierde lo que vivía sólo en un mensaje. Cuando el cambio se
+cierra, lo que sobrevive del registro son los desacuerdos, que van a `docs/decisiones/`.
+
+| # | Hallazgo | Quién | Verificado | Qué se hizo |
+|---|---|---|---|---|
+| 1 | … | usuaria | sí, contra `main.ts:326` | arreglado en la vuelta 1 |
+| 2 | … | código | no se sostiene | **rechazado**: … |
+
+**El registro acumula todo lo visto, no sólo lo arreglado.** Si sólo anotás lo que
+arreglaste, los rechazados vuelven a aparecer vuelta tras vuelta y el loop no converge
+nunca.
+
+### 4.4 — Qué hacer con cada hallazgo
+
+**Verificá cada uno antes de actuar, incluso los del especialista.** Un revisor puede tener
+razón en el fondo y equivocarse en el detalle — ya pasó dos veces. El economista dio un
+número de anclaje que al recalcularlo dio distinto; la conclusión no cambiaba, pero el
+número que quedó en el repo es el verificado. Y los "11 meses" que reportó la usuaria no
+eran un error de conteo como parecía: el rango arrancaba antes del punto de partida. **El
+diagnóstico correcto sale de la verificación, no del reporte.**
+
+Después, cada hallazgo termina en uno de tres lugares:
+
+- **Arreglado.** Volvés al paso 2.
+- **Rechazado, con la razón escrita.** Es una salida legítima y el usuario del loop la
+  decide. Pero la razón se escribe: "no estoy de acuerdo" no es una razón, "el CER usa
+  meses ya publicados por Res. MECON 47/2002, así que la analogía no aplica" sí. Si el
+  desacuerdo sobrevive al final del loop, va a `docs/decisiones/` — una tensión conocida y
+  anotada vale mucho más que una que se descartó en silencio.
+- **Confirmado como correcto: no se toca.** La lista de lo verificado-y-correcto es tan
+  útil como la de hallazgos. Sin ella se cambian por las dudas cosas que funcionaban.
 
 **Si uno refuta una hipótesis tuya, aceptalo.** Ya pasó que una hipótesis sobre etiquetado
 parecía obvia, era falsa, y "arreglarla" habría roto algo que andaba.
 
-Las dos listas suelen **no superponerse casi nada** y las dos suelen ser ciertas.
+### 4.5 — Cuándo se corta
+
+Volvés al paso 3 (verificar) y después al 4 (revisar) cada vez que arreglás algo. El loop
+termina cuando se cumple una de estas dos:
+
+1. **Una vuelta no trae ningún hallazgo nuevo.** Nuevo se predica de la **evidencia**, no
+   del título del hallazgo: si un revisor vuelve sobre algo que rechazaste pero trae un
+   caso concreto que antes no estaba, **eso es nuevo y reabre el loop**. Repetir el mismo
+   argumento con otras palabras, no.
+
+   Es la diferencia entre un loop que converge y uno que se blinda: si "ya está en el
+   registro" alcanzara para cerrar, un rechazo equivocado en la primera vuelta se volvería
+   imposible de corregir después, y la salida por desacuerdo dejaría de ser una decisión
+   para pasar a ser una trampa. Ya pasó que un hallazgo del tipo "nadie deflacta desde un
+   mes futuro" se rechazara por inverosímil y fuera un bug real.
+2. **Lo único que trae son hallazgos que rechazás, y la razón está escrita.**
+
+Que una vuelta no traiga nada nuevo es información, no una formalidad: es la única
+evidencia de que los arreglos de la vuelta anterior no rompieron otra cosa. Arreglar el
+hallazgo 3 y romper lo que se había arreglado en el hallazgo 1 es exactamente lo que esta
+vuelta existe para atrapar.
+
+**Ojo con la salida por desacuerdo.** Es legítima, pero si estás rechazando todo, el que
+está fallando es el loop y no los revisores. Si en una vuelta rechazás más de lo que
+arreglás, pará y preguntate si entendieron mal el cambio (probablemente les diste material
+incompleto: ver 4.2) o si el que no quiere escuchar sos vos.
+
+### 4.6 — El techo
+
+**Tres vueltas que encuentran cosas.** Si a la tercera siguen apareciendo hallazgos nuevos,
+el problema no es que falte una vuelta más: el cambio es demasiado grande para revisarse de
+una.
+
+**La vuelta de confirmación no cuenta contra el techo.** El techo limita las vueltas que
+encuentran cosas nuevas, no las que verifican que los últimos arreglos no rompieron nada.
+Si contara, el techo te obligaría a publicar exactamente el estado que el 4.5 declara no
+verificado: arreglás en la vuelta 3 y publicás sin que nadie haya mirado ese arreglo. Una
+vuelta de confirmación sobre los últimos arreglos siempre se puede hacer, y con un solo
+revisor alcanza si el arreglo fue chico.
+
+Al llegar al techo, lo que se publica es lo que **pasó una vuelta limpia**. Los arreglos de
+la última vuelta que no la pasaron se confirman o se revierten — no se publican a mitad de
+camino. Y lo que queda pendiente se parte en un cambio aparte, con dos condiciones que sin
+ellas el techo es nominal: **la partición tiene que ser estrictamente más chica** que lo
+que ya cerraste, y **el registro viaja con ella**. Si no, el mismo hallazgo sin resolver
+puede saltar de cambio en cambio para siempre, con presupuesto fresco cada vez.
 
 ## Paso 5 — Cerrar
 
-- `docs/decisiones/` actualizado si el cambio movió una decisión.
+- `docs/decisiones/` actualizado si el cambio movió una decisión, **y con los desacuerdos
+  que quedaron abiertos**.
 - El README sigue diciendo la verdad. Ya pasó de documentar lo contrario de lo configurado,
   que es peor que no documentar: el siguiente "arregla" algo que estaba bien.
 - Mensaje de commit que explique **por qué**, no qué. El qué está en el diff.

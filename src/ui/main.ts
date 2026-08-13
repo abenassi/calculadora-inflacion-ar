@@ -239,6 +239,13 @@ function explicarMetodo(r: Resultado): string {
       const { mesesEstimados, tasaMensualPct, base } = r.metodo;
       const n = mesesEstimados.length;
 
+      // Se puede pedir una metodología de estimación sobre un período que ya está
+      // publicado entero: no queda nada que estimar y la frase salía con la lista de
+      // meses vacía — "El INDEC todavía no publicó ," con la coma colgando.
+      if (n === 0) {
+        return "Todos los meses del cálculo son datos oficiales ya publicados por el INDEC.";
+      }
+
       // Acá había una aclaración para el caso "elegiste no estimar ninguno y aun así
       // estás viendo filas estimadas". Ya no puede pasar: cuando el período obliga a
       // proyectar, esa opción queda deshabilitada en el selector y el desplegable pasa
@@ -307,6 +314,35 @@ function aclararParciales(r: Resultado): string {
   );
 }
 
+/**
+ * Si en la tabla hay algún dato oficial que la persona pueda señalar con el dedo.
+ *
+ * Mira **todas** las filas, incluida la de partida: con un origen ya publicado, esa fila
+ * lleva su sello del INDEC impreso, así que decir "acá no hay ningún dato oficial" la
+ * contradice a dos centímetros. Y sale de una sola función porque el pie de la tabla y la
+ * referencia del gráfico afirman lo mismo y se leen juntos: dos copias del predicado es
+ * exactamente cómo terminan diciendo cosas distintas (regla 4).
+ */
+function hayDatoOficial(r: Resultado): boolean {
+  return r.desglose.some((f) => !f.esProyeccion);
+}
+
+/** Si algo de lo que se muestra es efectivamente una estimación. */
+function hayAlgoEstimado(r: Resultado): boolean {
+  return r.desglose.some((f) => f.esProyeccion);
+}
+
+/**
+ * Si el resultado se muestra con `~`.
+ *
+ * Con `ventana_reciente` el `~` no es por estimar —son todos datos publicados— sino
+ * porque el tramo que se usó no es exactamente el pedido. Con `proyeccion` es por
+ * estimar, y entonces depende de que haya algo estimado de verdad.
+ */
+function esAproximado(r: Resultado): boolean {
+  return r.metodo.tipo === "ventana_reciente" || hayAlgoEstimado(r);
+}
+
 /** El pie de la tabla, que dice qué está mirando el lector. */
 function explicarTabla(r: Resultado): string {
   switch (r.metodo.tipo) {
@@ -329,7 +365,17 @@ function explicarTabla(r: Resultado): string {
       // en la tabla: decía 8 donde había 7 porcentajes.
       const tramos = r.desglose.slice(1);
       const proyectadas = tramos.filter((f) => f.esProyeccion).length;
-      const todos = proyectadas === tramos.length;
+      // Pedir una metodología de estimación no obliga a que haya algo estimado: si el
+      // período pedido está enteramente publicado, no hay ningún tramo proyectado y el
+      // pie decía "Los 0 porcentajes resaltados son tramos proyectados" sobre una tabla
+      // con todas las filas selladas por el INDEC.
+      if (proyectadas === 0) {
+        return (
+          "Todas las filas salen de datos oficiales publicados por el INDEC: el período " +
+          "que pediste ya está publicado entero, así que no hubo nada que estimar." +
+          aclararParciales(r)
+        );
+      }
       const de =
         base.fuente === "rem"
           ? `el REM del BCRA de ${nombrarMes(base.mesEncuesta)}`
@@ -340,9 +386,9 @@ function explicarTabla(r: Resultado): string {
       // "El resto son datos oficiales" prometía una parte oficial que muchas veces no
       // existe: cuando el destino todavía no llegó, la tabla entera está estimada y esa
       // frase mandaba a buscar un dato del INDEC que no se puede señalar en ningún lado.
-      const cierre = todos
-        ? " En esta tabla no hay ningún dato oficial: el INDEC todavía no publicó ninguno de estos meses."
-        : " El resto son datos oficiales.";
+      const cierre = hayDatoOficial(r)
+        ? " El resto son datos oficiales."
+        : " En esta tabla no hay ningún dato oficial: el INDEC todavía no publicó ninguno de estos meses.";
       return (
         `Estos son los meses que pediste. ${plural(proyectadas, "El porcentaje resaltado", `Los ${proyectadas} porcentajes resaltados`)} ` +
         `${plural(proyectadas, "es un tramo proyectado", "son tramos proyectados")}, que el INDEC ` +
@@ -354,7 +400,11 @@ function explicarTabla(r: Resultado): string {
 }
 
 function pintarResultado(r: Resultado): void {
-  const esProyeccion = r.metodo.tipo === "proyeccion";
+  // Se anuncia estimación cuando hay algo estimado, no cuando se pidió una metodología
+  // que estima. Elegir "repetir el último mes" sobre un período ya publicado entero no
+  // estima nada, y el sitio igual ponía el cartel ≈ ESTIMADO y el ~ sobre una tabla con
+  // todas las filas selladas por el INDEC.
+  const esProyeccion = hayAlgoEstimado(r);
 
   el("chip-estimado").hidden = !esProyeccion;
   // Anunciar "estimado" en la leyenda cuando no hay ninguna fila estimada hace
@@ -362,7 +412,7 @@ function pintarResultado(r: Resultado): void {
   // oficial" cuando todas las barras están rayadas manda a buscar una barra oficial
   // que no está, que es peor todavía porque hace desconfiar de lo que sí es cierto.
   el("leyenda-estimado").hidden = !esProyeccion;
-  el("leyenda-oficial").hidden = r.desglose.slice(1).every((f) => f.esProyeccion);
+  el("leyenda-oficial").hidden = !hayDatoOficial(r);
   // Con `ventana_reciente` el eje del gráfico son los meses de referencia, no los
   // del período pedido: el título lo dice para que nadie lea mal las fechas.
   el("titulo-grafico").textContent =
@@ -370,8 +420,9 @@ function pintarResultado(r: Resultado): void {
       ? "Inflación mensual de los meses de referencia"
       : "Inflación mensual";
   el("rotulo-principal").textContent = `A ${nombrarPunto(r.hasta)}`;
-  el("cifra-principal").textContent =
-    r.metodo.tipo === "directo" ? pesosRedondo(r.montoAjustado) : `~${pesosRedondo(r.montoAjustado)}`;
+  el("cifra-principal").textContent = esAproximado(r)
+    ? `~${pesosRedondo(r.montoAjustado)}`
+    : pesosRedondo(r.montoAjustado);
   el("detalle-principal").textContent = explicar(r);
 
   // Cuanto más lejos se proyecta, menos es una cuenta y más un pronóstico.
@@ -457,14 +508,14 @@ function pintarResultado(r: Resultado): void {
  * explicación que se lea sola y que traiga la fuente adentro.
  */
 function armarExplicacion(r: Resultado): string {
-  const estimado = r.metodo.tipo === "proyeccion";
+  const estimado = hayAlgoEstimado(r);
 
   // En pantalla el cartel de ESTIMADO está pegado al número grande y se ve de lejos.
   // Pegado en un mensaje eso desaparece: quedaba arrancando con el monto y con "(IPC
   // del INDEC)" al lado de un porcentaje que el INDEC no publicó, y quien lo recibe
   // lee el primer renglón y nada más. El aviso va antes del número, no después.
   const lineas: string[] =
-    r.metodo.tipo === "proyeccion"
+    estimado && r.metodo.tipo === "proyeccion"
       ? [
           `OJO: esto es una estimación, no un dato publicado. El INDEC todavía no publicó ` +
             `${frasearMeses(r.metodo.mesesEstimados, "ni")}.`,
@@ -474,7 +525,7 @@ function armarExplicacion(r: Resultado): string {
 
   lineas.push(
     `${pesos(r.monto)} de ${nombrarPunto(r.desde)} equivalen a ` +
-      `${r.metodo.tipo === "directo" ? "" : "unos "}${pesosRedondo(r.montoAjustado)} ` +
+      `${esAproximado(r) ? "unos " : ""}${pesosRedondo(r.montoAjustado)} ` +
       `en ${nombrarPunto(r.hasta)}.`,
     estimado
       ? `Inflación acumulada estimada: ${porcentaje(r.variacionPct)}.`
