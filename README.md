@@ -223,9 +223,23 @@ padrón de ARCA, precios de supermercados y más.
 
 ## Dominio
 
-`inflacion.mymcps.dev`, vía un `CNAME` a `abenassi.github.io` **sin proxy de
-Cloudflare** (nube gris): con el proxy adelante, GitHub no puede validar el dominio
-para emitir el certificado.
+`inflacion.mymcps.dev`, vía un `CNAME` a `abenassi.github.io`, **con el proxy de
+Cloudflare prendido** (nube naranja).
+
+El orden importa y es la parte que cuesta descubrir: **para EMITIR el certificado por
+primera vez hay que estar en nube gris.** GitHub valida el dominio y, con el proxy
+adelante, el nombre resuelve a IPs de Cloudflare en vez de a las suyas, así que la emisión
+falla. Una vez que `gh api repos/<owner>/<repo>/pages` dice `cert_state: approved`, se
+puede prender el proxy y el sitio sigue sirviendo — ahí se gana conteo server-side que los
+bloqueadores no evitan, WAF y el header de país.
+
+Lo que queda pendiente de ver es la **renovación** con el proxy puesto, porque usa el mismo
+mecanismo de validación que la emisión. Dos cosas medidas que acotan el riesgo: el path
+`/.well-known/acme-challenge/` **atraviesa el proxy** y llega al origen (contesta 404 de
+GitHub, no 403 de Cloudflare), y la zona está en SSL **`full`**, que *no* valida el
+certificado del origen — así que aun si venciera, el sitio seguiría sirviendo para el
+visitante. Si algún día se pasa la zona a `full (strict)`, esa red deja de existir y hay
+que volver a gris un rato para renovar.
 
 El build usa rutas relativas, así que el mismo artefacto sirve desde la raíz del
 dominio propio y desde el subpath de `github.io`. No hay que recompilar para
