@@ -89,3 +89,33 @@ coherentes.
 | 29 | El techo de 24 meses se cumplía en los campos de fecha pero no en los desplegables, que acotan por año | sí, pudo pedir diciembre 2028 con Santa Fe | arreglado por el mismo `rangoPedible()` del #20 y #21 |
 | 30 | En el server de desarrollo `/inflacion-2024/` sirve la calculadora, no la página por año | sí | **no es un hallazgo del producto**: es cómo Vite hace fallback. Anotado para que la próxima revisión no lo redescubra |
 | 31 | El texto que explicaba por qué «no estimar ninguno» está gris hablaba siempre del destino futuro | sí, lo vi yo al verificar el arreglo del #1: decía "el mes de destino todavía no llegó" sobre un pedido a junio, estando en agosto | arreglado: el motivo lo contesta el motor, en la misma evaluación que decide si la opción se ofrece |
+
+
+---
+
+## Vuelta 2
+
+### Vanina (usuaria)
+
+**Neuquén cerrado.** *"Sí, este número se lo muestro a una clienta. Le puedo decir 'en
+Neuquén todavía no salieron los últimos cinco meses, así que esto es una cuenta con el
+último dato que hay'. Lo otro, el de $1.761.628, no se lo podía mostrar a nadie."* La tabla
+arranca en su mes y las cinco filas estimadas dicen `estimado`.
+
+**El rótulo sin el paréntesis: aprobado.** *"No quedó suelto… me gusta más que antes, porque
+el paréntesis viejo me estaba empujando a elegir región si mi provincia no estaba."*
+
+Confirmó además que funcionan el sello `INDEC Noreste ✓` ("ahora sí le saco la foto a la
+tabla"), el encabezado de ida y de vuelta, "oficial Estadística Tucumán", los meses grises
+de Santa Fe en 2013, y `datos.html`.
+
+| # | Hallazgo | Verificado | Qué se hizo |
+|---|---|---|---|
+| 32 | Las opciones de región no dicen qué provincias tienen adentro: hay que elegir a ciegas y leer el párrafo de abajo para saber si te tocaba | sí | arreglado: el renglón del desplegable las lleva, "Región Noreste (Corrientes, Chaco, Formosa, Misiones)" |
+| 33 | **La descripción de las regiones decía "Lo publica el INDEC, que lo publica para la región noreste"** — publica dos veces, y la región en minúscula | sí, lo rompí yo en la vuelta 1 | arreglado: la cláusula sobraba entera |
+| 34 | **Sacar "serie empalmada" empeoró la descripción de Córdoba**: la reemplacé por dos frases que tampoco se entienden ("lo publica encadenado", "los números son tan chicos que se pierden cifras") | sí, lo rompí yo en la vuelta 1 | arreglado: "Índice provincial de Córdoba, con datos desde 1990". El porqué queda en la página de fuentes |
+| 35 | El renglón del medio del párrafo que explica por qué la opción quedó gris es palabrerío: "tramo", "referencia" y "reemplaza" no significan nada | sí | arreglado: se borró. Queda "este índice viene atrasado" + la consecuencia, que es la parte que sirvió |
+| 36 | "¿Y para qué está la región, entonces?" — al sacar el paréntesis, el grupo quedó sin justificación visible | sí, es una consecuencia directa del arreglo #12 | contestado en `datos.html` con el número: la región le acierta a tu provincia más que el nacional tres de cada ocho veces |
+| 37 | En celular el aviso de atraso arranca a 959 sobre una pantalla de 844: queda abajo del corte | sí | **rechazado**: el cartel ESTIMADO sí se ve sin scrollear (755), que es la advertencia que no se puede perder. Bajar el aviso de atraso más arriba significa subirlo por encima del número, que es de donde lo mudamos justamente porque ahí se salteaba. Ella misma dijo "lo dejaría así" |
+| 38 | El número grande en celular entra con 29 puntos de margen: "en mi iPhone de verdad, con la barra de abajo de Safari, me la juego a que lo veo cortado" | sí | **anotado, no resuelto.** Ya pasaba antes de este cambio y arreglarlo es rediseñar el alto del formulario. Va aparte, junto con el #10 |
+| 39 | El texto que se copia tiene 33 renglones con Tucumán | sí | **rechazo confirmado por ella misma**: *"es una molestia mía, no un riesgo… déjenlo para el cambio aparte, me parece bien"* |
