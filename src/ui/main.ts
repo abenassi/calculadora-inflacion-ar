@@ -898,14 +898,13 @@ function descargarCsv(): void {
   const r = ultimoResultado;
   if (!r) return;
 
+  // Tabla pura: sólo cabecera de columnas y una fila por dato, sin filas de
+  // metadata (`# ...`). Algunos programas que abren CSV no las entienden, y
+  // arruinan la primera impresión de alguien que sólo quería ver los números.
+  // La trazabilidad de cada fila (oficial vs. estimado) ya vive en `origen`;
+  // el resto del contexto —fuente, período, método— se explica en la página,
+  // no en el archivo.
   const filas: string[][] = [
-    // La cabecera declara la fuente de lo que hay abajo, así que sale de las filas y no
-    // de una constante: un CSV de 1999 decía "INDEC" con la columna origen llena de "bcra".
-    [`# Calculadora de inflacion - fuente: ${fuenteDe(r.desglose, r).corta}`],
-    [`# Periodo: ${r.desde} a ${r.hasta}`],
-    [`# Datos via Argentina Data MCP, actualizados al ${serie.actualizado.slice(0, 10)}`],
-    [`# Ultimo mes publicado: ${serie.ultimo_oficial}`],
-    [],
     ["punto", "indice_ipc", "variacion_pct", "acumulado_pct", "monto", "origen"],
     ...r.desglose.map((f) => [
       f.punto,
@@ -916,32 +915,6 @@ function descargarCsv(): void {
       f.origen,
     ]),
   ];
-
-  // El método viaja adentro del archivo. Si alguien descarga esto para mostrárselo
-  // a otra persona, los números solos no alcanzan: hay que poder decir de qué meses
-  // salieron y por qué.
-  filas.push([], ["# metodo", r.metodo.tipo]);
-  if (r.metodo.tipo === "ventana_reciente") {
-    filas.push(
-      ["# meses_del_periodo", String(r.metodo.mesesDelPeriodo)],
-      ["# meses_sin_publicar", r.metodo.mesesSinPublicar.join(" ")],
-      ["# ventana_corrida_meses", String(r.metodo.desplazamiento)],
-    );
-  } else if (r.metodo.tipo === "proyeccion") {
-    const { base } = r.metodo;
-    filas.push(
-      ["# base_proyeccion", base.fuente],
-      ["# tasa_mensual_aplicada_pct", r.metodo.tasaMensualPct?.toFixed(4) ?? "varía por mes"],
-      ["# meses_estimados", r.metodo.mesesEstimados.join(" ")],
-      base.fuente === "rem"
-        ? [
-            "# rem_encuesta",
-            `${base.mesEncuesta} · senda: ${base.mesesDeLaSenda.join(" ") || "—"} · ` +
-              `extrapolados a ${base.expectativaAnualPct}% anual: ${base.mesesExtrapolados.join(" ") || "—"}`,
-          ]
-        : ["# mes_base", base.mes],
-    );
-  }
 
   const csv = filas.map((f) => f.join(",")).join("\n");
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
