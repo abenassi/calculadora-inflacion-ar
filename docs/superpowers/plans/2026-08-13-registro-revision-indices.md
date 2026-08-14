@@ -119,3 +119,22 @@ de Santa Fe en 2013, y `datos.html`.
 | 37 | En celular el aviso de atraso arranca a 959 sobre una pantalla de 844: queda abajo del corte | sí | **rechazado**: el cartel ESTIMADO sí se ve sin scrollear (755), que es la advertencia que no se puede perder. Bajar el aviso de atraso más arriba significa subirlo por encima del número, que es de donde lo mudamos justamente porque ahí se salteaba. Ella misma dijo "lo dejaría así" |
 | 38 | El número grande en celular entra con 29 puntos de margen: "en mi iPhone de verdad, con la barra de abajo de Safari, me la juego a que lo veo cortado" | sí | **anotado, no resuelto.** Ya pasaba antes de este cambio y arreglarlo es rediseñar el alto del formulario. Va aparte, junto con el #10 |
 | 39 | El texto que se copia tiene 33 renglones con Tucumán | sí | **rechazo confirmado por ella misma**: *"es una molestia mía, no un riesgo… déjenlo para el cambio aparte, me parece bien"* |
+
+### El economista (metodología)
+
+Verificó la fórmula contra su propia derivación: es la misma, verbatim, con la sustitución
+correcta y el umbral en el lugar que no se puede separar del desplegable. Confirmó también
+que **el rótulo de las regiones sin el paréntesis alcanza** —"lo que había que sacar era la
+afirmación que los datos no bancan, y ya no está. No agregues nada"—, que esperar para bajar
+el umbral 0,01 es la decisión correcta ("tu razón es mejor que mi hallazgo: es la regla 4
+cruzando repos"), y que dejar la sigla del Chaco en IPECD corresponde hasta que cambie el
+upstream.
+
+| # | Hallazgo | Verificado | Qué se hizo |
+|---|---|---|---|
+| 40 | 🔴 **El mismo bug estaba espejado hacia atrás.** El guard se anclaba en `desde`, y deflactando —de junio 2026 a mayo 2024— `desde` es el extremo nuevo, no tiene dato publicado, y el guard se daba por vencido devolviendo cero. Contestaba −70,48% cuando lo real ronda −44%, otra vez desde la opción «(recomendado)» | sí, lo reprodujo en pantalla y yo después | arreglado: se ancla en el extremo **viejo**, que es el que arrastra los meses vaya el cálculo en la dirección que vaya. Test del caso hacia atrás agregado |
+| 41 | El cartel decía "daría un número bastante **más alto**", pero el sesgo se mide en valor absoluto: de los períodos que bloquea, 119 darían uno más **bajo**, y el caso deflactando es siempre en esa dirección | sí | arreglado: "bastante distinto de" |
+| 42 | "Neuquén es el único índice que cambia" es cierto para el caso testeado, pero sobre una grilla de períodos 12 de los 16 tienen algún período que ahora se bloquea | sí, y revisó caso por caso | **confirmado correcto, no se toca**: no encontró un solo falso positivo. Son `A` parado sobre el pico dic-2023/ene-2024 y `A` en la hiper del 89/90, o sea exactamente lo que el criterio existe para atrapar |
+| 43 | Si `U−d` cayera antes del primer mes de la serie no habría tramo de referencia y el guard devolvería 0 sin bloquear | sí, y verificó que **hoy no se puede llegar** | **rechazado por ahora**: haría falta una serie futura, corta y atrasada. Él mismo recomendó dejarlo |
+| 44 | El FAQ sigue diciendo "Desde enero de 1990" | **no se sostiene**: lo verifiqué y ya estaba arreglado en `e0c5638`, en el `<details>` y en el JSON-LD. Su revisión miró un rango de commits anterior | nada que hacer |
+| 45 | Ofrecer sólo la estimación cuando existe una respuesta con datos reales ($989.502 hasta enero 2026) | sí | **rechazado, con su acuerdo**: "no son respuestas a la misma pregunta". $989.502 es la inflación hasta enero 2026 y la pregunta era hasta junio; presentarla como la respuesta sería pasar una cota inferior por una estimación. Su punto intermedio —una oración con el dato publicado al lado— queda anotado para el cambio aparte |
