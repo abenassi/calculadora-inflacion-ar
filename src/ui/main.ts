@@ -490,7 +490,10 @@ async function cargarIndice(slug: string): Promise<SerieIndice> {
       : `${import.meta.env.BASE_URL}data/indices/${slug}.json`;
 
   const respuesta = await fetch(ruta);
-  if (!respuesta.ok) throw new Error(`No se pudo cargar el índice (HTTP ${respuesta.status})`);
+  // El mensaje es sólo la causa, sin "no se pudo cargar" adelante: el que llama sabe qué
+  // índice pidió y arma la oración con el nombre. Envolviendo un texto ya envuelto salía
+  // "No se pudo cargar ese índice (No se pudo cargar el índice (HTTP 404))".
+  if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
   const cargada = (await respuesta.json()) as SerieIndice;
   seriesCargadas.set(slug, cargada);
   return cargada;
@@ -536,50 +539,67 @@ function poblarSelectorDeIndices(): void {
  * selector existiera, que es la condición de que esto no le meta ruido a quien no lo
  * necesita.
  */
-function pintarNotaDelIndice(periodoCorrido: Punto | null = null): void {
-  const nota = el("nota-indice");
-  const partes: string[] = [];
-
-  if (periodoCorrido !== null) {
-    partes.push(
-      // "mide desde" era falso: Mendoza mide desde 1968 y publicó de corrido de 1988 a
-      // 2012; lo que arranca en 2016 es la serie que nosotros servimos, después del
-      // recorte por el hueco. Lo mismo para Córdoba y Chaco, que encadenan desde 1968.
-      `La serie de ${indiceActivo.nombre} que usamos arranca en ` +
-        `${nombrarMes(indiceActivo.primerMes)}, así que se corrió el período: pediste ` +
-        `desde ${nombrarPunto(periodoCorrido)}.`,
-    );
-  }
-
-  if (indiceActivo.slug === SLUG_NACIONAL) {
-    // Con el nacional la nota sólo aparece si hubo que correr el período. Si no, la
-    // pantalla queda igual que antes de que el selector existiera.
-    nota.textContent = partes.join(" ");
-    nota.hidden = partes.length === 0;
-    return;
-  }
-
-  partes.push(`${indiceActivo.cubre} Lo publica ${fuenteDe([], serie).publicadosPor}.`);
-
-  // Un índice provincial puede ir meses detrás del nacional —el Neuquén viene atrasado
-  // desde enero— y eso cambia de verdad sobre qué ventana se calcula. Un mes de
-  // diferencia es lo normal y no se avisa: sería un cartel permanente que nadie lee.
+function pintarNotaDelIndice(corridos: PeriodoCorrido[] = []): void {
+  // El atraso se calcula SIEMPRE, incluso para el nacional, y por eso se resuelve antes de
+  // cualquier `return`. `#aviso-atraso` vive en la tarjeta del resultado y lo enciende
+  // cualquier índice: con el early return del nacional adentro del medio, volver de
+  // Neuquén al nacional dejaba "Ojo: Neuquén publicó hasta enero 2026, 5 meses detrás del
+  // índice nacional" pegado abajo del número del INDEC, que está al día. Con el nacional
+  // el atraso da cero y el nodo se apaga solo.
   const nacional = buscarIndice(catalogo, SLUG_NACIONAL);
   const atraso = aOrdinal(nacional.ultimoOficial) - aOrdinal(indiceActivo.ultimoOficial);
-  nota.textContent = partes.join(" ");
-  nota.hidden = partes.length === 0;
-
-  // El atraso NO va acá arriba: va pegado al número, en la tarjeta del resultado. Iba
-  // atrás de la descripción, mismo gris y mismo tamaño, y en el review se salteó entero
-  // —se leyó recién cuando el número raro obligó a buscar la causa—. Un aviso que sólo
-  // encontrás cuando ya sospechás no es un aviso.
   const aviso = el("aviso-atraso");
   aviso.hidden = atraso <= MESES_DE_ATRASO_TOLERADOS;
+  // Un índice provincial puede ir meses detrás del nacional —el de Neuquén viene atrasado
+  // desde enero— y eso cambia de verdad sobre qué ventana se calcula. Un mes de diferencia
+  // es lo normal y no se avisa: sería un cartel permanente que nadie lee.
+  //
+  // El aviso NO va arriba con el resto de la nota: va pegado al número. Iba atrás de la
+  // descripción, mismo gris y mismo tamaño, y en el review se salteó entero —se leyó
+  // recién cuando el número raro obligó a buscar la causa—. Un aviso que sólo encontrás
+  // cuando ya sospechás no es un aviso.
   aviso.textContent = aviso.hidden
     ? ""
     : `Ojo: ${indiceActivo.nombre} publicó hasta ${nombrarMes(indiceActivo.ultimoOficial)}, ` +
       `${atraso} ${atraso === 1 ? "mes" : "meses"} detrás del índice nacional. El cálculo ` +
       `no puede llegar más allá de ese mes con datos publicados.`;
+
+  const partes = corridos.map(fraseDelCorrido);
+
+  // Lo que mide el índice se dice sólo cuando no es el nacional: con el de siempre la
+  // pantalla queda igual que antes de que el selector existiera, que es la condición de
+  // que esto no le meta ruido a quien no lo necesita.
+  if (indiceActivo.slug !== SLUG_NACIONAL) {
+    partes.push(`${indiceActivo.cubre} Lo publica ${fuenteDe([], serie).publicadosPor}.`);
+  }
+
+  const nota = el("nota-indice");
+  nota.textContent = partes.join(" ");
+  nota.hidden = partes.length === 0;
+}
+
+/**
+ * Por qué se corrió una punta del período, en una oración.
+ *
+ * La nota explicaba **siempre** el piso, porque cuando se escribió eso era lo único que se
+ * acotaba. Al empezar a acotar también por arriba, un `?indice=neuquen&hasta=2029-05`
+ * contestaba "la serie arranca en noviembre 2001, así que se corrió el período: pediste
+ * desde mayo 2029": las dos mitades falsas. Es el mismo error que `motivoParaEstimar`
+ * arregló en el motor —texto fijo para una condición que dejó de ser única— y se arregla
+ * igual: el que acota dice contra qué extremo se topó y la frase sale de ahí.
+ */
+function fraseDelCorrido(c: PeriodoCorrido): string {
+  const { primero, ultimo } = rangoPedible(serie);
+  const punta = c.punta === "desde" ? "desde" : "hasta";
+  return c.contra === "primero"
+    ? // "mide desde" era falso: Mendoza mide desde 1968 y publicó de corrido de 1988 a
+      // 2012; lo que arranca en 2016 es la serie que nosotros servimos, después del
+      // recorte por el hueco. Lo mismo para Córdoba y Chaco, que encadenan desde 1968.
+      `La serie de ${indiceActivo.nombre} que usamos arranca en ${nombrarMes(primero)}, ` +
+        `así que se corrió el período: pediste ${punta} ${nombrarPunto(c.pedido)}.`
+    : `${indiceActivo.nombre} publicó hasta ${nombrarMes(indiceActivo.ultimoOficial)} y el ` +
+        `cálculo no estima más allá de ${nombrarMes(ultimo)}, así que se corrió el ` +
+        `período: pediste ${punta} ${nombrarPunto(c.pedido)}.`;
 }
 
 /**
@@ -648,17 +668,25 @@ function leerPuntoLaxo(prefijo: "desde" | "hasta"): Punto {
   return `${anio}-${mes}`;
 }
 
+/** Una punta del período que no entraba en el índice elegido, y contra qué extremo se topó. */
+type PeriodoCorrido = {
+  punta: "desde" | "hasta";
+  /** El punto que se había pedido. La nota lo nombra: correrlo en silencio sería cambiarle
+   * la pregunta a la persona sin decírselo. */
+  pedido: Punto;
+  contra: "primero" | "ultimo";
+};
+
 /**
- * Devuelve el período al formulario, corriéndolo si el índice nuevo no llega tan atrás.
+ * Devuelve el período al formulario, corriendo las puntas que el índice nuevo no alcanza.
  *
- * Correrlo en silencio sería cambiarle la pregunta a la persona sin decírselo, así que
- * devuelve el mes que se perdió para que la nota lo nombre. La alternativa —dejar el
- * desplegable en un año que ya no existe— es peor: el control quedaría ofreciendo algo
- * que el motor rechaza, que es justo lo que la regla 3 prohíbe.
+ * Devuelve cuáles se corrieron —y contra qué extremo— para que la nota lo diga. La
+ * alternativa —dejar el desplegable en un año que ya no existe— es peor: el control
+ * quedaría ofreciendo algo que el motor rechaza, que es justo lo que la regla 3 prohíbe.
  */
-function escribirPeriodoAcotado(periodo: { desde: Punto; hasta: Punto }): Punto | null {
+function escribirPeriodoAcotado(periodo: { desde: Punto; hasta: Punto }): PeriodoCorrido[] {
   const { primero, ultimo } = rangoPedible(serie);
-  let corrido: Punto | null = null;
+  const corridos: PeriodoCorrido[] = [];
 
   for (const [prefijo, punto] of [
     ["desde", periodo.desde],
@@ -680,12 +708,16 @@ function escribirPeriodoAcotado(periodo: { desde: Punto; hasta: Punto }): Punto 
     if (fuera === null) {
       escribirPunto(prefijo, punto);
     } else {
-      corrido ??= punto;
+      corridos.push({
+        punta: prefijo,
+        pedido: punto,
+        contra: fuera === primero ? "primero" : "ultimo",
+      });
       escribirPunto(prefijo, usaDias() ? primerDia(fuera) : fuera);
     }
     acotarMesesDelAnio(prefijo);
   }
-  return corrido;
+  return corridos;
 }
 
 /**
@@ -772,7 +804,7 @@ function sincronizarUrl(
   history.replaceState(null, "", `?${p}`);
 }
 
-function leerUrl(): Punto | null {
+function leerUrl(): PeriodoCorrido[] {
   const p = new URLSearchParams(location.search);
 
   // Sólo desde un link explícito: nunca se recuerda entre visitas. Quien llega
@@ -957,10 +989,13 @@ async function iniciar(): Promise<void> {
       // control decía "Tucumán" arriba de una tabla entera de Mendoza, con los sellos y
       // todo, y el único rastro era un error en la consola que nadie mira.
       (e: unknown) => {
+        // El que falló se nombra: "ese índice" obligaba a adivinar cuál, y el único otro
+        // nombre de la oración es el que **sí** está en pantalla, o sea el equivocado.
+        const pedido = buscarIndice(catalogo, slug).nombre;
         el<HTMLSelectElement>("indice").value = indiceActivo.slug;
         const error = el("error");
         error.textContent =
-          `No se pudo cargar ese índice (${(e as Error).message}). Se sigue mostrando ` +
+          `No se pudo cargar ${pedido} (${(e as Error).message}). Se sigue mostrando ` +
           `${indiceActivo.nombre}.`;
         error.hidden = false;
       },

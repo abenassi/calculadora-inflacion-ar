@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { adjust, sePuedeEvitarEstimar } from "../src/engine/adjust.js";
+import { adjust, motivoParaEstimar, sePuedeEvitarEstimar } from "../src/engine/adjust.js";
 import {
   agruparParaSelector,
   buscarIndice,
@@ -180,41 +180,170 @@ describe("la atribución de un índice jurisdiccional", () => {
 });
 
 describe("la ventana corrida deja de ofrecerse cuando arrastra meses muy distintos", () => {
-  const neuquen = serieDe("neuquen");
+  /**
+   * Series sintéticas, y no la de Neuquén viva, **a propósito**.
+   *
+   * La primera versión de estos tests pedía "2024-05" → "2026-06" sobre el archivo de
+   * Neuquén y daba por sentado que iba a seguir publicado hasta enero de 2026. El día que
+   * la DPEyC de Neuquén saque febrero, el desplazamiento baja de cinco meses a cuatro, la
+   * ventana deja de tragarse enero de 2024 y el test se pone rojo **sin que nadie haya
+   * tocado el código**. Y no se pone rojo en una PR: se pone rojo en el job diario, que
+   * corre `verificar` antes de commitear, así que un dato nuevo de Neuquén dejaría de
+   * publicar el mes nuevo de los dieciséis índices, el nacional incluido.
+   *
+   * Con series armadas acá el criterio se prueba entero y el resultado no depende de qué
+   * publicó nadie. Abajo queda igual el caso real de Neuquén, pero congelado.
+   */
+  const sinteticaConAtraso = (variaciones: number[], ultimoOficial: string): SerieIndice => {
+    let indice = 100;
+    const datos = variaciones.map((v, i) => {
+      indice *= 1 + v;
+      return {
+        mes: `${2020 + Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, "0")}`,
+        indice,
+        origen: "indec",
+      };
+    });
+    return {
+      serie: "test",
+      base: "2020-01=100",
+      fuentes: [],
+      ultimo_oficial: ultimoOficial,
+      actualizado: "2024-06-01T00:00:00Z",
+      datos,
+    } as SerieIndice;
+  };
 
-  it("no ofrece «sin estimar» en el caso que la rompía", () => {
-    // Neuquén publicó hasta enero de 2026, así que un pedido a junio corre la ventana
-    // cinco meses hasta diciembre de 2023 y se traga enero de 2024 (+24,50%). Contestaba
-    // +238,77% cuando la inflación de Neuquén en el tramo que sí existe fue +90,29%, y lo
-    // hacía desde la opción marcada «(recomendado)».
-    expect(sePuedeEvitarEstimar("2024-05", "2026-06", neuquen)).toBe(false);
+  // 44 meses parejos al 2%: de 2020-01 a 2023-08. Pedir hasta 2024-01 corre la ventana
+  // cinco meses, que es exactamente el atraso de Neuquén cuando apareció el problema.
+  const parejos = Array.from({ length: 44 }, () => 0.02);
+  const suave = sinteticaConAtraso(parejos, "2023-08");
+  // La misma serie con un solo mes de +60% adentro del tramo que la ventana arrastra.
+  const conSalto = sinteticaConAtraso(
+    parejos.map((v, i) => (i === 14 ? 0.6 : v)),
+    "2023-08",
+  );
+  const HOY = "2024-06";
+
+  it("sigue ofreciendo «sin estimar» cuando la ventana corrida arrastra meses parecidos", () => {
+    // La mitad que importa para no romper lo que funcionaba: el criterio es la distorsión
+    // que arrastra la ventana, **no** cuántos meses se corre. Acá se corre cinco meses,
+    // igual que en el caso que falla, y tiene que seguir ofreciéndose.
+    expect(sePuedeEvitarEstimar("2021-06", "2024-01", suave, HOY)).toBe(true);
+    expect(motivoParaEstimar("2021-06", "2024-01", suave, HOY)).toBe(null);
+  });
+
+  it("deja de ofrecerlo cuando esos meses no se parecen en nada", () => {
+    expect(sePuedeEvitarEstimar("2021-06", "2024-01", conSalto, HOY)).toBe(false);
+    expect(motivoParaEstimar("2021-06", "2024-01", conSalto, HOY)).toBe("ventana_sesgada");
+  });
+
+  it("tampoco lo ofrece deflactando, que es el mismo caso al revés", () => {
+    // El guard se anclaba en `desde`, y yendo hacia atrás `desde` es el extremo NUEVO: no
+    // tiene dato publicado, así que el guard no podía medir y se daba por vencido. Los
+    // meses que la ventana arrastra son siempre los previos al extremo viejo, vaya el
+    // cálculo en la dirección que vaya.
+    expect(sePuedeEvitarEstimar("2024-01", "2021-06", conSalto, HOY)).toBe(false);
+    expect(sePuedeEvitarEstimar("2024-01", "2021-06", suave, HOY)).toBe(true);
   });
 
   it("y el motor hace lo mismo que dice el desplegable", () => {
     // La regla 4 en su forma más concreta: si el predicado dice que no se puede evitar
     // estimar, pedir «sin estimar» tiene que terminar estimando de verdad.
-    const r = adjust(520000, "2024-05", "2026-06", neuquen, { metodologia: "sin_proyectar" });
+    const r = adjust(1000, "2021-06", "2024-01", conSalto, {
+      metodologia: "sin_proyectar",
+      hoy: HOY,
+    });
+    expect(r.metodo.tipo).toBe("proyeccion");
+  });
+
+  it("no bloquea ningún período que el índice pueda contestar sin correr la ventana", () => {
+    // Sobre los dieciséis de verdad, pero con un pedido que **no** depende de hasta dónde
+    // publicó cada uno: de punta a punta de lo que cada archivo tiene. Ahí el
+    // desplazamiento es cero y el guard no tiene nada que decir. Un falso positivo acá
+    // sería el guard tapando cálculos que salen de datos publicados enteros.
+    const bloqueados = catalogo.indices.filter(
+      (i) => !sePuedeEvitarEstimar(i.primerMes, i.ultimoOficial, serieDe(i.slug), i.ultimoOficial),
+    );
+    expect(bloqueados.map((i) => i.slug)).toEqual([]);
+  });
+});
+
+describe("el caso real que lo destapó, con los datos de Neuquén congelados", () => {
+  /**
+   * Neuquén tal como estaba cuando apareció el problema: publicado hasta enero de 2026.
+   *
+   * Se recorta el archivo vivo en vez de leerlo entero para que el test no cambie de
+   * sentido cuando Neuquén publique febrero. Los números son los reales —el bug no fue
+   * teórico— pero la ventana sobre la que se miden queda fija.
+   */
+  const vivo = serieDe("neuquen");
+  const CONGELADO = "2026-01";
+  const neuquen: SerieIndice = {
+    ...vivo,
+    ultimo_oficial: CONGELADO,
+    datos: vivo.datos.filter((p) => p.mes <= CONGELADO),
+  };
+  const HOY = "2026-08";
+
+  it("el archivo llega al menos hasta el mes congelado", () => {
+    // Si el pipeline dejara de traer enero de 2026, el recorte de arriba se quedaría corto
+    // y los tres tests de abajo pasarían a medir otra cosa en silencio.
+    expect(neuquen.datos.at(-1)!.mes).toBe(CONGELADO);
+  });
+
+  it("no ofrece «sin estimar» en el caso que la rompía", () => {
+    // Un pedido a junio de 2026 corre la ventana cinco meses hasta diciembre de 2023 y se
+    // traga enero de 2024 (+24,50%). Contestaba +238,77% cuando la inflación de Neuquén en
+    // el tramo que sí existe fue +90,29%, y lo hacía desde la opción «(recomendado)».
+    expect(sePuedeEvitarEstimar("2024-05", "2026-06", neuquen, HOY)).toBe(false);
+  });
+
+  it("tampoco deflactando: contestaba −70,48% cuando lo real es −44%", () => {
+    expect(sePuedeEvitarEstimar("2026-06", "2024-05", neuquen, HOY)).toBe(false);
+  });
+
+  it("estimando da un número de la familia del nacional y no el triple", () => {
+    const r = adjust(520000, "2024-05", "2026-06", neuquen, {
+      metodologia: "sin_proyectar",
+      hoy: HOY,
+    });
     expect(r.metodo.tipo).toBe("proyeccion");
     expect(r.montoAjustado).toBeLessThan(1_300_000);
   });
+});
 
-  it("tampoco lo ofrece deflactando, que es el mismo caso al revés", () => {
-    // El guard se anclaba en `desde`, y yendo hacia atrás `desde` es el extremo NUEVO: no
-    // tiene dato publicado, así que el guard no podía medir y se daba por vencido. El
-    // mismo pedido invertido contestaba −70,48% cuando lo real es −44%, otra vez desde la
-    // opción «(recomendado)». Los meses que la ventana arrastra son siempre los previos al
-    // extremo viejo, vaya el cálculo en la dirección que vaya.
-    expect(sePuedeEvitarEstimar("2026-06", "2024-05", neuquen)).toBe(false);
+describe("las fechas que las preguntas frecuentes dicen a mano", () => {
+  // El FAQ de `index.html` —y su copia en el JSON-LD, y dos párrafos de `datos.html`—
+  // nombra fechas de arranque: "Chaco en 1988, Santa Fe en diciembre de 2013, las seis
+  // regiones en diciembre de 2016". Son texto estático, así que si el arranque de una
+  // serie cambia, la página sigue afirmando lo viejo y nadie se entera. Ya pasó adentro de
+  // este mismo cambio: el recorte por huecos movió a Mendoza de 1968 a 2016.
+  //
+  // Este test SÍ tiene que frenar el pipeline si se pone rojo, al revés que los de la
+  // ventana corrida. Que un índice publique un mes nuevo es lo normal y no puede bloquear
+  // nada; que **cambie dónde arranca** es raro, y mientras no se arregle el texto la
+  // página estaría afirmando algo falso.
+  const arranque = (slug: string) =>
+    catalogo.indices.find((i) => i.slug === slug)?.primerMes ?? "(no está en el catálogo)";
+
+  it("siguen siendo verdad", () => {
+    expect({
+      nacional: arranque(SLUG_NACIONAL),
+      chaco: arranque("chaco"),
+      santaFe: arranque("santa-fe"),
+      cordoba: arranque("cordoba"),
+    }).toEqual({
+      nacional: "1990-01",
+      chaco: "1988-08",
+      santaFe: "2013-12",
+      cordoba: "1990-03",
+    });
   });
 
-  it("no toca a ningún otro índice del catálogo", () => {
-    // El criterio es la distorsión que arrastra la ventana, no cuántos meses se corre. Si
-    // deshabilitara opciones en índices al día, estaría midiendo la cosa equivocada.
-    const otros = catalogo.indices.filter((i) => i.slug !== "neuquen");
-    const bloqueados = otros.filter(
-      (i) => !sePuedeEvitarEstimar("2024-05", "2026-06", serieDe(i.slug)),
-    );
-    expect(bloqueados.map((i) => i.slug)).toEqual([]);
+  it("y las seis regiones siguen arrancando todas en el mismo mes", () => {
+    const regiones = catalogo.indices.filter((i) => i.tipo === "region");
+    expect([...new Set(regiones.map((i) => i.primerMes))]).toEqual(["2016-12"]);
   });
 });
 

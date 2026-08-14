@@ -9,6 +9,7 @@
  * bajan sólo cuando se eligen.
  */
 
+import { sumarMeses } from "./mes.js";
 import type { Mes } from "./types.js";
 
 /**
@@ -128,9 +129,8 @@ export function rangoPedible(serie: { datos: { mes: Mes }[]; ultimo_oficial: Mes
   primero: Mes;
   ultimo: Mes;
 } {
-  const primero = serie.datos[0]!.mes;
-  const [y, m] = serie.ultimo_oficial.split("-").map(Number);
-  const ordinal = y! * 12 + (m! - 1) + HORIZONTE_MESES;
-  const ultimo = `${Math.floor(ordinal / 12)}-${String((ordinal % 12) + 1).padStart(2, "0")}`;
-  return { primero, ultimo };
+  return {
+    primero: serie.datos[0]!.mes,
+    ultimo: sumarMeses(serie.ultimo_oficial, HORIZONTE_MESES),
+  };
 }
