@@ -432,7 +432,7 @@ const MOTIVOS: Record<NonNullable<ReturnType<typeof motivoParaEstimar>>, string>
   // confiar más y no menos: se sacó la opción para no pasarte un número inflado.
   ventana_sesgada:
     "«No estimar ninguno» no está disponible para este período: este índice viene atrasado, " +
-    "y esa opción daría un número bastante más alto que la inflación real del período. " +
+    "y esa opción daría un número bastante distinto de la inflación real del período. " +
     "Preferimos estimar y decirlo.",
 };
 

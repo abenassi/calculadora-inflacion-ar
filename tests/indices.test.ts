@@ -198,6 +198,15 @@ describe("la ventana corrida deja de ofrecerse cuando arrastra meses muy distint
     expect(r.montoAjustado).toBeLessThan(1_300_000);
   });
 
+  it("tampoco lo ofrece deflactando, que es el mismo caso al revés", () => {
+    // El guard se anclaba en `desde`, y yendo hacia atrás `desde` es el extremo NUEVO: no
+    // tiene dato publicado, así que el guard no podía medir y se daba por vencido. El
+    // mismo pedido invertido contestaba −70,48% cuando lo real es −44%, otra vez desde la
+    // opción «(recomendado)». Los meses que la ventana arrastra son siempre los previos al
+    // extremo viejo, vaya el cálculo en la dirección que vaya.
+    expect(sePuedeEvitarEstimar("2026-06", "2024-05", neuquen)).toBe(false);
+  });
+
   it("no toca a ningún otro índice del catálogo", () => {
     // El criterio es la distorsión que arrastra la ventana, no cuántos meses se corre. Si
     // deshabilitara opciones en índices al día, estaría midiendo la cosa equivocada.

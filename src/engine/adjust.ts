@@ -204,6 +204,11 @@ function extremoNuevo(desde: Punto, hasta: Punto): Punto {
   return compararMeses(mesDe(hasta), mesDe(desde)) >= 0 ? hasta : desde;
 }
 
+/** El extremo más viejo. Es el que arrastra los meses cuando se corre la ventana. */
+function extremoViejo(desde: Punto, hasta: Punto): Punto {
+  return compararMeses(mesDe(hasta), mesDe(desde)) >= 0 ? desde : hasta;
+}
+
 /**
  * Los puntos que componen el desglose.
  *
@@ -326,14 +331,21 @@ export function adjust(
  * corre la ventana cinco meses hasta diciembre de 2023 y se traga enero de 2024 (+24,5%).
  * Contestaba +238,77% cuando la inflación de Neuquén en el tramo que sí existe fue
  * +90,29%, y lo hacía desde la opción marcada «(recomendado)».
+ *
+ * **Se ancla en el extremo VIEJO del período, no en `desde`.** Los meses que la ventana
+ * arrastra son siempre los previos al extremo viejo, vaya el cálculo hacia adelante o
+ * hacia atrás. Anclarlo en `desde` dejaba pasar el mismo caso deflactando —pedir de junio
+ * de 2026 a mayo de 2024 con Neuquén— porque ahí `desde` es el extremo nuevo, no tiene
+ * dato publicado, y el guard se daba por vencido en vez de medir: contestaba −70,48% en
+ * lugar de −44%, y otra vez desde la opción «(recomendado)».
  */
-function sesgoDeLaVentana(idx: Indice, desde: Punto, desplazamiento: number): number {
+function sesgoDeLaVentana(idx: Indice, viejo: Punto, desplazamiento: number): number {
   if (desplazamiento === 0) return 0;
 
   // Se mide sobre MESES y no sobre el punto crudo: el sesgo es qué meses arrastra la
   // ventana, y el día dentro del mes no cambia cuáles son. Además `valorEn` de una fecha
   // necesita el índice del mes anterior para prorratear, y ese mes puede no existir.
-  const mesDesde = mesDe(desde);
+  const mesDesde = mesDe(viejo);
   const mesArrastrado = sumarMeses(mesDesde, -desplazamiento);
   const mesReferencia = sumarMeses(idx.ultimoOficial, -desplazamiento);
   const extremos = [mesDesde, mesArrastrado, idx.ultimoOficial, mesReferencia];
@@ -386,7 +398,9 @@ function evaluarPeriodo(desde: Punto, hasta: Punto, idx: Indice, hoy?: Mes) {
   // deje de ser una referencia. Es un criterio del motor y no de la interfaz a propósito:
   // el desplegable lee esta misma respuesta, así que los dos no se pueden separar.
   const sesgoTolerable =
-    !cabeLaVentana || sesgoDeLaVentana(idx, desde, desplazamiento) <= SESGO_MAXIMO_DE_LA_VENTANA;
+    !cabeLaVentana ||
+    sesgoDeLaVentana(idx, extremoViejo(desde, hasta), desplazamiento) <=
+      SESGO_MAXIMO_DE_LA_VENTANA;
 
   return {
     desplazamiento,
