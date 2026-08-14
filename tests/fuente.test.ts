@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { adjust, sumaDeVariaciones } from "../src/engine/adjust.js";
+import { sumarMeses } from "../src/engine/mes.js";
 import { fuenteDe } from "../src/ui/etiquetas.js";
 import { comoSeMuestra, porcentaje, seVenDistintos } from "../src/ui/format.js";
 import type { Punto, SerieIndice } from "../src/engine/types.js";
@@ -49,8 +50,15 @@ describe("la fuente que se nombra es la de las filas que se muestran", () => {
   });
 
   it("con todas las filas estimadas declara que no hay nada publicado", () => {
-    // Un período enteramente futuro: no hay dato de nadie todavía.
-    const r = adjust(1000, "2026-12", "2027-05", serie, { metodologia: "repite_ultimo" });
+    // Un período enteramente futuro: no hay dato de nadie todavía. Arrancado seis meses
+    // después de `ultimo_oficial` y no en un literal — "2026-12" daba por sentado que el
+    // INDEC no iba a llegar ahí, y es la misma bomba que ya explotó dos veces en otros
+    // archivos de este cambio: el día que el INDEC publique diciembre, la primera fila
+    // deja de ser proyección y este test se pone rojo solo, en el paso del job diario que
+    // corre antes de commitear.
+    const desde = sumarMeses(serie.ultimo_oficial, 6);
+    const hasta = sumarMeses(serie.ultimo_oficial, 11);
+    const r = adjust(1000, desde, hasta, serie, { metodologia: "repite_ultimo", hoy: hasta });
     expect(r.desglose.every((f) => f.origen === "proyeccion")).toBe(true);
     const f = fuenteDe(r.desglose, r);
     expect(f.presentes).toHaveLength(0);

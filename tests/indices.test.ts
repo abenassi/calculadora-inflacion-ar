@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { adjust, motivoParaEstimar, sePuedeEvitarEstimar } from "../src/engine/adjust.js";
+import { sumarMeses } from "../src/engine/mes.js";
 import {
   agruparParaSelector,
   buscarIndice,
@@ -170,8 +171,14 @@ describe("la atribución de un índice jurisdiccional", () => {
   });
 
   it("no sella las filas estimadas", () => {
-    const conEstimacion = adjust(1000, "2026-01", "2026-09", serie, {
+    // `hasta` sale de `serie.ultimo_oficial` y no de un mes fijo: "2026-09" daba por
+    // sentado que Córdoba no iba a publicar más allá de agosto. Córdoba ya está en julio
+    // al escribir esto — con el literal, dos meses más de publicación y este test deja de
+    // tener ninguna fila estimada que revisar, en silencio, en el job diario.
+    const hasta = sumarMeses(serie.ultimo_oficial, 2);
+    const conEstimacion = adjust(1000, serie.ultimo_oficial, hasta, serie, {
       metodologia: "repite_ultimo",
+      hoy: hasta,
     });
     const estimadas = conEstimacion.desglose.filter((f) => f.esProyeccion);
     expect(estimadas.length).toBeGreaterThan(0);
@@ -238,6 +245,23 @@ describe("la ventana corrida deja de ofrecerse cuando arrastra meses muy distint
     expect(motivoParaEstimar("2021-06", "2024-01", conSalto, HOY)).toBe("ventana_sesgada");
   });
 
+  it("el umbral cae justo entre estos dos, y no en cualquier lado de 0,02 a 0,57", () => {
+    // `suave` (sesgo ≈ 0) y `conSalto` (sesgo ≈ 0,57) prueban que el criterio distingue
+    // "nada" de "muchísimo", pero no dónde está el corte: mutando el umbral, las 273
+    // pruebas de entonces pasaban con cualquier valor entre 0,02 y 0,57 — seis veces más
+    // laxo de lo que el commit decía. Estos dos saltos —hallados por bisección sobre el
+    // mismo caso, en el mismo mes— caen a un lado y otro de la frontera real, que hoy está
+    // en 0,122: uno pasa, el otro no, y a ninguno de los dos le sobra margen.
+    expect(motivoParaEstimar("2021-06", "2024-01", sinteticaConAtraso(
+      parejos.map((v, i) => (i === 14 ? 0.115 : v)),
+      "2023-08",
+    ), HOY)).toBe(null);
+    expect(motivoParaEstimar("2021-06", "2024-01", sinteticaConAtraso(
+      parejos.map((v, i) => (i === 14 ? 0.13 : v)),
+      "2023-08",
+    ), HOY)).toBe("ventana_sesgada");
+  });
+
   it("tampoco lo ofrece deflactando, que es el mismo caso al revés", () => {
     // El guard se anclaba en `desde`, y yendo hacia atrás `desde` es el extremo NUEVO: no
     // tiene dato publicado, así que el guard no podía medir y se daba por vencido. Los
@@ -257,14 +281,32 @@ describe("la ventana corrida deja de ofrecerse cuando arrastra meses muy distint
     expect(r.metodo.tipo).toBe("proyeccion");
   });
 
-  it("no bloquea ningún período que el índice pueda contestar sin correr la ventana", () => {
-    // Sobre los dieciséis de verdad, pero con un pedido que **no** depende de hasta dónde
-    // publicó cada uno: de punta a punta de lo que cada archivo tiene. Ahí el
-    // desplazamiento es cero y el guard no tiene nada que decir. Un falso positivo acá
-    // sería el guard tapando cálculos que salen de datos publicados enteros.
-    const bloqueados = catalogo.indices.filter(
-      (i) => !sePuedeEvitarEstimar(i.primerMes, i.ultimoOficial, serieDe(i.slug), i.ultimoOficial),
-    );
+  it("no bloquea de más un desplazamiento chico, en ninguno de los dieciséis", () => {
+    // De punta a punta de cada archivo el desplazamiento YA da cero — `evaluarPeriodo`
+    // corta ahí antes de llegar a `sesgoDeLaVentana` — así que ese pedido no ejercita el
+    // guard para nada: pasa con cualquier umbral, cualquier serie y cualquier cambio a la
+    // fórmula. Acá se pide con un desplazamiento real de 3 meses, anclado al
+    // `ultimoOficial` de cada índice y no a una fecha fija, así que no depende de qué
+    // publicó nadie hoy. Tres meses corridos sobre un tramo largo es el caso normal —el de
+    // Neuquén y Río Negro entre ellos, sin ir a un caso patológico— y un falso positivo acá
+    // sería el guard tapando cálculos que no deberían estar tapados.
+    // El desplazamiento tiene que ser CHICO y no cualquiera: a 3 meses de cualquier
+    // `ultimoOficial` reciente, medio catálogo bloquea de verdad —2023/2024 tuvo el salto
+    // real más grande de las series, y arrastrarlo no es un falso positivo, es el caso que
+    // el guard existe para atrapar—. Probado y descartado: con `desde` en `primerMes` el
+    // mes que se arrastra cae antes del arranque de la serie y el guard no llega a medir
+    // nada; con `desde` dos años después de `primerMes`, Chaco y Tucumán caen sobre la
+    // hiperinflación de 1989/90, otro bloqueo legítimo. Dos meses de desplazamiento —el
+    // borde de `MESES_DE_ATRASO_TOLERADOS`, el atraso que la interfaz todavía no avisa— es
+    // el que separa "atraso normal, no bloquea" (acá) de "atraso real, si bloquea" (el
+    // caso de Neuquén, de sobra, en el describe de abajo).
+    const bloqueados = catalogo.indices
+      .filter((i) => i.slug !== "neuquen")
+      .filter((i) => {
+        const desde = sumarMeses(i.ultimoOficial, -24);
+        const hasta = sumarMeses(i.ultimoOficial, 2);
+        return !sePuedeEvitarEstimar(desde, hasta, serieDe(i.slug), hasta);
+      });
     expect(bloqueados.map((i) => i.slug)).toEqual([]);
   });
 });
@@ -326,18 +368,25 @@ describe("las fechas que las preguntas frecuentes dicen a mano", () => {
   // página estaría afirmando algo falso.
   const arranque = (slug: string) =>
     catalogo.indices.find((i) => i.slug === slug)?.primerMes ?? "(no está en el catálogo)";
+  const anioDe = (slug: string) => arranque(slug).slice(0, 4);
 
   it("siguen siendo verdad", () => {
+    // El nacional y Santa Fe llevan mes en la página ("desde enero de 1990", "Santa Fe en
+    // diciembre de 2013") y se comparan al mes. Chaco y Córdoba sólo llevan el año ("Chaco
+    // en 1988", "Córdoba arranca en 1990" en `datos.html`) y se comparan sólo al año: si se
+    // compararan al mes, bajar el umbral de cifras significativas —el cambio que ya quedó
+    // anotado como pendiente— podría mover el arranque de Chaco unos meses adentro de 1988
+    // sin volver falso ningún texto, y este test frenaría el pipeline igual.
     expect({
       nacional: arranque(SLUG_NACIONAL),
-      chaco: arranque("chaco"),
       santaFe: arranque("santa-fe"),
-      cordoba: arranque("cordoba"),
     }).toEqual({
       nacional: "1990-01",
-      chaco: "1988-08",
       santaFe: "2013-12",
-      cordoba: "1990-03",
+    });
+    expect({ chaco: anioDe("chaco"), cordoba: anioDe("cordoba") }).toEqual({
+      chaco: "1988",
+      cordoba: "1990",
     });
   });
 

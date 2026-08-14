@@ -82,8 +82,8 @@ cambia. Se notó de casualidad, porque cinco series dieron 365 justo.
 atrás a través de los cambios de moneda cae por debajo de una millonésima y queda guardado
 como cero: Chaco tenía 256 puntos en cero, Tucumán 167, Mendoza 148. Un cero ahí no es un
 dato impreciso, es una división por cero en el único cálculo que hace este sitio. El
-pipeline descarta el arranque no representable con umbral `0.01` —que garantiza cuatro
-cifras significativas, no sólo "que no sea cero"— y **recorta en vez de reescalar**:
+pipeline descarta el arranque no representable con umbral `0.01` —que garantiza cinco
+cifras significativas como mínimo, no sólo "que no sea cero"— y **recorta en vez de reescalar**:
 reescalar preservaría los cocientes pero nuestros números dejarían de coincidir con la
 tabla que publica el organismo, que es justo lo que alguien cruza cuando quiere verificar.
 Es un problema del lado del MCP —82 series, 1.888 puntos, la peor es el IPC histórico del
@@ -114,6 +114,22 @@ sirve para lo único que hace este sitio, que es traer un monto hasta hoy.
 - **Neuquén viene cinco meses detrás del nacional**, y eso cambia sobre qué ventana se
   calcula. Se avisa a partir de dos meses de atraso: uno es lo normal —los organismos
   publican en fechas distintas— y avisarlo sería un cartel permanente que nadie lee.
+- **La ventana corrida deja de ofrecerse cuando arrastra meses muy distintos.** Con un
+  índice atrasado, "sin estimar" (la opción "(recomendado)") corre la ventana hacia atrás
+  tantos meses como haga falta y usa el tramo equivalente más reciente. Eso está bien
+  cuando el tramo que se pierde y el que lo reemplaza se parecen; con Neuquén cinco meses
+  atrás, un pedido de mayo 2024 a junio 2026 se corría hasta diciembre de 2023 y se tragaba
+  enero de 2024 —el mes de la devaluación, +24,5%—, contestando +238,77% cuando la
+  inflación real del período fue +90,29%, desde la opción marcada como recomendada. El
+  criterio que lo bloquea (`sesgoDeLaVentana` en `src/engine/adjust.ts`) compara la
+  inflación de los meses que la ventana arrastra contra la de los meses equivalentes más
+  recientes, ancladas las dos en el extremo **viejo** del período —no en `desde` a secas:
+  deflactando, `desde` es el extremo nuevo sin dato publicado, y anclar ahí dejaba el guard
+  ciego en esa dirección, con el mismo caso contestando −70,48% en vez de −44%—. Se
+  bloquea por encima del 10% de diferencia, calibrado barriendo el índice nacional desde
+  2004: con un mes de corrimiento se toca el 3,2% de los períodos, con dos —el caso más
+  común entre los que van sistemáticamente detrás— el 10,4%, y siempre corresponde: son
+  meses parados sobre un salto real.
 - Sumar una jurisdicción es agregar una entrada a `scripts/indices-declarados.ts`. Nada
   más.
 

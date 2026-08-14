@@ -43,10 +43,12 @@ import {
   fuenteDe,
   fuenteDeLaSerie,
   organismoDeFila,
+  quienPublicaAhora,
   rotularFila,
   selloDeFila,
 } from "./etiquetas.js";
 import {
+  capitalizar,
   esAproximado,
   explicar,
   explicarCompuesto,
@@ -341,8 +343,14 @@ function armarExplicacion(r: Resultado): string {
   const lineas: string[] =
     estimado && r.metodo.tipo === "proyeccion"
       ? [
-          `OJO: esto es una estimación, no un dato publicado. Todavía no publicó ` +
-            `${frasearMeses(r.metodo.mesesEstimados, "ni")} ${fuenteDe(r.desglose, r).publicadosPor}.`,
+          // El sujeto va primero, como en `explicaciones.ts`: "El IPEC, el instituto de
+          // estadística de Santa Fe todavía no publicó ni julio ni agosto de 2026." Al
+          // sacar el "El INDEC" fijo el sujeto se corrió al final de la lista de meses y
+          // quedó "Todavía no publicó los 24 meses que van de julio 2026 a junio 2028 el
+          // IPEC…" — la única línea de este mensaje que se lee sin buscar el sujeto.
+          `OJO: esto es una estimación, no un dato publicado. ` +
+            `${capitalizar(quienPublicaAhora(r))} todavía no publicó ` +
+            `${frasearMeses(r.metodo.mesesEstimados, "ni")}.`,
           "",
         ]
       : [];
@@ -564,7 +572,7 @@ function pintarNotaDelIndice(corridos: PeriodoCorrido[] = []): void {
       `${atraso} ${atraso === 1 ? "mes" : "meses"} detrás del índice nacional. El cálculo ` +
       `no puede llegar más allá de ese mes con datos publicados.`;
 
-  const partes = corridos.map(fraseDelCorrido);
+  const partes = fraseDeLosCorridos(corridos);
 
   // Lo que mide el índice se dice sólo cuando no es el nacional: con el de siempre la
   // pantalla queda igual que antes de que el selector existiera, que es la condición de
@@ -576,6 +584,33 @@ function pintarNotaDelIndice(corridos: PeriodoCorrido[] = []): void {
   const nota = el("nota-indice");
   nota.textContent = partes.join(" ");
   nota.hidden = partes.length === 0;
+}
+
+/**
+ * Las oraciones de la nota que explican por qué se corrió el período, ya armadas.
+ *
+ * Cuando se corren las DOS puntas —desde antes del arranque, hasta más allá del
+ * horizonte— dos oraciones de `fraseDelCorrido` seguidas quedan larguísimas y repiten "así
+ * que se corrió el período" dos veces. En el celular esa nota sola empuja el cartel
+ * ESTIMADO y el número fuera de la pantalla: Vanina la leyó, dijo "la segunda vez ya no la
+ * leí, salteé hasta el número", y con las dos puntas corridas el número quedaba tapado del
+ * todo. Ese caso puntual —desde antes del arranque, hasta después del horizonte— se dice
+ * en una sola oración con las dos fechas adentro. Cualquier otra combinación de corridos
+ * (rara: las dos puntas del mismo lado) sigue frase por frase.
+ */
+function fraseDeLosCorridos(corridos: PeriodoCorrido[]): string[] {
+  const desde = corridos.find((c) => c.punta === "desde" && c.contra === "primero");
+  const hasta = corridos.find((c) => c.punta === "hasta" && c.contra === "ultimo");
+  if (corridos.length === 2 && desde && hasta) {
+    const { primero, ultimo } = rangoPedible(serie);
+    return [
+      `${indiceActivo.nombre} tiene datos de ${nombrarMes(primero)} a ` +
+        `${nombrarMes(indiceActivo.ultimoOficial)} y el cálculo no estima más allá de ` +
+        `${nombrarMes(ultimo)}, así que se corrió el período: pediste de ` +
+        `${nombrarPunto(desde.pedido)} a ${nombrarPunto(hasta.pedido)}.`,
+    ];
+  }
+  return corridos.map(fraseDelCorrido);
 }
 
 /**
@@ -966,6 +1001,14 @@ async function iniciar(): Promise<void> {
     // rechaza — y para que elegir el año de arranque no deje seleccionado un mes muerto.
     if (objetivo.id === "desde-anio") acotarMesesDelAnio("desde");
     if (objetivo.id === "hasta-anio") acotarMesesDelAnio("hasta");
+    // La nota de "se corrió el período" describe la corrección que hizo `cambiarIndice`
+    // sobre el período que HABÍA antes. Si la persona toca el formulario a mano después,
+    // esa frase queda hablando de un pedido que ya no existe: con Santa Fe, tras corregir
+    // "pediste desde enero 1995" y mover el año a mano a 2020, la nota seguía diciendo
+    // "pediste desde enero 1995" sobre un período que nunca se corrió. Cualquier campo de
+    // fecha la vuelve a poner en blanco; `cambiarIndice` es la única que tiene algo que
+    // contar ahí.
+    if (/^(desde|hasta)-(anio|mes|dia)$/.test(objetivo.id)) pintarNotaDelIndice([]);
     calcular();
   });
   el("formulario").addEventListener("submit", (ev) => ev.preventDefault());

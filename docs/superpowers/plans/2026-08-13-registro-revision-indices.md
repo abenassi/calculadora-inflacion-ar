@@ -157,3 +157,65 @@ economista, ya arreglados en `a75f17c` — su revisión miró el commit anterior
 | 50 | `rangoPedible` rehacía la aritmética de meses en vez de usar `mes.ts` | sí | arreglado: `sumarMeses` |
 | 51 | Tres fechas escritas a mano en el FAQ nuevo (Chaco 1988, Santa Fe diciembre 2013, las regiones diciembre 2016) que quedan falsas si cambia el arranque de una serie | sí, y ya pasó adentro de este cambio con Mendoza | arreglado con un test. **Ese sí tiene que frenar el pipeline**: que un índice publique un mes nuevo es normal, que cambie dónde arranca es raro y mientras el texto no se corrija la página afirma algo falso |
 | 52 | `tests/_zz_v2.test.ts` quedó sin trackear y corriendo adentro de `npm run verificar` | sí | borrado, junto con `probe.ts` y `probe2.ts` |
+
+---
+
+## Vuelta 3
+
+Los tres revisores otra vez en paralelo, sin verse. Verdicto de los tres: **no publicar
+todavía** — cada uno encontró algo real y distinto.
+
+### Vanina (usuaria)
+
+Confirmó que los cuatro arreglos de la vuelta 2 funcionan y no rompieron nada: el aviso de
+atraso se apaga solo al volver al nacional, la nota del acotado dice la causa real en los
+tres casos (piso, techo, los dos), el error de carga nombra bien al que falló. Encontró una
+regresión que bloqueaba publicar y una de usabilidad.
+
+| # | Hallazgo | Verificado | Qué se hizo |
+|---|---|---|---|
+| 53 | 🔴 **El primer renglón del texto que se copia —el que se manda a una clienta— tenía el sujeto invertido, hasta en el nacional.** Al sacar el "El INDEC" fijo de `armarExplicacion`, quedó "Todavía no publicó los 24 meses que van de julio 2026 a junio 2028 el IPEC, el instituto de estadística de Santa Fe" — el sujeto tirado al final de una lista de meses. Antes de este cambio decía "El INDEC todavía no publicó…", con el sujeto primero | sí, y confirmó que afectaba también al nacional: "Todavía no publicó los 5 meses que van de julio 2026 a noviembre 2026 el INDEC" | arreglado: el sujeto vuelve primero, usando `quienPublicaAhora` capitalizado. Verificado interceptando `clipboard.writeText` en browser, con Santa Fe y con el nacional |
+| 54 | La nota con las dos puntas corridas empuja el cartel ESTIMADO y el número fuera de la pantalla en celular (390×844): con `desde` y `hasta` corridos, el cartel arrancaba en 884px, más abajo que el corte de pantalla | sí, medido en 390×844 con las dos puntas corridas | mejorado: las dos oraciones de `fraseDelCorrido` se combinan en una sola cuando se corren las dos puntas ("Santa Fe tiene datos de… y el cálculo no estima más allá de…, así que se corrió el período: pediste de… a…"). El cartel pasa de 884px a 841px, la cifra de ~910px a 866px. Sigue quedando justo en el borde del pliegue, no completamente arriba: una solución completa implicaría mover la nota de lugar, que ya se decidió no hacer en la vuelta 2 para el aviso de atraso |
+| 55 | Con Neuquén y el techo corrido, dos frases seguidas empiezan igual ("el cálculo no estima más allá de…" / "El cálculo no puede llegar más allá de…") con meses distintos (2028 y "ese mes" = enero 2026), una arriba y otra abajo del número | sí | **anotado, no resuelto en esta vuelta**: es una arista real pero no bloqueaba publicar por sí sola, y las dos frases tocan código de sesiones distintas (la nota del acotado y `#aviso-atraso`). Queda para el cambio aparte junto con el rediseño del alto del formulario (#38) |
+
+### El economista (metodología)
+
+Verificó que `extremoViejo` sigue en pie (47.574 pares, 0 asimetrías) y que el catálogo
+sintético prueba de verdad "cero" contra "mucho" pero no dónde está el corte del 10%.
+Encontró un bug metodológico **anterior a este cambio**, multiplicado por dieciséis: un
+período enteramente publicado, con el destino cayendo el día 1 de un mes, entraba por la
+ventana corrida en vez de calcular directo — porque `desplazamientoNecesario` medía sobre
+`mesDe(punto)` en vez de sobre `mesTopeNecesario(punto)`, que el propio archivo ya usaba en
+otro lado para la misma pregunta.
+
+| # | Hallazgo | Verificado | Qué se hizo |
+|---|---|---|---|
+| 56 | 🔴 **Un período ya publicado entero se contestaba con los meses equivocados, en la opción "(recomendado)", en los 16 índices.** `1-jul-2025 → 1-jul-2026` (el ajuste anual de alquiler, la consulta más común) contestaba +33,20% ($692.622) usando mayo 2025 a mayo 2026, cuando lo publicado da +33,55% ($694.448) con junio a junio, y afirmaba que "el INDEC todavía no publicó julio de 2026" sin que julio hiciera falta. Es anterior a este cambio (`c98e7c1`) pero el selector de índices lo multiplicó por 16: peor caso, Río Negro, $10.567 de diferencia sobre $520.000 a un año | sí, reproducido con datos reales antes y después del arreglo | arreglado: `desplazamientoNecesario` mide sobre `mesTopeNecesario`, y `valorEn` deja de pedir el índice del propio mes en un día 1 —matemáticamente no le hace falta, `fraccionDeMes` da 0—. Verificado: $692.621,91 → $694.448,20, exacto al cálculo directo a mano. Rompió dos tests que documentaban el síntoma como si fuera correcto; se reescribieron como casos `directo` |
+| 57 | 🔴 **Consecuencia directa del #56, y esta sí introducida por este cambio: el guard nuevo deshabilitaba "no estimar ninguno" sobre períodos 100% publicados**, con la tarjeta contradiciéndose a dos renglones de distancia ("Todos los meses son datos oficiales" arriba, "este índice viene atrasado" abajo). 131 combinaciones (índice, fecha), 13 en el nacional | sí, con CABA en pantalla | arreglado por el mismo cambio del #56. Verificado en browser: "no estimar ninguno (recomendado)" vuelve a estar habilitada para CABA en el caso que fallaba |
+| 58 | 🟠 El umbral de 0,1 no estaba ejercido por ningún test: cualquier valor entre 0,05 y 0,55 pasaba las 273 pruebas (mutación exhaustiva, 0,0001 a 0,6) | sí | arreglado: dos series sintéticas más, con el salto calibrado por bisección justo a los dos lados de la frontera real (0,115 pasa, 0,13 bloquea, frontera en 0,122). Verificado con la misma mutación: ahora cualquier valor entre 0,05 y 0,55 rompe al menos un test |
+| 59 | 🟡 El comentario que justificaba el umbral decía "1,4% de las veces" para un mes de corrimiento; recalculado da 3,14–3,17% (dos cálculos independientes coinciden), y no mencionaba que la mayoría de los índices opera con dos meses de corrimiento, no uno, donde el 10% se toca 10,3–10,4% de las veces | sí, recalculado con la serie nacional completa desde 2004 | arreglado: el comentario cita los números recalculados para uno y dos meses de corrimiento, y linkea a este documento |
+| 60 | 🟡 El criterio metodológico más grande de este cambio —cuándo se apaga "(recomendado)"— no estaba en `docs/decisiones/` | sí | arreglado: agregado a las consecuencias de la 0010 |
+| 61 | ⚪ El guard deja pasar hasta 10% de distorsión bajo "(recomendado)" sin decir cuánto (`1990-04 → 2026-07` nacional: 9,3% de brecha entre estimar y no estimar, servida sin number) | sí | **fuera de alcance**: el guard ya calcula ese número; mostrarlo es una mejora de texto, no un defecto, y queda para el cambio aparte |
+
+### El revisor de código
+
+Partió de que el árbol de trabajo estaba sucio con la corrección del hallazgo #53 en curso
+—lo señaló sin tocarlo, y confirmó su veredicto contra `45e3f10` limpio—. Encontró que la
+familia de bug del #46 no se había erradicado, sólo movido: otras dos bombas de tiempo
+exactamente iguales en otros archivos de test, una a días de explotar.
+
+| # | Hallazgo | Verificado | Qué se hizo |
+|---|---|---|---|
+| 62 | 🔴 **`tests/adjust.test.ts` tenía el mismo bug del #46, sin congelar: `serie` es `ipc.json` vivo** (nacional, `ultimo_oficial` 2026-06) y un test fijaba `hasta="2026-08"` esperando `mesesSinPublicar: ["2026-07","2026-08"]`. Y es inminente: CABA, Córdoba y Río Negro **ya están en julio**, el nacional a días de seguirlos | sí, agregando julio a un snapshot de prueba y corriendo el test, que se rompió | arreglado: la serie se recorta a junio 2026 con el mismo patrón que Neuquén (copia congelada + test centinela que el recorte no se quede corto) |
+| 63 | 🔴 Segunda bomba en `tests/indices.test.ts`: "no sella las filas estimadas" pedía Córdoba de enero a septiembre 2026 dando por sentado que no iba a publicar agosto ni septiembre. Simulado con +2 meses de publicación, ya se rompía | sí | arreglado: `hasta` sale de `sumarMeses(serie.ultimo_oficial, 2)`, con `hoy` igual, no de un literal |
+| 64 | 🟠 Tercera bomba en `tests/fuente.test.ts`, más lejos (~enero 2027) y anterior a este cambio, pero misma familia: un período fijo "2026-12 → 2027-05" asumía que el nacional no iba a publicar diciembre | sí | arreglado: `desde`/`hasta` salen de `sumarMeses(serie.ultimo_oficial, …)` |
+| 65 | 🟡 El barrido "no toca a ningún otro índice del catálogo" de la vuelta 2 (hallazgo #46) quedó **vacío sin que nadie se diera cuenta**: pedir de punta a punta de cada archivo da desplazamiento cero, y `evaluarPeriodo` corta ahí antes de llegar a `sesgoDeLaVentana`. Con el umbral en `-1` (bloquear todo) o en `1000` (no bloquear nada) el test no se movía en ningún caso | sí, con la misma mutación que ya se usaba para el umbral | arreglado, y no trivialmente: el primer reemplazo (`primerMes`+24 meses) caía sobre la hiperinflación de 1989/90 para Chaco y Tucumán, un bloqueo legítimo y no un falso positivo; el segundo (2 años antes de `ultimoOficial`, desplazamiento 3) tocaba la devaluación real de 2023/24 en 9 de 16 índices, también legítimo. El que quedó: desplazamiento de 2 meses —el borde de `MESES_DE_ATRASO_TOLERADOS`— sobre los dos años antes de `ultimoOficial` de cada índice, salvo Neuquén (que a esa distancia también bloquea de verdad, y ya lo prueba el describe de abajo) |
+| 66 | 🟡 `datos.html` y la decisión 0010 seguían diciendo "cuatro cifras significativas" cuando el propio comentario de `fetch-snapshot.ts` decía "cinco" desde la vuelta 1, y el ejemplo de la misma oración (Córdoba en 0,016615) tiene cinco cifras, no cuatro | sí | arreglado en los dos lugares |
+| 67 | 🟡 El test de las fechas del FAQ (#51) comparaba a Chaco y Córdoba **al mes**, cuando la página sólo afirma el año para esos dos. Bajar el umbral de cifras significativas —ya anotado como pendiente— podría mover el arranque de Chaco unos meses sin volver falso ningún texto, y el test frenaría el pipeline igual | sí | arreglado: Chaco y Córdoba se comparan sólo al año; el nacional y Santa Fe, que sí llevan mes en la página, siguen comparándose al mes |
+| 68 | El browser de `mcp__playwright__*` está compartido entre sesiones paralelas, no aislado por sesión | sí, lo detectó comparando `location.href` | **no es un hallazgo del producto**: anotado para que la próxima vuelta con revisores en paralelo lo sepa de antemano |
+
+**276 tests, `tsc --noEmit` y build limpios.** Los hallazgos #53, #56 y #57 eran bloqueantes
+por separado; los tres están arreglados y verificados en browser con datos reales. Queda
+pendiente, explícitamente fuera de esta vuelta: #54 (el pliegue en celular, mejorado pero no
+resuelto del todo), #55 (las dos frases parecidas de Neuquén) y #61 (mostrar la brecha del
+9,3% en vez de sólo advertirla).

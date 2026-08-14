@@ -178,7 +178,6 @@ describe("proyección — el destino es un mes futuro", () => {
       ["día · adelante · mixto", "2020-03-10", "2020-05-20"],
       ["día · atrás · mixto", "2020-05-20", "2020-03-10"],
       ["día · adelante · arranque parcial estimado", "2020-05-15", "2020-07-20"],
-      ["día · destino el 1° del mes siguiente al último publicado", "2020-02-01", "2020-05-01"],
     ];
 
     for (const [nombre, desde, hasta] of casos) {
@@ -194,16 +193,21 @@ describe("proyección — el destino es un mes futuro", () => {
   });
 
   /**
-   * Pedir una metodología de estimación no obliga a que haya algo que estimar. Cuando no
-   * lo hay, la lista tiene que venir vacía y no puede haber ningún tramo marcado como
-   * proyección: si no, la interfaz anuncia una estimación sobre una tabla enteramente
-   * sellada por el INDEC.
+   * Pedir una metodología de estimación no obliga a que haya algo que estimar, ni siquiera
+   * a que el motor pase por la rama que sabe estimar. Un destino que cae el 1° del mes
+   * siguiente al último publicado no necesita ese mes —el índice del día 1 es el cierre
+   * del anterior, ver `mesTopeNecesario`— así que el período está publicado entero y el
+   * cálculo tiene que ser `directo`, sin pasar por `proyeccion` con una lista vacía.
+   *
+   * Antes de `desplazamientoNecesario` sobre `mesTopeNecesario` esto SÍ entraba por
+   * `proyeccion`: la metodología pedía "repite_ultimo" y el motor, engañado por el mismo
+   * desplazamiento espurio de un día 1, ofrecía a estimar un mes que ya estaba publicado.
+   * El síntoma no era sólo de tipo: en la rama `sin_proyectar` (la opción "(recomendado)"
+   * del sitio) el mismo desplazamiento hacía correr la ventana en vez de calcular
+   * directo, y daba un número distinto del exacto — ver los tests de `sin_proyectar` más
+   * abajo con los mismos puntos.
    */
-  it("no inventa meses estimados cuando el período ya está publicado entero", () => {
-    // El disparador es un destino que cae el 1° del mes siguiente al último publicado:
-    // el desplazamiento que elige la metodología se mide sobre el mes del destino, pero
-    // la inflación de ese mes no hace falta —el índice del día 1 es el del mes anterior—,
-    // así que se entra por `proyeccion` sin tener nada que proyectar.
+  it("no estima cuando el período ya está publicado entero, aunque el destino caiga el 1°", () => {
     for (const [desde, hasta] of [
       ["2020-02-01", "2020-05-01"],
       ["2020-05-01", "2020-02-01"],
@@ -212,10 +216,32 @@ describe("proyección — el destino es un mes futuro", () => {
         hoy: "2020-05",
         metodologia: "repite_ultimo",
       });
-      if (r.metodo.tipo !== "proyeccion") throw new Error("tipo inesperado");
-      expect(r.metodo.mesesEstimados, `${desde}→${hasta}`).toEqual([]);
+      expect(r.metodo.tipo, `${desde}→${hasta}`).toBe("directo");
       expect(r.desglose.some((f) => f.esProyeccion), `${desde}→${hasta}`).toBe(false);
     }
+  });
+
+  /**
+   * La misma pareja de puntos, pero por la rama "(recomendado)" del sitio. Es la que
+   * importa en plata: antes de este arreglo, un pedido de aniversario de contrato —"del 1
+   * de tal mes al 1 del mismo mes del año que viene"— con el destino un mes más allá de lo
+   * publicado no daba `directo` con datos oficiales, daba `ventana_reciente` con un mes
+   * corrido de menos, y el número no era el que decía ser.
+   */
+  it("con «sin_proyectar» un destino el 1° del mes siguiente al último publicado calcula directo", () => {
+    const directo = adjust(1000, "2020-02-01", "2020-05-01", sintetica, {
+      metodologia: "sin_proyectar",
+    });
+    expect(directo.metodo.tipo).toBe("directo");
+    // 2020-02-01 vale el cierre de enero (100); 2020-05-01 vale el cierre de abril
+    // (133,1). Ninguno de los dos necesita el índice de su propio mes.
+    expect(directo.montoAjustado).toBeCloseTo(1331, 6);
+
+    const atras = adjust(1331, "2020-05-01", "2020-02-01", sintetica, {
+      metodologia: "sin_proyectar",
+    });
+    expect(atras.metodo.tipo).toBe("directo");
+    expect(atras.montoAjustado).toBeCloseTo(1000, 6);
   });
 
   it("repite el último valor, no el promedio de varios", () => {
@@ -564,9 +590,26 @@ describe("contra la serie real", () => {
    * Mayo→agosto son 3 meses. Julio y agosto no salieron, así que la ventana se
    * corre 2 meses y se usa abril→junio: la inflación de los últimos 3 meses
    * publicados. Ningún número inventado.
+   *
+   * El nacional recortado a junio 2026, no `serie` entera: `serie` es `ipc.json` **vivo**,
+   * y el día que el INDEC publique julio este test se pone rojo solo, en el paso del job
+   * diario que corre antes de commitear — la misma bomba que el #46 desactivó en
+   * `indices.test.ts`, en el archivo de al lado. El guard de abajo avisa si el recorte se
+   * queda corto.
    */
+  const ULTIMO_CONGELADO = "2026-06";
+  const serieCongelada: SerieIndice = {
+    ...serie,
+    ultimo_oficial: ULTIMO_CONGELADO,
+    datos: serie.datos.filter((p) => p.mes <= ULTIMO_CONGELADO),
+  };
+
+  it("el nacional llega al menos hasta el mes congelado", () => {
+    expect(serieCongelada.datos.at(-1)!.mes).toBe(ULTIMO_CONGELADO);
+  });
+
   it("resuelve el caso testigo con los últimos 3 meses publicados", () => {
-    const r = adjust(520000, "2026-05", "2026-08", serie, { hoy });
+    const r = adjust(520000, "2026-05", "2026-08", serieCongelada, { hoy });
 
     expect(r.metodo.tipo).toBe("ventana_reciente");
     if (r.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");

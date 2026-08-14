@@ -149,6 +149,12 @@ function armarIndice(serie: SerieIndice): Indice {
             `y la serie arranca en ${nombrarMes(primerMes)}.`,
         );
       }
+      // El día 1 es, por construcción, el mismo punto que el cierre del mes anterior
+      // (ver `interpolarEnMes`): `fraccionDeMes` da 0 y la fórmula devuelve `inicio` sin
+      // usar `fin`. Pedir igual `indiceDeMes(mes)` era una `RangoError` innecesaria un mes
+      // entero antes de que hiciera falta — la raíz del bug que `mesTopeNecesario` ya
+      // documentaba abajo pero que esta función no consultaba.
+      if (diaDe(punto) === 1) return indiceDeMes(anterior);
       return interpolarEnMes(indiceDeMes(anterior), indiceDeMes(mes), punto);
     },
   };
@@ -160,11 +166,18 @@ function armarIndice(serie: SerieIndice): Indice {
  * Cuántos meses hay que retroceder un punto para que su índice sea calculable con
  * datos publicados.
  *
- * Días y meses tienen el mismo requisito —que el mes del punto esté publicado—
- * porque prorratear un día usa su propio mes y el anterior, nunca el siguiente.
+ * Sobre `mesTopeNecesario` y no sobre `mesDe`: un día 1 no necesita su propio mes (ver
+ * ahí el porqué). Medirlo sobre `mesDe` hacía que **cualquier fecha del día 1** un mes
+ * más allá de lo publicado —el caso de libro es el aniversario de un contrato: "1 de
+ * julio de este año al 1 de julio del que viene"— entrara por `ventana_reciente` en vez
+ * de `directo`, con la ventana arrastrando un mes que la respuesta exacta no necesitaba.
+ * `calcularProyectando` ya usaba el tope correcto; esta función, que decide si hace falta
+ * estimar, usaba el otro. Las dos versiones del mismo criterio conviviendo es como una
+ * mentira de texto sobrevive: la que se ve en pantalla decía "el índice viene atrasado"
+ * sobre un período publicado entero.
  */
 function desplazamientoNecesario(punto: Punto, ultimoOficial: Mes): number {
-  return Math.max(0, diffMeses(ultimoOficial, mesDe(punto)));
+  return Math.max(0, diffMeses(ultimoOficial, mesTopeNecesario(punto)));
 }
 
 function correr(punto: Punto, meses: number): Punto {
@@ -366,13 +379,20 @@ function sesgoDeLaVentana(idx: Indice, viejo: Punto, desplazamiento: number): nu
 /**
  * Cuánta distorsión se tolera antes de dejar de ofrecer la ventana corrida.
  *
- * Diez por ciento, elegido sobre los 16.200 períodos posibles del índice nacional desde
- * 2004: con ese número el camino normal —un mes de corrimiento— se toca el 1,4% de las
- * veces, y cuando se toca corresponde. Con 5% se tocaría el 15% de los casos con dos meses
- * de corrimiento, que es ruido; con 20% pasarían distorsiones de un quinto del monto.
+ * Diez por ciento, elegido barriendo todos los pares (desde, hasta) del índice nacional
+ * desde 2004: con un mes de corrimiento —el caso más común, el de "todavía no salió el mes
+ * pasado"— el 10% se toca en el 3,2% de los períodos, y cuando se toca corresponde: son los
+ * meses parados sobre un salto real, devaluación o ajuste de tarifas. Con dos meses de
+ * corrimiento —el caso de los índices que van sistemáticamente un mes atrás del
+ * nacional— ya se toca el 10,4% de las veces, y con cinco (Neuquén hoy) el 37%. La revisión
+ * de la vuelta 3 recalculó estos números de forma independiente y dio los mismos, con la
+ * salvedad de que el primer borrador de este comentario decía 1,4% en vez de 3,2% para un
+ * mes, y no mencionaba que la mayoría de los índices opera con dos meses y no con uno.
  *
  * Y tiene sentido fuera de la estadística: por encima del 10% el número deja de servir
- * para lo que la gente lo usa, que es discutir un alquiler o un presupuesto.
+ * para lo que la gente lo usa, que es discutir un alquiler o un presupuesto. El criterio
+ * completo —qué mide `sesgoDeLaVentana`, por qué se ancla en el extremo viejo, y esta
+ * calibración— está en `docs/decisiones/0010-indices-provinciales-y-regiones.md`.
  */
 const SESGO_MAXIMO_DE_LA_VENTANA = 0.1;
 

@@ -18,7 +18,7 @@ import type { Mes, Resultado } from "../engine/types.js";
 import { fuenteDe, quienPublicaAhora } from "./etiquetas.js";
 
 /** Para arrancar una oración con el organismo, que viene con el artículo en minúscula. */
-const capitalizar = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+export const capitalizar = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 import { comoSeMuestra, pesos, porcentaje } from "./format.js";
 
 /** A partir de cuántos meses proyectados dejamos de tratarlo como una cuenta razonable. */
