@@ -85,6 +85,15 @@ let ultimoResultado: Resultado | null = null;
  */
 const seriesCargadas = new Map<string, SerieIndice>();
 
+/**
+ * La frase del subtítulo tal como viene en el HTML.
+ *
+ * Se guarda para poder **volver** a ella: pintarla sólo cuando el índice no es el nacional
+ * dejaba la bajada de Córdoba puesta al volver al nacional, que es la mitad que se olvida
+ * de todo texto que se pisa.
+ */
+let bajadaOriginal = "";
+
 /** Largo del período que se muestra al entrar, en meses. */
 const MESES_DEL_DEFAULT = 3;
 
@@ -584,8 +593,15 @@ function pintarTextosDeLaFuente(): void {
     `Meses que ${fuente.publicadosPor} todavía no publicó:`;
   // La bajada del encabezado también: quien eligió Tucumán no puede seguir leyendo arriba
   // de todo que el sitio calcula "según el IPC del INDEC".
+  //
+  // Con el nacional NO se toca. La frase del HTML dice "según el IPC del INDEC", que es
+  // corta y verdadera; reemplazarla por la etiqueta larga metía el empalme con el BCRA en
+  // el subtítulo del h1 sin que nadie lo hubiera pedido. El criterio de todo este cambio
+  // es que con el índice de siempre la pantalla quede igual que antes.
   el("bajada-fuente").textContent =
-    `Cuánto vale un monto de otra fecha, según ${fuenteDeLaSerie(serie).larga}.`;
+    indiceActivo.slug === SLUG_NACIONAL
+      ? bajadaOriginal
+      : `Cuánto vale un monto de otra fecha, según ${fuenteDeLaSerie(serie).larga}.`;
   // La nota legal habla del índice y no del período que está en pantalla, así que para el
   // nacional tiene que seguir nombrando al BCRA aunque el cálculo elegido sea de 2024.
   el("nota-legal").textContent =
@@ -883,6 +899,7 @@ async function iniciar(): Promise<void> {
   indiceActivo = buscarIndice(catalogo, new URLSearchParams(location.search).get("indice"));
   serie = await cargarIndice(indiceActivo.slug);
 
+  bajadaOriginal = el("bajada-fuente").textContent ?? "";
   poblarSelectorDeIndices();
   el<HTMLSelectElement>("indice").value = indiceActivo.slug;
   poblarSelects();
