@@ -884,12 +884,21 @@ button:focus-visible {
  * leyó recién cuando el número raro obligó a buscar la causa. Va en su propio renglón y
  * con el color de advertencia, que es el mismo que usa el chip de estimado.
  */
-.nota-indice__atraso {
-  display: block;
-  margin: 0.55rem auto 0;
-  padding: 0.4rem 0.7rem;
+/*
+ * El aviso de que el índice viene atrasado.
+ *
+ * Vive **adentro de la tarjeta del resultado**, al lado del número, y no arriba con la
+ * descripción del índice. En el review se salteó entero cuando estaba arriba: se leyó
+ * recién cuando el número raro obligó a buscar la causa. Acá abajo cae en el mismo lugar
+ * donde ya se leen el chip de estimado y el aviso de proyección larga, que es donde el ojo
+ * ya está mirando. De paso deja de empujar el número fuera de la pantalla en un celular.
+ */
+.aviso-atraso {
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.75rem;
   border-radius: var(--radio);
   background: var(--wash-estimado);
   color: var(--text-primary);
+  font-size: 0.9rem;
   font-weight: 600;
 }

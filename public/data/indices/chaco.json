@@ -7,7 +7,7 @@
       "serie": "indec:464.1_IPC_CHACO_NG_0_0_22_93",
       "organismo": "Instituto Provincial de Estadísticas y Ciencia de Datos del Chaco",
       "organismoCorto": "IPECD",
-      "url": "https://estadistica.chaco.gob.ar/",
+      "url": "https://dipiet.chaco.gob.ar/",
       "rango": "1988-08/2026-06",
       "etiqueta": {
         "corta": "IPC de Chaco",
@@ -17,7 +17,7 @@
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:26:43.739Z",
+  "actualizado": "2026-08-14T00:07:39.274Z",
   "datos": [
     {
       "mes": "1988-08",

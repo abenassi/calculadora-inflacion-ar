@@ -1,10 +1,10 @@
 /**
  * Baja las series de Argentina Data MCP y escribe el snapshot que consume el sitio.
  *
- * Corre en GitHub Actions una vez por día. Seis llamadas de quota.
+ * Corre en GitHub Actions una vez por día. Veintiuna llamadas de quota: cuatro del índice
+ * nacional y el REM, dos auxiliares, y una por cada índice jurisdiccional.
  *
- * Invariante que este script protege: **un snapshot nunca puede encoger ni perder
- * meses**. Si el MCP responde raro, o el INDEC revisa la serie hacia atrás, o una
+ * Invariante que este script protege: **ni un snapshot ni el catálogo pueden encoger**. Si el MCP responde raro, o el INDEC revisa la serie hacia atrás, o una
  * fuente se cae, preferimos fallar ruidosamente y seguir sirviendo el último
  * snapshot bueno antes que publicar datos peores que los que ya teníamos.
  */
@@ -55,12 +55,16 @@ async function escribirSiMejora(archivo: string, contenido: unknown, minimoDatos
 
   const previo = await readFile(ruta, "utf8").catch(() => null);
   if (previo !== null) {
-    const anterior = JSON.parse(previo) as { datos?: unknown[] };
-    const cantidadAnterior = anterior.datos?.length ?? 0;
-    const cantidadNueva = (contenido as { datos?: unknown[] }).datos?.length ?? 0;
+    // El catálogo no tiene `datos` sino `indices`, y sin contarlo la guarda quedaba en
+    // `0 < 0`: el archivo nuevo era justo el que la invariante no cubría. Un catálogo al
+    // que se le caen cinco provincias las borra del desplegable sin que nada falle.
+    const cuantos = (x: { datos?: unknown[]; indices?: unknown[] }) =>
+      x.datos?.length ?? x.indices?.length ?? 0;
+    const cantidadAnterior = cuantos(JSON.parse(previo) as object);
+    const cantidadNueva = cuantos(contenido as object);
     if (cantidadNueva < cantidadAnterior) {
       throw new Error(
-        `${archivo}: el snapshot nuevo tiene ${cantidadNueva} puntos y el vigente ${cantidadAnterior}. ` +
+        `${archivo}: el snapshot nuevo tiene ${cantidadNueva} entradas y el vigente ${cantidadAnterior}. ` +
           `Un snapshot no puede encoger — abortando sin escribir.`,
       );
     }
@@ -242,7 +246,16 @@ async function construirIpc(): Promise<SerieIndice> {
  *
  * Un cero no es un dato impreciso: es una división por cero en el único cálculo que hace
  * este sitio. El umbral está en 1e-2 y no en 1e-6 porque el límite no es "que no sea cero"
- * sino "que queden cifras significativas": con 1e-2 el peor caso conserva cuatro.
+ * sino "que queden cifras significativas": como la cuantización de la columna es 1e-6, con
+ * un umbral de 1e-2 el peor caso conserva **cinco** cifras y el error relativo máximo es
+ * 0,005%.
+ *
+ * Con 1e-3 quedarían cuatro cifras (0,05% de error) y se recuperarían veinte meses de
+ * Chaco y diecinueve de Tucumán, que son los únicos dos índices donde cambiaría algo. Es
+ * una mejora real y chica, pero el mismo umbral vive también en los colectores del MCP
+ * (`src/collectors/lib/ipc-jurisdiccional.ts`), que son los que recortan Córdoba y Río
+ * Negro: bajarlo de un solo lado dejaría dos criterios distintos para lo mismo. Se cambia
+ * en los dos repos o en ninguno.
  *
  * Es un problema del lado del MCP —82 series de nivel de índice, 1.888 puntos, la peor es
  * el IPC histórico del propio INDEC— y hay que arreglarlo allá. Mientras tanto el sitio no
@@ -416,6 +429,7 @@ async function construirCatalogo(nacional: SerieIndice): Promise<void> {
       nombre: "Nacional (INDEC)",
       tipo: "nacional",
       cubre: "El IPC Nivel General Nacional del INDEC.",
+      organismos: nacional.fuentes.map((f) => f.organismoCorto),
       primerMes: nacional.datos[0]!.mes,
       ultimoOficial: nacional.ultimo_oficial,
     },
@@ -432,6 +446,7 @@ async function construirCatalogo(nacional: SerieIndice): Promise<void> {
         nombre: decl.nombre,
         tipo: decl.tipo,
         cubre: decl.cubre,
+        organismos: [decl.organismoCorto],
         primerMes: serie.datos[0]!.mes,
         ultimoOficial: serie.ultimo_oficial,
       });

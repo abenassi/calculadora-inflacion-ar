@@ -7,12 +7,7 @@
  */
 
 import { nombrarMes } from "../engine/mes.js";
-import {
-  agruparParaSelector,
-  SLUG_NACIONAL,
-  type CatalogoIndices,
-  type EntradaCatalogo,
-} from "../engine/indices.js";
+import { agruparParaSelector, type CatalogoIndices } from "../engine/indices.js";
 import { fechaLarga } from "./format.js";
 
 type Meta = {
@@ -55,28 +50,21 @@ async function pintarTablaDeIndices(): Promise<void> {
   const r = await fetch(`${import.meta.env.BASE_URL}data/indices.json`);
   if (!r.ok) throw new Error(String(r.status));
   const catalogo = (await r.json()) as CatalogoIndices;
+  // Los organismos salen del catálogo y no de los dieciséis archivos. Leerlos de cada
+  // archivo obligaba a bajar 400 KB para una columna, y una sola respuesta con error se
+  // llevaba puesta la tabla entera en vez de una fila.
   const { nacional, provincias, regiones } = agruparParaSelector(catalogo);
 
-  const serieDe = async (i: EntradaCatalogo) => {
-    const ruta =
-      i.slug === SLUG_NACIONAL
-        ? `${import.meta.env.BASE_URL}data/ipc.json`
-        : `${import.meta.env.BASE_URL}data/indices/${i.slug}.json`;
-    const res = await fetch(ruta);
-    return (await res.json()) as { fuentes: { organismoCorto: string }[] };
-  };
-
   const orden = [nacional, ...provincias, ...regiones];
-  const organismos = await Promise.all(orden.map(serieDe));
 
   // Construido con nodos y no con innerHTML: los nombres y las coberturas vienen del
   // snapshot, y así no hay forma de que un cambio de forma inyecte markup en la página.
   cuerpo.replaceChildren(
-    ...orden.map((i, n) => {
+    ...orden.map((i) => {
       const tr = document.createElement("tr");
       for (const texto of [
         i.nombre,
-        organismos[n]!.fuentes.map((f) => f.organismoCorto).join(" · "),
+        i.organismos.join(" · "),
         nombrarMes(i.primerMes),
         nombrarMes(i.ultimoOficial),
         i.cubre,

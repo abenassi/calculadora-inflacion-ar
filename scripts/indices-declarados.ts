@@ -102,7 +102,11 @@ export const INDICES: IndiceDeclarado[] = [
     origen: "ipecd-chaco",
     organismo: "Instituto Provincial de Estadísticas y Ciencia de Datos del Chaco",
     organismoCorto: "IPECD",
-    url: "https://estadistica.chaco.gob.ar/",
+    // El dominio viejo (estadistica.chaco.gob.ar) y el del IPECD dejaron de resolver;
+    // el que está vivo es éste. La sigla del sello queda en IPECD hasta confirmar el
+    // renombramiento: el propio MCP sigue devolviendo ese nombre, y cambiar el rótulo de
+    // autoridad de una fila por una inferencia de DNS sería peor que dejarlo viejo.
+    url: "https://dipiet.chaco.gob.ar/",
     etiqueta: {
       corta: "IPC de Chaco",
       larga: "el IPC de la Provincia del Chaco",

@@ -13,7 +13,7 @@ import {
   adjust,
   mesActual,
   RangoError,
-  sePuedeEvitarEstimar,
+  motivoParaEstimar,
   sumaDeVariaciones,
 } from "../engine/adjust.js";
 import * as analytics from "./analytics.js";
@@ -33,6 +33,7 @@ import {
   agruparParaSelector,
   buscarIndice,
   MESES_DE_ATRASO_TOLERADOS,
+  rangoPedible,
   SLUG_NACIONAL,
   type CatalogoIndices,
   type EntradaCatalogo,
@@ -84,9 +85,6 @@ let ultimoResultado: Resultado | null = null;
  */
 const seriesCargadas = new Map<string, SerieIndice>();
 
-/** Hasta cuántos meses más allá del último dato oficial se puede pedir. */
-const HORIZONTE_MESES = 24;
-
 /** Largo del período que se muestra al entrar, en meses. */
 const MESES_DEL_DEFAULT = 3;
 
@@ -108,24 +106,26 @@ function leerMetodologia(): Metodologia {
 }
 
 function poblarSelects(): void {
-  const primero = serie.datos[0]!.mes;
-  // Repetir la última variación mensual más allá de dos años es ruido con forma
-  // de número, así que ese es el techo.
-  const ultimo = deOrdinal(aOrdinal(serie.ultimo_oficial) + HORIZONTE_MESES);
+  const { primero, ultimo } = rangoPedible(serie);
+
+  const opcion = (valor: string, texto: string) => {
+    const o = document.createElement("option");
+    o.value = valor;
+    o.textContent = texto;
+    return o;
+  };
 
   for (const id of ["desde-mes", "hasta-mes"]) {
-    el<HTMLSelectElement>(id).innerHTML = NOMBRES_MES.map(
-      (n, i) => `<option value="${String(i + 1).padStart(2, "0")}">${n}</option>`,
-    ).join("");
+    el<HTMLSelectElement>(id).replaceChildren(
+      ...NOMBRES_MES.map((n, i) => opcion(String(i + 1).padStart(2, "0"), n)),
+    );
   }
 
   const anioMin = Number(primero.slice(0, 4));
   const anioMax = Number(ultimo.slice(0, 4));
   const anios = Array.from({ length: anioMax - anioMin + 1 }, (_, i) => anioMin + i);
   for (const id of ["desde-anio", "hasta-anio"]) {
-    el<HTMLSelectElement>(id).innerHTML = anios
-      .map((a) => `<option value="${a}">${a}</option>`)
-      .join("");
+    el<HTMLSelectElement>(id).replaceChildren(...anios.map((a) => opcion(String(a), String(a))));
   }
 
   // Los input[type=date] se acotan al mismo rango, para que el calendario del
@@ -137,6 +137,33 @@ function poblarSelects(): void {
     input.min = primerDia(deOrdinal(aOrdinal(primero) + 1));
     input.max = `${ultimo}-28`;
   }
+}
+
+/**
+ * Apaga los meses que el año elegido no puede ofrecer.
+ *
+ * Sólo el índice nacional arranca un 1° de enero; los otros quince arrancan en marzo, en
+ * agosto, en diciembre. Con Santa Fe elegida —mide desde diciembre de 2013— el desplegable
+ * ofrecía enero de 2013 y el motor contestaba "No hay datos anteriores a diciembre 2013",
+ * escondiendo el resultado. Es la regla 3 en el control que más se usa: no se ofrece lo que
+ * no se puede cumplir.
+ *
+ * Corre después de cada cambio de año y después de cada cambio de índice, y si el mes que
+ * estaba elegido queda apagado, se corre al más cercano que sí se puede.
+ */
+function acotarMesesDelAnio(prefijo: "desde" | "hasta"): void {
+  const { primero, ultimo } = rangoPedible(serie);
+  const anio = el<HTMLSelectElement>(`${prefijo}-anio`).value;
+  const selectMes = el<HTMLSelectElement>(`${prefijo}-mes`);
+
+  const minimo = anio === primero.slice(0, 4) ? primero.slice(5, 7) : "01";
+  const maximo = anio === ultimo.slice(0, 4) ? ultimo.slice(5, 7) : "12";
+
+  for (const opcion of selectMes.options) {
+    opcion.disabled = opcion.value < minimo || opcion.value > maximo;
+  }
+  if (selectMes.value < minimo) selectMes.value = minimo;
+  if (selectMes.value > maximo) selectMes.value = maximo;
 }
 
 function leerPunto(prefijo: "desde" | "hasta"): Punto {
@@ -372,6 +399,31 @@ function anotarCalculo(r: Resultado): void {
 let metodologiaCambiadaPorNosotros = false;
 
 /**
+ * Por qué «no estimar ninguno» quedó gris, en las palabras de cada caso.
+ *
+ * Antes había un solo texto fijo en el HTML que hablaba del destino futuro. Cuando el guard
+ * de la ventana sesgada empezó a deshabilitar la opción, ese texto pasó a explicar una
+ * razón que no era: decía "el mes de destino todavía no llegó" sobre un pedido a junio,
+ * estando en agosto. El motivo lo contesta el motor, en la misma evaluación que decide si
+ * la opción se puede ofrecer.
+ */
+const MOTIVOS: Record<NonNullable<ReturnType<typeof motivoParaEstimar>>, string> = {
+  futuro:
+    "«No estimar ninguno» no está disponible para este período: el mes de destino todavía " +
+    "no llegó, así que no existe ningún tramo ya publicado que sirva de referencia. " +
+    "Cualquier respuesta va a ser una estimación.",
+  ventana_no_cabe:
+    "«No estimar ninguno» no está disponible para este período: para tomar como referencia " +
+    "un tramo publicado del mismo largo habría que ir más atrás de donde arranca esta " +
+    "serie. Cualquier respuesta va a ser una estimación.",
+  ventana_sesgada:
+    "«No estimar ninguno» no está disponible para este período: este índice viene atrasado, " +
+    "y el tramo publicado que habría que usar como referencia arrastra meses muy distintos " +
+    "de los que reemplaza. Daría un número bastante más alto que la inflación real del " +
+    "período, así que preferimos estimar y decirlo.",
+};
+
+/**
  * Deshabilita "no estimar ninguno" cuando el período no admite esa respuesta.
  *
  * Pasa siempre que el destino es un mes posterior al actual: no existe ningún tramo ya
@@ -384,7 +436,8 @@ function sincronizarOpcionesDeMetodologia(desde: Punto, hasta: Punto): void {
   const opcion = select.querySelector<HTMLOptionElement>('option[value="sin_proyectar"]');
   if (!opcion) return;
 
-  const sePuede = sePuedeEvitarEstimar(desde, hasta, serie);
+  const motivo = motivoParaEstimar(desde, hasta, serie);
+  const sePuede = motivo === null;
   opcion.disabled = !sePuede;
   // Dejarle el "(recomendado)" a la opción gris es recomendar justo la única que no se
   // puede elegir. La etiqueta tiene que decir por qué está gris, que es lo que la
@@ -393,6 +446,7 @@ function sincronizarOpcionesDeMetodologia(desde: Punto, hasta: Punto): void {
     ? "no estimar ninguno (recomendado)"
     : "no estimar ninguno (no disponible para este período)";
   el("nota-metodologia").hidden = sePuede;
+  if (motivo !== null) el("nota-metodologia").textContent = MOTIVOS[motivo];
 
   if (!sePuede && select.value === "sin_proyectar") {
     select.value = "repite_ultimo";
@@ -431,19 +485,35 @@ async function cargarIndice(slug: string): Promise<SerieIndice> {
 
 function poblarSelectorDeIndices(): void {
   const { nacional, provincias, regiones } = agruparParaSelector(catalogo);
-  const opcion = (i: EntradaCatalogo) =>
-    `<option value="${i.slug}">${i.nombre}</option>`;
-  const grupo = (etiqueta: string, items: EntradaCatalogo[]) =>
-    items.length === 0 ? "" : `<optgroup label="${etiqueta}">${items.map(opcion).join("")}</optgroup>`;
 
-  // Los dos grupos van rotulados por lo que son. "Provincias que miden su propia
-  // inflación" contra "Regiones del INDEC" es la diferencia que alguien tiene que poder
-  // ver ANTES de elegir: si las quince estuvieran mezcladas en una lista sola, elegir
-  // "Noreste" buscando Formosa parecería haber encontrado el índice de Formosa.
-  el<HTMLSelectElement>("indice").innerHTML =
-    opcion(nacional) +
-    grupo("Provincias que miden su propia inflación", provincias) +
-    grupo("Regiones del INDEC (para las provincias que no miden)", regiones);
+  // Con nodos y no con innerHTML: los nombres vienen del snapshot, y aunque hoy los
+  // controle el repo, es la regla 9 y el resto del proyecto la cumple. Tener dos formas de
+  // pintar el mismo dato en el mismo cambio es cómo se pierde la regla.
+  const opcion = (i: EntradaCatalogo) => {
+    const o = document.createElement("option");
+    o.value = i.slug;
+    o.textContent = i.nombre;
+    return o;
+  };
+  const grupo = (etiqueta: string, items: EntradaCatalogo[]) => {
+    const g = document.createElement("optgroup");
+    g.label = etiqueta;
+    g.append(...items.map(opcion));
+    return g;
+  };
+
+  // Los dos grupos van rotulados por lo que son, y **nada más que por lo que son**. El
+  // rótulo decía "Regiones del INDEC (para las provincias que no miden)", que es una
+  // recomendación implícita, y el economista la midió: entre las ocho provincias que sí
+  // miden y están dentro de una región, la región le acierta más que el nacional apenas
+  // 3 de 8 veces. Río Negro dio +72,10% contra +98,72% de su propia Región Patagónica:
+  // 26,6 puntos, $138.429 sobre $520.000. La región no sabe más de tu provincia que el
+  // nacional, así que el sitio no puede sugerir que sí.
+  el<HTMLSelectElement>("indice").replaceChildren(
+    opcion(nacional),
+    grupo("Provincias que miden su propia inflación", provincias),
+    grupo("Regiones del INDEC", regiones),
+  );
 }
 
 /**
@@ -459,8 +529,12 @@ function pintarNotaDelIndice(periodoCorrido: Punto | null = null): void {
 
   if (periodoCorrido !== null) {
     partes.push(
-      `${indiceActivo.nombre} mide desde ${nombrarMes(indiceActivo.primerMes)}, así que se ` +
-        `corrió el período: pediste desde ${nombrarPunto(periodoCorrido)}.`,
+      // "mide desde" era falso: Mendoza mide desde 1968 y publicó de corrido de 1988 a
+      // 2012; lo que arranca en 2016 es la serie que nosotros servimos, después del
+      // recorte por el hueco. Lo mismo para Córdoba y Chaco, que encadenan desde 1968.
+      `La serie de ${indiceActivo.nombre} que usamos arranca en ` +
+        `${nombrarMes(indiceActivo.primerMes)}, así que se corrió el período: pediste ` +
+        `desde ${nombrarPunto(periodoCorrido)}.`,
     );
   }
 
@@ -482,19 +556,17 @@ function pintarNotaDelIndice(periodoCorrido: Punto | null = null): void {
   nota.textContent = partes.join(" ");
   nota.hidden = partes.length === 0;
 
-  // El atraso va en su propio nodo y con su propio estilo. Iba pegado atrás de la
-  // descripción, en el mismo gris y el mismo tamaño, y Vanina lo salteó entero: lo leyó
-  // recién cuando fue a buscar por qué el número le había dado el doble. Un aviso que
-  // sólo se encuentra cuando ya sospechás no es un aviso.
-  if (atraso > MESES_DE_ATRASO_TOLERADOS) {
-    const aviso = document.createElement("strong");
-    aviso.className = "nota-indice__atraso";
-    aviso.textContent =
-      `Ojo: ${indiceActivo.nombre} publicó hasta ${nombrarMes(indiceActivo.ultimoOficial)}, ` +
-      `${atraso} meses detrás del índice nacional.`;
-    nota.append(aviso);
-    nota.hidden = false;
-  }
+  // El atraso NO va acá arriba: va pegado al número, en la tarjeta del resultado. Iba
+  // atrás de la descripción, mismo gris y mismo tamaño, y en el review se salteó entero
+  // —se leyó recién cuando el número raro obligó a buscar la causa—. Un aviso que sólo
+  // encontrás cuando ya sospechás no es un aviso.
+  const aviso = el("aviso-atraso");
+  aviso.hidden = atraso <= MESES_DE_ATRASO_TOLERADOS;
+  aviso.textContent = aviso.hidden
+    ? ""
+    : `Ojo: ${indiceActivo.nombre} publicó hasta ${nombrarMes(indiceActivo.ultimoOficial)}, ` +
+      `${atraso} ${atraso === 1 ? "mes" : "meses"} detrás del índice nacional. El cálculo ` +
+      `no puede llegar más allá de ese mes con datos publicados.`;
 }
 
 /**
@@ -565,19 +637,33 @@ function leerPuntoLaxo(prefijo: "desde" | "hasta"): Punto {
  * que el motor rechaza, que es justo lo que la regla 3 prohíbe.
  */
 function escribirPeriodoAcotado(periodo: { desde: Punto; hasta: Punto }): Punto | null {
-  const primero = serie.datos[0]!.mes;
+  const { primero, ultimo } = rangoPedible(serie);
   let corrido: Punto | null = null;
 
   for (const [prefijo, punto] of [
     ["desde", periodo.desde],
     ["hasta", periodo.hasta],
   ] as const) {
-    if (aOrdinal(mesDe(punto)) < aOrdinal(primero)) {
-      corrido ??= punto;
-      escribirPunto(prefijo, usaDias() ? primerDia(primero) : primero);
-    } else {
+    // Se acota por las DOS puntas contra el mismo rango que puebla los desplegables. Antes
+    // sólo se miraba el piso, y un índice que se atrasara hasta cruzar un año dejaba el
+    // año elegido sin `option`: el `value` quedaba vacío y el sitio contestaba
+    // `Mes inválido: "-05"`. Hoy no se dispara porque los dieciséis caen en el mismo año
+    // tope, pero Neuquén ya lleva cinco meses de atraso y son doce los que hacen falta.
+    const mes = mesDe(punto);
+    const fuera =
+      aOrdinal(mes) < aOrdinal(primero)
+        ? primero
+        : aOrdinal(mes) > aOrdinal(ultimo)
+          ? ultimo
+          : null;
+
+    if (fuera === null) {
       escribirPunto(prefijo, punto);
+    } else {
+      corrido ??= punto;
+      escribirPunto(prefijo, usaDias() ? primerDia(fuera) : fuera);
     }
+    acotarMesesDelAnio(prefijo);
   }
   return corrido;
 }
@@ -595,11 +681,17 @@ function sincronizarOpcionRem(): void {
   const opcion = document.getElementById("opcion-rem") as HTMLOptionElement | null;
   if (!opcion) return;
 
+  // El motivo sale de por qué está gris, no de una suposición. La condición es "esta serie
+  // no trae REM", y eso pasa por dos razones distintas: el índice no es el nacional, o el
+  // pipeline no pudo bajar el REM ese día. Un control gris que dice "sólo para el índice
+  // nacional" estando en el nacional es peor que uno sin explicación.
   const hayRem = Boolean(serie.rem);
   opcion.disabled = !hayRem;
   opcion.textContent = hayRem
     ? "estimarlos con el REM del BCRA"
-    : "estimarlos con el REM del BCRA (sólo para el índice nacional)";
+    : indiceActivo.slug === SLUG_NACIONAL
+      ? "estimarlos con el REM del BCRA (no disponible en esta actualización)"
+      : "estimarlos con el REM del BCRA (sólo para el índice nacional)";
 
   // Si estaba elegida y el índice nuevo no la soporta, el desplegable tiene que quedar en
   // la que se va a usar de verdad. Dejarlo mostrando una opción deshabilitada pintaría un
@@ -816,6 +908,11 @@ async function iniciar(): Promise<void> {
     const objetivo = ev.target as HTMLElement;
     if (objetivo.id === "indice") return; // lo atiende `cambiarIndice`, que además baja la serie
     if (objetivo.id === "monto") formatearMontoEnVivo();
+    // El primer y el último año del índice no tienen los doce meses. Se recalcula al
+    // cambiar de año para que el desplegable de meses nunca ofrezca uno que el motor
+    // rechaza — y para que elegir el año de arranque no deje seleccionado un mes muerto.
+    if (objetivo.id === "desde-anio") acotarMesesDelAnio("desde");
+    if (objetivo.id === "hasta-anio") acotarMesesDelAnio("hasta");
     calcular();
   });
   el("formulario").addEventListener("submit", (ev) => ev.preventDefault());
@@ -832,7 +929,21 @@ async function iniciar(): Promise<void> {
     // El listener de `input` del formulario también dispara con este select, así que el
     // cambio se atiende acá y allá se ignora: si no, se calcularía dos veces, una con la
     // serie vieja, y se vería el número anterior parpadear.
-    void cambiarIndice(slug).then(() => analytics.cambioIndice(slug));
+    void cambiarIndice(slug).then(
+      () => analytics.cambioIndice(slug),
+      // Si el archivo del índice no se puede bajar —un deploy a medias, un hipo de red—
+      // el desplegable tiene que volver a lo que la pantalla está mostrando. Sin esto el
+      // control decía "Tucumán" arriba de una tabla entera de Mendoza, con los sellos y
+      // todo, y el único rastro era un error en la consola que nadie mira.
+      (e: unknown) => {
+        el<HTMLSelectElement>("indice").value = indiceActivo.slug;
+        const error = el("error");
+        error.textContent =
+          `No se pudo cargar ese índice (${(e as Error).message}). Se sigue mostrando ` +
+          `${indiceActivo.nombre}.`;
+        error.hidden = false;
+      },
+    );
   });
 
   el<HTMLButtonElement>("copiar").addEventListener("click", (ev) => {

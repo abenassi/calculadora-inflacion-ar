@@ -83,6 +83,8 @@ type Indice = {
   /** Variación mensual del último mes publicado, en porcentaje. */
   ultimaVariacionPct: number;
   origenDe(mes: Mes): Origen;
+  /** Si un mes tiene dato publicado. Lo necesita el cálculo del sesgo de la ventana. */
+  tieneDato(mes: Mes): boolean;
   /** Se copia al resultado para que explicarlo no necesite volver a la serie. */
   fuentes: FuentesDeSerie;
 };
@@ -130,6 +132,7 @@ function armarIndice(serie: SerieIndice): Indice {
     // Un mes sin origen conocido sólo puede ser uno proyectado, y ésos no llegan acá. El
     // respaldo es la fuente del tramo más reciente, que es la que publica lo que sigue.
     origenDe: (mes) => origenPorMes.get(mes) ?? serie.fuentes.at(-1)?.id ?? PROYECCION,
+    tieneDato: (mes) => porMes.has(mes),
     fuentes: { fuentes: serie.fuentes, etiquetaCombinada: serie.etiquetaCombinada },
 
     /**
@@ -299,6 +302,68 @@ export function adjust(
  * mentira. Si cada uno tuviera su copia del criterio, tarde o temprano el dropdown diría
  * una cosa y el cálculo haría otra — que es exactamente el bug que esto vino a cerrar.
  */
+/**
+ * Cuánto distorsiona correr la ventana, en tanto por uno.
+ *
+ * `ventana_reciente` contesta `I(U)/I(A−d)` cuando lo honesto sería `I(B)/I(A)`. El
+ * cociente entre las dos se despeja exacto:
+ *
+ * ```
+ *   distorsión = [ I(A) / I(A−d) ]  ÷  [ I(B) / I(B−d) ]
+ * ```
+ *
+ * o sea **la inflación de los `d` meses que la ventana mete, dividida por la de los `d`
+ * meses que saca**. El denominador es desconocido por construcción —son los meses que
+ * todavía no se publicaron— y el mejor sustituto disponible es el tramo publicado más
+ * reciente del mismo largo, que es literalmente lo que ya usa `repite_ultimo`.
+ *
+ * **Por qué esto y no un tope de `d`.** Contar meses mide lo que no importa. Con un solo
+ * mes de corrimiento sobre diciembre de 2023 la distorsión ya llega al 23%, y con cinco
+ * meses en un tramo estable queda en 2,6% y es perfectamente defendible. Lo que rompe la
+ * referencia no es cuántos meses entran sino qué pasó en ellos.
+ *
+ * El caso que lo destapó: Neuquén publicó hasta enero de 2026, así que un pedido a junio
+ * corre la ventana cinco meses hasta diciembre de 2023 y se traga enero de 2024 (+24,5%).
+ * Contestaba +238,77% cuando la inflación de Neuquén en el tramo que sí existe fue
+ * +90,29%, y lo hacía desde la opción marcada «(recomendado)».
+ */
+function sesgoDeLaVentana(idx: Indice, desde: Punto, desplazamiento: number): number {
+  if (desplazamiento === 0) return 0;
+
+  // Se mide sobre MESES y no sobre el punto crudo: el sesgo es qué meses arrastra la
+  // ventana, y el día dentro del mes no cambia cuáles son. Además `valorEn` de una fecha
+  // necesita el índice del mes anterior para prorratear, y ese mes puede no existir.
+  const mesDesde = mesDe(desde);
+  const mesArrastrado = sumarMeses(mesDesde, -desplazamiento);
+  const mesReferencia = sumarMeses(idx.ultimoOficial, -desplazamiento);
+  const extremos = [mesDesde, mesArrastrado, idx.ultimoOficial, mesReferencia];
+  // Los cuatro tienen que estar publicados. Si alguno no lo está —el período pedido cae
+  // entero después del último dato, o el tramo de referencia se sale por abajo de la
+  // serie— no hay con qué medir el sesgo, y **la ausencia de evidencia no deshabilita
+  // nada**: se contesta 0 y la opción sigue disponible. Bloquear sin medición sería
+  // exactamente lo que este guard vino a evitar, sólo que para el otro lado.
+  if (extremos.some((m) => !idx.tieneDato(m))) return 0;
+
+  const arrastrado = idx.valorEn(mesDesde) / idx.valorEn(mesArrastrado);
+  const reciente = idx.valorEn(idx.ultimoOficial) / idx.valorEn(mesReferencia);
+
+  if (!Number.isFinite(arrastrado) || !Number.isFinite(reciente) || reciente === 0) return 0;
+  return Math.abs(arrastrado / reciente - 1);
+}
+
+/**
+ * Cuánta distorsión se tolera antes de dejar de ofrecer la ventana corrida.
+ *
+ * Diez por ciento, elegido sobre los 16.200 períodos posibles del índice nacional desde
+ * 2004: con ese número el camino normal —un mes de corrimiento— se toca el 1,4% de las
+ * veces, y cuando se toca corresponde. Con 5% se tocaría el 15% de los casos con dos meses
+ * de corrimiento, que es ruido; con 20% pasarían distorsiones de un quinto del monto.
+ *
+ * Y tiene sentido fuera de la estadística: por encima del 10% el número deja de servir
+ * para lo que la gente lo usa, que es discutir un alquiler o un presupuesto.
+ */
+const SESGO_MAXIMO_DE_LA_VENTANA = 0.1;
+
 function evaluarPeriodo(desde: Punto, hasta: Punto, idx: Indice, hoy?: Mes) {
   const mesHoy = hoy ?? mesActual();
   const nuevo = extremoNuevo(desde, hasta);
@@ -317,13 +382,21 @@ function evaluarPeriodo(desde: Punto, hasta: Punto, idx: Indice, hoy?: Mes) {
     compararMeses(mesDe(correr(desde, desplazamiento)), idx.primerMes) >= 0 &&
     compararMeses(mesDe(correr(hasta, desplazamiento)), idx.primerMes) >= 0;
 
+  // Y no puede arrastrar meses tan distintos de los que reemplaza como para que el número
+  // deje de ser una referencia. Es un criterio del motor y no de la interfaz a propósito:
+  // el desplegable lee esta misma respuesta, así que los dos no se pueden separar.
+  const sesgoTolerable =
+    !cabeLaVentana || sesgoDeLaVentana(idx, desde, desplazamiento) <= SESGO_MAXIMO_DE_LA_VENTANA;
+
   return {
     desplazamiento,
     esFuturo,
+    cabeLaVentana,
+    sesgoTolerable,
     // La ventana corrida sólo sirve como referencia de un período que YA transcurrió. Para
     // un mes futuro no existe equivalente publicado, así que aun la metodología que no
     // estima nada tiene que proyectar.
-    sinEstimarPosible: desplazamiento === 0 || (!esFuturo && cabeLaVentana),
+    sinEstimarPosible: desplazamiento === 0 || (!esFuturo && cabeLaVentana && sesgoTolerable),
   };
 }
 
@@ -367,6 +440,27 @@ export function sePuedeEvitarEstimar(
   hoy?: Mes,
 ): boolean {
   return evaluarPeriodo(desde, hasta, armarIndice(serie), hoy).sinEstimarPosible;
+}
+
+/**
+ * Por qué no se puede evitar estimar, o `null` si sí se puede.
+ *
+ * Sale de la **misma** evaluación que `sePuedeEvitarEstimar`, y no de una segunda lectura
+ * del período en la interfaz, porque si no el cartel y el desplegable se separan: el sitio
+ * ya tuvo un texto fijo que explicaba "el mes de destino todavía no llegó" arriba de un
+ * caso donde el destino era junio y estábamos en agosto. La razón verdadera era otra.
+ */
+export function motivoParaEstimar(
+  desde: Punto,
+  hasta: Punto,
+  serie: SerieIndice,
+  hoy?: Mes,
+): "futuro" | "ventana_no_cabe" | "ventana_sesgada" | null {
+  const e = evaluarPeriodo(desde, hasta, armarIndice(serie), hoy);
+  if (e.sinEstimarPosible) return null;
+  if (e.esFuturo) return "futuro";
+  if (!e.cabeLaVentana) return "ventana_no_cabe";
+  return "ventana_sesgada";
 }
 
 /** Arma el desglose y el resultado a partir de una lista de puntos ya calculables. */

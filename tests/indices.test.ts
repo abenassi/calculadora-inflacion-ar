@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { adjust } from "../src/engine/adjust.js";
+import { adjust, sePuedeEvitarEstimar } from "../src/engine/adjust.js";
 import {
   agruparParaSelector,
   buscarIndice,
@@ -12,6 +12,7 @@ import {
 } from "../src/engine/indices.js";
 import { fuenteDe, organismoDeFila, selloDeFila } from "../src/ui/etiquetas.js";
 import type { SerieIndice } from "../src/engine/types.js";
+import { INDICES } from "../scripts/indices-declarados.js";
 
 const DATOS = resolve(import.meta.dirname, "../public/data");
 const leer = <T>(ruta: string): T => JSON.parse(readFileSync(resolve(DATOS, ruta), "utf8")) as T;
@@ -52,6 +53,26 @@ describe("agruparParaSelector", () => {
     expect(nombres).toEqual([...nombres].sort((a, b) => a.localeCompare(b, "es-AR")));
     expect(nombres[0]).toBe("Chaco");
     expect(nombres[1]).toBe("Ciudad de Buenos Aires");
+  });
+
+  it("tiene una entrada por cada índice declarado, más el nacional", () => {
+    // Todos los demás tests **iteran el catálogo**, así que un catálogo al que se le
+    // cayeron cinco provincias los pasa a todos sin una queja: se limita a revisar menos
+    // cosas. Este es el único que se entera, y por eso compara contra la lista declarada
+    // y no contra un número escrito a mano.
+    expect(catalogo.indices.map((i) => i.slug).sort()).toEqual(
+      [SLUG_NACIONAL, ...INDICES.map((i) => i.slug)].sort(),
+    );
+  });
+
+  it("no deja archivos huérfanos en public/data/indices/", () => {
+    // El que queda cuando se renombra un slug: sigue en el repo, no lo anuncia nadie y no
+    // lo mira ningún test. Es invisible hasta que alguien lo lee creyendo que está vivo.
+    const enDisco = readdirSync(resolve(DATOS, "indices"))
+      .filter((f) => f.endsWith(".json"))
+      .map((f) => f.replace(/\.json$/, ""))
+      .sort();
+    expect(enDisco).toEqual(INDICES.map((i) => i.slug).sort());
   });
 
   it("ofrece las seis regiones del INDEC", () => {
@@ -155,6 +176,36 @@ describe("la atribución de un índice jurisdiccional", () => {
     const estimadas = conEstimacion.desglose.filter((f) => f.esProyeccion);
     expect(estimadas.length).toBeGreaterThan(0);
     expect(estimadas.map((f) => selloDeFila(f, conEstimacion))).toEqual(estimadas.map(() => null));
+  });
+});
+
+describe("la ventana corrida deja de ofrecerse cuando arrastra meses muy distintos", () => {
+  const neuquen = serieDe("neuquen");
+
+  it("no ofrece «sin estimar» en el caso que la rompía", () => {
+    // Neuquén publicó hasta enero de 2026, así que un pedido a junio corre la ventana
+    // cinco meses hasta diciembre de 2023 y se traga enero de 2024 (+24,50%). Contestaba
+    // +238,77% cuando la inflación de Neuquén en el tramo que sí existe fue +90,29%, y lo
+    // hacía desde la opción marcada «(recomendado)».
+    expect(sePuedeEvitarEstimar("2024-05", "2026-06", neuquen)).toBe(false);
+  });
+
+  it("y el motor hace lo mismo que dice el desplegable", () => {
+    // La regla 4 en su forma más concreta: si el predicado dice que no se puede evitar
+    // estimar, pedir «sin estimar» tiene que terminar estimando de verdad.
+    const r = adjust(520000, "2024-05", "2026-06", neuquen, { metodologia: "sin_proyectar" });
+    expect(r.metodo.tipo).toBe("proyeccion");
+    expect(r.montoAjustado).toBeLessThan(1_300_000);
+  });
+
+  it("no toca a ningún otro índice del catálogo", () => {
+    // El criterio es la distorsión que arrastra la ventana, no cuántos meses se corre. Si
+    // deshabilitara opciones en índices al día, estaría midiendo la cosa equivocada.
+    const otros = catalogo.indices.filter((i) => i.slug !== "neuquen");
+    const bloqueados = otros.filter(
+      (i) => !sePuedeEvitarEstimar("2024-05", "2026-06", serieDe(i.slug)),
+    );
+    expect(bloqueados.map((i) => i.slug)).toEqual([]);
   });
 });
 

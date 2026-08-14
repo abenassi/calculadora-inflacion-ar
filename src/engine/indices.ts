@@ -31,6 +31,14 @@ export type EntradaCatalogo = {
    * nacional. Es lo que impide que una región se lea como si fuera un índice provincial.
    */
   cubre: string;
+  /**
+   * Las siglas de los organismos que lo publican, en el orden del empalme.
+   *
+   * Está acá y no sólo en el archivo de la serie porque la página de fuentes las muestra
+   * para los dieciséis: leerlas de cada archivo la obligaba a bajar 400 KB para una
+   * columna, y a que una sola respuesta con error se llevara puesta la tabla entera.
+   */
+  organismos: string[];
   primerMes: Mes;
   ultimoOficial: Mes;
 };
@@ -88,3 +96,33 @@ export function agruparParaSelector(catalogo: CatalogoIndices): {
  * cambia de verdad la ventana sobre la que se calcula y hay que decirlo.
  */
 export const MESES_DE_ATRASO_TOLERADOS = 2;
+
+/**
+ * Hasta cuántos meses más allá del último dato publicado se puede pedir.
+ *
+ * Repetir la última variación mensual más allá de dos años es ruido con forma de número.
+ */
+export const HORIZONTE_MESES = 24;
+
+/**
+ * Los dos extremos que el índice puede contestar: `[primer mes con dato, último pedible]`.
+ *
+ * **Es la única fuente de ese rango.** Lo tienen que responder los tres lugares que antes
+ * lo calculaban por su cuenta —los desplegables de mes y año, el `min`/`max` de los campos
+ * de fecha, y el acotado que corre el período cuando cambiás de índice— y hasta ahora
+ * cada uno lo hacía distinto. El resultado eran dos agujeros que el review encontró: el
+ * desplegable ofrecía meses del primer año que el motor rechaza (Santa Fe mide desde
+ * diciembre de 2013 y se podía elegir enero de 2013) y sólo se acotaba por abajo, así que
+ * un índice que se atrasara hasta cruzar un año dejaba el año seleccionado sin `option` y
+ * el sitio contestaba `Mes inválido: "-05"`.
+ */
+export function rangoPedible(serie: { datos: { mes: Mes }[]; ultimo_oficial: Mes }): {
+  primero: Mes;
+  ultimo: Mes;
+} {
+  const primero = serie.datos[0]!.mes;
+  const [y, m] = serie.ultimo_oficial.split("-").map(Number);
+  const ordinal = y! * 12 + (m! - 1) + HORIZONTE_MESES;
+  const ultimo = `${Math.floor(ordinal / 12)}-${String((ordinal % 12) + 1).padStart(2, "0")}`;
+  return { primero, ultimo };
+}

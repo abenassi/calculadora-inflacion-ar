@@ -74,7 +74,7 @@
                 "name": "¿De dónde salen los datos de esta calculadora?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Del IPC Nivel General Nacional del INDEC, que publica un índice de nivel desde diciembre de 2016. Para atrás, la serie se reconstruye con las variaciones mensuales que publica el BCRA, hasta enero de 1990. Todo llega vía Argentina Data MCP y nada está cargado a mano."
+                  "text": "Del IPC Nivel General Nacional del INDEC, que publica un índice de nivel desde diciembre de 2016, y —si elegís otro índice— del organismo de esa provincia o de la región del INDEC que corresponda. Para atrás, la serie nacional se reconstruye con las variaciones mensuales que publica el BCRA, hasta enero de 1990. Todo llega vía Argentina Data MCP y nada está cargado a mano."
                 }
               },
               {
@@ -90,7 +90,7 @@
                 "name": "¿Por qué si sumo los porcentajes de la tabla no me da el total?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Porque los porcentajes mensuales no se suman: cada mes se aplica sobre el nivel de precios que dejó el anterior. La diferencia no es chica y crece con la inflación —en 2024 la columna suma 81,94% y el año cerró en 117,76%—, así que si te dio distinto no te equivocaste vos ni se equivocó la tabla. El número que vale es el acumulado, que es el que sale del cociente entre los índices de las dos puntas."
+                  "text": "Porque los porcentajes mensuales no se suman: cada mes se aplica sobre el nivel de precios que dejó el anterior. La diferencia no es chica y crece con la inflación —con el índice nacional, en 2024 la columna suma 81,94% y el año cerró en 117,76%—, así que si te dio distinto no te equivocaste vos ni se equivocó la tabla. El número que vale es el acumulado, que es el que sale del cociente entre los índices de las dos puntas."
                 }
               },
               {
@@ -98,7 +98,7 @@
                 "name": "¿Desde qué año hay datos?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Desde enero de 1990. Dos cosas para tener en cuenta si vas tan atrás: entre 2007 y 2016 el INDEC estuvo intervenido —en 2016 el Poder Ejecutivo declaró por Decreto 55/2016 la emergencia del sistema estadístico— y los números oficiales de esos años están cuestionados; y antes de 1992 la moneda era el austral, así que un monto de esa época no se puede leer en pesos."
+                  "text": "Con el índice nacional, desde enero de 1990. Los índices provinciales y las regiones arrancan cada uno cuando arranca su serie —Chaco en 1988, Santa Fe en diciembre de 2013, las seis regiones en diciembre de 2016— y el desplegable de años se acomoda solo al que elijas. Dos cosas para tener en cuenta si vas tan atrás: entre 2007 y 2016 el INDEC estuvo intervenido —en 2016 el Poder Ejecutivo declaró por Decreto 55/2016 la emergencia del sistema estadístico— y los números oficiales de esos años están cuestionados; y antes de 1992 la moneda era el austral, así que un monto de esa época no se puede leer en pesos."
                 }
               },
               {
@@ -218,8 +218,8 @@
       <!--
         Qué mide el índice elegido y quién lo publica. Aparece SÓLO cuando no es el
         nacional: con el default la pantalla queda igual que antes de que existiera el
-        selector. Es un solo párrafo y no dos avisos separados porque quien elige Neuquén
-        necesita leer las dos cosas —qué cubre y que va atrasado— de una sola vez.
+        selector. El aviso de que el índice viene atrasado NO va acá: va pegado al número,
+        en #aviso-atraso, que es donde el ojo está mirando.
       -->
       <p class="nota-indice" id="nota-indice" hidden></p>
 
@@ -243,6 +243,11 @@
           </p>
           <p class="resultado__cifra" id="cifra-principal"></p>
           <p class="resultado__detalle" id="detalle-principal"></p>
+          <!--
+            Que el índice elegido venga meses atrás del nacional. Va acá, pegado al número,
+            y no arriba con la descripción del índice: arriba se saltea.
+          -->
+          <p class="aviso-atraso" id="aviso-atraso" hidden></p>
           <p class="aviso-largo" id="aviso-largo" hidden></p>
         </div>
 
@@ -358,7 +363,9 @@
           <summary>¿De dónde salen los datos de esta calculadora?</summary>
           <p>
             Del IPC Nivel General Nacional del INDEC, que publica un índice de nivel desde
-            diciembre de 2016. Para atrás, la serie se reconstruye con las variaciones mensuales
+            diciembre de 2016, y —si elegís otro índice— del organismo de esa provincia o
+            de la región del INDEC que corresponda. Para atrás, la serie nacional se
+            reconstruye con las variaciones mensuales
             que publica el BCRA, hasta enero de 1990. Todo llega vía
             <a href="https://argentinadata.mymcps.dev" rel="noopener">Argentina Data MCP</a> y nada
             está cargado a mano: el detalle del empalme está en
@@ -385,8 +392,8 @@
           <summary>¿Por qué si sumo los porcentajes de la tabla no me da el total?</summary>
           <p>
             Porque los porcentajes mensuales no se suman: cada mes se aplica sobre el nivel de
-            precios que dejó el anterior. La diferencia no es chica y crece con la inflación —en
-            2024 la columna suma 81,94% y el año cerró en 117,76%—, así que si te dio distinto no
+            precios que dejó el anterior. La diferencia no es chica y crece con la inflación —con el índice
+            nacional, en 2024 la columna suma 81,94% y el año cerró en 117,76%—, así que si te dio distinto no
             te equivocaste vos ni se equivocó la tabla.
           </p>
           <p>
@@ -398,7 +405,7 @@
         <details>
           <summary>¿Desde qué año hay datos?</summary>
           <p>
-            Desde enero de 1990. Dos cosas para tener en cuenta si vas tan atrás: entre 2007 y 2016
+            Con el índice nacional, desde enero de 1990. Los índices provinciales y las regiones arrancan cada uno cuando arranca su serie —Chaco en 1988, Santa Fe en diciembre de 2013, las seis regiones en diciembre de 2016— y el desplegable de años se acomoda solo al que elijas. Dos cosas para tener en cuenta si vas tan atrás: entre 2007 y 2016
             el INDEC estuvo intervenido —en 2016 el Poder Ejecutivo declaró por Decreto 55/2016 la
             emergencia del sistema estadístico— y los números oficiales de esos años están
             cuestionados; y antes de 1992 la moneda era el austral, así que un monto de esa época

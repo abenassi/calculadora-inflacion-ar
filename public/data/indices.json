@@ -5,6 +5,10 @@
       "nombre": "Nacional (INDEC)",
       "tipo": "nacional",
       "cubre": "El IPC Nivel General Nacional del INDEC.",
+      "organismos": [
+        "BCRA",
+        "INDEC"
+      ],
       "primerMes": "1990-01",
       "ultimoOficial": "2026-06"
     },
@@ -13,6 +17,9 @@
       "nombre": "Ciudad de Buenos Aires",
       "tipo": "provincia",
       "cubre": "Mide precios en la Ciudad de Buenos Aires, no en el conurbano. Para el aglomerado completo está la región Gran Buenos Aires.",
+      "organismos": [
+        "IDECBA"
+      ],
       "primerMes": "2012-07",
       "ultimoOficial": "2026-07"
     },
@@ -21,6 +28,9 @@
       "nombre": "Chaco",
       "tipo": "provincia",
       "cubre": "Se releva en el Gran Resistencia y se publica como índice provincial.",
+      "organismos": [
+        "IPECD"
+      ],
       "primerMes": "1988-08",
       "ultimoOficial": "2026-06"
     },
@@ -29,6 +39,9 @@
       "nombre": "Córdoba",
       "tipo": "provincia",
       "cubre": "Índice provincial de Córdoba. La provincia lo publica encadenado desde 1968; acá arranca en 1990 porque más atrás los números son tan chicos que se pierden cifras.",
+      "organismos": [
+        "DGEyC Córdoba"
+      ],
       "primerMes": "1990-03",
       "ultimoOficial": "2026-07"
     },
@@ -37,6 +50,9 @@
       "nombre": "Mendoza",
       "tipo": "provincia",
       "cubre": "Índice provincial de Mendoza. La provincia no publicó entre marzo de 2012 y abril de 2016, así que la serie arranca después de ese corte: rellenar el hueco sería inventar números que no publicó nadie.",
+      "organismos": [
+        "DEIE"
+      ],
       "primerMes": "2016-04",
       "ultimoOficial": "2026-06"
     },
@@ -45,6 +61,9 @@
       "nombre": "Neuquén",
       "tipo": "provincia",
       "cubre": "Índice provincial del Neuquén.",
+      "organismos": [
+        "DPEyC Neuquén"
+      ],
       "primerMes": "2001-11",
       "ultimoOficial": "2026-01"
     },
@@ -53,6 +72,9 @@
       "nombre": "Río Negro",
       "tipo": "provincia",
       "cubre": "Se releva en Viedma y se publica como referencia provincial.",
+      "organismos": [
+        "DEyC Río Negro"
+      ],
       "primerMes": "1989-09",
       "ultimoOficial": "2026-07"
     },
@@ -61,6 +83,9 @@
       "nombre": "San Luis",
       "tipo": "provincia",
       "cubre": "Índice provincial de San Luis.",
+      "organismos": [
+        "DPEyC San Luis"
+      ],
       "primerMes": "2005-10",
       "ultimoOficial": "2026-06"
     },
@@ -69,6 +94,9 @@
       "nombre": "Santa Fe",
       "tipo": "provincia",
       "cubre": "Índice provincial de Santa Fe.",
+      "organismos": [
+        "IPEC Santa Fe"
+      ],
       "primerMes": "2013-12",
       "ultimoOficial": "2026-06"
     },
@@ -77,6 +105,9 @@
       "nombre": "Tucumán",
       "tipo": "provincia",
       "cubre": "Índice provincial de Tucumán.",
+      "organismos": [
+        "Estadística Tucumán"
+      ],
       "primerMes": "1989-03",
       "ultimoOficial": "2026-06"
     },
@@ -85,6 +116,9 @@
       "nombre": "Región Gran Buenos Aires",
       "tipo": "region",
       "cubre": "Cubre la Ciudad de Buenos Aires y los 24 partidos del conurbano bonaerense juntos. Si buscás sólo la Ciudad, está el IPCBA del IDECBA.",
+      "organismos": [
+        "INDEC Gran Buenos Aires"
+      ],
       "primerMes": "2016-12",
       "ultimoOficial": "2026-06"
     },
@@ -93,6 +127,9 @@
       "nombre": "Región Pampeana",
       "tipo": "region",
       "cubre": "Cubre Buenos Aires, Córdoba, Entre Ríos, La Pampa y Santa Fe. No es el índice de ninguna de ellas por separado.",
+      "organismos": [
+        "INDEC Pampeana"
+      ],
       "primerMes": "2016-12",
       "ultimoOficial": "2026-06"
     },
@@ -101,6 +138,9 @@
       "nombre": "Región Noroeste",
       "tipo": "region",
       "cubre": "Cubre Catamarca, Jujuy, La Rioja, Salta, Santiago del Estero y Tucumán. No es el índice de ninguna de ellas por separado.",
+      "organismos": [
+        "INDEC Noroeste"
+      ],
       "primerMes": "2016-12",
       "ultimoOficial": "2026-06"
     },
@@ -109,6 +149,9 @@
       "nombre": "Región Noreste",
       "tipo": "region",
       "cubre": "Cubre Corrientes, Chaco, Formosa y Misiones. No es el índice de ninguna de ellas por separado.",
+      "organismos": [
+        "INDEC Noreste"
+      ],
       "primerMes": "2016-12",
       "ultimoOficial": "2026-06"
     },
@@ -117,6 +160,9 @@
       "nombre": "Región Cuyo",
       "tipo": "region",
       "cubre": "Cubre Mendoza, San Juan y San Luis. No es el índice de ninguna de ellas por separado.",
+      "organismos": [
+        "INDEC Cuyo"
+      ],
       "primerMes": "2016-12",
       "ultimoOficial": "2026-06"
     },
@@ -125,9 +171,12 @@
       "nombre": "Región Patagónica",
       "tipo": "region",
       "cubre": "Cubre Chubut, Neuquén, Río Negro, Santa Cruz y Tierra del Fuego. No es el índice de ninguna de ellas por separado.",
+      "organismos": [
+        "INDEC Patagónica"
+      ],
       "primerMes": "2016-12",
       "ultimoOficial": "2026-06"
     }
   ],
-  "actualizado": "2026-08-13T23:52:42.327Z"
+  "actualizado": "2026-08-14T00:02:40.645Z"
 }
