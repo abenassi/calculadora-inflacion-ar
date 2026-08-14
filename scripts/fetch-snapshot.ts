@@ -445,6 +445,7 @@ async function construirCatalogo(nacional: SerieIndice): Promise<void> {
         slug: decl.slug,
         nombre: decl.nombre,
         tipo: decl.tipo,
+        ...(decl.enElSelector ? { enElSelector: decl.enElSelector } : {}),
         cubre: decl.cubre,
         organismos: [decl.organismoCorto],
         primerMes: serie.datos[0]!.mes,

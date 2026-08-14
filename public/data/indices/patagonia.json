@@ -12,12 +12,12 @@
       "etiqueta": {
         "corta": "IPC Región Patagónica del INDEC",
         "larga": "el IPC de la Región Patagónica del INDEC",
-        "publicadosPor": "el INDEC, que lo publica para la región patagónica"
+        "publicadosPor": "el INDEC"
       }
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:52:42.325Z",
+  "actualizado": "2026-08-14T00:19:52.504Z",
   "datos": [
     {
       "mes": "2016-12",

@@ -38,7 +38,7 @@
       "slug": "cordoba",
       "nombre": "Córdoba",
       "tipo": "provincia",
-      "cubre": "Índice provincial de Córdoba. La provincia lo publica encadenado desde 1968; acá arranca en 1990 porque más atrás los números son tan chicos que se pierden cifras.",
+      "cubre": "Índice provincial de Córdoba, con datos desde 1990.",
       "organismos": [
         "DGEyC Córdoba"
       ],
@@ -115,6 +115,7 @@
       "slug": "gba",
       "nombre": "Región Gran Buenos Aires",
       "tipo": "region",
+      "enElSelector": "Región Gran Buenos Aires (CABA y conurbano)",
       "cubre": "Cubre la Ciudad de Buenos Aires y los 24 partidos del conurbano bonaerense juntos. Si buscás sólo la Ciudad, está el IPCBA del IDECBA.",
       "organismos": [
         "INDEC Gran Buenos Aires"
@@ -126,6 +127,7 @@
       "slug": "pampeana",
       "nombre": "Región Pampeana",
       "tipo": "region",
+      "enElSelector": "Región Pampeana (Buenos Aires, Córdoba, Entre Ríos, La Pampa, Santa Fe)",
       "cubre": "Cubre Buenos Aires, Córdoba, Entre Ríos, La Pampa y Santa Fe. No es el índice de ninguna de ellas por separado.",
       "organismos": [
         "INDEC Pampeana"
@@ -137,6 +139,7 @@
       "slug": "noroeste",
       "nombre": "Región Noroeste",
       "tipo": "region",
+      "enElSelector": "Región Noroeste (Catamarca, Jujuy, La Rioja, Salta, Sgo. del Estero, Tucumán)",
       "cubre": "Cubre Catamarca, Jujuy, La Rioja, Salta, Santiago del Estero y Tucumán. No es el índice de ninguna de ellas por separado.",
       "organismos": [
         "INDEC Noroeste"
@@ -148,6 +151,7 @@
       "slug": "noreste",
       "nombre": "Región Noreste",
       "tipo": "region",
+      "enElSelector": "Región Noreste (Corrientes, Chaco, Formosa, Misiones)",
       "cubre": "Cubre Corrientes, Chaco, Formosa y Misiones. No es el índice de ninguna de ellas por separado.",
       "organismos": [
         "INDEC Noreste"
@@ -159,6 +163,7 @@
       "slug": "cuyo",
       "nombre": "Región Cuyo",
       "tipo": "region",
+      "enElSelector": "Región Cuyo (Mendoza, San Juan, San Luis)",
       "cubre": "Cubre Mendoza, San Juan y San Luis. No es el índice de ninguna de ellas por separado.",
       "organismos": [
         "INDEC Cuyo"
@@ -170,6 +175,7 @@
       "slug": "patagonia",
       "nombre": "Región Patagónica",
       "tipo": "region",
+      "enElSelector": "Región Patagónica (Chubut, Neuquén, Río Negro, Santa Cruz, T. del Fuego)",
       "cubre": "Cubre Chubut, Neuquén, Río Negro, Santa Cruz y Tierra del Fuego. No es el índice de ninguna de ellas por separado.",
       "organismos": [
         "INDEC Patagónica"
@@ -178,5 +184,5 @@
       "ultimoOficial": "2026-06"
     }
   ],
-  "actualizado": "2026-08-14T00:02:40.645Z"
+  "actualizado": "2026-08-14T00:19:52.506Z"
 }

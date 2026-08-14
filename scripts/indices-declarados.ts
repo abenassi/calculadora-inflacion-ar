@@ -25,6 +25,8 @@ import type { EtiquetaFuente } from "../src/engine/types.js";
 export type IndiceDeclarado = {
   slug: string;
   nombre: string;
+  /** Cómo se lee en el desplegable, si difiere del nombre. */
+  enElSelector?: string;
   tipo: TipoIndice;
   cubre: string;
   /** La serie del catálogo del MCP de la que sale. */
@@ -52,11 +54,17 @@ function region(
   nombre: string,
   serie: string,
   provincias: string,
+  enElSelector: string,
 ): IndiceDeclarado {
   return {
     slug,
     nombre,
     tipo: "region",
+    // Qué provincias tiene adentro, **en el renglón del desplegable**. Sin esto alguien de
+    // Formosa mira la lista, ve seis nombres de regiones, ninguno dice Formosa, y tiene que
+    // elegir a ciegas y leer el párrafo de abajo para enterarse de si le tocaba. No es una
+    // recomendación de nada: es decir qué es cada cosa antes de que la elijas.
+    enElSelector: `${nombre} (${enElSelector})`,
     cubre: `Cubre ${provincias}. No es el índice de ninguna de ellas por separado.`,
     serie,
     ...INDEC,
@@ -68,7 +76,7 @@ function region(
     etiqueta: {
       corta: `IPC ${nombre} del INDEC`,
       larga: `el IPC de la ${nombre} del INDEC`,
-      publicadosPor: `el INDEC, que lo publica para la ${nombre.toLowerCase()}`,
+      publicadosPor: "el INDEC",
     },
   };
 }
@@ -117,9 +125,7 @@ export const INDICES: IndiceDeclarado[] = [
     slug: "cordoba",
     nombre: "Córdoba",
     tipo: "provincia",
-    cubre:
-      "Índice provincial de Córdoba. La provincia lo publica encadenado desde 1968; acá " +
-      "arranca en 1990 porque más atrás los números son tan chicos que se pierden cifras.",
+    cubre: "Índice provincial de Córdoba, con datos desde 1990.",
     serie: "ipc:cordoba",
     origen: "dgeyc-cordoba",
     organismo: "Dirección General de Estadística y Censos de la Provincia de Córdoba",
@@ -238,6 +244,7 @@ export const INDICES: IndiceDeclarado[] = [
     // y el conurbano juntos— porque quien busca sólo la Ciudad tiene el IPCBA al lado.
     slug: "gba",
     nombre: "Región Gran Buenos Aires",
+    enElSelector: "Región Gran Buenos Aires (CABA y conurbano)",
     tipo: "region",
     cubre:
       "Cubre la Ciudad de Buenos Aires y los 24 partidos del conurbano bonaerense juntos. " +
@@ -249,7 +256,7 @@ export const INDICES: IndiceDeclarado[] = [
     etiqueta: {
       corta: "IPC Región Gran Buenos Aires del INDEC",
       larga: "el IPC de la Región Gran Buenos Aires del INDEC",
-      publicadosPor: "el INDEC, que lo publica para el Gran Buenos Aires",
+      publicadosPor: "el INDEC",
     },
   },
   region(
@@ -257,24 +264,34 @@ export const INDICES: IndiceDeclarado[] = [
     "Región Pampeana",
     "indec:148.3_INIVELANA_DICI_M_26",
     "Buenos Aires, Córdoba, Entre Ríos, La Pampa y Santa Fe",
+    "Buenos Aires, Córdoba, Entre Ríos, La Pampa, Santa Fe",
   ),
   region(
     "noroeste",
     "Región Noroeste",
     "indec:148.3_INIVELNOA_DICI_M_21",
     "Catamarca, Jujuy, La Rioja, Salta, Santiago del Estero y Tucumán",
+    "Catamarca, Jujuy, La Rioja, Salta, Sgo. del Estero, Tucumán",
   ),
   region(
     "noreste",
     "Región Noreste",
     "indec:148.3_INIVELNEA_DICI_M_21",
     "Corrientes, Chaco, Formosa y Misiones",
+    "Corrientes, Chaco, Formosa, Misiones",
   ),
-  region("cuyo", "Región Cuyo", "indec:148.3_INIVELUYO_DICI_M_22", "Mendoza, San Juan y San Luis"),
+  region(
+    "cuyo",
+    "Región Cuyo",
+    "indec:148.3_INIVELUYO_DICI_M_22",
+    "Mendoza, San Juan y San Luis",
+    "Mendoza, San Juan, San Luis",
+  ),
   region(
     "patagonia",
     "Región Patagónica",
     "indec:148.3_INIVELNIA_DICI_M_27",
     "Chubut, Neuquén, Río Negro, Santa Cruz y Tierra del Fuego",
+    "Chubut, Neuquén, Río Negro, Santa Cruz, T. del Fuego",
   ),
 ];

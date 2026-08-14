@@ -12,12 +12,12 @@
       "etiqueta": {
         "corta": "IPC Región Pampeana del INDEC",
         "larga": "el IPC de la Región Pampeana del INDEC",
-        "publicadosPor": "el INDEC, que lo publica para la región pampeana"
+        "publicadosPor": "el INDEC"
       }
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:52:31.969Z",
+  "actualizado": "2026-08-14T00:19:51.355Z",
   "datos": [
     {
       "mes": "2016-12",

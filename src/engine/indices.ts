@@ -23,8 +23,16 @@ export type TipoIndice = "nacional" | "provincia" | "region";
 
 export type EntradaCatalogo = {
   slug: string;
-  /** Cómo se llama en el desplegable. */
+  /** Cómo se llama en las frases del sitio. */
   nombre: string;
+  /**
+   * Cómo se lee en el desplegable, cuando decir sólo el nombre no alcanza.
+   *
+   * Las regiones lo usan para llevar sus provincias adentro del renglón: alguien de
+   * Formosa que mira la lista ve seis nombres de regiones y ninguno dice Formosa, así que
+   * sin esto tiene que elegir a ciegas y leer el párrafo de abajo para saber si le tocaba.
+   */
+  enElSelector?: string;
   tipo: TipoIndice;
   /**
    * Qué mide de verdad, en una oración. Se muestra sólo cuando el índice elegido no es el

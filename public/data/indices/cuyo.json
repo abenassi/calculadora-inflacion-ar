@@ -12,12 +12,12 @@
       "etiqueta": {
         "corta": "IPC Región Cuyo del INDEC",
         "larga": "el IPC de la Región Cuyo del INDEC",
-        "publicadosPor": "el INDEC, que lo publica para la región cuyo"
+        "publicadosPor": "el INDEC"
       }
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:52:41.987Z",
+  "actualizado": "2026-08-14T00:19:52.242Z",
   "datos": [
     {
       "mes": "2016-12",

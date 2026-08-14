@@ -425,11 +425,15 @@ const MOTIVOS: Record<NonNullable<ReturnType<typeof motivoParaEstimar>>, string>
     "«No estimar ninguno» no está disponible para este período: para tomar como referencia " +
     "un tramo publicado del mismo largo habría que ir más atrás de donde arranca esta " +
     "serie. Cualquier respuesta va a ser una estimación.",
+  // Sin la explicación del mecanismo. Estaba en el medio —"el tramo publicado que habría
+  // que usar como referencia arrastra meses muy distintos de los que reemplaza"— y en el
+  // review no dejó nada: "tramo", "referencia" y "reemplaza" no significan nada para quien
+  // no conoce el método. Lo que sí sirvió es la consecuencia, que además es un motivo para
+  // confiar más y no menos: se sacó la opción para no pasarte un número inflado.
   ventana_sesgada:
     "«No estimar ninguno» no está disponible para este período: este índice viene atrasado, " +
-    "y el tramo publicado que habría que usar como referencia arrastra meses muy distintos " +
-    "de los que reemplaza. Daría un número bastante más alto que la inflación real del " +
-    "período, así que preferimos estimar y decirlo.",
+    "y esa opción daría un número bastante más alto que la inflación real del período. " +
+    "Preferimos estimar y decirlo.",
 };
 
 /**
@@ -501,7 +505,7 @@ function poblarSelectorDeIndices(): void {
   const opcion = (i: EntradaCatalogo) => {
     const o = document.createElement("option");
     o.value = i.slug;
-    o.textContent = i.nombre;
+    o.textContent = i.enElSelector ?? i.nombre;
     return o;
   };
   const grupo = (etiqueta: string, items: EntradaCatalogo[]) => {

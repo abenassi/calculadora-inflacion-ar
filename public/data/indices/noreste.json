@@ -12,12 +12,12 @@
       "etiqueta": {
         "corta": "IPC Región Noreste del INDEC",
         "larga": "el IPC de la Región Noreste del INDEC",
-        "publicadosPor": "el INDEC, que lo publica para la región noreste"
+        "publicadosPor": "el INDEC"
       }
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:52:38.227Z",
+  "actualizado": "2026-08-14T00:19:51.927Z",
   "datos": [
     {
       "mes": "2016-12",
