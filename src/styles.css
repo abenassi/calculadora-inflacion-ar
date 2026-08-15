@@ -114,7 +114,14 @@ h1 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
   gap: 1rem;
-  align-items: end;
+  /*
+   * Alineado arriba, no abajo: desde que "de" y "equivale, en" llevan una fila
+   * más (los atajos) que "Monto" y "según el índice", alinear por abajo
+   * empujaba a estos últimos hacia abajo para igualar el borde inferior del
+   * campo más alto, y sus etiquetas quedaban flotando más abajo que las de
+   * los campos de fecha.
+   */
+  align-items: start;
 }
 
 .campo {
