@@ -88,6 +88,9 @@ acumulada de los últimos tres meses publicados. **No es la inflación del perí
 pedido**, sino la del período publicado más reciente de igual duración; por eso la
 interfaz nombra siempre los meses concretos que usó.
 
+Con fechas exactas la duración se mide en días y el tramo de referencia son los últimos N
+días publicados, que terminan con el último mes que salió (`docs/decisiones/0013`).
+
 Las otras dos muestran los meses que pediste de verdad y completan los que faltan con
 una tasa mensual constante, marcada como estimación en la tabla y con trama diagonal
 en el gráfico.

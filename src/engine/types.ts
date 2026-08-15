@@ -182,6 +182,8 @@ export type Metodo =
       desplazamiento: number;
       /** Los meses del período pedido que el INDEC todavía no publicó. */
       mesesSinPublicar: Mes[];
+      /** El último mes con dato, con el que termina la ventana de referencia. */
+      ultimoPublicado: Mes;
     }
   /**
    * Los meses que faltan se estiman con una tasa mensual constante, y el desglose

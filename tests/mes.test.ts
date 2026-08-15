@@ -34,17 +34,25 @@ describe("compararPuntos", () => {
   // main.ts (para no dejar el destino antes del origen ya cargado). Un solo lugar, un
   // solo test: si el criterio se duplicara y se desalineara, el motor y la interfaz
   // podrían terminar en desacuerdo sobre cuál punta es la más nueva.
-  it("es negativo cuando el primero es anterior, positivo cuando es posterior, cero en el mismo mes", () => {
+  it("es negativo cuando el primero es anterior, positivo cuando es posterior, cero en el mismo punto", () => {
     expect(compararPuntos("2026-05", "2026-08")).toBeLessThan(0);
     expect(compararPuntos("2026-08", "2026-05")).toBeGreaterThan(0);
     expect(compararPuntos("2026-08", "2026-08")).toBe(0);
   });
 
-  it("compara por el mes, no por el día, cuando alguno de los dos puntos es una fecha", () => {
-    // Mismo mes, distinto día: siguen empatados a nivel mes, que es el único criterio
-    // que usa el motor para ordenar los extremos de un período.
-    expect(compararPuntos("2026-08-31", "2026-08-01")).toBe(0);
+  it("distingue el día, no sólo el mes", () => {
+    // Empatar dos días del mismo mes alcanzaba mientras el único uso era ordenar meses,
+    // pero deja pasar los dos casos en que el orden importa adentro de un mes: la
+    // ventana de referencia por día necesita saber si el período va hacia adelante o
+    // deflacta, y el atajo "ahora" se apaga justo cuando dejaría el destino antes de un
+    // origen del mismo mes —el 20 de agosto con hoy 15— que a nivel mes no se ve.
+    expect(compararPuntos("2026-08-31", "2026-08-01")).toBeGreaterThan(0);
     expect(compararPuntos("2026-07-31", "2026-08-01")).toBeLessThan(0);
+  });
+
+  it("un mes vale por su día 1, así que empata con él y va antes que cualquier otro día", () => {
+    expect(compararPuntos("2026-08", "2026-08-01")).toBe(0);
+    expect(compararPuntos("2026-08", "2026-08-15")).toBeLessThan(0);
   });
 });
 

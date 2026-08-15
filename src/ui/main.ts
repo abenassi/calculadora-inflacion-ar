@@ -19,17 +19,17 @@ import {
 } from "../engine/adjust.js";
 import * as analytics from "./analytics.js";
 import {
-  abreviarPunto,
   aOrdinal,
   compararMeses,
+  comoDestino,
   compararPuntos,
+  conPreposicion,
   deOrdinal,
   esFecha,
   esFechaValida,
   esMesValido,
   mesDe,
   nombrarMes,
-  nombrarPunto,
   primerDia,
   restarMesesAFecha,
   sumarMeses,
@@ -346,7 +346,7 @@ function pintarResultado(r: Resultado): void {
     r.metodo.tipo === "ventana_reciente"
       ? "Inflación mensual de los meses de referencia"
       : "Inflación mensual";
-  el("rotulo-principal").textContent = `A ${nombrarPunto(r.hasta)}`;
+  el("rotulo-principal").textContent = capitalizar(conPreposicion("a", r.hasta));
   el("cifra-principal").textContent = esAproximado(r)
     ? `~${pesosRedondo(r.montoAjustado)}`
     : pesosRedondo(r.montoAjustado);
@@ -430,6 +430,18 @@ function pintarResultado(r: Resultado): void {
 }
 
 /**
+ * El título de la lista de porcentajes del texto que se copia.
+ *
+ * Con la ventana de referencia en modo por día las filas son tramos de días —"2 jul 2026
+ * → 31 jul 2026", que es la inflación de julio prorrateada— y "Meses usados:" arriba de
+ * eso invita a leer un mes entero donde hay 29 días.
+ */
+function encabezadoDelDesglose(r: Resultado): string {
+  if (r.metodo.tipo !== "ventana_reciente") return "Mes a mes:";
+  return esFecha(r.desglose[0]!.punto) ? "Tramos usados:" : "Meses usados:";
+}
+
+/**
  * Un párrafo listo para pegar en un mensaje.
  *
  * El objetivo de quien usa esto no suele ser saber el número, sino justificarlo
@@ -459,17 +471,18 @@ function armarExplicacion(r: Resultado): string {
       : [];
 
   lineas.push(
-    `${pesos(r.monto)} de ${nombrarPunto(r.desde)} equivalen a ` +
+    `${pesos(r.monto)} ${conPreposicion("de", r.desde)} equivalen a ` +
       `${esAproximado(r) ? "unos " : ""}${pesosRedondo(r.montoAjustado)} ` +
-      `en ${nombrarPunto(r.hasta)}.`,
+      `${comoDestino(r.hasta)}.`,
     estimado
       ? `Inflación acumulada estimada: ${porcentaje(r.variacionPct)}.`
       : `Inflación acumulada: ${porcentaje(r.variacionPct)} (${fuenteDe(r.desglose, r).corta}).`,
     "",
-    r.metodo.tipo === "ventana_reciente" ? "Meses usados:" : "Mes a mes:",
+    encabezadoDelDesglose(r),
   );
 
-  for (const f of r.desglose.slice(1)) {
+  for (const [i, f] of r.desglose.entries()) {
+    if (i === 0) continue;
     // La etiqueta de cada línea tiene que ser el mismo sello que la persona ve en la tabla.
     // Decía "oficial INDEC" en filas selladas "BCRA ✓", así que el texto que se manda por
     // mensaje contradecía a la pantalla que el destinatario podía abrir.
@@ -479,7 +492,13 @@ function armarExplicacion(r: Resultado): string {
       : f.esParcial
         ? `prorrateado sobre el dato de ${organismo}`
         : `oficial ${organismo}`;
-    lineas.push(`- ${abreviarPunto(f.punto)}: ${porcentaje(f.varMensualPct ?? 0)} (${etiqueta})`);
+    // El mismo rótulo que la tabla, no el punto final a secas. Un tramo del 2 de mayo al
+    // 1 de junio salía acá como "1 jun 2026: +2,08%", que se lee como que junio subió
+    // 2,08% cuando ese número es la parte de mayo —junio subió 1,89%—. Y este texto se
+    // manda por mensaje: se lee sin la tabla al lado, que es donde el rango sí estaba.
+    lineas.push(
+      `- ${rotularFila(r.desglose, i)}: ${porcentaje(f.varMensualPct ?? 0)} (${etiqueta})`,
+    );
   }
 
   lineas.push("", explicarMetodo(r));
@@ -709,8 +728,8 @@ function fraseDeLosCorridos(corridos: PeriodoCorrido[]): string[] {
     return [
       `${indiceActivo.nombre} tiene datos de ${nombrarMes(primero)} a ` +
         `${nombrarMes(indiceActivo.ultimoOficial)} y el cálculo no estima más allá de ` +
-        `${nombrarMes(ultimo)}, así que se corrió el período: pediste de ` +
-        `${nombrarPunto(desde.pedido)} a ${nombrarPunto(hasta.pedido)}.`,
+        `${nombrarMes(ultimo)}, así que se corrió el período: pediste ` +
+        `${conPreposicion("de", desde.pedido)} ${conPreposicion("a", hasta.pedido)}.`,
     ];
   }
   return corridos.map(fraseDelCorrido);
@@ -734,10 +753,10 @@ function fraseDelCorrido(c: PeriodoCorrido): string {
       // 2012; lo que arranca en 2016 es la serie que nosotros servimos, después del
       // recorte por el hueco. Lo mismo para Córdoba y Chaco, que encadenan desde 1968.
       `La serie de ${indiceActivo.nombre} que usamos arranca en ${nombrarMes(primero)}, ` +
-        `así que se corrió el período: pediste ${punta} ${nombrarPunto(c.pedido)}.`
+        `así que se corrió el período: pediste ${conPreposicion(punta, c.pedido)}.`
     : `${indiceActivo.nombre} publicó hasta ${nombrarMes(indiceActivo.ultimoOficial)} y el ` +
         `cálculo no estima más allá de ${nombrarMes(ultimo)}, así que se corrió el ` +
-        `período: pediste ${punta} ${nombrarPunto(c.pedido)}.`;
+        `período: pediste ${conPreposicion(punta, c.pedido)}.`;
 }
 
 /**

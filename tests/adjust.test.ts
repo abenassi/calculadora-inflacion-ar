@@ -508,14 +508,44 @@ describe("modo por día", () => {
     expect(r.metodo.tipo).toBe("directo");
   });
 
-  it("cuando hay que correr la ventana, días y meses corren lo mismo", () => {
-    const porDia = adjust(1000, "2020-03-10", "2020-05-20", irregular, { hoy: "2020-05" });
-    const porMes = adjust(1000, "2020-03", "2020-05", irregular, { hoy: "2020-05" });
-    if (porDia.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");
-    if (porMes.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");
-    expect(porDia.metodo.desplazamiento).toBe(porMes.metodo.desplazamiento);
-    expect(porDia.desglose[0]!.punto).toBe("2020-02-10");
-    expect(porDia.desglose.at(-1)!.punto).toBe("2020-04-20");
+  /**
+   * La ventana de referencia por día se ancla al final de lo publicado, no al día del
+   * mes que se pidió.
+   *
+   * Correr meses enteros conservando el día dejaba la ventana terminando el 20 de abril
+   * con abril ya publicado entero: se tiraban diez días de dato, y el pie de la tabla
+   * prometía "el tramo publicado más reciente" sobre un tramo que no lo era. Ver
+   * `ventanaDeReferencia` y `docs/decisiones/0013`.
+   */
+  it("la ventana por día termina con el último mes publicado", () => {
+    const r = adjust(1000, "2020-03-10", "2020-05-20", irregular, { hoy: "2020-05" });
+    if (r.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");
+    // Del 10 de marzo al 20 de mayo hay 71 días, y abril es el último publicado.
+    expect(r.desglose.at(-1)!.punto).toBe("2020-04-30");
+    expect(r.desglose[0]!.punto).toBe("2020-02-19");
+    expect(r.metodo.ultimoPublicado).toBe("2020-04");
+  });
+
+  /**
+   * El caso que motivó el cambio: un período corto que entra entero en el último mes
+   * publicado se contesta con ese mes prorrateado, sin mezclar el anterior.
+   */
+  it("un período más corto que un mes usa sólo el último mes publicado", () => {
+    const r = adjust(1000, "2020-06-17", "2020-07-15", irregular, { hoy: "2020-07" });
+    if (r.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");
+    // 28 días, todos adentro de abril: del 2 al 30, y ninguna fila de marzo.
+    expect(r.desglose.map((f) => f.punto)).toEqual(["2020-04-02", "2020-04-30"]);
+    // Abril subió 3%, prorrateado a 28 de sus 30 días.
+    expect(r.variacionPct).toBeCloseTo((Math.pow(1.03, 28 / 30) - 1) * 100, 8);
+  });
+
+  it("deflactando, la ventana se recorre al revés y el monto baja", () => {
+    const r = adjust(1000, "2020-07-15", "2020-06-17", irregular, { hoy: "2020-07" });
+    if (r.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");
+    expect(r.desglose.map((f) => f.punto)).toEqual(["2020-04-30", "2020-04-02"]);
+    expect(r.montoAjustado).toBeLessThan(1000);
+    // Y es exactamente la vuelta del test de arriba.
+    expect(r.montoAjustado).toBeCloseTo(1000 / Math.pow(1.03, 28 / 30), 8);
   });
 
   it("ida y vuelta con días devuelve el monto original", () => {

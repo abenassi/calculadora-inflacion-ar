@@ -88,3 +88,9 @@ que ser indiscutible.
 Las filas de las puntas van marcadas **`prorrateado`** y no con el sello del INDEC: ese
 porcentaje no es una cifra que el INDEC haya publicado, es una cuenta nuestra sobre un
 dato suyo.
+
+## Lo que se apoyó después en esta convención
+
+Que el dato de un mes valga por **todos los días de ese mes** es lo que permite contestar
+un período de 29 días sin publicar con el último mes publicado prorrateado, en vez de ir a
+buscar el mismo día del mes unos meses atrás. Ver `0013`.

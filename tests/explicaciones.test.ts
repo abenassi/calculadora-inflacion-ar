@@ -12,6 +12,7 @@ import {
   fuenteDelTexto,
   hayAlgoEstimado,
   hayDatoOficial,
+  resumir,
 } from "../src/ui/explicaciones.js";
 import { porcentaje } from "../src/ui/format.js";
 import type { Metodologia, Punto, Resultado, SerieIndice } from "../src/engine/types.js";
@@ -47,6 +48,7 @@ const CASOS: { que: string; desde: Punto; hasta: Punto; metodologia: Metodologia
   { que: "enteramente sin publicar, con REM", desde: mas(1), hasta: mas(8), metodologia: "rem" },
   { que: "sin proyectar sobre un período que no llegó", desde: menos(2), hasta: mas(4), metodologia: "sin_proyectar" },
   { que: "por día, dentro de meses publicados", desde: "2024-01-15", hasta: "2024-08-20", metodologia: "sin_proyectar" },
+  { que: "por día, con ventana reciente", desde: `${ultimo}-17`, hasta: `${mas(1)}-15`, metodologia: "sin_proyectar" },
   { que: "por día, terminando sin publicar", desde: "2026-01-10", hasta: `${mas(3)}-20`, metodologia: "repite_ultimo" },
   { que: "hacia atrás", desde: "2024-12", hasta: "2024-01", metodologia: "sin_proyectar" },
 ];
@@ -105,6 +107,63 @@ describe("la aclaración de las filas prorrateadas", () => {
     const r = adjust(520_000, `${mas(2)}-15`, `${mas(8)}-20`, serie, { metodologia: "repite_ultimo" });
     expect(r.desglose.some((f) => f.esParcial && f.esProyeccion)).toBe(true);
     expect(explicarTabla(r)).not.toContain("prorrateada");
+  });
+});
+
+/**
+ * El caso que motivó la ventana anclada al último mes publicado: $1.000.000 del 17 de
+ * julio al 15 de agosto de 2026, con el INDEC publicado hasta junio.
+ *
+ * Son 29 días. Antes se contestaba con el tramo 17 de mayo → 15 de junio, que mezclaba dos
+ * meses y dejaba junio a medio usar teniéndolo publicado entero. Ahora se contesta con los
+ * últimos 29 días publicados, que caen enteros adentro de junio.
+ *
+ * La serie va congelada en junio de 2026 a propósito: `ipc.json` está vivo y el día que el
+ * INDEC publique un mes más, un test escrito sobre el último dato cambiaría de caso solo.
+ */
+describe("la ventana de referencia en modo por día", () => {
+  const CONGELADO = "2026-06";
+  const congelada: SerieIndice = {
+    ...serie,
+    ultimo_oficial: CONGELADO,
+    datos: serie.datos.filter((p) => p.mes <= CONGELADO),
+  };
+  const r = adjust(1_000_000, "2026-07-17", "2026-08-15", congelada, {
+    metodologia: "sin_proyectar",
+    hoy: "2026-08",
+  });
+
+  it("el recorte de la serie llega hasta el mes congelado", () => {
+    expect(congelada.datos.at(-1)!.mes).toBe(CONGELADO);
+  });
+
+  it("usa el último mes publicado, prorrateado a los días del período", () => {
+    const texto = explicarMetodo(r);
+    expect(texto).toContain("pasaron 29 días");
+    expect(texto).toContain("los últimos 29 días publicados");
+    expect(texto).toContain("la inflación de junio de 2026, el último mes con dato");
+    expect(texto).toContain("prorrateada a 29 de sus 30 días");
+    // Y no nombra ningún mes anterior al último publicado: es la mitad que se ganó.
+    expect(texto).not.toContain("mayo");
+  });
+
+  it("los días llevan artículo y las contracciones armadas", () => {
+    const texto = `${resumir(r)} ${explicarMetodo(r)}`;
+    expect(texto).toContain("del 17 de julio de 2026");
+    expect(texto).toContain("al 15 de agosto de 2026");
+    // Las formas sin artículo, que es como salían antes de `conPreposicion`.
+    expect(texto).not.toContain("de 17 de julio");
+    expect(texto).not.toContain("a 15 de agosto");
+    expect(texto).not.toContain("de el ");
+  });
+
+  it("con un período de un solo mes la contracción también sale armada", () => {
+    // El modo mensual tenía la misma falla: "usamos la inflación de el último mes".
+    const mensual = adjust(1_000_000, "2026-07", "2026-08", congelada, {
+      metodologia: "sin_proyectar",
+      hoy: "2026-08",
+    });
+    expect(explicarMetodo(mensual)).toContain("la inflación del último mes publicado");
   });
 });
 

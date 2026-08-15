@@ -13,7 +13,17 @@
  */
 
 import { sumaDeVariaciones, tasaMensualDelRem } from "../engine/adjust.js";
-import { diasEntre, esFecha, mesDe, nombrarMes, nombrarPunto, soloMes } from "../engine/mes.js";
+import {
+  compararPuntos,
+  conPreposicion,
+  diasEnMes,
+  diasEntre,
+  esFecha,
+  mesConAnio,
+  mesDe,
+  nombrarMes,
+  soloMes,
+} from "../engine/mes.js";
 import type { Mes, Resultado } from "../engine/types.js";
 import { fuenteDe, quienPublicaAhora } from "./etiquetas.js";
 
@@ -64,7 +74,7 @@ export function plural(n: number, singular: string, plural: string): string {
 
 /** El resultado dicho en una línea, antes de explicar de dónde sale. */
 export function resumir(r: Resultado): string {
-  return `${pesos(r.monto)} de ${nombrarPunto(r.desde)}, con ${frasearVariacion(r.variacionPct)}.`;
+  return `${pesos(r.monto)} ${conPreposicion("de", r.desde)}, con ${frasearVariacion(r.variacionPct)}.`;
 }
 
 /**
@@ -82,7 +92,7 @@ export function explicarMetodo(r: Resultado): string {
       return `Todos los meses del cálculo son datos oficiales ya publicados por ${fuenteDe(r.desglose, r).publicadosPor}.`;
 
     case "ventana_reciente": {
-      const { mesesDelPeriodo, mesesSinPublicar } = r.metodo;
+      const { mesesDelPeriodo, mesesSinPublicar, ultimoPublicado } = r.metodo;
       // Con fechas exactas el período casi nunca son meses redondos: del 15 de mayo
       // al 10 de agosto no pasaron 3 meses, pasaron 87 días. Decir "3 meses" es
       // falso y lo detecta cualquiera que mire el calendario.
@@ -90,8 +100,9 @@ export function explicarMetodo(r: Resultado): string {
         ? `pasaron ${diasEntre(r.desde, r.hasta)} días`
         : plural(mesesDelPeriodo, "pasó 1 mes", `pasaron ${mesesDelPeriodo} meses`);
       const contexto =
-        `De ${nombrarPunto(r.desde)} a ${nombrarPunto(r.hasta)} ${largo}, y ` +
-        `${quienPublicaAhora(r)} todavía no publicó ${frasearMeses(mesesSinPublicar, "ni")}. `;
+        `${capitalizar(conPreposicion("de", r.desde))} ${conPreposicion("a", r.hasta)} ` +
+        `${largo}, y ${quienPublicaAhora(r)} todavía no publicó ` +
+        `${frasearMeses(mesesSinPublicar, "ni")}. `;
       // El resultado se muestra con "~" y antes esta frase decía que no había
       // ninguna estimación. Las dos cosas son ciertas y juntas se contradicen, así
       // que la aproximación tiene que quedar atribuida a su causa real.
@@ -103,17 +114,34 @@ export function explicarMetodo(r: Resultado): string {
       // duplicaría el del extremo. Se nombra el tramo por sus puntas, que además
       // es lo que efectivamente se calculó.
       if (esFecha(r.desglose[0]!.punto)) {
+        // Cronológico, no en el orden de las filas: deflactando el desglose va del punto
+        // nuevo al viejo, y "del 31 de julio al 2 de julio" se lee como un error.
+        const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto].sort(compararPuntos);
+        const dias = diasEntre(ini!, fin!);
+        const ultimo = `${mesConAnio(ultimoPublicado)}, el último mes con dato`;
+
+        // La ventana casi siempre entra entera en el último mes publicado, y ése es el
+        // caso que se puede decir en los términos de la persona: un mes que conoce, una
+        // regla de tres que puede rehacer. Nombrarlo por las puntas —"del 2 al 31 de
+        // julio"— obliga a preguntarse de dónde salió el 2.
+        const tramo =
+          mesDe(ini!) === mesDe(fin!)
+            ? `la inflación de ${ultimo}, prorrateada a ${dias} de sus ${diasEnMes(mesDe(fin!))} días`
+            : `el tramo que va ${conPreposicion("de", ini!)} ${conPreposicion("a", fin!)}, ` +
+              `que termina con ${ultimo}`;
+
         return (
-          `${contexto}Así que usamos el tramo equivalente más reciente que sí está publicado: ` +
-          `del ${nombrarPunto(r.desglose[0]!.punto)} al ${nombrarPunto(r.desglose.at(-1)!.punto)} ` +
-          `(${diasEntre(r.desglose[0]!.punto, r.desglose.at(-1)!.punto)} días). ${cierre}`
+          `${contexto}Así que usamos los últimos ${dias} días publicados: ${tramo}. ${cierre}`
         );
       }
 
       const usados = frasearMeses(r.desglose.slice(1).map((f) => mesDe(f.punto)));
+      // "de" + "el" es "del". Con un período de un solo mes la frase salía "usamos la
+      // inflación de el último mes publicado": la contracción no se puede dejar armada
+      // afuera cuando la parte que sigue cambia de número.
       return (
-        `${contexto}Así que usamos la inflación de ` +
-        `${plural(mesesDelPeriodo, "el último mes publicado", `los últimos ${mesesDelPeriodo} meses publicados`)} ` +
+        `${contexto}Así que usamos la inflación ` +
+        `${plural(mesesDelPeriodo, "del último mes publicado", `de los últimos ${mesesDelPeriodo} meses publicados`)} ` +
         `(${usados}). ${cierre}`
       );
     }

@@ -3,9 +3,10 @@
  *
  * La aritmética se hace sobre los strings, no con `Date`: el sistema razona en meses
  * calendario, y `Date` arrastra zonas horarias que acá no significan nada y sólo
- * generan off-by-one (un `2026-08-01T00:00:00Z` renderizado en ART es julio). La
- * única excepción es `diasEnMes`, donde `Date` en UTC es la forma más corta de
- * resolver los años bisiestos y no hay ambigüedad posible.
+ * generan off-by-one (un `2026-08-01T00:00:00Z` renderizado en ART es julio). Las
+ * únicas excepciones son `diasEnMes` y `restarDias`, donde `Date` en UTC es la forma
+ * más corta de resolver los años bisiestos y el largo de cada mes, y no hay
+ * ambigüedad posible: no interviene ninguna hora.
  */
 
 import type { Fecha, Mes, Punto } from "./types.js";
@@ -40,18 +41,6 @@ export function diffMeses(a: Mes, b: Mes): number {
 
 export function compararMeses(a: Mes, b: Mes): number {
   return aOrdinal(a) - aOrdinal(b);
-}
-
-/**
- * Compara dos puntos por el mes al que pertenecen: negativo si `a` es anterior a `b`,
- * cero si caen en el mismo mes. No distingue días dentro del mismo mes a propósito: es
- * el mismo criterio que usa el motor para decidir qué extremo de un período es el más
- * nuevo (`extremoNuevo`/`extremoViejo` en `adjust.ts`), y tiene que salir de un solo
- * lugar para que un control de la interfaz no pueda ofrecer un período invertido que el
- * motor sí acepta.
- */
-export function compararPuntos(a: Punto, b: Punto): number {
-  return compararMeses(mesDe(a), mesDe(b));
 }
 
 /** Lista inclusiva de `a` a `b`. Va hacia atrás si `b` es anterior a `a`. */
@@ -148,6 +137,40 @@ export function primerDia(mes: Mes): Fecha {
   return `${mes}-01`;
 }
 
+/** Último día de `mes`, como fecha completa. */
+export function ultimoDia(mes: Mes): Fecha {
+  return `${mes}-${String(diasEnMes(mes)).padStart(2, "0")}`;
+}
+
+/**
+ * Resta `n` días a una fecha.
+ *
+ * Es la única cuenta del archivo que no sale del string: cruzar de mes hacia atrás
+ * necesita saber cuántos días tiene el anterior. `Date` en UTC no tiene ambigüedad
+ * posible acá —no hay hora ni zona en juego, igual que en `diasEnMes`— y `Date.UTC`
+ * normaliza solo el desborde de día.
+ */
+export function restarDias(fecha: Fecha, n: number): Fecha {
+  const t = Date.UTC(
+    Number(fecha.slice(0, 4)),
+    Number(fecha.slice(5, 7)) - 1,
+    diaDe(fecha) - n,
+  );
+  return new Date(t).toISOString().slice(0, 10);
+}
+
+/**
+ * Ordena dos puntos en el tiempo, tomando el día 1 cuando el punto es un mes.
+ *
+ * Comparar por mes no alcanza cuando los dos puntos caen en el mismo: del 17 al 5 de
+ * julio hay que saber que va hacia atrás. Los strings ISO ordenan solos, y `2026-07`
+ * queda antes que `2026-07-05`, que es exactamente donde vale el día 1.
+ */
+export function compararPuntos(a: Punto, b: Punto): number {
+  const clave = (p: Punto) => (esFecha(p) ? p : primerDia(p));
+  return clave(a) < clave(b) ? -1 : clave(a) > clave(b) ? 1 : 0;
+}
+
 /**
  * Resta `n` meses a una fecha, recortando el día si el mes de destino es más corto.
  *
@@ -202,6 +225,37 @@ export function nombrarPunto(punto: Punto): string {
   const mes = mesDe(punto);
   const o = aOrdinal(mes);
   return `${diaDe(punto)} de ${NOMBRES[o % 12]} de ${Math.floor(o / 12)}`;
+}
+
+/** Preposiciones que se contraen con el artículo. Las demás lo llevan suelto. */
+const CONTRAIDAS: Partial<Record<Preposicion, string>> = { de: "del", a: "al" };
+
+type Preposicion = "de" | "a" | "en" | "desde" | "hasta";
+
+/**
+ * Un punto detrás de una preposición, con el artículo que pide el castellano.
+ *
+ * Un día lo lleva y un mes no: se dice "**del** 17 de julio de 2026" pero "**de** julio
+ * 2026". Escrito a mano en cada frase salía "de 17 de julio" y "en 15 de agosto", que es
+ * el tipo de detalle por el que un texto suena a máquina justo donde tiene que sonar
+ * defendible. Va acá y no en cada llamador porque son ocho oraciones repartidas entre la
+ * tarjeta, la nota del índice y el texto que se copia.
+ */
+export function conPreposicion(prep: Preposicion, punto: Punto): string {
+  if (!esFecha(punto)) return `${prep} ${nombrarMes(punto)}`;
+  return `${CONTRAIDAS[prep] ?? `${prep} el`} ${nombrarPunto(punto)}`;
+}
+
+/**
+ * El destino de una frase de equivalencia: `"en agosto 2026"`, `"al 15 de agosto de 2026"`.
+ *
+ * La preposición cambia con el modo, y por eso no sale de `conPreposicion` a secas: un mes
+ * es el período dentro del cual vale el monto ("en agosto"), y un día es el instante al
+ * que se lo trae ("al 15 de agosto"). "A agosto 2026" y "en el 15 de agosto" son las dos
+ * combinaciones que ninguna persona escribiría.
+ */
+export function comoDestino(punto: Punto): string {
+  return conPreposicion(esFecha(punto) ? "a" : "en", punto);
 }
 
 /** Días calendario entre dos puntos, tomando el día 1 cuando el punto es un mes. */
