@@ -11,6 +11,7 @@
 
 import {
   adjust,
+  hoyFecha,
   mesActual,
   RangoError,
   motivoParaEstimar,
@@ -20,15 +21,20 @@ import * as analytics from "./analytics.js";
 import {
   abreviarPunto,
   aOrdinal,
+  compararMeses,
+  compararPuntos,
   deOrdinal,
+  esFecha,
   esFechaValida,
   esMesValido,
   mesDe,
   nombrarMes,
   nombrarPunto,
   primerDia,
+  restarMesesAFecha,
+  sumarMeses,
 } from "../engine/mes.js";
-import type { Metodologia, Punto, Resultado, SerieIndice } from "../engine/types.js";
+import type { Mes, Metodologia, Punto, Resultado, SerieIndice } from "../engine/types.js";
 import {
   agruparParaSelector,
   buscarIndice,
@@ -116,6 +122,22 @@ function leerMetodologia(): Metodologia {
   return esMetodologia(v) ? v : "sin_proyectar";
 }
 
+/**
+ * El primer mes que se puede pedir de verdad.
+ *
+ * En modo por mes es el primero de la serie: el índice de nivel alcanza. En modo por
+ * día es uno después: prorratear un día del primer mes necesita el índice del mes
+ * anterior, que no existe. Sale de una sola función porque `poblarSelects` (el mínimo
+ * del calendario) y los atajos de fecha (`sincronizarAtajos`) tienen que estar de
+ * acuerdo en el mismo piso — que quedaran separados es justo cómo un atajo podía
+ * quedar habilitado un mes antes de donde el calendario ya no dejaba entrar, y tirar
+ * el `RangoError` del motor en vez de aparecer gris.
+ */
+function primerMesPedible(dias: boolean): Mes {
+  const { primero } = rangoPedible(serie);
+  return dias ? sumarMeses(primero, 1) : primero;
+}
+
 function poblarSelects(): void {
   const { primero, ultimo } = rangoPedible(serie);
 
@@ -140,12 +162,10 @@ function poblarSelects(): void {
   }
 
   // Los input[type=date] se acotan al mismo rango, para que el calendario del
-  // navegador no ofrezca fechas que el motor va a rechazar. El piso es el segundo
-  // mes de la serie: prorratear un día necesita el mes anterior, y el primero no
-  // lo tiene.
+  // navegador no ofrezca fechas que el motor va a rechazar.
   for (const id of ["desde-dia", "hasta-dia"]) {
     const input = el<HTMLInputElement>(id);
-    input.min = primerDia(deOrdinal(aOrdinal(primero) + 1));
+    input.min = primerDia(primerMesPedible(true));
     input.max = `${ultimo}-28`;
   }
 }
@@ -218,7 +238,90 @@ function alternarModo(): void {
   for (const campo of document.querySelectorAll<HTMLElement>("[data-modo]")) {
     campo.hidden = (campo.dataset.modo === "dia") !== dias;
   }
+  el<HTMLButtonElement>("atajo-ahora").textContent = dias ? "hoy" : "ahora";
   calcular();
+}
+
+/* -------------------------------------------------------------------- atajos */
+
+/**
+ * El origen que resulta de restarle `meses` al destino ya cargado.
+ *
+ * Se ancla al destino elegido, no a hoy: si se ancla a hoy, un "12m" sobre un
+ * destino puesto a mano en el pasado (por ejemplo mayo 2024) daría un origen
+ * posterior al destino y el período quedaría invertido. Anclado al destino,
+ * "12m" siempre significa "un período de 12 meses", sea cual sea el destino.
+ */
+function origenDelAtajo(hasta: Punto, meses: number): Punto {
+  return esFecha(hasta) ? restarMesesAFecha(hasta, meses) : sumarMeses(hasta, -meses);
+}
+
+function fueraDelRangoPedible(mes: Mes, dias: boolean): boolean {
+  const { ultimo } = rangoPedible(serie);
+  return compararMeses(mes, primerMesPedible(dias)) < 0 || compararMeses(mes, ultimo) > 0;
+}
+
+/**
+ * Habilita, deshabilita y marca los botones de atajo según el período cargado.
+ *
+ * Un atajo que caería antes de donde arranca la serie —típico de los índices
+ * provinciales, más cortos que el nacional— se deshabilita en vez de calcular
+ * mal: es la regla 3 en el control que se agregó ahora. El chip que reproduce
+ * el valor ya cargado queda marcado, así que al entrar (destino = mes actual,
+ * origen = 3 meses antes) ya se ve "ahora" y "3m" prendidos, sin que haga
+ * falta tocar nada.
+ *
+ * "ahora" también se deshabilita si dejaría el destino antes del origen ya
+ * cargado. Los chips de origen se anclan al destino para no invertir el
+ * período (ver `origenDelAtajo`), pero "ahora" mueve el destino y no tiene
+ * a qué anclarse: sin este chequeo, con un origen puesto a mano en el futuro
+ * (por ejemplo un contrato que arranca en octubre, hoy agosto), "ahora"
+ * dejaba el período invertido y el sitio lo calculaba igual —matemáticamente
+ * válido, pero sin decir que el período había quedado dado vuelta—. La
+ * comparación usa `compararPuntos`, la misma función de la que salen
+ * `extremoNuevo`/`extremoViejo` en `adjust.ts` para decidir qué punta es la más
+ * nueva: dos lugares de acuerdo sobre el mismo criterio, no dos criterios.
+ *
+ * El `title` en el atajo deshabilitado dice por qué: un control gris sin
+ * explicación manda a buscar la razón en otro lado, y la mayoría no la busca.
+ */
+function sincronizarAtajos(desde: Punto, hasta: Punto): void {
+  const dias = usaDias();
+  const objetivoAhora = dias ? hoyFecha() : mesActual();
+  const botonAhora = el<HTMLButtonElement>("atajo-ahora");
+  const ahoraFueraDeRango = fueraDelRangoPedible(mesDe(objetivoAhora), dias);
+  const ahoraInvertiria = !ahoraFueraDeRango && compararPuntos(objetivoAhora, desde) < 0;
+  botonAhora.disabled = ahoraFueraDeRango || ahoraInvertiria;
+  botonAhora.title = ahoraFueraDeRango
+    ? `No hay datos disponibles todavía para ${dias ? "hoy" : "el mes actual"}.`
+    : ahoraInvertiria
+      ? `El origen que ya elegiste es posterior a ${dias ? "hoy" : "este mes"}.`
+      : "";
+  botonAhora.setAttribute("aria-pressed", String(!botonAhora.disabled && hasta === objetivoAhora));
+
+  for (const boton of document.querySelectorAll<HTMLButtonElement>("[data-atajo-desde]")) {
+    const meses = Number(boton.dataset.atajoDesde);
+    const objetivo = origenDelAtajo(hasta, meses);
+    boton.disabled = fueraDelRangoPedible(mesDe(objetivo), dias);
+    boton.title = boton.disabled
+      ? `No hay datos anteriores a ${nombrarMes(primerMesPedible(dias))}.`
+      : "";
+    boton.setAttribute("aria-pressed", String(!boton.disabled && desde === objetivo));
+  }
+}
+
+function aplicarAtajoAhora(): void {
+  escribirPunto("hasta", usaDias() ? hoyFecha() : mesActual());
+  acotarMesesDelAnio("hasta");
+  calcular();
+  analytics.cambioPreset(usaDias() ? "hoy" : "ahora");
+}
+
+function aplicarAtajoDesde(meses: number): void {
+  escribirPunto("desde", origenDelAtajo(leerPunto("hasta"), meses));
+  acotarMesesDelAnio("desde");
+  calcular();
+  analytics.cambioPreset(`${meses}m`);
 }
 
 /* ------------------------------------------------------------------ resultado */
@@ -802,6 +905,7 @@ function calcular(): void {
     // quedar en la metodología que se va a usar de verdad. Al revés se pinta un resultado
     // proyectado con el desplegable diciendo "no estimar ninguno".
     sincronizarOpcionesDeMetodologia(desde, hasta);
+    sincronizarAtajos(desde, hasta);
 
     const metodologia = leerMetodologia();
     const r = adjust(monto, desde, hasta, serie, { metodologia });
@@ -985,6 +1089,17 @@ async function iniciar(): Promise<void> {
     calcular();
   });
   el("formulario").addEventListener("submit", (ev) => ev.preventDefault());
+  el("formulario").addEventListener("click", (ev) => {
+    const boton = (ev.target as HTMLElement).closest<HTMLButtonElement>(
+      "#atajo-ahora, [data-atajo-desde]",
+    );
+    if (!boton || boton.disabled) return;
+    if (boton.id === "atajo-ahora") {
+      aplicarAtajoAhora();
+    } else {
+      aplicarAtajoDesde(Number(boton.dataset.atajoDesde));
+    }
+  });
   el("usar-dias").addEventListener("change", () => {
     alternarModo();
     analytics.cambioModo(el<HTMLInputElement>("usar-dias").checked ? "fecha" : "mes");

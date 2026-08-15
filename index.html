@@ -169,30 +169,53 @@
           </div>
         </div>
 
-        <div class="campo" data-modo="mes">
-          <label for="desde-mes">de</label>
-          <div class="entrada-fecha">
-            <select id="desde-mes" aria-label="Mes de origen"></select>
-            <select id="desde-anio" aria-label="Año de origen"></select>
+        <div class="campo-grupo">
+          <div class="campo" data-modo="mes">
+            <label for="desde-mes">de</label>
+            <div class="entrada-fecha">
+              <select id="desde-mes" aria-label="Mes de origen"></select>
+              <select id="desde-anio" aria-label="Año de origen"></select>
+            </div>
+          </div>
+
+          <div class="campo" data-modo="dia" hidden>
+            <label for="desde-dia">del día</label>
+            <input type="date" id="desde-dia" aria-label="Fecha de origen" />
+          </div>
+
+          <!--
+            Atajos para no tener que ir mes a mes hasta encontrar el origen. Restan
+            sobre la fecha de DESTINO ya elegida, no sobre hoy: así "12m" siempre
+            significa "un período de 12 meses" aunque el destino no sea el actual.
+            main.ts los deshabilita cuando el resultado caería antes de donde arranca
+            la serie (regla 3: un control no ofrece lo que no puede cumplir).
+          -->
+          <div class="atajos" role="group" aria-label="Atajos para la fecha de origen">
+            <button type="button" class="atajo" data-atajo-desde="1">1m</button>
+            <button type="button" class="atajo" data-atajo-desde="3">3m</button>
+            <button type="button" class="atajo" data-atajo-desde="6">6m</button>
+            <button type="button" class="atajo" data-atajo-desde="12">12m</button>
           </div>
         </div>
 
-        <div class="campo" data-modo="mes">
-          <label for="hasta-mes">equivale, en</label>
-          <div class="entrada-fecha">
-            <select id="hasta-mes" aria-label="Mes de destino"></select>
-            <select id="hasta-anio" aria-label="Año de destino"></select>
+        <div class="campo-grupo">
+          <div class="campo" data-modo="mes">
+            <label for="hasta-mes">equivale, en</label>
+            <div class="entrada-fecha">
+              <select id="hasta-mes" aria-label="Mes de destino"></select>
+              <select id="hasta-anio" aria-label="Año de destino"></select>
+            </div>
           </div>
-        </div>
 
-        <div class="campo" data-modo="dia" hidden>
-          <label for="desde-dia">del día</label>
-          <input type="date" id="desde-dia" aria-label="Fecha de origen" />
-        </div>
+          <div class="campo" data-modo="dia" hidden>
+            <label for="hasta-dia">equivale, al día</label>
+            <input type="date" id="hasta-dia" aria-label="Fecha de destino" />
+          </div>
 
-        <div class="campo" data-modo="dia" hidden>
-          <label for="hasta-dia">equivale, al día</label>
-          <input type="date" id="hasta-dia" aria-label="Fecha de destino" />
+          <!-- "hoy" en modo por día, main.ts cambia el texto al alternar el modo. -->
+          <div class="atajos" role="group" aria-label="Atajo para la fecha de destino">
+            <button type="button" class="atajo" id="atajo-ahora">ahora</button>
+          </div>
         </div>
 
         <!--

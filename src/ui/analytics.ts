@@ -149,6 +149,11 @@ export function cambioModo(modo: "mes" | "fecha"): void {
   evento("modo", { modo });
 }
 
+/** Qué atajo de fecha se tocó: "ahora"/"hoy", o "1m"/"3m"/"6m"/"12m". */
+export function cambioPreset(preset: string): void {
+  evento("preset", { preset });
+}
+
 const HOST_MCP = "argentinadata.mymcps.dev";
 
 /**

@@ -29,6 +29,7 @@
 import { comoSeMuestra } from "../ui/format.js";
 import type {
   BaseProyeccion,
+  Fecha,
   Fila,
   Mes,
   Metodo,
@@ -43,6 +44,7 @@ import { PROYECCION } from "./types.js";
 import {
   aOrdinal,
   compararMeses,
+  compararPuntos,
   deOrdinal,
   diaDe,
   diffMeses,
@@ -214,12 +216,12 @@ function cubreUnMesEntero(a: Punto, b: Punto): boolean {
 
 /** El extremo más nuevo del intervalo, sin importar en qué orden vinieron. */
 function extremoNuevo(desde: Punto, hasta: Punto): Punto {
-  return compararMeses(mesDe(hasta), mesDe(desde)) >= 0 ? hasta : desde;
+  return compararPuntos(hasta, desde) >= 0 ? hasta : desde;
 }
 
 /** El extremo más viejo. Es el que arrastra los meses cuando se corre la ventana. */
 function extremoViejo(desde: Punto, hasta: Punto): Punto {
-  return compararMeses(mesDe(hasta), mesDe(desde)) >= 0 ? desde : hasta;
+  return compararPuntos(hasta, desde) >= 0 ? desde : hasta;
 }
 
 /**
@@ -698,7 +700,19 @@ function calcularProyectando(
   );
 }
 
-/** El mes en curso. */
+/**
+ * El mes en curso, en hora local.
+ *
+ * No UTC: con UTC, en Argentina (UTC-3) las últimas tres horas de cada día —y del
+ * mes— ya viven en el "mañana" del huso horario que usa `Date.getUTC*`. Un preset
+ * de "ahora" calculado así puede adelantar un mes entero entre las 21:00 y la
+ * medianoche local, el 31 de cualquier mes.
+ */
 export function mesActual(ahora = new Date()): Mes {
-  return deOrdinal(aOrdinal(`${ahora.getUTCFullYear()}-01`) + ahora.getUTCMonth());
+  return deOrdinal(aOrdinal(`${ahora.getFullYear()}-01`) + ahora.getMonth());
+}
+
+/** La fecha de hoy, en hora local. Ver `mesActual` sobre por qué no es UTC. */
+export function hoyFecha(ahora = new Date()): Fecha {
+  return `${mesActual(ahora)}-${String(ahora.getDate()).padStart(2, "0")}`;
 }

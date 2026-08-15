@@ -35,6 +35,9 @@ Esta calculadora hace esa planilla por vos:
 - **Meses por defecto, días si hacen falta.** El modo por día le da a los días
   sueltos de las puntas la parte proporcional de la inflación de su mes, y los marca
   como `prorrateado` en vez de atribuirle al INDEC un número que no publicó.
+- **Atajos de fecha.** Un botón *ahora* pone el destino en el momento actual, y
+  1m/3m/6m/12m ponen el origen a esa cantidad de meses antes del destino, sin ir
+  desplegable por desplegable.
 
 ## Cómo funciona
 

@@ -42,6 +42,18 @@ export function compararMeses(a: Mes, b: Mes): number {
   return aOrdinal(a) - aOrdinal(b);
 }
 
+/**
+ * Compara dos puntos por el mes al que pertenecen: negativo si `a` es anterior a `b`,
+ * cero si caen en el mismo mes. No distingue días dentro del mismo mes a propósito: es
+ * el mismo criterio que usa el motor para decidir qué extremo de un período es el más
+ * nuevo (`extremoNuevo`/`extremoViejo` en `adjust.ts`), y tiene que salir de un solo
+ * lugar para que un control de la interfaz no pueda ofrecer un período invertido que el
+ * motor sí acepta.
+ */
+export function compararPuntos(a: Punto, b: Punto): number {
+  return compararMeses(mesDe(a), mesDe(b));
+}
+
 /** Lista inclusiva de `a` a `b`. Va hacia atrás si `b` es anterior a `a`. */
 export function rangoMeses(a: Mes, b: Mes): Mes[] {
   const paso = compararMeses(b, a) >= 0 ? 1 : -1;
@@ -134,6 +146,18 @@ export function diasEnMes(mes: Mes): number {
 /** Primer día de `mes`, como fecha completa. */
 export function primerDia(mes: Mes): Fecha {
   return `${mes}-01`;
+}
+
+/**
+ * Resta `n` meses a una fecha, recortando el día si el mes de destino es más corto.
+ *
+ * 31 de marzo menos 1 mes cae en un mes que no tiene día 31: el resultado es el
+ * último día de febrero (28 o 29), no marzo desbordado a abril.
+ */
+export function restarMesesAFecha(fecha: Fecha, n: number): Fecha {
+  const mesDestino = deOrdinal(aOrdinal(mesDe(fecha)) - n);
+  const dia = Math.min(diaDe(fecha), diasEnMes(mesDestino));
+  return `${mesDestino}-${String(dia).padStart(2, "0")}`;
 }
 
 /**

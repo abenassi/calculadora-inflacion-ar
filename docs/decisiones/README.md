@@ -24,6 +24,7 @@ arquitectura y la que probablemente quieras copiar tal cual.
 | [0009](0009-paginas-por-anio-y-seo.md) | Una página por año | El SEO obligó a decir en voz alta dos cosas que el sitio callaba |
 | [0010](0010-indices-provinciales-y-regiones.md) | El IPC de tu provincia | Sólo diez de veinticuatro miden, y ofrecer una región sin decirlo sería prometer lo que no hay |
 | [0011](0011-csv-de-descarga-sin-metadata.md) | El CSV de descarga se queda sin metadata | Las filas `#` rompían la lectura en algunos programas; se sacrifica contexto (fecha, método) para que el archivo abra bien en cualquier lado |
+| [0012](0012-atajos-de-fecha.md) | Atajos de fecha: "ahora" y 1m/3m/6m/12m | Mueven fechas, no cambian el cálculo — no reviven los presets que sacó la 0002 |
 
 ## Formato
 

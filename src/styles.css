@@ -129,6 +129,52 @@ h1 {
   color: var(--text-secondary);
 }
 
+/*
+ * Envuelve un campo de fecha (su versión mes y su versión día, que se alternan con
+ * `hidden`) junto con su fila de atajos, para que el grid del formulario los trate
+ * como una sola celda: los atajos quedan siempre pegados a SU campo sin importar
+ * cómo el `auto-fit` reparta las columnas en cada ancho de pantalla.
+ */
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.atajos {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.atajo {
+  border: 1px solid var(--border);
+  background: var(--plane);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.atajo:hover:not(:disabled) {
+  background: var(--wash-hover);
+}
+
+/* El que reproduce el valor que ya está cargado, marcado para orientar sin gritar. */
+.atajo[aria-pressed="true"] {
+  background: var(--series-1);
+  border-color: var(--series-1);
+  color: #ffffff;
+}
+
+.atajo:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .entrada-monto {
   display: flex;
   align-items: center;
