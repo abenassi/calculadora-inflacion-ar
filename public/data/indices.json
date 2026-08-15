@@ -10,7 +10,7 @@
         "INDEC"
       ],
       "primerMes": "1990-01",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-07"
     },
     {
       "slug": "caba",
@@ -121,7 +121,7 @@
         "INDEC Gran Buenos Aires"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-07"
     },
     {
       "slug": "pampeana",
@@ -133,7 +133,7 @@
         "INDEC Pampeana"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-07"
     },
     {
       "slug": "noroeste",
@@ -145,7 +145,7 @@
         "INDEC Noroeste"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-07"
     },
     {
       "slug": "noreste",
@@ -157,7 +157,7 @@
         "INDEC Noreste"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-07"
     },
     {
       "slug": "cuyo",
@@ -169,7 +169,7 @@
         "INDEC Cuyo"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-07"
     },
     {
       "slug": "patagonia",
@@ -181,8 +181,8 @@
         "INDEC Patagónica"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-07"
     }
   ],
-  "actualizado": "2026-08-14T00:19:52.506Z"
+  "actualizado": "2026-08-15T12:17:52.846Z"
 }
