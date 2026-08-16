@@ -126,3 +126,56 @@ menos) salvo por el agujero de las ventanas que cruzan bordes de mes, que ya exi
 
 El modo por meses sigue siendo el default y el recomendado cuando el número tiene que ser
 indiscutible: nada de esto arregla que el IPC mensual no es la foto de un día (0004).
+
+## Lo que aprendió el pie de la tabla, en tres vueltas
+
+Cambiar la ventana no cambió un solo número del modo mensual, y aun así rompió el pie de la
+tabla dos veces. Vale la pena dejar por qué, porque el error de fondo es el mismo las dos
+veces: **una fila prorrateada no cae de ningún lado de la pregunta vieja.** No es una
+proyección —nadie estimó nada— y tampoco es un dato publicado —el INDEC no publica días—, y
+todos los predicados del sitio estaban escritos para un mundo de dos categorías.
+
+- La vuelta 1 preguntaba "¿hay alguna fila que no sea proyección?", y una tabla enteramente
+  prorrateada contestaba que sí: *"Todas las filas salen de datos oficiales."*
+- La vuelta 2 lo corrigió preguntando por el sello, y se pasó de largo para el otro lado: un
+  período por día que arranca dentro del último mes publicado no tiene ninguna fila sellada,
+  y el pie pasó a decir *"el INDEC todavía no publicó ninguno de estos meses"* dos renglones
+  abajo de citar la inflación de julio.
+- La vuelta 3 encontró que la pregunta seguía mal planteada en un tercer eje: **de qué filas
+  habla**. Las tres frases hablan de los porcentajes, y la fila de partida no muestra
+  ninguno. Con el origen el 1 de un mes publicado, esa fila lleva su `INDEC ✓` impreso y
+  arrastraba al pie a decir *"Todas las filas salen de datos oficiales"* sobre una tabla cuyo
+  único porcentaje dice `prorrateado` — mientras el gráfico de la misma pantalla contestaba
+  lo contrario, porque él siempre miró `slice(1)`.
+
+Quedó un solo predicado, `hayTramoOficial` (sello sobre `slice(1)`), y **tres** frases, no
+dos: hay un caso donde ningún porcentaje es publicado y aun así todos salen de meses
+publicados, y otro donde ninguno es publicado y la fila de partida sí lo es. Las tres se
+atan con un test que pasa por `selloDeFila` —lo que se imprime en la columna Origen— y por
+el texto renderizado. El test anterior era `if (hayDatoOficial(r)) expect(<la definición de
+hayDatoOficial>)`: no podía fallar, y no falló cuando el revisor de código devolvió el
+predicado a su versión equivocada.
+
+## El techo de tres vueltas
+
+Este cambio llegó al techo que fija el skill: tres vueltas que encuentran cosas. Lo que la
+vuelta 3 levantó y **no** entró acá va como cambios propios, y está anotado para no perderse:
+
+- **Deflactando, la tabla le pone a cada porcentaje el mes de al lado.** Yendo para atrás, la
+  fila rotulada "jun 2026" muestra el índice de junio y la variación jul→jun: −2,07%, que es
+  julio dado vuelta. Junio fue +1,89%. Con `INDEC ✓` al lado, y así viaja al texto que se
+  copia. Es pre-existente —el camino de deflactar no lo tocó este cambio— y es una violación
+  de la regla 2 de las caras: le atribuye al INDEC una cifra de un mes que no es. La razón
+  con la que se difirió en la vuelta 2, *"es el mismo dato leído en la dirección que se
+  pidió"*, era **falsa**.
+- **Puntas mixtas mes+día.** `adjust("2026-06", "2026-07-15")` produce una fila fantasma
+  "jun 2026, +0,00%, INDEC ✓" que duplica la de partida, porque `puntosDelRecorrido` sigue
+  mapeando un mes a su día 1 mientras el motor lo valúa en su cierre. Y la UI reinterpreta
+  `?desde=2026-06&hasta=2026-07-15` como `2026-06-01`, así que el mismo par de puntos
+  contesta +2,85% en pantalla y +0,95% en el motor. Hoy no se llega desde la interfaz, pero
+  el motor promete soportarlo y tiene tests que lo dicen.
+- **El texto que se copia habla de "tramo de referencia"**, que es vocabulario nuestro. La
+  revisora usuaria propuso "el último período comparable". Es una decisión de nombre que
+  toca el pie, el nombre del CSV y esta misma ADR.
+- Sigue en pie lo diferido de las vueltas 1 y 2: el guard de sesgo, el layout en el celular,
+  la metodología por default, y el día ≠ 1 del primer mes de la serie.

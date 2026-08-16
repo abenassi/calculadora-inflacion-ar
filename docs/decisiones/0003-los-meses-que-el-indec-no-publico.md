@@ -126,6 +126,12 @@ del INDEC imposible de señalar. Lo mismo hacía la referencia del gráfico, que
 menos un tramo oficial. Es la regla 2 aplicada al revés de como se suele leer: no
 prometer dato oficial donde no lo hay es tan importante como marcar lo estimado.
 
+> **Al día de la 0013 esto quedó a medias, y volvió a morder.** "Un tramo oficial" se
+> implementó como "una fila sin sello de estimación", y con las filas prorrateadas de la
+> ventana por día eso dejó de ser lo mismo: una fila prorrateada no es una estimación y
+> tampoco es un dato publicado. Hoy la pregunta se hace con el sello (`llevaSello`) y sobre
+> `slice(1)`, sin la fila de partida, que no muestra ningún porcentaje. Ver la 0013.
+
 **El texto que se copia arrancaba diciendo "IPC del INDEC".** En pantalla el cartel de
 ESTIMADO está pegado al número y se ve de lejos; pegado en un mensaje eso desaparece y
 quedan dos renglones que le atribuyen al INDEC un porcentaje que el INDEC no publicó.
@@ -160,8 +166,17 @@ salteaba entero. Ahora, cuando la punta vieja cae en un día que no es el 1, su 
 **Y la frase nueva mentía en espejo.** *"En esta tabla no hay ningún dato oficial"* se
 decidía mirando sólo los tramos, así que aparecía con una fila de partida que llevaba su
 `INDEC ✓` impreso dos centímetros más arriba. Es la misma falla que vino a corregir, dada
-vuelta. Ahora sale de `hayDatoOficial()`, que mira todas las filas — y de una sola función,
-porque el pie de la tabla y la referencia del gráfico afirman lo mismo y se leen juntos.
+vuelta. La solución de entonces fue mirar todas las filas, con una sola función para el pie
+y para la referencia del gráfico.
+
+> **Y esa solución se pasó de largo, como registra la 0013.** Las tres frases que cuelgan de
+> acá hablan de los **porcentajes** —"el resto son datos oficiales", "todas las filas salen
+> de datos oficiales", la referencia del gráfico— y la fila de partida no muestra ninguno.
+> Mirando la tabla entera, un período por día que arranca el 1 de un mes publicado contestaba
+> que sí había dato oficial mientras su único porcentaje decía `prorrateado`, y el gráfico de
+> la misma pantalla contestaba lo contrario porque él sí miraba `slice(1)`. Hoy es una sola
+> función, `hayTramoOficial`, sobre `slice(1)`. La frase que sí puede hablar de la fila de
+> partida es otra, y por eso son tres casos y no dos.
 
 **Pedir una metodología de estimación no obliga a que haya algo que estimar.** Con un
 destino que cae el 1° del mes siguiente al último publicado no queda nada que proyectar, y

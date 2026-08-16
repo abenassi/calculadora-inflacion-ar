@@ -260,31 +260,25 @@ export function aclararParciales(r: Resultado): string {
 }
 
 /**
- * Si en la tabla hay algún dato oficial que la persona pueda señalar con el dedo.
+ * Si algún **porcentaje** de la tabla es un dato publicado que se pueda señalar con el dedo.
  *
- * Mira **todas** las filas, incluida la de partida: con un origen ya publicado, esa fila
- * lleva su sello del INDEC impreso, así que decir "acá no hay ningún dato oficial" la
- * contradice a dos centímetros.
+ * Mira `slice(1)`, sin la fila de partida, y ésa es toda la gracia. Las tres superficies que
+ * cuelgan de acá —"Todas las filas salen de datos oficiales", "El resto son datos oficiales"
+ * y la referencia "dato oficial" del gráfico— hablan de los porcentajes, y la fila de partida
+ * no muestra ninguno: sólo fija el monto inicial, y el gráfico ni siquiera la dibuja.
  *
- * Pregunta por el **sello**, no por "que no sea proyección". Una fila prorrateada no es
- * una proyección y tampoco es un dato publicado: preguntando lo segundo, una tabla con
- * todas las filas prorrateadas contestaba que sí había dato oficial. El predicado sale de
- * `llevaSello`, el mismo del que sale el sello impreso (regla 4).
+ * Mirando la tabla entera, un período por día que arranca el 1 de un mes publicado —la fila
+ * de partida lleva sello, el único porcentaje es un prorrateo— contestaba que sí, y el pie
+ * decía "Todas las filas salen de datos oficiales publicados por el INDEC" arriba de una
+ * tabla cuya única fila con porcentaje dice `prorrateado`. En la misma pantalla el gráfico
+ * contestaba lo contrario, porque él sí preguntaba por `slice(1)`.
+ *
+ * Pregunta por el **sello**, no por "que no sea proyección". Una fila prorrateada no es una
+ * proyección y tampoco es un dato publicado: preguntando lo segundo, una tabla con todas las
+ * filas prorrateadas contestaba que sí había dato oficial. Sale de `llevaSello`, el mismo
+ * criterio del sello impreso (regla 4).
  */
-export function hayDatoOficial(r: Resultado): boolean {
-  return r.desglose.some(llevaSello);
-}
-
-/**
- * Si alguna **barra** del gráfico es un dato publicado.
- *
- * No es la misma pregunta que `hayDatoOficial`, y por eso no es la misma función: el
- * gráfico dibuja `desglose.slice(1)`, sin la fila de partida. Preguntando por la tabla,
- * la referencia "dato oficial" aparecía sobre un gráfico de una sola barra prorrateada
- * —el caso normal de la ventana por día— porque la fila que la justificaba no se dibuja.
- * Las dos preguntas descansan en el mismo criterio, `llevaSello`.
- */
-export function hayBarraOficial(r: Resultado): boolean {
+export function hayTramoOficial(r: Resultado): boolean {
   return r.desglose.slice(1).some(llevaSello);
 }
 
@@ -342,42 +336,47 @@ export function avisarTramoAjeno(r: Resultado): string {
     ? `${conPreposicion("de", ini!)} ${conPreposicion("a", fin!)}`
     : `la inflación de ${frasearMeses(r.desglose.slice(1).map((f) => mesDe(f.punto)))}`;
 
+  // Ni "Pediste" ni "Abajo no vas a encontrar esos meses". Lo primero porque el aviso
+  // encabeza el texto que se copia y se manda, y quien lo recibe no pidió nada: lee
+  // "pediste" como si le hablaran a ella. Lo segundo porque era **falso** apenas los dos
+  // períodos se pisan: pidiendo de mayo a agosto, la ventana son mayo, junio y julio, y
+  // mayo está abajo. Lo único que no está es lo que no se publicó.
   return (
-    `Pediste ${conPreposicion("de", r.desde)} ${conPreposicion("a", r.hasta)}, y eso todavía ` +
-    `no está publicado. Abajo no vas a encontrar ${porDia ? "esas fechas" : "esos meses"}: ` +
-    `lo que ves es lo que se usó en su lugar, ${tramo}.`
+    `El período que pediste, ${conPreposicion("de", r.desde)} ${conPreposicion("a", r.hasta)}, ` +
+    `todavía no está publicado entero. Estos números son ${tramo}, el tramo publicado más ` +
+    `reciente del mismo largo.`
   );
 }
 
 /**
  * De dónde salen las filas que no son una estimación, dicho sin prometer de más.
  *
- * Hay **dos** predicados y no uno, y confundirlos fue el defecto que esto vino a cerrar:
+ * Las tres frases hablan de los **porcentajes**, así que las tres preguntan por `slice(1)`:
+ * la fila de partida no muestra ninguno. Y hay **tres** casos y no dos, que es lo que este
+ * pie fue aprendiendo a los golpes:
  *
- * - `hayDatoOficial` — alguna fila muestra un número tal cual lo publicó el organismo.
- * - `hayMesPublicado` — alguna fila descansa en un mes publicado, aunque el número que
- *   muestre sea un prorrateo nuestro.
- *
- * Entre los dos hay un caso entero, y es el más común del producto: un período por día que
- * arranca dentro del último mes publicado. Ahí ninguna fila lleva sello, pero la mitad del
- * movimiento sale de un mes que sí está publicado. Preguntando sólo por el sello, el pie
- * decía "el INDEC todavía no publicó ninguno de estos meses" dos renglones abajo de citar
- * la inflación de julio, y el texto que se copia —que viaja sin el sitio al lado— cerraba
- * con "son todas estimaciones" sobre un cálculo cuya mitad es dato publicado.
+ * 1. Algún tramo lleva sello — se puede decir "el resto son datos oficiales" y señalarlo.
+ * 2. Ningún tramo lleva sello, pero los que no son estimación reparten meses publicados.
+ *    Es el caso más común del producto: un período por día que arranca dentro del último
+ *    mes publicado. Preguntando sólo por el sello, el pie decía "el INDEC todavía no
+ *    publicó ninguno de estos meses" dos renglones abajo de citar la inflación de julio, y
+ *    el texto que se copia —que viaja sin el sitio al lado— cerraba con "son todas
+ *    estimaciones" sobre un cálculo cuya mitad es dato publicado.
+ * 3. Todos los tramos son estimación. Acá la frase **no puede** hablar de "estos meses":
+ *    con el origen en un mes publicado —"de julio a hoy", la consulta insignia— julio está
+ *    publicado y su fila lo muestra sellado, aunque el único porcentaje sea el estimado.
  */
 function deDondeSalenLasFilas(r: Resultado): string {
   const organismo = fuenteDe(r.desglose, r).publicadosPor;
-  if (hayDatoOficial(r)) return ` El resto son datos oficiales.`;
-  if (hayMesPublicado(r)) {
+  const tramos = r.desglose.slice(1);
+  if (tramos.some(llevaSello)) return ` El resto son datos oficiales.`;
+  if (tramos.some((f) => !f.esProyeccion)) {
     return (
-      ` Ninguna fila muestra un número tal cual lo publicó ${organismo}: las que no son ` +
-      `estimación reparten entre los días meses que sí publicó.`
+      ` Ningún porcentaje de esta tabla es un número que haya publicado ${organismo} tal ` +
+      `cual: los que no son estimación reparten entre los días meses que sí publicó.`
     );
   }
-  return (
-    ` En esta tabla no hay ningún dato oficial: ${quienPublicaAhora(r)} todavía no publicó ` +
-    `ninguno de estos meses.`
-  );
+  return ` Ningún porcentaje de esta tabla es un dato publicado: son todos estimaciones.`;
 }
 
 /** El pie de la tabla, que dice qué está mirando el lector. */
@@ -387,7 +386,7 @@ export function explicarTabla(r: Resultado): string {
       // Un período corto por día puede tener TODAS las filas prorrateadas —del 10 al 20 de
       // junio son dos filas y ninguna cubre un mes— y aun así no tener nada estimado. La
       // frase de siempre prometía filas oficiales que ahí no se pueden señalar.
-      return hayDatoOficial(r)
+      return hayTramoOficial(r)
         ? `Todas las filas salen de datos oficiales publicados por ${fuenteDe(r.desglose, r).publicadosPor}. ` +
             `Acá no hay nada estimado.` + aclararParciales(r)
         : `Acá no hay nada estimado: todo sale de meses que ${fuenteDe(r.desglose, r).publicadosPor} ` +

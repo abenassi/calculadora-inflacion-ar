@@ -48,6 +48,7 @@ import { dibujar } from "./chart.js";
 import {
   fuenteDe,
   fuenteDeLaSerie,
+  hayTramosDeDias,
   mesDelTramo,
   organismoDeFila,
   quienPublicaAhora,
@@ -65,7 +66,7 @@ import {
   frasearMeses,
   fuenteDelTexto,
   hayAlgoEstimado,
-  hayBarraOficial,
+  hayTramoOficial,
   MESES_PROYECCION_LARGA,
 } from "./explicaciones.js";
 import { fechaLarga, indice, pesos, pesosRedondo, porcentaje, seVenDistintos } from "./format.js";
@@ -347,7 +348,7 @@ function pintarResultado(r: Resultado): void {
     .slice(1)
     .some((f) => f.esParcial && !f.esProyeccion);
   // La leyenda habla de las BARRAS, y el gráfico no dibuja la fila de partida.
-  el("leyenda-oficial").hidden = !hayBarraOficial(r);
+  el("leyenda-oficial").hidden = !hayTramoOficial(r);
   // Con `ventana_reciente` el eje del gráfico son los meses de referencia, no los
   // del período pedido: el título lo dice para que nadie lea mal las fechas.
   //
@@ -356,12 +357,12 @@ function pintarResultado(r: Resultado): void {
   // inflación de julio: titularla "Inflación mensual" invita a leer 1,98% como el mes de
   // julio, que fue 2,11%. El título sigue al eje, igual que "Tramos usados:" en el texto
   // que se copia.
-  const queMide = porTramos(r) ? "Inflación de cada tramo" : "Inflación mensual";
+  const queMide = hayTramosDeDias(r.desglose) ? "Inflación de cada tramo" : "Inflación mensual";
   el("titulo-grafico").textContent =
     r.metodo.tipo === "ventana_reciente" ? `${queMide}, sobre el tramo de referencia` : queMide;
   el("grafico").setAttribute(
     "aria-label",
-    `${queMide} del IPC en ${porTramos(r) ? "los tramos" : "los meses"} usados para el cálculo`,
+    `${queMide} del IPC en ${hayTramosDeDias(r.desglose) ? "los tramos" : "los meses"} usados para el cálculo`,
   );
   el("rotulo-principal").textContent = capitalizar(comoDestino(r.hasta));
   el("cifra-principal").textContent = esAproximado(r)
@@ -454,18 +455,6 @@ function pintarResultado(r: Resultado): void {
 }
 
 /**
- * Si las filas son tramos de días y no meses calendario.
- *
- * Lo contestan el título del gráfico, su `aria-label` y el encabezado del texto que se
- * copia. Estaba escrito dos veces con criterios distintos —uno miraba el método y el otro
- * no— y por eso la misma pantalla decía "Inflación de cada tramo" arriba del gráfico y
- * "Mes a mes:" arriba de la misma lista en el mensaje.
- */
-function porTramos(r: Resultado): boolean {
-  return esFecha(r.desglose[0]!.punto);
-}
-
-/**
  * El título de la lista de porcentajes del texto que se copia.
  *
  * Con la ventana de referencia en modo por día las filas son tramos de días —"2 jul 2026
@@ -473,8 +462,8 @@ function porTramos(r: Resultado): boolean {
  * eso invita a leer un mes entero donde hay 29 días.
  */
 function encabezadoDelDesglose(r: Resultado): string {
-  if (r.metodo.tipo !== "ventana_reciente") return porTramos(r) ? "Tramo a tramo:" : "Mes a mes:";
-  return porTramos(r) ? "Tramos usados:" : "Meses usados:";
+  if (r.metodo.tipo !== "ventana_reciente") return hayTramosDeDias(r.desglose) ? "Tramo a tramo:" : "Mes a mes:";
+  return hayTramosDeDias(r.desglose) ? "Tramos usados:" : "Meses usados:";
 }
 
 /**

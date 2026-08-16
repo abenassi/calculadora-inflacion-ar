@@ -142,6 +142,24 @@ export function llevaSello(fila: Fila): boolean {
 }
 
 /**
+ * Si alguna de las filas que muestran un porcentaje es un tramo de días.
+ *
+ * Es la pregunta que separa "Inflación mensual" de "Inflación de cada tramo", y la
+ * contestan cuatro superficies: el título del gráfico, su `aria-label`, el encabezado del
+ * texto que se copia y el tooltip de la barra. Estaba deletreada de dos formas distintas
+ * —una miraba la fila de partida, la otra estaba cableada— y el tooltip contestaba "del
+ * mes" arriba de un tramo de 15 días cuyo porcentaje no es el del mes.
+ *
+ * Mira `slice(1)` porque la fila de partida no muestra ningún porcentaje, y `esParcial`
+ * porque es el mismo criterio con el que `rotularFila` decide si el rótulo es un mes o un
+ * tramo: una fila `1 jun → 1 jul` cubre un mes entero y se rotula "jun 2026" aunque el
+ * período se haya pedido con fechas exactas.
+ */
+export function hayTramosDeDias(desglose: Fila[]): boolean {
+  return desglose.slice(1).some((f) => f.esParcial);
+}
+
+/**
  * La sigla del organismo que publicó el dato de fondo de una fila, sin el ✓.
  *
  * La necesita el `title` de una fila prorrateada y la línea que esa fila aporta al texto

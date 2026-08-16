@@ -12,10 +12,10 @@ import {
   explicarTabla,
   fuenteDelTexto,
   hayAlgoEstimado,
-  hayDatoOficial,
   hayMesPublicado,
   resumir,
 } from "../src/ui/explicaciones.js";
+import { selloDeFila } from "../src/ui/etiquetas.js";
 import { porcentaje } from "../src/ui/format.js";
 import type { Metodologia, Punto, Resultado, SerieIndice } from "../src/engine/types.js";
 
@@ -56,6 +56,13 @@ const CASOS: { que: string; desde: Punto; hasta: Punto; metodologia: Metodologia
   { que: "por día, entero adentro de un mes publicado", desde: `${menos(1)}-10`, hasta: `${menos(1)}-20`, metodologia: "sin_proyectar" },
   { que: "por día, terminando sin publicar", desde: "2026-01-10", hasta: `${mas(3)}-20`, metodologia: "repite_ultimo" },
   { que: "hacia atrás", desde: "2024-12", hasta: "2024-01", metodologia: "sin_proyectar" },
+  // Los tres casos donde la fila de partida lleva sello y ningún porcentaje lo lleva. El
+  // pie los daba por oficiales porque preguntaba por la tabla entera, y la fila de partida
+  // no muestra ningún porcentaje: "Todas las filas salen de datos oficiales" arriba de una
+  // única fila que dice `prorrateado`, y "El resto son datos oficiales" sin resto.
+  { que: "por día, del 1 al 20 de un mes publicado", desde: `${menos(1)}-01`, hasta: `${menos(1)}-20`, metodologia: "sin_proyectar" },
+  { que: "del último mes publicado al siguiente", desde: ultimo, hasta: mas(1), metodologia: "repite_ultimo" },
+  { que: "del último mes publicado al siguiente, con REM", desde: ultimo, hasta: mas(1), metodologia: "rem" },
 ];
 
 const resultados: { que: string; r: Resultado }[] = CASOS.map((c) => ({
@@ -87,6 +94,7 @@ const PROMESAS_DE_DATO_OFICIAL = [
  */
 const NEGACIONES_DE_DATO_PUBLICADO = [
   "no hay ningún dato oficial",
+  "todavía no publicó ninguno de estos meses",
   "ningún mes de este cálculo está publicado",
   "son todas estimaciones",
 ];
@@ -106,6 +114,19 @@ describe("los textos no prometen dato oficial donde hay estimación", () => {
   }
 });
 
+/**
+ * Las frases que prometen que se puede **señalar** un porcentaje publicado en la tabla.
+ *
+ * Distintas de `PROMESAS_DE_DATO_OFICIAL`, que habla de los meses: "Todos los meses del
+ * cálculo son datos oficiales ya publicados" es cierta sin ninguna fila sellada, porque un
+ * tramo prorrateado sale de un mes publicado. Éstas hablan de las filas, y sólo valen si
+ * hay una fila con sello y con porcentaje.
+ */
+const PROMESAS_SOBRE_LAS_FILAS = [
+  "salen de datos oficiales publicados",
+  "el resto son datos oficiales",
+];
+
 describe("los carteles y los textos contestan la misma pregunta", () => {
   for (const { que, r } of resultados) {
     it(que, () => {
@@ -113,11 +134,21 @@ describe("los carteles y los textos contestan la misma pregunta", () => {
       // predicados; los textos salen de las funciones de arriba. Si una tabla tiene una
       // fila estimada, las dos puntas tienen que reconocerla.
       expect(hayAlgoEstimado(r)).toBe(r.desglose.some((f) => f.esProyeccion));
-      // Con sello no puede haber ninguna fila estimada más que las estimadas: es la
-      // dirección que ya estaba cubierta. Lo que se ata acá es que si hay dato oficial,
-      // se pueda señalar una fila sin sello de estimación.
-      if (hayDatoOficial(r)) expect(r.desglose.some((f) => !f.esProyeccion)).toBe(true);
       if (hayAlgoEstimado(r)) expect(esAproximado(r)).toBe(true);
+      // Y las promesas sobre las filas se atan a lo que la tabla **imprime**, no a la
+      // definición del predicado. La versión anterior era `if (hayDatoOficial(r))
+      // expect(<la definición de hayDatoOficial>)`: no podía fallar, y de hecho no falló
+      // cuando el revisor de código devolvió `hayDatoOficial` a su versión equivocada.
+      // Acá el lado izquierdo pasa por `selloDeFila`, que es lo que se dibuja en la
+      // columna Origen, y el derecho por el texto renderizado.
+      if (r.desglose.slice(1).every((f) => selloDeFila(f, r) === null)) {
+        const textos = [explicarMetodo(r), explicarTabla(r)];
+        for (const texto of textos) {
+          for (const promesa of PROMESAS_SOBRE_LAS_FILAS) {
+            expect(texto.toLowerCase()).not.toContain(promesa);
+          }
+        }
+      }
     });
   }
 });
@@ -218,7 +249,25 @@ describe("la ventana de referencia en modo por día", () => {
     expect(aviso).toContain("al 15 de agosto de 2026");
     expect(aviso).toContain("del 1 de junio de 2026");
     expect(aviso).toContain("al 30 de junio de 2026");
-    expect(aviso).toContain("esas fechas");
+    // Ni "pediste" como verbo suelto ni "abajo". El aviso encabeza el texto que se copia y
+    // se manda: quien lo recibe no pidió nada, y abajo de un mensaje no hay una tabla.
+    expect(aviso).not.toMatch(/^Pediste/);
+    expect(aviso.toLowerCase()).not.toContain("abajo");
+  });
+
+  /**
+   * El aviso decía "Abajo no vas a encontrar esos meses" y era **falso** apenas los dos
+   * períodos se pisan. Pidiendo de mayo a agosto con junio publicado, la ventana son los
+   * últimos 3 meses publicados —abril, mayo y junio— y mayo está abajo, con su porcentaje.
+   * La revisora usuaria lo leyó y buscó el mes que le acababan de decir que no iba a estar.
+   */
+  it("no promete que los meses pedidos no están cuando la ventana se pisa con el pedido", () => {
+    const r = adjust(1_000_000, "2026-05", "2026-08", congelada, { hoy: "2026-08" });
+    expect(r.metodo.tipo).toBe("ventana_reciente");
+    const aviso = avisarTramoAjeno(r);
+    expect(aviso).toContain("de mayo 2026 a agosto 2026");
+    expect(aviso).toContain("abril, mayo y junio de 2026");
+    expect(aviso).not.toContain("no vas a encontrar");
   });
 
   it("sin ventana corrida no hay aviso, para que el aviso no deje de leerse", () => {

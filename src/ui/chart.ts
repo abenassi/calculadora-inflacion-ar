@@ -6,10 +6,12 @@
  * consulta. Lo que sí varía —y lo que la persona necesita para defender el
  * porcentaje que aplicó— es cuánto subió cada mes.
  *
- * Una sola serie, así que no lleva caja de leyenda: el título nombra qué se está
- * viendo. Lo único que hay que distinguir dentro de la serie es el mes oficial del
- * estimado, y eso va por trama diagonal además de por la leyenda inline del
- * encabezado — nunca por color solo.
+ * Una sola serie, así que no lleva caja de leyenda: el título nombra qué se está viendo.
+ * Adentro de la serie hay **tres** clases de barra, no dos, y ninguna se distingue por
+ * color solo: el mes publicado va liso, el estimado va con trama diagonal, y el tramo
+ * prorrateado —que no es ninguna de las dos: su número no lo publicó nadie, pero tampoco
+ * es una estimación— va con el mismo color más claro y el contorno lleno. Las tres tienen
+ * su leyenda inline en el encabezado.
  *
  * Colores tomados de la paleta de referencia (slot categórico 1), validados contra
  * ambas superficies con el validador del skill de dataviz.
@@ -25,7 +27,7 @@ import {
 } from "chart.js";
 
 import type { Resultado } from "../engine/types.js";
-import { llevaSello, rotularFila } from "./etiquetas.js";
+import { hayTramosDeDias, llevaSello, rotularFila } from "./etiquetas.js";
 import { porcentaje } from "./format.js";
 
 Chart.register(CategoryScale, LinearScale, BarController, BarElement, Tooltip);
@@ -124,7 +126,7 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
       labels: filas.map((_, i) => rotularFila(r.desglose, i + 1, true)),
       datasets: [
         {
-          label: "Inflación del tramo",
+          label: hayTramosDeDias(r.desglose) ? "Inflación del tramo" : "Inflación mensual",
           data: filas.map((f) => f.varMensualPct ?? 0),
           backgroundColor: filas.map((f) =>
             f.esProyeccion ? estimada : f.esParcial ? prorrateada : t.serie,
@@ -171,7 +173,11 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
             },
             label: (item) => {
               const fila = filas[item.dataIndex]!;
-              const partes = [`Inflación del mes: ${porcentaje(fila.varMensualPct ?? 0)}`];
+              // Por fila y no por tabla: el rótulo de arriba ya distingue "5 jul → 20 jul"
+              // de "jun 2026" con este mismo criterio, y decir "del mes" sobre un tramo de
+              // 15 días le pone el nombre de julio (+2,11%) a un número que es +1,02%.
+              const de = fila.esParcial ? "Inflación del tramo" : "Inflación del mes";
+              const partes = [`${de}: ${porcentaje(fila.varMensualPct ?? 0)}`];
               if (fila.acumuladoPct !== null) {
                 partes.push(`${porcentaje(fila.acumuladoPct)} acumulado`);
               }
