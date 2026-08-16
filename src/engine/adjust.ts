@@ -47,9 +47,9 @@ import {
   compararPuntos,
   deOrdinal,
   diaDe,
-  diasEntre,
   diffMeses,
   esFecha,
+  largoEnDias,
   interpolarEnMes,
   mesDe,
   nombrarMes,
@@ -230,7 +230,10 @@ function ventanaDeReferencia(
     return [correr(desde, desplazamiento), correr(hasta, desplazamiento)];
   }
   const fin = ultimoDia(ultimoOficial);
-  const inicio = restarDias(fin, diasEntre(desde, hasta));
+  // `largoEnDias` y no `diasEntre`: con un extremo mes y el otro día, `diasEntre` toma el
+  // mes por su día 1 y el motor lo valúa en su cierre. La ventana de `2026-07 → 2026-08-15`
+  // salía de 45 días cuando el período pedido son 14, o sea 3,2 veces más larga.
+  const inicio = restarDias(fin, largoEnDias(desde, hasta));
   // Deflactando, el extremo viejo es `hasta`: la ventana se recorre al revés para que el
   // resultado siga dividiendo, no multiplicando.
   return compararPuntos(desde, hasta) <= 0 ? [inicio, fin] : [fin, inicio];
@@ -588,7 +591,23 @@ function armarResultado(
       monto: (monto * indice) / indiceBase,
       esProyeccion: proyectado,
       origen: proyectado ? "proyeccion" : idx.origenDe(mesDe(punto)),
-      esParcial: i > 0 && !cubreUnMesEntero(puntos[i - 1]!, punto),
+      // La fila de partida también es parcial cuando su índice no es un dato publicado.
+      //
+      // Una fila lleva el sello del organismo si el número que muestra salió de él. Para
+      // las filas con porcentaje eso se decide por el tramo; la de partida no tiene tramo,
+      // pero **sí muestra un índice**, y en modo por día ese índice es una interpolación
+      // nuestra: el 2 de julio de 2026 salía sellado `INDEC ✓` con 11.834,39, un número
+      // que el INDEC nunca publicó —publicó 11.826,41 para junio y 12.076,39 para julio—.
+      // Quien va a comprobarlo contra la publicación oficial no lo encuentra, y es la
+      // única fila que le prometía que sí.
+      //
+      // `datos.html` y la decisión 0004 ya decían que **las dos** puntas van marcadas
+      // prorrateado. Era cierto de una sola. Un día 1 no entra: ahí el índice del día es,
+      // por construcción, el cierre del mes anterior, que sí es dato publicado.
+      esParcial:
+        i === 0
+          ? esFecha(punto) && diaDe(punto) !== 1
+          : !cubreUnMesEntero(puntos[i - 1]!, punto),
     };
   });
 

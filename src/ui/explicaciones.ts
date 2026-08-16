@@ -19,13 +19,14 @@ import {
   diasEnMes,
   diasEntre,
   esFecha,
+  largoEnDias,
   mesConAnio,
   mesDe,
   nombrarMes,
   soloMes,
 } from "../engine/mes.js";
 import type { Mes, Resultado } from "../engine/types.js";
-import { fuenteDe, quienPublicaAhora } from "./etiquetas.js";
+import { fuenteDe, llevaSello, quienPublicaAhora } from "./etiquetas.js";
 
 /** Para arrancar una oración con el organismo, que viene con el artículo en minúscula. */
 export const capitalizar = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
@@ -97,18 +98,28 @@ export function explicarMetodo(r: Resultado): string {
       // al 10 de agosto no pasaron 3 meses, pasaron 87 días. Decir "3 meses" es
       // falso y lo detecta cualquiera que mire el calendario.
       const largo = esFecha(r.desde) || esFecha(r.hasta)
-        ? `pasaron ${diasEntre(r.desde, r.hasta)} días`
+        ? `pasaron ${largoEnDias(r.desde, r.hasta)} días`
         : plural(mesesDelPeriodo, "pasó 1 mes", `pasaron ${mesesDelPeriodo} meses`);
       const contexto =
         `${capitalizar(conPreposicion("de", r.desde))} ${conPreposicion("a", r.hasta)} ` +
         `${largo}, y ${quienPublicaAhora(r)} todavía no publicó ` +
         `${frasearMeses(mesesSinPublicar, "ni")}. `;
-      // El resultado se muestra con "~" y antes esta frase decía que no había
-      // ninguna estimación. Las dos cosas son ciertas y juntas se contradicen, así
-      // que la aproximación tiene que quedar atribuida a su causa real.
+      // El orden importa más que las palabras. "Son todos datos publicados por el INDEC; el ~
+      // está porque el tramo no es el tuyo" pone la tranquilidad primero y la salvedad
+      // después, y la revisora usuaria leyó las dos mitades como si se anularan: se llevaba
+      // "es un dato oficial" de un número que no es el de su período. Peor todavía, con un
+      // período que arranca en el último mes publicado la metodología que **sí** estima puede
+      // dar exactamente el mismo número —repite la tasa de ese mes, y prorratear es
+      // geométrico—, así que la misma cifra al centavo aparecía una vez sellada "datos
+      // oficiales" y otra bajo un "OJO: esto es una estimación".
+      //
+      // La salvedad va primero, entonces, y la atribución después y acotada a lo que de
+      // verdad cubre: los meses de los que sale el número, no el número.
       const cierre =
-        `Son todos datos publicados por ${fuenteDe(r.desglose, r).publicadosPor}; el ~ está porque ` +
-        `el tramo que se usó no es exactamente el tuyo.`;
+        `Ojo: no es la inflación de tu período —ésa todavía no se puede saber—, es la del tramo ` +
+        `de referencia, y por eso el resultado va con ~. Ninguno de estos porcentajes es una ` +
+        `estimación: los meses de los que salen ya los publicó ` +
+        `${fuenteDe(r.desglose, r).publicadosPor}.`;
 
       // En modo por día las filas son fechas, no meses: enumerar sus meses
       // duplicaría el del extremo. Se nombra el tramo por sus puntas, que además
@@ -130,8 +141,11 @@ export function explicarMetodo(r: Resultado): string {
             : `el tramo que va ${conPreposicion("de", ini!)} ${conPreposicion("a", fin!)}, ` +
               `que termina con ${ultimo}`;
 
+        // "los últimos N días publicados" sonaba a que existe un dato diario en algún lado.
+        // El INDEC publica meses, y eso lo explica el propio sitio dos secciones más abajo.
         return (
-          `${contexto}Así que usamos los últimos ${dias} días publicados: ${tramo}. ${cierre}`
+          `${contexto}Así que usamos el tramo de ${dias} días más reciente que cae adentro de ` +
+          `lo publicado: ${tramo}. ${cierre}`
         );
       }
 
@@ -234,10 +248,14 @@ export function aclararParciales(r: Resultado): string {
   // tabla donde las nueve decían `estimado`.
   const parciales = r.desglose.filter((f) => f.esParcial && !f.esProyeccion).length;
   if (parciales === 0) return "";
+  // La fila de partida no muestra ningún porcentaje —muestra un índice interpolado—, así
+  // que "es un tramo de días sueltos" no la describe. La frase habla de lo único que las
+  // dos clases tienen en común y que es lo que importa: el número que muestran lo sacamos
+  // nosotros repartiendo un dato del organismo entre los días de su mes.
   return (
     ` ${plural(parciales, "La fila marcada como prorrateada no es un mes entero", "Las filas marcadas como prorrateadas no son meses enteros")}: ` +
-    `${plural(parciales, "es un tramo", "son tramos")} de días sueltos, y ` +
-    `${plural(parciales, "le toca", "les toca")} la parte proporcional de la inflación de su mes.`
+    `${plural(parciales, "su número sale", "sus números salen")} de repartir la inflación de ` +
+    `su mes entre los días, que es una cuenta nuestra sobre un dato publicado.`
   );
 }
 
@@ -246,12 +264,28 @@ export function aclararParciales(r: Resultado): string {
  *
  * Mira **todas** las filas, incluida la de partida: con un origen ya publicado, esa fila
  * lleva su sello del INDEC impreso, así que decir "acá no hay ningún dato oficial" la
- * contradice a dos centímetros. Y sale de una sola función porque el pie de la tabla y la
- * referencia del gráfico afirman lo mismo y se leen juntos: dos copias del predicado es
- * exactamente cómo terminan diciendo cosas distintas (regla 4).
+ * contradice a dos centímetros.
+ *
+ * Pregunta por el **sello**, no por "que no sea proyección". Una fila prorrateada no es
+ * una proyección y tampoco es un dato publicado: preguntando lo segundo, una tabla con
+ * todas las filas prorrateadas contestaba que sí había dato oficial. El predicado sale de
+ * `llevaSello`, el mismo del que sale el sello impreso (regla 4).
  */
 export function hayDatoOficial(r: Resultado): boolean {
-  return r.desglose.some((f) => !f.esProyeccion);
+  return r.desglose.some(llevaSello);
+}
+
+/**
+ * Si alguna **barra** del gráfico es un dato publicado.
+ *
+ * No es la misma pregunta que `hayDatoOficial`, y por eso no es la misma función: el
+ * gráfico dibuja `desglose.slice(1)`, sin la fila de partida. Preguntando por la tabla,
+ * la referencia "dato oficial" aparecía sobre un gráfico de una sola barra prorrateada
+ * —el caso normal de la ventana por día— porque la fila que la justificaba no se dibuja.
+ * Las dos preguntas descansan en el mismo criterio, `llevaSello`.
+ */
+export function hayBarraOficial(r: Resultado): boolean {
+  return r.desglose.slice(1).some(llevaSello);
 }
 
 /** Si algo de lo que se muestra es efectivamente una estimación. */
@@ -270,6 +304,29 @@ export function esAproximado(r: Resultado): boolean {
   return r.metodo.tipo === "ventana_reciente" || hayAlgoEstimado(r);
 }
 
+/**
+ * El aviso que va **arriba** de la tabla cuando las filas no son el período pedido.
+ *
+ * Vive arriba y no en el pie por una razón que la revisora usuaria dijo mejor que nadie:
+ * *"el pie lo leo yo, que estoy buscando el problema; la clienta mira la tabla"*. Con
+ * fechas exactas el salto es más violento que con meses —pidió del 17 de julio al 15 de
+ * agosto y la tabla habla del 2 al 31 de julio, y **ninguna** de sus dos fechas aparece en
+ * ningún lado—, así que el aviso nombra las dos cosas: lo que pidió y lo que se usó.
+ *
+ * Devuelve `""` cuando las filas sí son el período pedido, y entonces el elemento se
+ * esconde: un aviso permanente deja de leerse.
+ */
+export function avisarTramoAjeno(r: Resultado): string {
+  if (r.metodo.tipo !== "ventana_reciente") return "";
+  const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto].sort(compararPuntos);
+  const esas = esFecha(r.desde) || esFecha(r.hasta) ? "esas fechas" : "esos meses";
+  return (
+    `Pediste ${conPreposicion("de", r.desde)} ${conPreposicion("a", r.hasta)}, y eso todavía ` +
+    `no está publicado. Abajo no vas a encontrar ${esas}: lo que ves es el tramo que se usó ` +
+    `en su lugar, ${conPreposicion("de", ini!)} ${conPreposicion("a", fin!)}.`
+  );
+}
+
 /** El pie de la tabla, que dice qué está mirando el lector. */
 export function explicarTabla(r: Resultado): string {
   switch (r.metodo.tipo) {
@@ -279,9 +336,12 @@ export function explicarTabla(r: Resultado): string {
         `Acá no hay nada estimado.` + aclararParciales(r)
       );
     case "ventana_reciente":
+      // Qué se está mirando lo dice `avisarTramoAjeno`, arriba de la tabla. Acá abajo queda
+      // lo que sólo se puede decir habiendo visto las filas: de dónde salió cada número.
       return (
-        `Este es el tramo publicado más reciente del mismo largo que el que pediste. Lo usamos ` +
-        `como referencia porque los últimos meses del tuyo todavía no salieron.` +
+        `Es el tramo publicado más reciente del mismo largo que el que pediste, y por eso ` +
+        `sirve de referencia. Ningún porcentaje de esta tabla es una estimación: los meses ` +
+        `de los que salen ya los publicó ${fuenteDe(r.desglose, r).publicadosPor}.` +
         aclararParciales(r)
       );
     case "proyeccion": {

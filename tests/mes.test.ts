@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { compararPuntos, restarMesesAFecha } from "../src/engine/mes.js";
+import {
+  compararPuntos,
+  largoEnDias,
+  restarDias,
+  restarMesesAFecha,
+  ultimoDia,
+} from "../src/engine/mes.js";
 import { hoyFecha, mesActual } from "../src/engine/adjust.js";
 
 describe("restarMesesAFecha", () => {
@@ -88,5 +94,55 @@ describe("mesActual y hoyFecha, en hora local", () => {
       expect(mesActual(instante)).toBe("2026-05");
       expect(hoyFecha(instante)).toBe("2026-05-07");
     });
+  });
+});
+
+describe("restarDias", () => {
+  it("resta dentro del mes", () => {
+    expect(restarDias("2026-07-31", 29)).toBe("2026-07-02");
+    expect(restarDias("2026-07-31", 0)).toBe("2026-07-31");
+  });
+
+  it("cruza el mes y el año hacia atrás", () => {
+    expect(restarDias("2026-07-01", 1)).toBe("2026-06-30");
+    expect(restarDias("2026-01-01", 1)).toBe("2025-12-31");
+    expect(restarDias("2026-08-15", 400)).toBe("2025-07-11");
+  });
+
+  it("acierta el bisiesto, que es para lo que se usa Date", () => {
+    expect(restarDias("2024-03-01", 1)).toBe("2024-02-29");
+    expect(restarDias("2023-03-01", 1)).toBe("2023-02-28");
+  });
+});
+
+describe("ultimoDia", () => {
+  it("da el último día de cada largo de mes", () => {
+    expect(ultimoDia("2026-07")).toBe("2026-07-31");
+    expect(ultimoDia("2026-06")).toBe("2026-06-30");
+    expect(ultimoDia("2026-02")).toBe("2026-02-28");
+    expect(ultimoDia("2024-02")).toBe("2024-02-29");
+  });
+});
+
+/**
+ * El largo de un período, medido como lo valúa el motor.
+ *
+ * `diasEntre` toma un mes por su día 1 y el motor lo valúa en su cierre. Mientras las dos
+ * convenciones no se cruzaban no molestaba; se cruzaron cuando la ventana de referencia
+ * pasó a medirse en días, y `2026-07 → 2026-08-15` —que son 14 días de valor— armaba una
+ * ventana de 45, o sea 3,2 veces más larga que el período pedido.
+ */
+describe("largoEnDias", () => {
+  it("entre dos fechas es la cuenta de siempre", () => {
+    expect(largoEnDias("2026-07-17", "2026-08-15")).toBe(29);
+  });
+
+  it("un mes vale por su cierre, no por su día 1", () => {
+    expect(largoEnDias("2026-07", "2026-08-15")).toBe(14);
+    expect(largoEnDias("2026-07", "2026-08")).toBe(31);
+  });
+
+  it("no depende del orden", () => {
+    expect(largoEnDias("2026-08-15", "2026-07")).toBe(14);
   });
 });

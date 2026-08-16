@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { adjust, RangoError, sePuedeEvitarEstimar, tasaMensualDelRem } from "../src/engine/adjust.js";
+import { largoEnDias } from "../src/engine/mes.js";
 import type { SerieIndice } from "../src/engine/types.js";
 
 const serie = JSON.parse(
@@ -476,9 +477,25 @@ describe("modo por día", () => {
    * distinción tiene que salir del motor: la interfaz no puede etiquetar como dato
    * oficial del INDEC un número que es un prorrateo nuestro.
    */
-  it("marca como parciales sólo las filas de las puntas", () => {
+  it("marca como parciales las dos puntas, incluida la de partida", () => {
     const r = adjust(1000, "2020-02-15", "2020-04-05", irregular, { hoy: "2020-06" });
-    expect(r.desglose.map((f) => f.esParcial)).toEqual([false, true, false, true]);
+    expect(r.desglose.map((f) => f.esParcial)).toEqual([true, true, false, true]);
+  });
+
+  /**
+   * La fila de partida no muestra porcentaje pero sí un índice, y en modo por día ese
+   * índice es una interpolación nuestra: sellarla con el organismo le atribuye un número
+   * que nunca publicó. Un día 1 es la excepción — ahí el índice ES el cierre del mes
+   * anterior, o sea el dato tal cual.
+   */
+  it("la partida en un día 1 no es parcial, porque su índice es un dato publicado", () => {
+    const r = adjust(1000, "2020-03-01", "2020-04-05", irregular, { hoy: "2020-06" });
+    expect(r.desglose[0]!.esParcial).toBe(false);
+  });
+
+  it("con meses enteros la partida tampoco es parcial", () => {
+    const r = adjust(1000, "2020-01", "2020-04", irregular, { hoy: "2020-06" });
+    expect(r.desglose[0]!.esParcial).toBe(false);
   });
 
   it("con meses enteros ninguna fila es parcial", () => {
@@ -537,6 +554,50 @@ describe("modo por día", () => {
     expect(r.desglose.map((f) => f.punto)).toEqual(["2020-04-02", "2020-04-30"]);
     // Abril subió 3%, prorrateado a 28 de sus 30 días.
     expect(r.variacionPct).toBeCloseTo((Math.pow(1.03, 28 / 30) - 1) * 100, 8);
+  });
+
+  /**
+   * La regla, no el caso: el pie de la tabla promete "el tramo publicado más reciente
+   * **del mismo largo** que el que pediste", y esa promesa se puede testear.
+   */
+  it("la ventana tiene exactamente el largo del período pedido", () => {
+    // Sobre la serie real, que es larga: en la sintética una ventana de tres meses ya se
+    // sale por abajo y el caso deja de ejercer la regla.
+    const nacional: SerieIndice = {
+      ...serie,
+      ultimo_oficial: "2026-06",
+      datos: serie.datos.filter((p) => p.mes <= "2026-06"),
+    };
+    const periodos: [string, string][] = [
+      ["2026-07-17", "2026-08-15"],
+      ["2026-05-02", "2026-08-20"],
+      ["2026-08-20", "2026-05-02"],
+      ["2024-03-11", "2026-08-01"],
+      ["2026-07-31", "2026-08-01"],
+    ];
+    for (const [desde, hasta] of periodos) {
+      const r = adjust(1000, desde, hasta, nacional, { hoy: "2026-08" });
+      if (r.metodo.tipo !== "ventana_reciente") continue;
+      const puntas = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto];
+      expect(largoEnDias(puntas[0]!, puntas[1]!)).toBe(largoEnDias(desde, hasta));
+    }
+  });
+
+  /**
+   * Con un extremo mes y el otro día, la ventana salía 3,2 veces más larga.
+   *
+   * `diasEntre` toma un mes por su día 1 y el motor lo valúa en su cierre: las dos
+   * convenciones convivían sin cruzarse hasta que la ventana pasó a medirse en días.
+   * `adjust()` declara que los puntos se pueden mezclar y no había ningún test que lo
+   * ejerciera, que es exactamente por qué pasó.
+   */
+  it("mide bien un período con un extremo mes y el otro día", () => {
+    const r = adjust(1000, "2020-06", "2020-07-15", irregular, { hoy: "2020-07" });
+    if (r.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");
+    // Del cierre de junio al 15 de julio hay 14 días, no 45.
+    const puntas = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto];
+    expect(largoEnDias(puntas[0]!, puntas[1]!)).toBe(14);
+    expect(r.desglose.at(-1)!.punto).toBe("2020-04-30");
   });
 
   it("deflactando, la ventana se recorre al revés y el monto baja", () => {

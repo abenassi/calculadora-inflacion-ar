@@ -25,7 +25,7 @@ import {
 } from "chart.js";
 
 import type { Resultado } from "../engine/types.js";
-import { rotularFila } from "./etiquetas.js";
+import { llevaSello, rotularFila } from "./etiquetas.js";
 import { porcentaje } from "./format.js";
 
 Chart.register(CategoryScale, LinearScale, BarController, BarElement, Tooltip);
@@ -57,6 +57,16 @@ function tokens(): Tokens {
  * dato de una cuenta nuestra. Con trama sobrevive al daltonismo, a la impresión en
  * blanco y negro y al modo de alto contraste.
  */
+/**
+ * El mismo color con menos peso, para las barras prorrateadas.
+ *
+ * Sale de `color-mix` y no de un token nuevo porque tiene que seguir al color de la
+ * serie: el gráfico lee sus colores del CSS y hay tema claro y oscuro.
+ */
+function conAlfa(color: string, alfa: number): string {
+  return `color-mix(in srgb, ${color} ${Math.round(alfa * 100)}%, transparent)`;
+}
+
 function trama(color: string, fondo: string): CanvasPattern | string {
   const tile = document.createElement("canvas");
   tile.width = 6;
@@ -90,6 +100,12 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
   // monto de partida. Graficarla como una barra en cero sería una lectura falsa.
   const filas = r.desglose.slice(1);
   const estimada = trama(t.serie, t.superficie);
+  // Una barra prorrateada no es un dato publicado, y hasta ahora se pintaba igual que
+  // uno: la distinción existía en la tabla, en el sello, y el gráfico la borraba. No
+  // lleva la trama de lo estimado —no es una estimación, es un dato repartido entre los
+  // días—, lleva el mismo color más claro y el contorno lleno, que se lee como "esto es
+  // de la misma familia pero no es lo mismo".
+  const prorrateada = conAlfa(t.serie, 0.45);
 
   grafico?.destroy();
   grafico = new Chart(canvas, {
@@ -99,11 +115,13 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
       labels: filas.map((_, i) => rotularFila(r.desglose, i + 1, true)),
       datasets: [
         {
-          label: "Inflación mensual",
+          label: "Inflación del tramo",
           data: filas.map((f) => f.varMensualPct ?? 0),
-          backgroundColor: filas.map((f) => (f.esProyeccion ? estimada : t.serie)),
+          backgroundColor: filas.map((f) =>
+            f.esProyeccion ? estimada : f.esParcial ? prorrateada : t.serie,
+          ),
           borderColor: t.serie,
-          borderWidth: filas.map((f) => (f.esProyeccion ? 1 : 0)),
+          borderWidth: filas.map((f) => (llevaSello(f) ? 0 : 1)),
           // Punta redondeada del lado del dato; el extremo apoyado en la línea de
           // cero queda recto. Con deflación la barra baja y Chart.js invierte el
           // lado sin que haya que hacer nada.

@@ -448,6 +448,19 @@ button:focus-visible {
   vertical-align: -1px;
 }
 
+/*
+ * Prorrateado: el color de la serie con menos peso y el contorno lleno. No usa la trama
+ * de lo estimado a propósito — son dos cosas distintas y confundirlas sería peor que no
+ * distinguirlas: una es una cuenta sobre un dato que existe, la otra un número que
+ * todavía no publicó nadie.
+ */
+.muestra--prorrateado {
+  margin-left: 0.6rem;
+  background: color-mix(in srgb, var(--series-1) 45%, transparent);
+  outline: 1px solid var(--series-1);
+  outline-offset: -1px;
+}
+
 .muestra--estimado {
   margin-left: 0.6rem;
   background: repeating-linear-gradient(
@@ -919,6 +932,25 @@ button:focus-visible {
   line-height: 1.5;
   color: var(--text-secondary);
   text-align: center;
+}
+
+/*
+ * El aviso de que la tabla no muestra el período pedido.
+ *
+ * Va arriba de la tabla y con más peso que el pie: es lo único que evita que alguien
+ * mande la tabla creyendo que habla de sus fechas. La barra de la izquierda lo separa
+ * del título sin convertirlo en un cartel de error — no hay ningún error, hay una
+ * sustitución que conviene saber antes de leer las filas.
+ */
+.aviso-tramo {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid var(--series-1);
+  border-radius: 0 6px 6px 0;
+  background: var(--wash-hover);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
 }
 
 /*

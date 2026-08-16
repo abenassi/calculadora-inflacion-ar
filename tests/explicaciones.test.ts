@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import { adjust, sumaDeVariaciones } from "../src/engine/adjust.js";
 import { deOrdinal, aOrdinal } from "../src/engine/mes.js";
 import {
+  avisarTramoAjeno,
   esAproximado,
   explicarCompuesto,
   explicarMetodo,
@@ -88,7 +89,11 @@ describe("los carteles y los textos contestan la misma pregunta", () => {
       // predicados; los textos salen de las funciones de arriba. Si una tabla tiene una
       // fila estimada, las dos puntas tienen que reconocerla.
       expect(hayAlgoEstimado(r)).toBe(r.desglose.some((f) => f.esProyeccion));
-      expect(hayDatoOficial(r)).toBe(r.desglose.some((f) => !f.esProyeccion));
+      // "Dato oficial" es lo que lleva sello: ni estimado ni prorrateado. Preguntando
+      // sólo por la proyección, una tabla enteramente prorrateada contestaba que sí.
+      expect(hayDatoOficial(r)).toBe(
+        r.desglose.some((f) => !f.esProyeccion && !f.esParcial),
+      );
       if (hayAlgoEstimado(r)) expect(esAproximado(r)).toBe(true);
     });
   }
@@ -97,7 +102,9 @@ describe("los carteles y los textos contestan la misma pregunta", () => {
 describe("la aclaración de las filas prorrateadas", () => {
   it("aparece cuando hay filas que muestran ese sello", () => {
     const r = adjust(520_000, "2024-01-15", "2024-08-20", serie, { metodologia: "sin_proyectar" });
-    expect(r.desglose.filter((f) => f.esParcial && !f.esProyeccion).length).toBe(2);
+    // Tres: las dos puntas del tramo más la fila de partida, cuyo índice también es
+    // una interpolación nuestra.
+    expect(r.desglose.filter((f) => f.esParcial && !f.esProyeccion).length).toBe(3);
     expect(explicarTabla(r)).toContain("prorrateadas");
   });
 
@@ -140,11 +147,45 @@ describe("la ventana de referencia en modo por día", () => {
   it("usa el último mes publicado, prorrateado a los días del período", () => {
     const texto = explicarMetodo(r);
     expect(texto).toContain("pasaron 29 días");
-    expect(texto).toContain("los últimos 29 días publicados");
+    expect(texto).toContain("el tramo de 29 días más reciente que cae adentro de lo publicado");
     expect(texto).toContain("la inflación de junio de 2026, el último mes con dato");
     expect(texto).toContain("prorrateada a 29 de sus 30 días");
     // Y no nombra ningún mes anterior al último publicado: es la mitad que se ganó.
     expect(texto).not.toContain("mayo");
+  });
+
+  /**
+   * La salvedad va antes que la atribución, y no al revés.
+   *
+   * Con un período que arranca en el último mes publicado, la metodología que **sí** estima
+   * puede dar exactamente el mismo número que ésta —repite la tasa de ese mes y prorratear
+   * es geométrico—. La revisora usuaria se encontró con $1.019.760,62 en las dos, una vez
+   * bajo "son todos datos publicados por el INDEC" y otra bajo "OJO: esto es una
+   * estimación", y no supo cuál creer. Si la misma cifra puede aparecer de los dos lados,
+   * la que no estima no puede abrir prometiendo dato oficial.
+   */
+  it("dice primero que el período no es el tuyo, y después de dónde salen los números", () => {
+    const texto = explicarMetodo(r);
+    expect(texto).toContain("no es la inflación de tu período");
+    expect(texto.indexOf("no es la inflación de tu período")).toBeLessThan(
+      texto.indexOf("ya los publicó"),
+    );
+    expect(texto).not.toContain("Son todos datos publicados por");
+  });
+
+  it("el aviso de arriba de la tabla nombra el período pedido y el que se usó", () => {
+    const aviso = avisarTramoAjeno(r);
+    expect(aviso).toContain("del 17 de julio de 2026");
+    expect(aviso).toContain("al 15 de agosto de 2026");
+    expect(aviso).toContain("del 1 de junio de 2026");
+    expect(aviso).toContain("al 30 de junio de 2026");
+    expect(aviso).toContain("esas fechas");
+  });
+
+  it("sin ventana corrida no hay aviso, para que el aviso no deje de leerse", () => {
+    const directo = adjust(1_000_000, "2026-01-10", "2026-03-20", congelada, { hoy: "2026-08" });
+    expect(directo.metodo.tipo).toBe("directo");
+    expect(avisarTramoAjeno(directo)).toBe("");
   });
 
   it("los días llevan artículo y las contracciones armadas", () => {

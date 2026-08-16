@@ -1,5 +1,10 @@
 # 0013 · La ventana de referencia por día termina donde terminan los datos
 
+> **Los ejemplos de acá usan el snapshot del día en que se decidió esto**, con el INDEC
+> publicado hasta **junio de 2026**. El sitio con el snapshot de hoy contesta el mismo caso
+> con julio y 31 días. El caso está congelado en `tests/explicaciones.test.ts` para que se
+> pueda reproducir aunque la serie siga avanzando.
+
 ## Contexto
 
 Cuando el período pedido todavía no se publicó entero, el sitio no estima: contesta con
@@ -82,6 +87,40 @@ Todo esto salió de leer el texto que se copia, y de ahí salieron tres cosas m�
 - **"la inflación de el último mes publicado"**, en modo mensual con un período de un solo
   mes. La contracción estaba armada afuera de un `plural()` cuya rama singular empieza con
   "el".
+
+## La tensión que queda abierta: el guard de sesgo mide la ventana vieja
+
+`sesgoDeLaVentana` (0010) sigue midiendo *"la inflación de los `d` **meses** que la ventana
+mete dividida por la de los `d` meses que saca"*. En modo por día la ventana ya no se corre
+`d` meses: se ancla al último día publicado, así que el corrimiento real va de un día a
+varios meses. **El criterio dejó de describir lo que hace el motor**, que es justo lo que la
+regla 4 existe para evitar, y esta decisión es la que lo produjo.
+
+Los dos revisores lo levantaron por separado, con evidencia distinta y la misma conclusión.
+Lo verificado:
+
+- **Sobreestima y bloquea de más.** Nacional, `15-ene-2024 → 15-ago-2026`: el guard mide
+  18,12% y deshabilita "no estimar ninguno"; el sesgo real de la ventana que construiría es
+  **8,53%**, por debajo del 10% que el sitio se fijó. La persona recibe una estimación de
+  ~$3.170.385 donde había una ventana publicada que daba $3.440.766.
+- **Subestima y deja pasar de más** *(esto es anterior a este cambio: se comporta igual en
+  `83ae4f1^`)*. Nacional, `2-abr-1990 → 28-ago-2026`: el guard mide 9,1% y pasa; la ventana
+  real descarta 28 días de marzo de 1990 (+95,5% mensual) y su sesgo real es **76,6%**.
+  Aparece en las 16 series.
+- **Se puede saltear el guard tildando "usar fechas exactas".** Neuquén, `dic-2024 →
+  ago-2026`: por meses la opción sale deshabilitada (+69,77% estimado) y con las mismas
+  fechas en día 1 sale habilitada y recomendada (+89,73%). Son $199.617 sobre un millón.
+  6 pares sobre 6144 barridos, todos en la dirección peligrosa.
+
+**No se arregla acá, y la razón es el tamaño.** La corrección conocida —medir el sesgo sobre
+la ventana que devuelve `ventanaDeReferencia`, en días, con la fórmula que colapsa a la
+actual en modo mensual— cambia qué períodos quedan habilitados, y el 10% de 0010 se calibró
+barriendo pares de **meses**. Meterlo en este cambio significa mover una decisión calibrada
+sin recalibrarla, en el mismo commit que cambia la ventana. Va aparte, con su propio barrido
+y su propia actualización de 0010.
+
+Mientras tanto el guard es **conservador en el caso que lo motivó** (bloquea de más, no de
+menos) salvo por el agujero de las ventanas que cruzan bordes de mes, que ya existía.
 
 ## Lo que no cambia
 

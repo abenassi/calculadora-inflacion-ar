@@ -34,7 +34,7 @@ import {
   restarMesesAFecha,
   sumarMeses,
 } from "../engine/mes.js";
-import type { Mes, Metodologia, Punto, Resultado, SerieIndice } from "../engine/types.js";
+import type { Fila, Mes, Metodologia, Punto, Resultado, SerieIndice } from "../engine/types.js";
 import {
   agruparParaSelector,
   buscarIndice,
@@ -54,6 +54,7 @@ import {
   selloDeFila,
 } from "./etiquetas.js";
 import {
+  avisarTramoAjeno,
   capitalizar,
   esAproximado,
   explicar,
@@ -63,7 +64,7 @@ import {
   frasearMeses,
   fuenteDelTexto,
   hayAlgoEstimado,
-  hayDatoOficial,
+  hayBarraOficial,
   MESES_PROYECCION_LARGA,
 } from "./explicaciones.js";
 import { fechaLarga, indice, pesos, pesosRedondo, porcentaje, seVenDistintos } from "./format.js";
@@ -339,14 +340,30 @@ function pintarResultado(r: Resultado): void {
   // oficial" cuando todas las barras están rayadas manda a buscar una barra oficial
   // que no está, que es peor todavía porque hace desconfiar de lo que sí es cierto.
   el("leyenda-estimado").hidden = !esProyeccion;
-  el("leyenda-oficial").hidden = !hayDatoOficial(r);
+  // La referencia de prorrateado aparece sólo si hay alguna barra así, por lo mismo que la
+  // de dato oficial: una referencia sin nada a lo que apuntar hace dudar de las otras.
+  el("leyenda-prorrateado").hidden = !r.desglose
+    .slice(1)
+    .some((f) => f.esParcial && !f.esProyeccion);
+  // La leyenda habla de las BARRAS, y el gráfico no dibuja la fila de partida.
+  el("leyenda-oficial").hidden = !hayBarraOficial(r);
   // Con `ventana_reciente` el eje del gráfico son los meses de referencia, no los
   // del período pedido: el título lo dice para que nadie lea mal las fechas.
+  //
+  // Y no dice "mensual" cuando las barras no son meses. Con la ventana anclada, el caso
+  // normal por día es **una sola barra** rotulada "2 jul → 31 jul" que vale 29/31 de la
+  // inflación de julio: titularla "Inflación mensual" invita a leer 1,98% como el mes de
+  // julio, que fue 2,11%. El título sigue al eje, igual que "Tramos usados:" en el texto
+  // que se copia.
+  const porTramos = esFecha(r.desglose[0]!.punto);
+  const queMide = porTramos ? "Inflación de cada tramo" : "Inflación mensual";
   el("titulo-grafico").textContent =
-    r.metodo.tipo === "ventana_reciente"
-      ? "Inflación mensual de los meses de referencia"
-      : "Inflación mensual";
-  el("rotulo-principal").textContent = capitalizar(conPreposicion("a", r.hasta));
+    r.metodo.tipo === "ventana_reciente" ? `${queMide}, sobre el tramo de referencia` : queMide;
+  el("grafico").setAttribute(
+    "aria-label",
+    `${queMide} del IPC en ${porTramos ? "los tramos" : "los meses"} usados para el cálculo`,
+  );
+  el("rotulo-principal").textContent = capitalizar(comoDestino(r.hasta));
   el("cifra-principal").textContent = esAproximado(r)
     ? `~${pesosRedondo(r.montoAjustado)}`
     : pesosRedondo(r.montoAjustado);
@@ -421,6 +438,9 @@ function pintarResultado(r: Resultado): void {
     r.metodo.tipo === "ventana_reciente"
       ? "El cálculo, paso a paso (sobre el tramo de referencia)"
       : "El cálculo, paso a paso";
+  const avisoDelTramo = avisarTramoAjeno(r);
+  el("aviso-tabla").textContent = avisoDelTramo;
+  el("aviso-tabla").hidden = avisoDelTramo === "";
   el("pie-tabla").textContent = explicarTabla(r);
   // Solo cuando los dos números que la nota contrapone se ven distintos. Con una sola
   // variación son el mismo número, y en tramos cortos caen en el mismo redondeo.
@@ -1024,18 +1044,29 @@ function descargarCsv(): void {
   // Tabla pura: sólo cabecera de columnas y una fila por dato, sin filas de
   // metadata (`# ...`). Algunos programas que abren CSV no las entienden, y
   // arruinan la primera impresión de alguien que sólo quería ver los números.
-  // La trazabilidad de cada fila (oficial vs. estimado) ya vive en `origen`;
+  // La trazabilidad de cada fila —oficial, prorrateada o estimada— vive en `origen`;
   // el resto del contexto —fuente, período, método— se explica en la página,
   // no en el archivo.
+  // El mismo criterio que el sello de la tabla. Una fila prorrateada salía con `indec` en
+  // esta columna mientras la pantalla la marcaba "prorrateado": el archivo se abre lejos
+  // del sitio, así que ahí es donde una atribución de más cuesta caro. `origen` sigue
+  // diciendo de quién es el dato de fondo, porque el prorrateo se hace sobre un dato suyo.
+  const origenCsv = (f: Fila) => (f.esParcial && !f.esProyeccion ? `${f.origen}-prorrateado` : f.origen);
+
+  // `punto_inicial` es dónde arranca el tramo que mide `variacion_pct`. Sin él, la fila
+  // `2026-06-01, 2.08` se lee como "junio subió 2,08%" —el INDEC publicó 2,15% para mayo y
+  // nunca publicó 2,08%—, que es el mismo error que la tabla arregló rotulando el rango.
+  // Vacía en la fila de partida, que no mide ningún tramo.
   const filas: string[][] = [
-    ["punto", "indice_ipc", "variacion_pct", "acumulado_pct", "monto", "origen"],
-    ...r.desglose.map((f) => [
+    ["punto", "punto_inicial", "indice_ipc", "variacion_pct", "acumulado_pct", "monto", "origen"],
+    ...r.desglose.map((f, i) => [
       f.punto,
+      i === 0 ? "" : r.desglose[i - 1]!.punto,
       f.indice.toFixed(4),
       f.varMensualPct?.toFixed(2) ?? "",
       f.acumuladoPct?.toFixed(2) ?? "",
       f.monto.toFixed(2),
-      f.origen,
+      origenCsv(f),
     ]),
   ];
 

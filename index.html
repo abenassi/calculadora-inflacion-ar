@@ -317,6 +317,13 @@
           <h2 id="titulo-tabla">El cálculo, paso a paso</h2>
         </div>
         <!--
+          El aviso va ANTES de la tabla, no en el pie: cuando las filas no son el
+          período pedido, quien mira la tabla tiene que enterarse antes de leerla.
+          El pie lo lee quien ya sospecha que algo no cierra. Lo escribe
+          `avisarTramoAjeno`, y queda oculto cuando las filas sí son lo pedido.
+        -->
+        <p id="aviso-tabla" class="aviso-tramo" hidden></p>
+        <!--
           Orden de columnas pensado para leerse de izquierda a derecha y cortar
           bien en pantallas chicas: cuándo, cuánto subió, cuánto da, y de dónde
           sale el dato. "Índice IPC" va última y se oculta en mobile: es la
@@ -357,6 +364,10 @@
           <p class="leyenda-inline">
             <span id="leyenda-oficial"
               ><span class="muestra muestra--oficial" aria-hidden="true"></span> dato oficial</span
+            >
+            <span id="leyenda-prorrateado"
+              ><span class="muestra muestra--prorrateado" aria-hidden="true"></span>
+              prorrateado</span
             >
             <span id="leyenda-estimado"
               ><span class="muestra muestra--estimado" aria-hidden="true"></span> estimado</span

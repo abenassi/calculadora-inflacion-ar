@@ -124,8 +124,21 @@ export function fuenteDeLaSerie(serie: FuentesDeSerie): EtiquetaFuente {
  * sería atribuirle al organismo una cifra que nunca publicó.
  */
 export function selloDeFila(fila: Fila, serie: FuentesDeSerie): string | null {
-  if (fila.esProyeccion || fila.esParcial) return null;
+  if (!llevaSello(fila)) return null;
   return organismoDeFila(fila, serie);
+}
+
+/**
+ * Si el número que muestra una fila lo publicó un organismo, tal cual.
+ *
+ * Es el predicado detrás del sello, y vive suelto porque hay tres superficies que tienen
+ * que contestarlo igual: la tabla (el sello), el pie ("el resto son datos oficiales") y la
+ * referencia del gráfico ("dato oficial"). El gráfico llegó a mostrar esa referencia con
+ * su única barra prorrateada, porque preguntaba otra cosa —"¿hay alguna fila que no sea
+ * proyección?"— y una fila prorrateada no es proyección pero tampoco es dato publicado.
+ */
+export function llevaSello(fila: Fila): boolean {
+  return !fila.esProyeccion && !fila.esParcial;
 }
 
 /**

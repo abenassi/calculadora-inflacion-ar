@@ -258,6 +258,33 @@ export function comoDestino(punto: Punto): string {
   return conPreposicion(esFecha(punto) ? "a" : "en", punto);
 }
 
+/**
+ * El instante que representa un punto: un día es él mismo, y un mes es su **cierre**.
+ *
+ * Es la convención de `valorEn`, y no la del día 1: el índice de un mes es el nivel al que
+ * se llega al terminarlo (0004), así que el punto `2026-07` vale lo mismo que el `2026-08-01`.
+ *
+ * Existe porque `diasEntre` toma un mes por su día 1 y las dos convenciones convivían
+ * desfasadas un mes sin cruzarse nunca. Se cruzaron cuando la ventana de referencia empezó
+ * a medirse en días: `2026-07 → 2026-08-15` son 14 días de valor y `diasEntre` decía 45, así
+ * que la ventana salía 3,2 veces más larga que el período pedido.
+ */
+export function comoInstante(punto: Punto): Fecha {
+  return esFecha(punto) ? punto : primerDia(sumarMeses(punto, 1));
+}
+
+/**
+ * El largo de un período en días, con cada punto valuado como lo valúa el motor.
+ *
+ * Es lo que hay que usar para medir un período pedido. `diasEntre` mide entre dos puntos
+ * crudos y sirve cuando los dos son fechas —las puntas de una ventana, por ejemplo—; con
+ * un mes de un lado y un día del otro, sólo esta función da el largo que después se
+ * calcula.
+ */
+export function largoEnDias(a: Punto, b: Punto): number {
+  return diasEntre(comoInstante(a), comoInstante(b));
+}
+
 /** Días calendario entre dos puntos, tomando el día 1 cuando el punto es un mes. */
 export function diasEntre(a: Punto, b: Punto): number {
   const aDate = (p: Punto) => Date.UTC(
