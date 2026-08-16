@@ -142,12 +142,19 @@ export type Fila = {
   esProyeccion: boolean;
   origen: Origen;
   /**
-   * El tramo que representa la fila no cubre un mes calendario entero.
+   * El número que muestra la fila es un prorrateo nuestro, no un dato publicado.
    *
-   * Sólo pasa en modo por día, en las puntas del período. Importa porque el número
-   * de esas filas **no es un dato que el INDEC haya publicado**: es la parte
-   * proporcional que le toca a esos días. Etiquetarlas como oficiales sería
-   * atribuirle al INDEC una cuenta nuestra.
+   * Sólo pasa en modo por día, y en las **dos** puntas del período. Significa dos cosas
+   * apenas distintas según dónde caiga, y las dos se resumen en la de arriba:
+   *
+   * - En una fila con porcentaje: el tramo que representa no cubre un mes calendario
+   *   entero, así que su variación es la parte proporcional que le toca a esos días.
+   * - En la fila de partida, que no representa ningún tramo: el **índice** que muestra es
+   *   una interpolación dentro de su mes. Un día 1 queda afuera, porque ahí el índice es
+   *   por construcción el cierre del mes anterior, o sea el dato tal cual.
+   *
+   * Importa porque etiquetar cualquiera de las dos como oficial sería atribuirle al
+   * organismo una cuenta nuestra. Es el predicado detrás de `llevaSello`.
    */
   esParcial: boolean;
 };
@@ -166,19 +173,32 @@ export type Metodo =
   /**
    * El destino todavía no se publicó, pero no es futuro: ya pasó o está pasando.
    *
-   * En vez de inventar los meses que faltan, se corre la ventana hacia atrás y se
-   * usa la inflación de los últimos N meses publicados, con N igual a la cantidad
-   * de meses del período pedido. Todos los números son del INDEC.
+   * En vez de inventar los meses que faltan se contesta con el **tramo publicado más
+   * reciente del mismo largo** que el pedido. Con meses enteros eso es correr la ventana
+   * hacia atrás; con fechas el largo se mide en días y la ventana se ancla al último mes
+   * publicado, sin correr nada (ver `ventanaDeReferencia` y la decisión 0013). Ningún
+   * número sale de una estimación, aunque las puntas por día lleven un prorrateo nuestro
+   * sobre un mes publicado.
    *
    * Sigue siendo una aproximación —no es la inflación del período pedido, sino la
    * del período publicado más reciente de igual duración— y por eso la interfaz
-   * nombra siempre los meses concretos que se usaron.
+   * nombra siempre los meses o los tramos concretos que se usaron.
    */
   | {
       tipo: "ventana_reciente";
-      /** Cuántos meses abarca el período pedido. */
+      /**
+       * Cuántos meses abarca el período pedido. En modo por día el período casi nunca son
+       * meses redondos y el texto habla en días: acá vale la diferencia entre los meses de
+       * las dos puntas, que para 29 días es 1.
+       */
       mesesDelPeriodo: number;
-      /** Cuántos meses hacia atrás se corrió la ventana. */
+      /**
+       * Cuántos meses hacia atrás hubo que retroceder para que el período fuera calculable.
+       *
+       * **No describe la ventana en modo por día**, que se ancla al último mes publicado en
+       * vez de correrse. Lo sigue usando `sesgoDeLaVentana`, y esa distancia entre lo que
+       * mide el guard y lo que hace el motor está anotada como tensión abierta en la 0013.
+       */
       desplazamiento: number;
       /** Los meses del período pedido que el INDEC todavía no publicó. */
       mesesSinPublicar: Mes[];

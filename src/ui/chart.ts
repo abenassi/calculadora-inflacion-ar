@@ -60,11 +60,20 @@ function tokens(): Tokens {
 /**
  * El mismo color con menos peso, para las barras prorrateadas.
  *
- * Sale de `color-mix` y no de un token nuevo porque tiene que seguir al color de la
- * serie: el gráfico lee sus colores del CSS y hay tema claro y oscuro.
+ * Sigue al color de la serie en vez de ser un token propio porque el gráfico lee sus
+ * colores del CSS y hay tema claro y oscuro.
+ *
+ * Devuelve un hex de 8 dígitos y no un `color-mix()`: un `fillStyle` que el browser no
+ * parsea **se ignora sin error**, y la barra se quedaría con el color anterior, o sea
+ * idéntica a una oficial. La degradación silenciosa iría hacia "esto parece un dato
+ * publicado", que es el lado que la regla 2 prohíbe. Si el token no es un hex —una serie
+ * futura podría traer `oklch()`—, se devuelve el color tal cual y la barra queda
+ * distinguida igual por el contorno.
  */
 function conAlfa(color: string, alfa: number): string {
-  return `color-mix(in srgb, ${color} ${Math.round(alfa * 100)}%, transparent)`;
+  const hex = /^#([0-9a-f]{6})$/i.exec(color.trim());
+  if (!hex) return color;
+  return `#${hex[1]}${Math.round(alfa * 255).toString(16).padStart(2, "0")}`;
 }
 
 function trama(color: string, fondo: string): CanvasPattern | string {

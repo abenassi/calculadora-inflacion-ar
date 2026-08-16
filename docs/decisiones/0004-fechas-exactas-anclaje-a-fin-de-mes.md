@@ -86,8 +86,10 @@ eso el modo por meses es el default y `/datos` recomienda usarlo si el número t
 que ser indiscutible.
 
 Las filas de las puntas van marcadas **`prorrateado`** y no con el sello del INDEC: ese
-porcentaje no es una cifra que el INDEC haya publicado, es una cuenta nuestra sobre un
-dato suyo.
+número no es una cifra que el INDEC haya publicado, es una cuenta nuestra sobre un dato
+suyo. Vale para las dos puntas, incluida la de partida, que no muestra porcentaje pero sí
+un índice interpolado. La excepción es un día 1, donde el índice **es** el cierre del mes
+anterior y por lo tanto un dato publicado.
 
 ## Lo que se apoyó después en esta convención
 

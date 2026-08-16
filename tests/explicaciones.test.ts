@@ -13,6 +13,7 @@ import {
   fuenteDelTexto,
   hayAlgoEstimado,
   hayDatoOficial,
+  hayMesPublicado,
   resumir,
 } from "../src/ui/explicaciones.js";
 import { porcentaje } from "../src/ui/format.js";
@@ -50,6 +51,9 @@ const CASOS: { que: string; desde: Punto; hasta: Punto; metodologia: Metodologia
   { que: "sin proyectar sobre un período que no llegó", desde: menos(2), hasta: mas(4), metodologia: "sin_proyectar" },
   { que: "por día, dentro de meses publicados", desde: "2024-01-15", hasta: "2024-08-20", metodologia: "sin_proyectar" },
   { que: "por día, con ventana reciente", desde: `${ultimo}-17`, hasta: `${mas(1)}-15`, metodologia: "sin_proyectar" },
+  { que: "por día, arrancando dentro del último mes publicado", desde: `${ultimo}-17`, hasta: `${mas(1)}-15`, metodologia: "repite_ultimo" },
+  { que: "por día, arrancando dentro del último mes publicado, con REM", desde: `${ultimo}-17`, hasta: `${mas(1)}-15`, metodologia: "rem" },
+  { que: "por día, entero adentro de un mes publicado", desde: `${menos(1)}-10`, hasta: `${menos(1)}-20`, metodologia: "sin_proyectar" },
   { que: "por día, terminando sin publicar", desde: "2026-01-10", hasta: `${mas(3)}-20`, metodologia: "repite_ultimo" },
   { que: "hacia atrás", desde: "2024-12", hasta: "2024-01", metodologia: "sin_proyectar" },
 ];
@@ -65,6 +69,26 @@ const PROMESAS_DE_DATO_OFICIAL = [
   "no hubo nada que estimar",
   "son datos oficiales ya publicados",
   "salen de datos oficiales publicados",
+];
+
+/**
+ * El espejo: las frases que niegan que haya algo publicado.
+ *
+ * La regla 2 se lee siempre en un solo sentido —no prometas dato oficial donde no lo hay—
+ * y la mitad simétrica es la que se olvida. Un período por día que arranca dentro del
+ * último mes publicado no tiene **ninguna** fila sellada, porque las dos puntas son
+ * prorrateos; preguntando sólo por el sello, el pie decía "el INDEC todavía no publicó
+ * ninguno de estos meses" dos renglones abajo de citar la inflación de julio, y el texto
+ * que se copia cerraba con "son todas estimaciones" sobre un cálculo cuya mitad es dato
+ * publicado.
+ *
+ * El test viejo era `expect(hayDatoOficial(r)).toBe(<la definición de hayDatoOficial>)`:
+ * no podía fallar nunca, y no lo cachó.
+ */
+const NEGACIONES_DE_DATO_PUBLICADO = [
+  "no hay ningún dato oficial",
+  "ningún mes de este cálculo está publicado",
+  "son todas estimaciones",
 ];
 
 describe("los textos no prometen dato oficial donde hay estimación", () => {
@@ -89,12 +113,27 @@ describe("los carteles y los textos contestan la misma pregunta", () => {
       // predicados; los textos salen de las funciones de arriba. Si una tabla tiene una
       // fila estimada, las dos puntas tienen que reconocerla.
       expect(hayAlgoEstimado(r)).toBe(r.desglose.some((f) => f.esProyeccion));
-      // "Dato oficial" es lo que lleva sello: ni estimado ni prorrateado. Preguntando
-      // sólo por la proyección, una tabla enteramente prorrateada contestaba que sí.
-      expect(hayDatoOficial(r)).toBe(
-        r.desglose.some((f) => !f.esProyeccion && !f.esParcial),
-      );
+      // Con sello no puede haber ninguna fila estimada más que las estimadas: es la
+      // dirección que ya estaba cubierta. Lo que se ata acá es que si hay dato oficial,
+      // se pueda señalar una fila sin sello de estimación.
+      if (hayDatoOficial(r)) expect(r.desglose.some((f) => !f.esProyeccion)).toBe(true);
       if (hayAlgoEstimado(r)) expect(esAproximado(r)).toBe(true);
+    });
+  }
+});
+
+describe("los textos no niegan lo publicado cuando hay un mes publicado", () => {
+  for (const { que, r } of resultados) {
+    it(que, () => {
+      // `hayMesPublicado` es el predicado honesto acá: una fila prorrateada no muestra un
+      // número del organismo, pero el mes del que sale sí está publicado.
+      if (!hayMesPublicado(r)) return;
+      const textos = [explicarMetodo(r), explicarTabla(r), fuenteDelTexto(r)];
+      for (const texto of textos) {
+        for (const negacion of NEGACIONES_DE_DATO_PUBLICADO) {
+          expect(texto.toLowerCase()).not.toContain(negacion);
+        }
+      }
     });
   }
 });

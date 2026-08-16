@@ -3,10 +3,13 @@
  *
  * La aritmética se hace sobre los strings, no con `Date`: el sistema razona en meses
  * calendario, y `Date` arrastra zonas horarias que acá no significan nada y sólo
- * generan off-by-one (un `2026-08-01T00:00:00Z` renderizado en ART es julio). Las
- * únicas excepciones son `diasEnMes` y `restarDias`, donde `Date` en UTC es la forma
- * más corta de resolver los años bisiestos y el largo de cada mes, y no hay
- * ambigüedad posible: no interviene ninguna hora.
+ * generan off-by-one (un `2026-08-01T00:00:00Z` renderizado en ART es julio).
+ *
+ * Las excepciones son las tres funciones que necesitan el calendario y no el almanaque
+ * de meses —`diasEnMes`, `restarDias` y `diasEntre`—, donde `Date` en **UTC** es la forma
+ * más corta de resolver bisiestos y largos de mes y no hay ambigüedad posible, porque no
+ * interviene ninguna hora. Si agregás una cuarta, sumala acá: esta lista existe para que
+ * el próximo `Date` sea una decisión y no un descuido.
  */
 
 import type { Fecha, Mes, Punto } from "./types.js";
@@ -145,7 +148,7 @@ export function ultimoDia(mes: Mes): Fecha {
 /**
  * Resta `n` días a una fecha.
  *
- * Es la única cuenta del archivo que no sale del string: cruzar de mes hacia atrás
+ * Una de las tres cuentas del archivo que no sale del string: cruzar de mes hacia atrás
  * necesita saber cuántos días tiene el anterior. `Date` en UTC no tiene ambigüedad
  * posible acá —no hay hora ni zona en juego, igual que en `diasEnMes`— y `Date.UTC`
  * normaliza solo el desborde de día.

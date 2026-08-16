@@ -288,6 +288,18 @@ export function hayBarraOficial(r: Resultado): boolean {
   return r.desglose.slice(1).some(llevaSello);
 }
 
+/**
+ * Si alguna fila descansa sobre un mes que el organismo ya publicó.
+ *
+ * Es más débil que `hayDatoOficial` a propósito, y la diferencia son justo las filas
+ * prorrateadas: su número no lo publicó nadie, pero el mes del que sale sí está publicado.
+ * Entre las dos preguntas está la única frase que se puede decir sin mentir cuando la
+ * tabla no tiene ninguna fila sellada y aun así no hay nada estimado en el fondo.
+ */
+export function hayMesPublicado(r: Resultado): boolean {
+  return r.desglose.some((f) => !f.esProyeccion);
+}
+
 /** Si algo de lo que se muestra es efectivamente una estimación. */
 export function hayAlgoEstimado(r: Resultado): boolean {
   return r.desglose.some((f) => f.esProyeccion);
@@ -318,12 +330,53 @@ export function esAproximado(r: Resultado): boolean {
  */
 export function avisarTramoAjeno(r: Resultado): string {
   if (r.metodo.tipo !== "ventana_reciente") return "";
+  const porDia = esFecha(r.desglose[0]!.punto);
+
+  // Con meses el tramo se nombra por los meses que aportan un porcentaje, no por las
+  // puntas. Nombrado por las puntas decía "de abril 2026 a julio 2026" mientras el
+  // párrafo de arriba decía "los últimos 3 meses publicados (mayo, junio y julio)":
+  // cuatro contra tres, y la fila de abril no lleva ningún porcentaje porque es la de
+  // partida. La regla 2 pide que lo que se nombra se pueda contar en pantalla.
   const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto].sort(compararPuntos);
-  const esas = esFecha(r.desde) || esFecha(r.hasta) ? "esas fechas" : "esos meses";
+  const tramo = porDia
+    ? `${conPreposicion("de", ini!)} ${conPreposicion("a", fin!)}`
+    : `la inflación de ${frasearMeses(r.desglose.slice(1).map((f) => mesDe(f.punto)))}`;
+
   return (
     `Pediste ${conPreposicion("de", r.desde)} ${conPreposicion("a", r.hasta)}, y eso todavía ` +
-    `no está publicado. Abajo no vas a encontrar ${esas}: lo que ves es el tramo que se usó ` +
-    `en su lugar, ${conPreposicion("de", ini!)} ${conPreposicion("a", fin!)}.`
+    `no está publicado. Abajo no vas a encontrar ${porDia ? "esas fechas" : "esos meses"}: ` +
+    `lo que ves es lo que se usó en su lugar, ${tramo}.`
+  );
+}
+
+/**
+ * De dónde salen las filas que no son una estimación, dicho sin prometer de más.
+ *
+ * Hay **dos** predicados y no uno, y confundirlos fue el defecto que esto vino a cerrar:
+ *
+ * - `hayDatoOficial` — alguna fila muestra un número tal cual lo publicó el organismo.
+ * - `hayMesPublicado` — alguna fila descansa en un mes publicado, aunque el número que
+ *   muestre sea un prorrateo nuestro.
+ *
+ * Entre los dos hay un caso entero, y es el más común del producto: un período por día que
+ * arranca dentro del último mes publicado. Ahí ninguna fila lleva sello, pero la mitad del
+ * movimiento sale de un mes que sí está publicado. Preguntando sólo por el sello, el pie
+ * decía "el INDEC todavía no publicó ninguno de estos meses" dos renglones abajo de citar
+ * la inflación de julio, y el texto que se copia —que viaja sin el sitio al lado— cerraba
+ * con "son todas estimaciones" sobre un cálculo cuya mitad es dato publicado.
+ */
+function deDondeSalenLasFilas(r: Resultado): string {
+  const organismo = fuenteDe(r.desglose, r).publicadosPor;
+  if (hayDatoOficial(r)) return ` El resto son datos oficiales.`;
+  if (hayMesPublicado(r)) {
+    return (
+      ` Ninguna fila muestra un número tal cual lo publicó ${organismo}: las que no son ` +
+      `estimación reparten entre los días meses que sí publicó.`
+    );
+  }
+  return (
+    ` En esta tabla no hay ningún dato oficial: ${quienPublicaAhora(r)} todavía no publicó ` +
+    `ninguno de estos meses.`
   );
 }
 
@@ -331,10 +384,14 @@ export function avisarTramoAjeno(r: Resultado): string {
 export function explicarTabla(r: Resultado): string {
   switch (r.metodo.tipo) {
     case "directo":
-      return (
-        `Todas las filas salen de datos oficiales publicados por ${fuenteDe(r.desglose, r).publicadosPor}. ` +
-        `Acá no hay nada estimado.` + aclararParciales(r)
-      );
+      // Un período corto por día puede tener TODAS las filas prorrateadas —del 10 al 20 de
+      // junio son dos filas y ninguna cubre un mes— y aun así no tener nada estimado. La
+      // frase de siempre prometía filas oficiales que ahí no se pueden señalar.
+      return hayDatoOficial(r)
+        ? `Todas las filas salen de datos oficiales publicados por ${fuenteDe(r.desglose, r).publicadosPor}. ` +
+            `Acá no hay nada estimado.` + aclararParciales(r)
+        : `Acá no hay nada estimado: todo sale de meses que ${fuenteDe(r.desglose, r).publicadosPor} ` +
+            `ya publicó.` + aclararParciales(r);
     case "ventana_reciente":
       // Qué se está mirando lo dice `avisarTramoAjeno`, arriba de la tabla. Acá abajo queda
       // lo que sólo se puede decir habiendo visto las filas: de dónde salió cada número.
@@ -364,9 +421,8 @@ export function explicarTabla(r: Resultado): string {
           ? `La tabla tiene una sola fila y su índice todavía no está publicado, así que ` +
               `sale marcada como estimada. Como el período empieza y termina en el mismo ` +
               `punto, el monto no cambia y esa estimación no entra en ninguna cuenta.`
-          : `Todas las filas salen de datos oficiales publicados por ${fuenteDe(r.desglose, r).publicadosPor}: ` +
-              `el período que pediste ya está publicado entero, así que no hubo nada que estimar.` +
-              aclararParciales(r);
+          : `El período que pediste ya está publicado entero, así que no hubo nada que ` +
+              `estimar.${deDondeSalenLasFilas(r)}` + aclararParciales(r);
       }
       const de =
         base.fuente === "rem"
@@ -378,10 +434,14 @@ export function explicarTabla(r: Resultado): string {
       // "El resto son datos oficiales" prometía una parte oficial que muchas veces no
       // existe: cuando el destino todavía no llegó, la tabla entera está estimada y esa
       // frase mandaba a buscar un dato del INDEC que no se puede señalar en ningún lado.
-      const cierre = hayDatoOficial(r)
-        ? " El resto son datos oficiales."
-        : ` En esta tabla no hay ningún dato oficial: ${quienPublicaAhora(r)} todavía no ` +
-          `publicó ninguno de estos meses.`;
+      //
+      // Y "ninguno de estos meses" no es lo mismo que "ninguna fila sellada". Con el
+      // origen en un día del último mes publicado, la tabla no tiene ninguna fila con
+      // sello —son todas prorrateadas o estimadas— pero julio sí está publicado, y de
+      // hecho es de donde sale la tasa que se nombra dos renglones antes. El pie decía
+      // "el INDEC todavía no publicó ninguno de estos meses" arriba de un párrafo que
+      // acababa de citar la inflación de julio.
+      const cierre = deDondeSalenLasFilas(r);
       return (
         `Estos son los meses que pediste. ${plural(proyectadas, "El porcentaje resaltado", `Los ${proyectadas} porcentajes resaltados`)} ` +
         `${plural(proyectadas, "es un tramo proyectado", "son tramos proyectados")}, que ` +
@@ -422,7 +482,12 @@ export function explicarCompuesto(r: Resultado): string {
  * el lugar donde una atribución equivocada más caro sale.
  */
 export function fuenteDelTexto(r: Resultado): string {
-  if (hayDatoOficial(r) || r.metodo.tipo !== "proyeccion") return fuenteDe(r.desglose, r).larga;
+  // Cuelga de `hayMesPublicado` y no del sello: la línea que sigue dice "son todas
+  // estimaciones", y eso es falso en cuanto un solo mes del cálculo esté publicado, aunque
+  // su fila muestre un prorrateo. Con el sello, un período que arranca dentro del último
+  // mes publicado le sacaba al INDEC la atribución de la mitad del número —y con el REM
+  // elegido se la daba al BCRA— en el texto que se manda por mensaje.
+  if (hayMesPublicado(r) || r.metodo.tipo !== "proyeccion") return fuenteDe(r.desglose, r).larga;
 
   const { base } = r.metodo;
   const origen =

@@ -48,6 +48,7 @@ import { dibujar } from "./chart.js";
 import {
   fuenteDe,
   fuenteDeLaSerie,
+  mesDelTramo,
   organismoDeFila,
   quienPublicaAhora,
   rotularFila,
@@ -355,13 +356,12 @@ function pintarResultado(r: Resultado): void {
   // inflación de julio: titularla "Inflación mensual" invita a leer 1,98% como el mes de
   // julio, que fue 2,11%. El título sigue al eje, igual que "Tramos usados:" en el texto
   // que se copia.
-  const porTramos = esFecha(r.desglose[0]!.punto);
-  const queMide = porTramos ? "Inflación de cada tramo" : "Inflación mensual";
+  const queMide = porTramos(r) ? "Inflación de cada tramo" : "Inflación mensual";
   el("titulo-grafico").textContent =
     r.metodo.tipo === "ventana_reciente" ? `${queMide}, sobre el tramo de referencia` : queMide;
   el("grafico").setAttribute(
     "aria-label",
-    `${queMide} del IPC en ${porTramos ? "los tramos" : "los meses"} usados para el cálculo`,
+    `${queMide} del IPC en ${porTramos(r) ? "los tramos" : "los meses"} usados para el cálculo`,
   );
   el("rotulo-principal").textContent = capitalizar(comoDestino(r.hasta));
   el("cifra-principal").textContent = esAproximado(r)
@@ -414,8 +414,12 @@ function pintarResultado(r: Resultado): void {
         // nacional el dato de fondo es del BCRA, y decir INDEC acá contradice el sello
         // de al lado.
         const organismo = organismoDeFila(f, r);
+        // El mes del TRAMO, no el del punto final: es el mismo criterio del que sale el
+        // rótulo de la fila. La fila de partida no representa ningún tramo y su índice se
+        // prorratea sobre su propio mes.
+        const mes = i === 0 ? mesDe(f.punto) : mesDelTramo(r.desglose, i);
         marca.title =
-          `Parte proporcional de la inflación de ${nombrarMes(mesDe(f.punto))}` +
+          `Parte proporcional de la inflación de ${nombrarMes(mes)}` +
           (organismo ? `, según ${organismo}.` : ".");
       }
       tdOrigen.append(marca);
@@ -450,6 +454,18 @@ function pintarResultado(r: Resultado): void {
 }
 
 /**
+ * Si las filas son tramos de días y no meses calendario.
+ *
+ * Lo contestan el título del gráfico, su `aria-label` y el encabezado del texto que se
+ * copia. Estaba escrito dos veces con criterios distintos —uno miraba el método y el otro
+ * no— y por eso la misma pantalla decía "Inflación de cada tramo" arriba del gráfico y
+ * "Mes a mes:" arriba de la misma lista en el mensaje.
+ */
+function porTramos(r: Resultado): boolean {
+  return esFecha(r.desglose[0]!.punto);
+}
+
+/**
  * El título de la lista de porcentajes del texto que se copia.
  *
  * Con la ventana de referencia en modo por día las filas son tramos de días —"2 jul 2026
@@ -457,8 +473,8 @@ function pintarResultado(r: Resultado): void {
  * eso invita a leer un mes entero donde hay 29 días.
  */
 function encabezadoDelDesglose(r: Resultado): string {
-  if (r.metodo.tipo !== "ventana_reciente") return "Mes a mes:";
-  return esFecha(r.desglose[0]!.punto) ? "Tramos usados:" : "Meses usados:";
+  if (r.metodo.tipo !== "ventana_reciente") return porTramos(r) ? "Tramo a tramo:" : "Mes a mes:";
+  return porTramos(r) ? "Tramos usados:" : "Meses usados:";
 }
 
 /**
@@ -475,28 +491,41 @@ function armarExplicacion(r: Resultado): string {
   // Pegado en un mensaje eso desaparece: quedaba arrancando con el monto y con "(IPC
   // del INDEC)" al lado de un porcentaje que el INDEC no publicó, y quien lo recibe
   // lee el primer renglón y nada más. El aviso va antes del número, no después.
-  const lineas: string[] =
-    estimado && r.metodo.tipo === "proyeccion"
-      ? [
-          // El sujeto va primero, como en `explicaciones.ts`: "El IPEC, el instituto de
-          // estadística de Santa Fe todavía no publicó ni julio ni agosto de 2026." Al
-          // sacar el "El INDEC" fijo el sujeto se corrió al final de la lista de meses y
-          // quedó "Todavía no publicó los 24 meses que van de julio 2026 a junio 2028 el
-          // IPEC…" — la única línea de este mensaje que se lee sin buscar el sujeto.
-          `OJO: esto es una estimación, no un dato publicado. ` +
-            `${capitalizar(quienPublicaAhora(r))} todavía no publicó ` +
-            `${frasearMeses(r.metodo.mesesEstimados, "ni")}.`,
-          "",
-        ]
-      : [];
+  // El aviso va antes del número, no después. En pantalla el cartel de ESTIMADO está
+  // pegado al número grande y el aviso del tramo va arriba de la tabla; pegado en un
+  // mensaje los dos se caían al final, después de fechas que no son las que la persona
+  // pidió. La revisora usuaria lo dijo mejor: "la clienta lee el renglón dos, que le dice
+  // que la inflación fue 6,13% con el nombre del INDEC al lado, después ve tres fechas
+  // que no le di, y recién abajo de todo aparece el ojo".
+  //
+  // El sujeto va primero, como en `explicaciones.ts`: al sacar el "El INDEC" fijo, el
+  // sujeto se corría al final de la lista de meses y quedaba "Todavía no publicó los 24
+  // meses que van de julio 2026 a junio 2028 el IPEC…", la única línea de este mensaje
+  // que se lee sin buscar el sujeto.
+  const alerta =
+    r.metodo.tipo === "ventana_reciente"
+      ? `OJO: ${avisarTramoAjeno(r)}`
+      : estimado && r.metodo.tipo === "proyeccion"
+        ? `OJO: esto es una estimación, no un dato publicado. ` +
+          `${capitalizar(quienPublicaAhora(r))} todavía no publicó ` +
+          `${frasearMeses(r.metodo.mesesEstimados, "ni")}.`
+        : null;
+
+  const lineas: string[] = alerta ? [alerta, ""] : [];
 
   lineas.push(
     `${pesos(r.monto)} ${conPreposicion("de", r.desde)} equivalen a ` +
       `${esAproximado(r) ? "unos " : ""}${pesosRedondo(r.montoAjustado)} ` +
       `${comoDestino(r.hasta)}.`,
+    // Y el porcentaje dice de qué es. "Inflación acumulada: +6,13% (IPC del INDEC)" le
+    // pone el nombre del organismo a un número que tres renglones más abajo se aclara que
+    // no es el del período pedido: el que lo recibe se queda con el primero.
     estimado
       ? `Inflación acumulada estimada: ${porcentaje(r.variacionPct)}.`
-      : `Inflación acumulada: ${porcentaje(r.variacionPct)} (${fuenteDe(r.desglose, r).corta}).`,
+      : r.metodo.tipo === "ventana_reciente"
+        ? `Inflación acumulada del tramo de referencia: ${porcentaje(r.variacionPct)} ` +
+          `(${fuenteDe(r.desglose, r).corta}).`
+        : `Inflación acumulada: ${porcentaje(r.variacionPct)} (${fuenteDe(r.desglose, r).corta}).`,
     "",
     encabezadoDelDesglose(r),
   );
@@ -1077,7 +1106,17 @@ function descargarCsv(): void {
   // El nombre del archivo lleva el índice: quien compara dos provincias termina con dos
   // CSV en la carpeta de descargas y sin esto los dos se llaman igual.
   const sufijo = indiceActivo.slug === SLUG_NACIONAL ? "" : `-${indiceActivo.slug}`;
-  a.download = `inflacion${sufijo}-${r.desde}-a-${r.hasta}.csv`;
+  // El nombre lleva el período que está ADENTRO del archivo, que con la ventana de
+  // referencia no es el que se pidió. Se llamaba `...2026-05-17-a-2026-08-15.csv` y no
+  // traía ninguna de esas dos fechas: abierto lejos del sitio, parece que alguien les
+  // cambió las fechas. Acá no se puede poner una fila de aclaración (decisión 0011: las
+  // filas `#` rompen la lectura en algunos programas), así que lo dice el nombre.
+  const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto].sort(compararPuntos);
+  const periodo =
+    r.metodo.tipo === "ventana_reciente"
+      ? `tramo-de-referencia-${ini}-a-${fin}`
+      : `${r.desde}-a-${r.hasta}`;
+  a.download = `inflacion${sufijo}-${periodo}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }

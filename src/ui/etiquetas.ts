@@ -151,8 +151,15 @@ export function organismoDeFila(fila: Fila, serie: FuentesDeSerie): string | nul
   return serie.fuentes.find((f) => f.id === fila.origen)?.organismoCorto ?? null;
 }
 
-/** El mes calendario que cubre un tramo completo: el más viejo de sus dos extremos. */
-function mesDelTramo(desglose: Fila[], i: number): string {
+/**
+ * El mes calendario que cubre un tramo: el más viejo de sus dos extremos.
+ *
+ * Exportada porque el `title` de la fila prorrateada la necesitaba y tenía su propia copia
+ * del criterio, hecha con `mesDe(fila.punto)` — el mes del punto **final**. El tramo
+ * "2 may → 1 jun" con +2,08% quedaba explicado como "parte proporcional de la inflación de
+ * junio", cuando ese número es de mayo y junio está en la fila de abajo con +1,89%.
+ */
+export function mesDelTramo(desglose: Fila[], i: number): string {
   const anterior = desglose[i - 1]!.punto;
   const actual = desglose[i]!.punto;
   return compararMeses(mesDe(anterior), mesDe(actual)) < 0 ? mesDe(anterior) : mesDe(actual);

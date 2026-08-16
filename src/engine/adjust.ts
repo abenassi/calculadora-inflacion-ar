@@ -134,8 +134,11 @@ function armarIndice(serie: SerieIndice): Indice {
     primerMes,
     ultimoOficial,
     ultimaVariacionPct: (ultimo.indice / penultimo.indice - 1) * 100,
-    // Un mes sin origen conocido sólo puede ser uno proyectado, y ésos no llegan acá. El
-    // respaldo es la fuente del tramo más reciente, que es la que publica lo que sigue.
+    // Un mes sin origen conocido llega acá por dos caminos: una fila proyectada, o una
+    // fila prorrateada cuyo punto final cae en un mes sin publicar y que igual descansa en
+    // el mes anterior —el tramo "17 jul → 1 ago" con agosto sin salir—. El respaldo es la
+    // fuente del tramo más reciente, que es la que publica lo que sigue, así que las dos
+    // quedan bien atribuidas. Estaba escrito que el segundo caso no podía pasar.
     origenDe: (mes) => origenPorMes.get(mes) ?? serie.fuentes.at(-1)?.id ?? PROYECCION,
     tieneDato: (mes) => porMes.has(mes),
     fuentes: { fuentes: serie.fuentes, etiquetaCombinada: serie.etiquetaCombinada },
