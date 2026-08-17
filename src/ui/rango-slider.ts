@@ -58,3 +58,33 @@ export function moverSlider(
     hastaEnElTope: hastaIdx === maximo,
   };
 }
+
+/**
+ * Arma el rango inicial a partir de dos índices explícitos — los que salen de buscar
+ * en `puntosCompletos` los meses `desde`/`hasta` de un link compartido (la búsqueda
+ * misma vive en `actualizar-main.ts`, que es quien tiene esa serie; acá sólo llegan
+ * los índices, ya resueltos o `-1`).
+ *
+ * Un índice que no vino (`-1`, porque el mes no está en la serie actual, no vino en
+ * la URL, o estaba mal formado) cae en la punta por default — mismo principio de
+ * gracia que `buscarIndice` cayendo al nacional: un link viejo o retocado a mano
+ * nunca tiene que romper el slider. Y si las dos puntas resuelven pero quedan
+ * cruzadas (un link armado a mano, o un mes objetivo que corrió las puntas de
+ * formas distintas), tampoco se adivina cuál de las dos está mal: se cae al rango
+ * completo, que es el default de las dos a la vez.
+ */
+export function rangoDesdeIndices(desdeIdx: number, hastaIdx: number, largo: number): EstadoRango {
+  const maximo = largo - 1;
+  const esValido = (v: number) => Number.isInteger(v) && v >= 0 && v <= maximo;
+
+  const desde = esValido(desdeIdx) ? desdeIdx : 0;
+  const hasta = esValido(hastaIdx) ? hastaIdx : maximo;
+  if (desde > hasta) return rangoInicial(largo);
+
+  return {
+    desdeIdx: desde,
+    hastaIdx: hasta,
+    desdeEnElPiso: desde === 0,
+    hastaEnElTope: hasta === maximo,
+  };
+}

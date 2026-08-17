@@ -5,11 +5,11 @@
  */
 import { actualizarSerie } from "../engine/actualizar.js";
 import type { PuntoActualizado } from "../engine/actualizar.js";
-import { abreviarMes, nombrarMes } from "../engine/mes.js";
+import { abreviarMes, esMesValido, nombrarMes } from "../engine/mes.js";
 import type { Mes, SerieIndice, SerieValores } from "../engine/types.js";
 import { dibujarSerieActualizada } from "./chart-serie.js";
 import { fechaLarga } from "./format.js";
-import { moverSlider, rangoInicial, reajustarRango } from "./rango-slider.js";
+import { moverSlider, rangoDesdeIndices, rangoInicial, reajustarRango } from "./rango-slider.js";
 import type { EstadoRango } from "./rango-slider.js";
 
 const NOMBRES_MES = [
@@ -120,6 +120,8 @@ function redibujar(): void {
 
   const puntos = puntosCompletos.slice(desdeIdx, hastaIdx + 1);
   dibujarSerieActualizada(el<HTMLCanvasElement>("grafico"), puntos, mesObjetivoTexto);
+
+  sincronizarUrl();
 }
 
 function manejarInputRango(origen: "desde" | "hasta"): void {
@@ -129,14 +131,84 @@ function manejarInputRango(origen: "desde" | "hasta"): void {
   redibujar();
 }
 
-function actualizar(): void {
+/**
+ * El índice en `puntosCompletos` del mes `desde`/`hasta` que trajo la URL, o `-1` si
+ * no está: mal formado, ausente, o un mes que la serie actual no tiene (cambió el mes
+ * objetivo, o el link es viejo). `rangoDesdeIndices` cae al default ante un `-1`, así
+ * que acá no hace falta distinguir el motivo.
+ */
+function indiceDeMes(mes: string | null): number {
+  if (mes === null || !esMesValido(mes)) return -1;
+  return puntosCompletos.findIndex((punto) => punto.mes === mes);
+}
+
+/**
+ * Recibe `{ desde, hasta }` crudos de la URL (`leerUrl`) y arma el primer `rango`. Sólo
+ * se usa en la primera llamada a `actualizar()` — de ahí en más `rango` no es `null` y
+ * el largo cambia por `reajustarRango`, no por un link.
+ */
+function actualizar(rangoUrl?: { desde: string | null; hasta: string | null }): void {
   const mesObjetivo = leerObjetivo();
   mesObjetivoTexto = nombrarMes(mesObjetivo);
   puntosCompletos = actualizarSerie(dolarBlue.datos, mesObjetivo, ipc);
-  rango = rango === null
-    ? rangoInicial(puntosCompletos.length)
-    : reajustarRango(rango, puntosCompletos.length);
+  if (rango === null) {
+    rango = rangoUrl
+      ? rangoDesdeIndices(indiceDeMes(rangoUrl.desde), indiceDeMes(rangoUrl.hasta), puntosCompletos.length)
+      : rangoInicial(puntosCompletos.length);
+  } else {
+    rango = reajustarRango(rango, puntosCompletos.length);
+  }
   redibujar();
+}
+
+/* ------------------------------------------------------------ URL compartible */
+
+/**
+ * Refleja el mes objetivo y el rango del slider en la URL, llamada desde `redibujar`
+ * —o sea, después de cualquier cambio de estado, sin un paso de "copiar link" aparte—
+ * así lo que está en la barra de direcciones en cualquier momento ya es el link que
+ * reproduce esa vista. Mismo criterio que `sincronizarUrl` en `main.ts`: el link más
+ * compartido —el que se ve al entrar sin parámetros— tiene que ser el más corto, así
+ * que sólo viaja lo que la persona cambió del default.
+ */
+function sincronizarUrl(): void {
+  const p = new URLSearchParams();
+
+  const mesObjetivo = leerObjetivo();
+  const { ultimo } = limiteObjetivo();
+  if (mesObjetivo !== ultimo) p.set("mes", mesObjetivo);
+
+  // El default del rango es la serie completa, con las dos puntas pegadas: sólo viaja
+  // la punta que la persona corrió del piso o del tope.
+  if (rango && !rango.desdeEnElPiso) p.set("desde", puntosCompletos[rango.desdeIdx]!.mes);
+  if (rango && !rango.hastaEnElTope) p.set("hasta", puntosCompletos[rango.hastaIdx]!.mes);
+
+  // Sin parámetros, ni el `?` queda: el link del caso común —entrar sin tocar nada—
+  // tiene que ser exactamente `/actualizar.html`, no `/actualizar.html?`.
+  history.replaceState(null, "", p.size > 0 ? `?${p}` : location.pathname);
+}
+
+/**
+ * Lee `mes`/`desde`/`hasta` de un link compartido. Sólo desde un link explícito:
+ * nunca se recuerda entre visitas, mismo principio que `leerUrl` en `main.ts`. Un
+ * `mes` que el motor no puede resolver (fuera de `limiteObjetivo`) o mal formado
+ * deja el selector en el default que ya tenía. `desde`/`hasta` se devuelven crudos
+ * porque recién se pueden resolver a índices después de calcular `puntosCompletos`
+ * en `actualizar()`.
+ */
+function leerUrl(): { desde: string | null; hasta: string | null } {
+  const p = new URLSearchParams(location.search);
+
+  const mes = p.get("mes");
+  if (mes !== null && esMesValido(mes)) {
+    const { primero, ultimo } = limiteObjetivo();
+    if (mes >= primero && mes <= ultimo) {
+      el<HTMLSelectElement>("objetivo-anio").value = mes.slice(0, 4);
+      el<HTMLSelectElement>("objetivo-mes").value = mes.slice(5, 7);
+    }
+  }
+
+  return { desde: p.get("desde"), hasta: p.get("hasta") };
 }
 
 async function iniciar(): Promise<void> {
@@ -158,6 +230,9 @@ async function iniciar(): Promise<void> {
   const { ultimo } = limiteObjetivo();
   el<HTMLSelectElement>("objetivo-anio").value = ultimo.slice(0, 4);
   el<HTMLSelectElement>("objetivo-mes").value = ultimo.slice(5, 7);
+  // Puede pisar objetivo-anio/objetivo-mes si la URL trae un `mes` válido; se lee acá,
+  // antes de acotar, para que el acotado corra sobre el valor que terminó eligiendo.
+  const rangoUrl = leerUrl();
   acotarMesesObjetivo();
 
   el("actualizado").textContent = fechaLarga(dolarBlue.actualizado);
@@ -171,7 +246,7 @@ async function iniciar(): Promise<void> {
   });
   el<HTMLInputElement>("rango-desde").addEventListener("input", () => manejarInputRango("desde"));
   el<HTMLInputElement>("rango-hasta").addEventListener("input", () => manejarInputRango("hasta"));
-  actualizar();
+  actualizar(rangoUrl);
 }
 
 iniciar().catch((e: unknown) => {

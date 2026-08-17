@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { moverSlider, rangoInicial, reajustarRango } from "../src/ui/rango-slider.js";
+import {
+  moverSlider,
+  rangoDesdeIndices,
+  rangoInicial,
+  reajustarRango,
+} from "../src/ui/rango-slider.js";
 
 describe("rangoInicial", () => {
   it("arranca mostrando la serie entera, con las dos puntas pegadas", () => {
@@ -68,5 +73,35 @@ describe("moverSlider", () => {
   it("marca hastaEnElTope cuando el slider se suelta justo en el máximo", () => {
     const r = moverSlider("hasta", 0, 295, 296);
     expect(r.hastaEnElTope).toBe(true);
+  });
+});
+
+describe("rangoDesdeIndices", () => {
+  it("usa los dos índices tal cual cuando los dos son válidos y quedan en orden", () => {
+    const r = rangoDesdeIndices(10, 200, 296);
+    expect(r).toEqual({ desdeIdx: 10, hastaIdx: 200, desdeEnElPiso: false, hastaEnElTope: false });
+  });
+
+  it("un -1 en 'desde' (mes ausente o mal formado) cae al piso sin tocar un 'hasta' válido", () => {
+    const r = rangoDesdeIndices(-1, 200, 296);
+    expect(r).toEqual({ desdeIdx: 0, hastaIdx: 200, desdeEnElPiso: true, hastaEnElTope: false });
+  });
+
+  it("un -1 en 'hasta' cae al tope sin tocar un 'desde' válido", () => {
+    const r = rangoDesdeIndices(10, -1, 296);
+    expect(r).toEqual({ desdeIdx: 10, hastaIdx: 295, desdeEnElPiso: false, hastaEnElTope: true });
+  });
+
+  it("un índice fuera de [0, máximo] se trata igual que -1: cae al default de esa punta", () => {
+    expect(rangoDesdeIndices(-5, 200, 296).desdeIdx).toBe(0);
+    expect(rangoDesdeIndices(10, 999, 296).hastaIdx).toBe(295);
+  });
+
+  it("sin ningún índice (los dos -1) da exactamente el rango inicial", () => {
+    expect(rangoDesdeIndices(-1, -1, 296)).toEqual(rangoInicial(296));
+  });
+
+  it("si los dos índices resuelven pero quedan cruzados, no se adivina cuál está mal: cae al rango completo", () => {
+    expect(rangoDesdeIndices(200, 10, 296)).toEqual(rangoInicial(296));
   });
 });
