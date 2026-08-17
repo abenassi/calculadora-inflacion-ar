@@ -175,6 +175,26 @@ export function compararPuntos(a: Punto, b: Punto): number {
 }
 
 /**
+ * Compara dos puntos por el **instante** que representan. El que hay que usar casi siempre.
+ *
+ * El reparto entre las dos, que no es una preferencia de estilo:
+ *
+ * - `compararPuntos` ordena puntos **como están escritos**: un mes vale por su día 1. Sirve
+ *   para el formulario, los atajos y cualquier cosa que hable de la fecha que se tipeó.
+ * - `ordenReal` los ordena como los valúa el motor: un mes vale por su **cierre** (0004), y un
+ *   día 1 es el cierre del mes anterior. Todo lo que tenga que coincidir con un número que
+ *   sale del índice va por acá.
+ *
+ * Se separan sólo cuando se mezclan un mes y un día de ese mismo mes, y ahí `compararPuntos`
+ * empata `2026-07` con `2026-07-01` cuando en realidad el mes termina un mes después.
+ */
+export function ordenReal(a: Punto, b: Punto): number {
+  const ia = comoInstante(a);
+  const ib = comoInstante(b);
+  return ia < ib ? -1 : ia > ib ? 1 : 0;
+}
+
+/**
  * Resta `n` meses a una fecha, recortando el día si el mes de destino es más corto.
  *
  * 31 de marzo menos 1 mes cae en un mes que no tiene día 31: el resultado es el

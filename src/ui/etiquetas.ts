@@ -16,9 +16,9 @@ import {
   abreviarMes,
   abreviarPunto,
   comoInstante,
-  compararPuntos,
   esFecha,
   mesDe,
+  ordenReal,
   restarDias,
 } from "../engine/mes.js";
 import type {
@@ -170,11 +170,15 @@ export function llevaSello(fila: Fila): boolean {
  * cubre un mes entero y se rotula "jun 2026" aunque el período se haya pedido con fechas
  * exactas.
  *
- * **No** es exactamente el criterio de `rotularFila`, aunque lo fue: desde la 0014 esa función
- * también emite un rango para una fila que no es parcial, cuando el rótulo del primer tramo
- * repetiría el de la fila de partida. Por eso el texto que se copia puede decir "Mes a mes:"
- * arriba de una línea con flecha. Los dos son ciertos —esa fila **es** un mes— pero si algún
- * día hay que elegir uno solo, el de acá es el que responde "¿estas filas son meses?".
+ * Vuelve a coincidir con `rotularFila`: la flecha sale exactamente cuando la fila es parcial.
+ * Hubo un rato en que no —la 0014 le agregó a `rotularFila` una rama para un choque de nombres
+ * que el recorrido cronológico terminó volviendo imposible— y en ese rato el texto que se
+ * copia podía decir "Mes a mes:" arriba de una línea con flecha. Barrido de 720 consultas: hoy
+ * son cero.
+ *
+ * Queda una diferencia chica y a propósito: `rotularFila` exige además `esFecha(fila.punto)`,
+ * así que una fila parcial cuyo punto sea un mes cae del lado de las puntas mixtas, que son el
+ * caso diferido.
  */
 export function hayTramosDeDias(desglose: Fila[]): boolean {
   return desglose.slice(1).some((f) => f.esParcial);
@@ -211,8 +215,12 @@ export function organismoDeFila(fila: Fila, serie: FuentesDeSerie): string | nul
  * días —el más viejo— acertaba siempre pero no servía para meses.
  */
 export function mesDelTramo(desglose: Fila[], i: number): Mes {
-  const nuevo = [desglose[i - 1]!.punto, desglose[i]!.punto].sort(compararPuntos).at(-1)!;
-  return mesDe(restarDias(comoInstante(nuevo), 1));
+  // `ordenReal` y no `compararPuntos`: con un mes y un día de ese mismo mes los dos empatan
+  // bajo `compararPuntos`, y esto acertaba por la **estabilidad** del `sort` —el array ya
+  // venía ordenado por el motor— y no por el criterio. Un acierto que depende de algo que
+  // nadie escribió es un acierto prestado.
+  const [, nuevo] = [desglose[i - 1]!.punto, desglose[i]!.punto].sort(ordenReal);
+  return mesDe(restarDias(comoInstante(nuevo!), 1));
 }
 
 /**
@@ -226,10 +234,13 @@ export function rotularFila(desglose: Fila[], i: number, corto = false): string 
   if (i === 0) return abreviarPunto(fila.punto);
 
   const sinAnio = (s: string) => s.replace(/ \d{4}$/, "");
+  // Las dos puntas ya vienen cronológicas: el desglose se recorre siempre del mes más viejo al
+  // más nuevo (0014). Antes no, y la flecha salía "15 jul 2026 → 1 jul 2026", apuntando para
+  // atrás en el tiempo cuando una flecha se lee "de acá hasta acá". Acá hubo un `sort` de red
+  // por si acaso; se sacó porque medido daba 912 llamadas y **cero** intercambios, y una rama
+  // que no se ejecuta nunca hace creer que el desglose puede venir en cualquier orden.
   const comoRango = (a: Punto, b: Punto) => {
-    // Cronológico, no en el orden del recorrido. Deflactando salía "15 jul 2026 → 1 jul 2026",
-    // con la flecha apuntando para atrás en el tiempo, y la flecha se lee "de acá hasta acá".
-    const [ini, fin] = [a, b].sort(compararPuntos).map(abreviarPunto) as [string, string];
+    const [ini, fin] = [abreviarPunto(a), abreviarPunto(b)];
     return corto ? `${sinAnio(ini)} → ${sinAnio(fin)}` : `${ini} → ${fin}`;
   };
 

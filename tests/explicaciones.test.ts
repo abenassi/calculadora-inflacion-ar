@@ -19,7 +19,7 @@ import {
 import { abreviarMes, mesDe, nombrarMes } from "../src/engine/mes.js";
 import { mesDelTramo, rotularFila, selloDeFila } from "../src/ui/etiquetas.js";
 import { porcentaje } from "../src/ui/format.js";
-import type { Metodologia, Punto, Resultado, SerieIndice } from "../src/engine/types.js";
+import type { Mes, Metodologia, Punto, Resultado, SerieIndice } from "../src/engine/types.js";
 
 const serie = JSON.parse(
   readFileSync(resolve(import.meta.dirname, "../public/data/ipc.json"), "utf8"),
@@ -387,15 +387,50 @@ describe("los rótulos no dependen de la dirección de la pregunta", () => {
    * era falso en toda deflación, y es el caso que la revisora usuaria dijo que no le mandaba
    * a una clienta: "junio bajó 1,85% según el INDEC" por escrito.
    */
-  it("una fila sellada nombra el mes cuya inflación muestra", () => {
-    for (const [i, f] of vuelta.desglose.entries()) {
-      if (i === 0 || selloDeFila(f, vuelta) === null) continue;
-      // O es el mes pelado, o el rango que termina en ese mes cuando el rótulo se repetiría
-      // con el de la fila de partida. Lo que no puede es nombrar otro mes.
-      expect(rotularFila(vuelta.desglose, i)).toContain(abreviarMes(mesDelTramo(vuelta.desglose, i)));
-      expect(f.varMensualPct).toBeGreaterThan(0);
-    }
-  });
+  /**
+   * Contra la **serie**, no contra `mesDelTramo`.
+   *
+   * La versión anterior era `expect(rotularFila(d, i)).toContain(abreviarMes(mesDelTramo(d, i)))`
+   * y para una fila no parcial `rotularFila` devuelve exactamente eso: `expect(X).toContain(X)`.
+   *
+   * Y la primera versión de este reemplazo tampoco mordía, por una razón más fina: en modo
+   * mensual la regla vieja —"el mes del punto de llegada"— **coincide** con la nueva, porque el
+   * recorrido es cronológico. La que no coincide es la de días: el tramo `1 jun → 1 jul` cubre
+   * junio y su punto de llegada cae en julio. Sin un caso por día, `mesDelTramo` no estaba
+   * atado por nadie.
+   */
+  for (const [que, desde, hasta] of [
+    ["por meses", "2026-07", "2026-02"],
+    ["por día", "2026-07-15", "2026-02-15"],
+    ["por día, al derecho", "2026-02-15", "2026-07-15"],
+  ] as const) {
+    it(`una fila sellada nombra el mes cuya inflación muestra — ${que}`, () => {
+      const r = adjust(1_000_000, desde, hasta, serie, { metodologia: "sin_proyectar" });
+      const indices = new Map(serie.datos.map((d) => [d.mes, d.indice]));
+      const variacionDe = (mes: Mes) => {
+        const previo = deOrdinal(aOrdinal(mes) - 1);
+        return (indices.get(mes)! / indices.get(previo)! - 1) * 100;
+      };
+      // El mes que la serie dice que tuvo esta variación, buscado sin preguntarle a la UI.
+      const mesQueVarioAsi = (pct: number) =>
+        [...indices.keys()].find(
+          (m) =>
+            indices.has(deOrdinal(aOrdinal(m) - 1)) && Math.abs(variacionDe(m) - pct) < 1e-9,
+        );
+
+      let selladas = 0;
+      for (const [i, f] of r.desglose.entries()) {
+        if (i === 0 || selloDeFila(f, r) === null) continue;
+        selladas += 1;
+        expect(f.varMensualPct).toBeGreaterThan(0);
+        const mes = mesQueVarioAsi(f.varMensualPct!);
+        expect(mes, `ninguna variación de la serie da ${f.varMensualPct}`).toBeDefined();
+        expect(rotularFila(r.desglose, i)).toBe(abreviarMes(mes!));
+      }
+      // Que haya filas selladas de las que hablar: sin esto el `for` vacío pasa solo.
+      expect(selladas).toBeGreaterThanOrEqual(4);
+    });
+  }
 });
 
 describe("el renglón del acumulado deflactando", () => {

@@ -23,6 +23,7 @@ import {
   compararMeses,
   comoDestino,
   compararPuntos,
+  ordenReal,
   conPreposicion,
   deOrdinal,
   esFecha,
@@ -1118,7 +1119,7 @@ function descargarCsv(): void {
   const tramo = (i: number): [string, string] =>
     i === 0
       ? ["", ""]
-      : ([r.desglose[i - 1]!.punto, r.desglose[i]!.punto].sort(compararPuntos) as [string, string]);
+      : ([r.desglose[i - 1]!.punto, r.desglose[i]!.punto].sort(ordenReal) as [string, string]);
   const filas: string[][] = [
     [
       "punto",
@@ -1153,7 +1154,8 @@ function descargarCsv(): void {
   // traía ninguna de esas dos fechas: abierto lejos del sitio, parece que alguien les
   // cambió las fechas. Acá no se puede poner una fila de aclaración (decisión 0011: las
   // filas `#` rompen la lectura en algunos programas), así que lo dice el nombre.
-  const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto].sort(compararPuntos);
+  // Ya vienen en orden: el desglose es cronológico en las dos direcciones (0014).
+  const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto];
   const periodo =
     r.metodo.tipo === "ventana_reciente"
       ? `tramo-de-referencia-${ini}-a-${fin}`

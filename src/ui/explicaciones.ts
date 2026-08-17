@@ -15,7 +15,6 @@
 import { sumaDeVariaciones, tasaMensualDelRem } from "../engine/adjust.js";
 import {
   comoInstante,
-  compararPuntos,
   conPreposicion,
   diasEnMes,
   diasEntre,
@@ -137,9 +136,10 @@ export function explicarMetodo(r: Resultado): string {
       // duplicaría el del extremo. Se nombra el tramo por sus puntas, que además
       // es lo que efectivamente se calculó.
       if (esFecha(r.desglose[0]!.punto)) {
-        // Cronológico, no en el orden de las filas: deflactando el desglose va del punto
-        // nuevo al viejo, y "del 31 de julio al 2 de julio" se lee como un error.
-        const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto].sort(compararPuntos);
+        // La primera fila es la más vieja y la última la más nueva, siempre: el desglose es
+        // cronológico en las dos direcciones (0014). Acá hubo un `sort` de red que dejó de
+        // hacer nada, y una red que nunca atrapa nada hace creer que puede venir al revés.
+        const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto];
         const dias = diasEntre(ini!, fin!);
         const ultimo = `${mesConAnio(ultimoPublicado)}, el último mes con dato`;
 
@@ -356,7 +356,8 @@ export function avisarTramoAjeno(r: Resultado): string {
   // párrafo de arriba decía "los últimos 3 meses publicados (mayo, junio y julio)":
   // cuatro contra tres, y la fila de abril no lleva ningún porcentaje porque es la de
   // partida. La regla 2 pide que lo que se nombra se pueda contar en pantalla.
-  const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto].sort(compararPuntos);
+  // Ya vienen en orden: el desglose es cronológico en las dos direcciones (0014).
+  const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto];
   const tramo = porDia
     ? `${conPreposicion("de", ini!)} ${conPreposicion("a", fin!)}`
     : `la inflación de ${frasearMeses(mesesConPorcentaje(r))}`;

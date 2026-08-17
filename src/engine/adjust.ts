@@ -44,8 +44,8 @@ import { PROYECCION } from "./types.js";
 import {
   aOrdinal,
   compararMeses,
-  comoInstante,
   compararPuntos,
+  ordenReal,
   deOrdinal,
   diaDe,
   diffMeses,
@@ -282,26 +282,12 @@ function cubreUnMesEntero(a: Punto, b: Punto): boolean {
 
 /** El extremo más nuevo del intervalo, sin importar en qué orden vinieron. */
 function extremoNuevo(desde: Punto, hasta: Punto): Punto {
-  return compararPuntos(hasta, desde) >= 0 ? hasta : desde;
+  return ordenReal(hasta, desde) >= 0 ? hasta : desde;
 }
 
 /** El extremo más viejo. Es el que arrastra los meses cuando se corre la ventana. */
 function extremoViejo(desde: Punto, hasta: Punto): Punto {
-  return compararPuntos(hasta, desde) >= 0 ? desde : hasta;
-}
-
-/**
- * Compara dos puntos por el **instante** que representan, no por su día 1.
- *
- * `compararPuntos` valúa un mes por su primer día porque es lo que hace falta para ordenar
- * fechas escritas; el motor lo valúa por su cierre (0004). Las dos convenciones sólo se
- * separan cuando se mezclan un mes y un día de ese mismo mes, y ahí `2026-07` contra
- * `2026-07-01` daba "el mes es anterior" cuando el mes **termina** un mes después.
- */
-function ordenReal(a: Punto, b: Punto): number {
-  const ia = comoInstante(a);
-  const ib = comoInstante(b);
-  return ia < ib ? -1 : ia > ib ? 1 : 0;
+  return ordenReal(hasta, desde) >= 0 ? desde : hasta;
 }
 
 /**
