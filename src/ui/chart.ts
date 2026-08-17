@@ -40,7 +40,7 @@ type Tokens = {
   superficie: string;
 };
 
-function tokens(): Tokens {
+export function tokens(): Tokens {
   const cs = getComputedStyle(document.documentElement);
   const leer = (n: string, fallback: string) => cs.getPropertyValue(n).trim() || fallback;
   return {
