@@ -6,6 +6,7 @@ import { adjust, sumaDeVariaciones } from "../src/engine/adjust.js";
 import { deOrdinal, aOrdinal } from "../src/engine/mes.js";
 import {
   avisarTramoAjeno,
+  efectoEnElMonto,
   esAproximado,
   explicarCompuesto,
   explicarMetodo,
@@ -571,6 +572,59 @@ describe("las marcas de la tabla no señalan un mes que no es el pedido", () => 
             if (marca === "el resultado") expect(f.punto).toBe(r.hasta);
           }
         }
+      }
+    }
+  });
+});
+
+/**
+ * El renglón del efecto sobre el monto, que es el que se manda por mensaje.
+ *
+ * Tenía el verbo cableado en "baja" y un `Math.abs()`, así que sobre un período de deflación
+ * leído para atrás afirmaba lo contrario de lo que el renglón de arriba acababa de decir:
+ * "$1.000.000 equivalen a $1.007.643" y dos renglones después "lo baja 0,76%". Alcanza al
+ * 2,39% de las consultas hacia atrás del índice nacional.
+ *
+ * Y vivía en `main.ts`, donde ningún test la podía tocar. Que esté acá es lo que le da forma
+ * de poder fallar en rojo.
+ */
+describe("el efecto sobre el monto dice para qué lado se movió", () => {
+  it("con inflación en el medio, el monto baja al ir para atrás", () => {
+    const r = adjust(1_000_000, "2026-07", "2026-02", serie, { metodologia: "sin_proyectar" });
+    expect(r.montoAjustado).toBeLessThan(r.monto);
+    expect(efectoEnElMonto(r)).toContain("lo baja");
+  });
+
+  it("con deflación en el medio, el monto sube al ir para atrás", () => {
+    // 1999–2001: el único tramo largo de deflación de la serie.
+    const r = adjust(1_000_000, "2001-12", "1999-01", serie, { metodologia: "sin_proyectar" });
+    expect(r.inflacionPct).toBeLessThan(0);
+    expect(r.montoAjustado).toBeGreaterThan(r.monto);
+    expect(efectoEnElMonto(r)).toContain("lo sube");
+    expect(efectoEnElMonto(r)).not.toContain("lo baja");
+  });
+
+  it("yendo para adelante no dice nada, porque los dos números son el mismo", () => {
+    const r = adjust(1_000_000, "2026-02", "2026-07", serie, { metodologia: "sin_proyectar" });
+    expect(efectoEnElMonto(r)).toBe("");
+  });
+
+  /**
+   * El barrido: el verbo tiene que coincidir con lo que hace el monto, siempre. Es la aserción
+   * que no depende de acordarse de que existió un tramo de deflación en la serie.
+   */
+  it("el verbo nunca contradice al monto", () => {
+    for (const desde of ["2026-07", "2016-08", "2001-12", "2002-06"] as const) {
+      for (const hasta of ["2026-02", "2016-07", "1999-01", "2001-03"] as const) {
+        let r: Resultado;
+        try {
+          r = adjust(1_000_000, desde, hasta, serie, { metodologia: "sin_proyectar" });
+        } catch {
+          continue;
+        }
+        const frase = efectoEnElMonto(r);
+        if (frase === "") continue;
+        expect(frase).toContain(r.montoAjustado < r.monto ? "lo baja" : "lo sube");
       }
     }
   });

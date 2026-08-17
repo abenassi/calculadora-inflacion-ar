@@ -406,6 +406,30 @@ function deDondeSalenLasFilas(r: Resultado): string {
 }
 
 /**
+ * La segunda mitad del renglón del acumulado, cuando el monto no se mueve como los precios.
+ *
+ * Deflactando son dos números distintos y los dos hacen falta: la inflación entre febrero y
+ * julio fue +12,71%, y sacársela a un millón lo deja en 11,28% menos. El renglón decía
+ * `Inflación acumulada: −11,28% (IPC del INDEC)`, que le pone el nombre del organismo al
+ * segundo número y la palabra "inflación" a algo que no lo es. La cifra que cita al organismo
+ * es la que el organismo publicó; el efecto sobre el monto va después y sin atribución.
+ *
+ * El verbo sale del signo y no está cableado. Con "baja" fijo y un `Math.abs()`, un período de
+ * **deflación** leído para atrás decía "Sacarle esa inflación al monto lo baja 0,76%" dos
+ * renglones abajo de "$1.000.000 equivalen a $1.007.643": el monto sube. Pasa en el 2,39% de
+ * las consultas hacia atrás del índice nacional, y una de ellas es agosto contra julio de 2016
+ * en CABA, que es la forma de consulta más común que existe.
+ *
+ * Yendo para adelante los dos números son el mismo y esto devuelve `""`: repetirlo sería
+ * decir dos veces lo mismo en el renglón que más se lee.
+ */
+export function efectoEnElMonto(r: Resultado): string {
+  if (comoSeMuestra(r.inflacionPct) === comoSeMuestra(r.variacionPct)) return "";
+  const verbo = r.variacionPct < 0 ? "baja" : "sube";
+  return ` Sacarle esa inflación al monto lo ${verbo} ${porcentaje(Math.abs(r.variacionPct), false)}.`;
+}
+
+/**
  * Si la pregunta va para atrás en el tiempo.
  *
  * Sale de `comoInstante` y no de `compararPuntos`: el primero valúa un mes por su cierre, que

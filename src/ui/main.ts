@@ -67,12 +67,12 @@ import {
   frasearMeses,
   fuenteDelTexto,
   hayAlgoEstimado,
+  efectoEnElMonto,
   hayTramoOficial,
   rotuloDeAnclaje,
   MESES_PROYECCION_LARGA,
 } from "./explicaciones.js";
 import {
-  comoSeMuestra,
   fechaLarga,
   indice,
   pesos,
@@ -471,22 +471,6 @@ function pintarResultado(r: Resultado): void {
   dibujar(el<HTMLCanvasElement>("grafico"), r);
 }
 
-/**
- * La segunda mitad del renglón del acumulado, cuando el monto no se mueve como los precios.
- *
- * Deflactando son dos números distintos y los dos hacen falta: la inflación entre febrero y
- * julio fue +12,71%, y sacársela a un millón lo deja en 11,28% menos. El renglón decía
- * `Inflación acumulada: −11,28% (IPC del INDEC)`, que le pone el nombre del organismo al
- * segundo número y la palabra "inflación" a algo que no lo es. La cifra que cita al organismo
- * es la que el organismo publicó; el efecto sobre el monto va después y sin atribución.
- *
- * Yendo para adelante los dos números son el mismo y esto devuelve `""`: repetirlo sería
- * decir dos veces lo mismo en el renglón que más se lee.
- */
-function efectoEnElMonto(r: Resultado): string {
-  if (comoSeMuestra(r.inflacionPct) === comoSeMuestra(r.variacionPct)) return "";
-  return ` Sacarle esa inflación al monto lo baja ${porcentaje(Math.abs(r.variacionPct), false)}.`;
-}
 
 /**
  * El título de la lista de porcentajes del texto que se copia.

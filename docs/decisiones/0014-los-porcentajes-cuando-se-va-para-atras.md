@@ -143,13 +143,30 @@ el gráfico—. Con el recorrido cronológico el choque no existe y la rama se b
 - `ordenReal`, que compara dos puntos por el instante que representan y no por su día 1. Es lo
   que decide la dirección, y con `compararPuntos` un mes contra un día de ese mismo mes daba
   al revés: `adjust(x, "2026-07", "2026-07-01")` mostraba **−1,56%** bajo "Subió" cuando julio
-  subió +2,11%. No se llegaba desde la interfaz, que normaliza el mes a su día 1.
+  subió +2,11%. No se llegaba desde la interfaz, que normaliza el mes a su día 1. Vive en
+  `mes.ts` al lado de `compararPuntos`, con el reparto escrito entre las dos.
+- El verbo de "Sacarle esa inflación al monto lo baja X" salía cableado, con un `Math.abs()`
+  encima. Sobre un período de **deflación** leído para atrás el monto sube, y la frase decía lo
+  contrario dos renglones abajo del número correcto: "$1.000.000 equivalen a $1.007.643" y
+  después "lo baja 0,76%". El 2,39% de las consultas hacia atrás del índice nacional, y una de
+  ellas es agosto contra julio de 2016 en CABA, que es la forma de consulta más común que hay.
 - El párrafo del resultado decía *"con una baja de 11,28%"* arriba de una tabla con todos los
   porcentajes positivos. Ahora dice *"con 12,71% de inflación en el medio"*, y el resultado más
   chico ya está en el número grande.
 - El comentario de `chart.ts` que explicaba que "con deflación la barra baja": ya no, las
   barras son inflación mensual y suben también deflactando. Bajan sólo cuando el mes tuvo
   deflación de verdad.
+
+## El alcance de `extremoNuevo` / `extremoViejo`
+
+Pasarlas a `ordenReal` toca el ancla de `sesgoDeLaVentana` y el cálculo de `esFuturo`, así que
+se barrió aparte: 9.408 consultas (48 puntos × 48 × 3 metodologías), comparando `metodo.tipo`,
+`montoAjustado`, `inflacionPct`, cantidad de filas, desplazamiento y `sePuedeEvitarEstimar`.
+Cambian **3**, y son la misma consulta con las tres metodologías: `2026-09-01 → 2026-08`, dos
+puntos que son **el mismo instante** —el día 1 de septiembre es el cierre de agosto—. El monto
+da idéntico (1000,00000000) porque el período tiene largo cero; lo que cambia es que ahora se
+clasifica como `ventana_reciente` en vez de `proyeccion`, que es lo correcto: no hay nada que
+estimar. Cae adentro de las puntas mixtas, que no son alcanzables desde la interfaz.
 
 ## Lo que no cambia
 
