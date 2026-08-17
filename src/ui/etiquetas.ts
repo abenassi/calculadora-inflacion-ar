@@ -238,13 +238,11 @@ export function rotularFila(desglose: Fila[], i: number, corto = false): string 
   }
 
   // El tramo se nombra por el mes de su inflación, que es el número que la fila muestra.
-  // Deflactando, el primer tramo saca la inflación del mes en el que arranca el período, así
-  // que ese rótulo repetiría el de la fila de partida —dos filas seguidas diciendo "jul
-  // 2026", una con guiones y la otra con +2,11%—. Cuando pasa, la fila se nombra por sus dos
-  // puntas, igual que un tramo de días.
-  const mes = mesDelTramo(desglose, i);
-  if (i === 1 && !esFecha(desglose[0]!.punto) && mesDe(desglose[0]!.punto) === mes) {
-    return comoRango(desglose[0]!.punto, fila.punto);
-  }
-  return abreviarMes(mes);
+  //
+  // Hubo una rama más acá: deflactando, el primer tramo sacaba la inflación del mes en el que
+  // arrancaba el período y su rótulo repetía el de la fila de partida, así que se nombraba por
+  // sus dos puntas. Murió con el desglose cronológico de la 0014 —ahora ninguna fila puede
+  // repetir a la de arriba— y la revisora usuaria tenía razón sobre ella: dejaba dos renglones
+  // seguidos empezando con "jun" y queriendo decir meses distintos, en la tabla y en el gráfico.
+  return abreviarMes(mesDelTramo(desglose, i));
 }

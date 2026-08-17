@@ -352,22 +352,21 @@ describe("los rótulos no dependen de la dirección de la pregunta", () => {
       "jun 2026",
       "jul 2026",
     ]);
-    // Deflactando, el primer tramo saca la inflación de julio, que es el mes de la fila de
-    // partida: ahí el rótulo pasa a nombrar las dos puntas para no repetirse.
-    expect(vuelta.desglose.map((_, i) => rotularFila(vuelta.desglose, i))).toEqual([
-      "jul 2026",
-      "jun 2026 → jul 2026",
-      "jun 2026",
-      "may 2026",
-      "abr 2026",
-      "mar 2026",
-    ]);
+    // Y deflactando son exactamente los mismos rótulos: la tabla es la misma tabla.
+    expect(vuelta.desglose.map((_, i) => rotularFila(vuelta.desglose, i))).toEqual(
+      ida.desglose.map((_, i) => rotularFila(ida.desglose, i)),
+    );
   });
 
-  it("ninguna fila repite el rótulo de la de arriba", () => {
+  it("ninguna fila repite el rótulo de la de arriba, ni el mes", () => {
     for (const r of [ida, vuelta]) {
       const rotulos = r.desglose.map((_, i) => rotularFila(r.desglose, i));
       expect(new Set(rotulos).size).toBe(rotulos.length);
+      // Y el mes tampoco aparece en dos renglones seguidos. La versión anterior comparaba
+      // strings completos, así que dejaba pasar "jun 2026 → jul 2026" arriba de "jun 2026":
+      // dos renglones que empiezan igual y dicen meses distintos.
+      const meses = r.desglose.slice(1).map((_, i) => mesDelTramo(r.desglose, i + 1));
+      expect(new Set(meses).size).toBe(meses.length);
     }
   });
 
@@ -375,7 +374,8 @@ describe("los rótulos no dependen de la dirección de la pregunta", () => {
     const r = adjust(1_000_000, "2026-07-15", "2026-02-15", serie, { hoy: "2026-08" });
     const rotulos = r.desglose.map((_, i) => rotularFila(r.desglose, i));
     // Decía "15 jul 2026 → 1 jul 2026": la flecha se lee "de acá hasta acá" y apuntaba para
-    // atrás en el tiempo.
+    // atrás en el tiempo. Con el desglose cronológico esto ya no se puede escribir mal, pero
+    // el test se queda: es la promesa, no la implementación.
     expect(rotulos).toContain("1 jul 2026 → 15 jul 2026");
     expect(rotulos).toContain("15 feb 2026 → 1 mar 2026");
     expect(rotulos.filter((x) => x.includes("→")).length).toBe(2);
@@ -407,11 +407,11 @@ describe("el renglón del acumulado deflactando", () => {
     expect(texto).not.toContain(porcentaje(vuelta.variacionPct, false));
   });
 
-  it("el pie avisa que los montos bajan mientras los porcentajes suben", () => {
-    expect(explicarTabla(vuelta)).toContain("cada monto es el que queda después de sacársela");
+  it("el pie avisa dónde quedó el monto que la persona escribió", () => {
+    expect(explicarTabla(vuelta)).toContain("está en la última fila y el resultado, en la primera");
     // Yendo para adelante no hay nada que aclarar.
     const ida = adjust(1_000_000, "2026-02", "2026-07", serie, { hoy: "2026-08" });
-    expect(explicarTabla(ida)).not.toContain("Vas para atrás");
+    expect(explicarTabla(ida)).not.toContain("la última fila");
   });
 });
 
@@ -457,28 +457,29 @@ describe("los meses que se nombran son los que se pueden contar en la tabla", ()
  * estimaciones. Vas para atrás en el tiempo, así que los porcentajes son la inflación que hubo
  * —la que publicó el INDEC—". Y en pasado, sobre meses que todavía no llegaron.
  */
-describe("la aclaración de la deflación no atribuye de más", () => {
-  it("nombra al organismo cuando hay algún tramo suyo en la tabla", () => {
-    const r = adjust(1_000_000, "2026-07", "2026-02", serie, { metodologia: "sin_proyectar" });
-    expect(explicarTabla(r)).toContain("la que publicó el INDEC");
-  });
-
-  it("no lo nombra cuando la tabla entera está estimada", () => {
-    const r = adjust(1_000_000, mas(9), mas(2), serie, { metodologia: "repite_ultimo" });
-    expect(r.desglose.every((f) => f.esProyeccion)).toBe(true);
-    const pie = explicarTabla(r);
-    expect(pie).toContain("Vas para atrás en el tiempo");
-    for (const promesa of ["la que publicó", "la inflación que hubo"]) {
-      expect(pie).not.toContain(promesa);
-    }
-  });
-
-  it("tampoco lo nombra cuando ningún porcentaje lleva sello", () => {
-    // Todas las filas prorrateadas: el número no lo publicó nadie, aunque el mes sí esté.
-    const r = adjust(1_000_000, `${menos(1)}-20`, `${menos(1)}-10`, serie, {
-      metodologia: "sin_proyectar",
+describe("la aclaración de la deflación no atribuye nada", () => {
+  /**
+   * La frase llegó a decir "los porcentajes son la inflación que hubo —la que publicó el
+   * INDEC—" de forma incondicional, así que con un período enteramente estimado quedaba pegada
+   * a la anterior contradiciéndola: "son todos estimaciones. Vas para atrás en el tiempo, así
+   * que los porcentajes son la inflación que hubo —la que publicó el INDEC—". En pasado, sobre
+   * meses de 2027. Con el desglose cronológico la frase pasó a hablar sólo de dónde quedó el
+   * monto, que es cierto sin importar de dónde salgan los números; el test se queda para que
+   * no vuelva a crecerle una atribución.
+   */
+  for (const [que, desde, hasta, metodologia] of [
+    ["todo publicado", "2026-07", "2026-02", "sin_proyectar"],
+    ["todo estimado", mas(9), mas(2), "repite_ultimo"],
+    ["todo prorrateado", `${menos(1)}-20`, `${menos(1)}-10`, "sin_proyectar"],
+  ] as const) {
+    it(`no nombra a ningún organismo — ${que}`, () => {
+      const r = adjust(1_000_000, desde, hasta, serie, { metodologia });
+      const pie = explicarTabla(r);
+      expect(pie).toContain("va del mes más viejo al más nuevo");
+      const frase = pie.slice(pie.indexOf("La tabla va del mes"));
+      for (const sigla of ["INDEC", "BCRA", "publicó"]) {
+        expect(frase).not.toContain(sigla);
+      }
     });
-    expect(r.desglose.slice(1).every((f) => f.esParcial)).toBe(true);
-    expect(explicarTabla(r)).not.toContain("la que publicó");
-  });
+  }
 });

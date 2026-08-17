@@ -61,11 +61,16 @@ describe("método directo — todo el período está publicado", () => {
     expect(r.desglose).toHaveLength(1);
   });
 
-  it("deflacta yendo hacia atrás", () => {
+  it("deflacta yendo hacia atrás, con el desglose igual de cronológico", () => {
     const r = adjust(1210, "2020-03", "2020-01", sintetica, { hoy: "2020-06" });
     expect(r.metodo.tipo).toBe("directo");
     expect(r.montoAjustado).toBeCloseTo(1000, 6);
-    expect(r.desglose.map((f) => f.punto)).toEqual(["2020-03", "2020-02", "2020-01"]);
+    // Del más viejo al más nuevo, como en cualquier otra consulta (0014). Lo que cambia con
+    // la dirección es dónde se apoya el monto: acá los $1.210 están en la **última** fila y
+    // los $1.000 —la respuesta— en la primera.
+    expect(r.desglose.map((f) => f.punto)).toEqual(["2020-01", "2020-02", "2020-03"]);
+    expect(r.desglose.at(-1)!.monto).toBeCloseTo(1210, 6);
+    expect(r.desglose[0]!.monto).toBeCloseTo(1000, 6);
   });
 
   it("ninguna fila queda marcada como proyección", () => {
@@ -115,8 +120,10 @@ describe("ventana reciente — el destino ya pasó pero no se publicó", () => {
     // "Cobré esto en junio, ¿cuánto era en marzo?", publicado hasta abril.
     const r = adjust(1331, "2020-06", "2020-03", sintetica, { hoy: "2020-06" });
     expect(r.metodo.tipo).toBe("ventana_reciente");
-    expect(r.desglose.map((f) => f.punto)).toEqual(["2020-04", "2020-03", "2020-02", "2020-01"]);
+    expect(r.desglose.map((f) => f.punto)).toEqual(["2020-01", "2020-02", "2020-03", "2020-04"]);
     expect(r.montoAjustado).toBeCloseTo(1000, 6);
+    // El monto pedido se apoya en la punta nueva de la ventana, no en la vieja.
+    expect(r.desglose.at(-1)!.monto).toBeCloseTo(1331, 6);
   });
 
   it("el desplazamiento es el mínimo que hace entrar la ventana", () => {
@@ -607,10 +614,10 @@ describe("modo por día", () => {
     expect(r.desglose.at(-1)!.punto).toBe("2020-04-30");
   });
 
-  it("deflactando, la ventana se recorre al revés y el monto baja", () => {
+  it("deflactando, la ventana se lee cronológica y el monto baja igual", () => {
     const r = adjust(1000, "2020-07-15", "2020-06-17", irregular, { hoy: "2020-07" });
     if (r.metodo.tipo !== "ventana_reciente") throw new Error("tipo inesperado");
-    expect(r.desglose.map((f) => f.punto)).toEqual(["2020-04-30", "2020-04-02"]);
+    expect(r.desglose.map((f) => f.punto)).toEqual(["2020-04-02", "2020-04-30"]);
     expect(r.montoAjustado).toBeLessThan(1000);
     // Y es exactamente la vuelta del test de arriba.
     expect(r.montoAjustado).toBeCloseTo(1000 / Math.pow(1.03, 28 / 30), 8);
@@ -827,10 +834,10 @@ describe("deflactar — los porcentajes son la inflación que hubo, no su recíp
       "2026-06",
       "2026-07",
     ]);
-    // Y son los mismos pares mes/porcentaje, en el orden en que se recorren. Ésta es la
-    // aserción que importa: no que los números sean tal o cual, sino que la dirección de la
-    // pregunta no los cambie.
-    expect(porMes(vuelta)).toEqual([...porMes(ida)].reverse());
+    // Y son los mismos pares mes/porcentaje, **en el mismo orden**. Ésta es la aserción que
+    // importa: no que los números sean tal o cual, sino que la dirección de la pregunta no
+    // cambie ni uno. Con el desglose cronológico (0014) las dos tablas son la misma tabla.
+    expect(porMes(vuelta)).toEqual(porMes(ida));
   });
 
   /**
@@ -848,12 +855,12 @@ describe("deflactar — los porcentajes son la inflación que hubo, no su recíp
         .slice(1)
         .map((f, i) => [mesDelTramo(r.desglose, i + 1), selloDeFila(f, r)] as const);
 
-    expect(conSello(vuelta)).toEqual([...conSello(ida)].reverse());
+    expect(conSello(vuelta)).toEqual(conSello(ida));
 
     const cruza = ["2016-09", "2017-01"] as const;
     const alDerecho = conSello(adjust(1_000_000, cruza[0], cruza[1], serie, { hoy: "2026-08" }));
     const alReves = conSello(adjust(1_000_000, cruza[1], cruza[0], serie, { hoy: "2026-08" }));
-    expect(alReves).toEqual([...alDerecho].reverse());
+    expect(alReves).toEqual(alDerecho);
     // Y el que vale es BCRA: el INDEC no publicó ninguna variación para diciembre de 2016 en
     // esta serie, porque su índice de nivel arranca ahí.
     expect(alDerecho.find(([mes]) => mes === "2016-12")?.[1]).toBe("BCRA");
@@ -869,6 +876,15 @@ describe("deflactar — los porcentajes son la inflación que hubo, no su recíp
       const publicado = (indices.get(mes)! / indices.get(previo)! - 1) * 100;
       expect(f.varMensualPct).toBeCloseTo(publicado, 10);
     }
+  });
+
+  it("lo único que cambia con la dirección es dónde se apoya el monto", () => {
+    expect(ida.desglose.map((f) => f.punto)).toEqual(vuelta.desglose.map((f) => f.punto));
+    // De ida el millón está arriba y el resultado abajo; de vuelta, al revés.
+    expect(ida.desglose[0]!.monto).toBeCloseTo(1_000_000, 6);
+    expect(ida.desglose.at(-1)!.monto).toBeCloseTo(ida.montoAjustado, 6);
+    expect(vuelta.desglose.at(-1)!.monto).toBeCloseTo(1_000_000, 6);
+    expect(vuelta.desglose[0]!.monto).toBeCloseTo(vuelta.montoAjustado, 6);
   });
 
   it("el acumulado de cada fila también es inflación, y crece", () => {

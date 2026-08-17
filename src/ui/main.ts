@@ -22,6 +22,7 @@ import {
   aOrdinal,
   compararMeses,
   comoDestino,
+  comoInstante,
   compararPuntos,
   conPreposicion,
   deOrdinal,
@@ -399,6 +400,15 @@ function pintarResultado(r: Resultado): void {
       const th = document.createElement("th");
       th.scope = "row";
       th.textContent = rotularFila(r.desglose, i);
+      // Deflactando, la tabla sigue yendo del mes más viejo al más nuevo (0014), así que el
+      // monto que la persona escribió no está en la primera fila sino en la última. Sin
+      // marcarlo, la tabla arranca con un número que nadie tipeó y termina con el que sí.
+      if (esDeflacion(r) && i === r.desglose.length - 1) {
+        const marca = document.createElement("span");
+        marca.className = "fila-anclaje";
+        marca.textContent = " ← tu monto";
+        th.append(marca);
+      }
       tr.append(th);
 
       const celda = (texto: string, clase?: string) => {
@@ -460,6 +470,17 @@ function pintarResultado(r: Resultado): void {
   el("nota-compuesto").hidden = !seVenDistintos(sumaDeVariaciones(r.desglose), r.inflacionPct);
   el("nota-compuesto").textContent = explicarCompuesto(r);
   dibujar(el<HTMLCanvasElement>("grafico"), r);
+}
+
+/**
+ * Si la pregunta va para atrás en el tiempo.
+ *
+ * Un solo lugar en la UI, y sale del mismo `comoInstante` que usa el motor: `compararPuntos`
+ * valúa un mes por su día 1 y el motor por su cierre, así que las dos convenciones se separan
+ * justo cuando se mezclan un mes y un día de ese mismo mes.
+ */
+function esDeflacion(r: Resultado): boolean {
+  return comoInstante(r.hasta) < comoInstante(r.desde);
 }
 
 /**

@@ -14,6 +14,7 @@
 
 import { sumaDeVariaciones, tasaMensualDelRem } from "../engine/adjust.js";
 import {
+  comoInstante,
   compararPuntos,
   conPreposicion,
   diasEnMes,
@@ -404,29 +405,18 @@ function deDondeSalenLasFilas(r: Resultado): string {
 }
 
 /**
- * Deflactando, la columna de porcentajes sube y la de montos baja. Hay que decirlo.
+ * Deflactando, la tabla arranca en la respuesta y termina en el monto que la persona escribió.
  *
- * Es el precio de mostrar la inflación que el organismo publicó en vez de su recíproco: la
- * fila "jun 2026" dice +1,89% —lo que subieron los precios en junio— y el monto que tiene al
- * lado es el de **mayo**, porque es dónde se llega después de sacarle ese 1,89%. Las dos
- * cosas son ciertas y juntas se leen como un error si nadie las nombra.
- *
- * La alternativa era invertir los porcentajes, y eso le atribuía al organismo cifras que
- * nunca publicó: junio salía como −1,85% con `INDEC ✓` al lado. Ver 0014.
+ * Es la contracara de leer siempre del mes más viejo al más nuevo (0014). La tabla es la misma
+ * que la de la consulta al derecho —los mismos meses, los mismos porcentajes, los mismos
+ * sellos— y lo único que se mueve es dónde se apoya el monto: abajo de todo, en vez de arriba.
+ * Sin decirlo, la primera fila muestra un número que nadie tipeó.
  */
 function aclararDeflacion(r: Resultado): string {
-  if (compararPuntos(r.hasta, r.desde) >= 0) return "";
-  // La atribución cuelga del sello y no de la dirección. La frase era incondicional y con un
-  // período enteramente estimado quedaba pegada a la anterior contradiciéndola: "Ningún
-  // porcentaje de esta tabla es un dato publicado: son todos estimaciones. Vas para atrás en
-  // el tiempo, así que los porcentajes son la inflación que hubo —la que publicó el INDEC—".
-  // Y en pasado, sobre meses de 2027. Es la regla 2 del lado que se olvida, en código nuevo.
-  const deQuien = hayTramoOficial(r)
-    ? `la inflación que hubo —la que publicó ${fuenteDe(r.desglose, r).publicadosPor}—`
-    : `inflación, no descuentos`;
+  if (comoInstante(r.hasta) >= comoInstante(r.desde)) return "";
   return (
-    ` Vas para atrás en el tiempo, así que los porcentajes son ${deQuien} y cada monto es el ` +
-    `que queda después de sacársela.`
+    ` La tabla va del mes más viejo al más nuevo, así que el monto que pediste ajustar está ` +
+    `en la última fila y el resultado, en la primera.`
   );
 }
 

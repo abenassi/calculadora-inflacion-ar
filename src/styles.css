@@ -607,6 +607,21 @@ button:focus-visible {
   font-style: italic;
 }
 
+/*
+ * Deflactando, la tabla se sigue leyendo del mes más viejo al más nuevo (0014), así que el
+ * monto que la persona escribió queda en la última fila y la respuesta en la primera. Sin
+ * esta marca la tabla arranca con un número que nadie tipeó.
+ *
+ * En minúscula y en el color secundario: es una referencia, no una advertencia — el cartel
+ * de `estimado` tiene que seguir siendo lo más fuerte de la fila.
+ */
+.fila-anclaje {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
 .origen {
   font-size: 0.72rem;
   font-style: normal;

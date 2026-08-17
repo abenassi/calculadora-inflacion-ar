@@ -44,6 +44,7 @@ import { PROYECCION } from "./types.js";
 import {
   aOrdinal,
   compararMeses,
+  comoInstante,
   compararPuntos,
   deOrdinal,
   diaDe,
@@ -290,26 +291,47 @@ function extremoViejo(desde: Punto, hasta: Punto): Punto {
 }
 
 /**
- * Los puntos que componen el desglose.
+ * Compara dos puntos por el **instante** que representan, no por su día 1.
+ *
+ * `compararPuntos` valúa un mes por su primer día porque es lo que hace falta para ordenar
+ * fechas escritas; el motor lo valúa por su cierre (0004). Las dos convenciones sólo se
+ * separan cuando se mezclan un mes y un día de ese mismo mes, y ahí `2026-07` contra
+ * `2026-07-01` daba "el mes es anterior" cuando el mes **termina** un mes después.
+ */
+function ordenReal(a: Punto, b: Punto): number {
+  const ia = comoInstante(a);
+  const ib = comoInstante(b);
+  return ia < ib ? -1 : ia > ib ? 1 : 0;
+}
+
+/**
+ * Los puntos que componen el desglose, **siempre del más viejo al más nuevo**.
  *
  * Con meses enteros es la lista de meses. Con días, a los extremos se les suman los
  * días 1 de cada mes que quede estrictamente en el medio, para que ninguna fila
  * abarque más de un mes: un tramo del 1 de julio al 5 de agosto mostrado como una
  * sola fila se leería como si fuera la inflación de un mes, y son 35 días.
+ *
+ * Cronológico también cuando se deflacta, y ésa es la decisión de la 0014. Recorriendo del
+ * punto nuevo al viejo, cada fila terminaba mezclando dos meses —el rótulo y el porcentaje de
+ * uno, el índice y el monto del otro— y la columna Índice IPC contestaba 11.826,41 para junio
+ * de ida y 11.607,39 de vuelta. Yendo siempre para adelante, cada fila es de un solo mes y la
+ * tabla de vuelta queda estructuralmente idéntica a la de ida. Lo que cambia con la dirección
+ * es **dónde se apoya el monto**, no en qué orden se leen los meses.
  */
 function puntosDelRecorrido(desde: Punto, hasta: Punto): Punto[] {
-  if (!esFecha(desde) && !esFecha(hasta)) return rangoMeses(desde, hasta);
+  const [viejo, nuevo] = ordenReal(desde, hasta) <= 0 ? [desde, hasta] : [hasta, desde];
+  if (!esFecha(viejo) && !esFecha(nuevo)) return rangoMeses(viejo, nuevo);
 
   const comoDia = (p: Punto) => (esFecha(p) ? p : primerDia(p));
-  const inicio = comoDia(desde);
-  const fin = comoDia(hasta);
-  const haciaAdelante = fin >= inicio;
+  const inicio = comoDia(viejo);
+  const fin = comoDia(nuevo);
 
-  const intermedios = rangoMeses(mesDe(desde), mesDe(hasta))
+  const intermedios = rangoMeses(mesDe(viejo), mesDe(nuevo))
     .map(primerDia)
-    .filter((d) => (haciaAdelante ? d > inicio && d < fin : d < inicio && d > fin));
+    .filter((d) => d > inicio && d < fin);
 
-  return [desde, ...intermedios, hasta];
+  return [viejo, ...intermedios, nuevo];
 }
 
 /* ------------------------------------------------------------------- ajuste */
@@ -580,17 +602,20 @@ function armarResultado(
   metodo: Metodo,
   esProyeccion: (punto: Punto, anterior: Punto | null) => boolean,
 ): Resultado {
-  const indiceBase = idx.valorEn(puntos[0]!);
-  // Deflactando, el recorrido va del punto nuevo al viejo. Los porcentajes de la tabla se
-  // calculan **siempre** en orden cronológico, no en el orden del recorrido, porque son la
-  // inflación de un mes y la inflación de un mes es una sola: la que publicó el organismo.
-  // Dividiendo en el orden del recorrido salían invertidos —junio publicó +1,89% y la tabla
-  // decía −1,85%, con `INDEC ✓` al lado y abajo de una columna que se llama "Subió"—, y de
-  // paso quedaban corridos un mes respecto del rótulo. Ver 0014.
-  const haciaAtras = compararPuntos(puntos.at(-1)!, puntos[0]!) < 0;
-  /** Del índice de esta fila y el de la fila con la que se compara, el cociente cronológico. */
-  const inflacion = (aca: number, contra: number) =>
-    (haciaAtras ? contra / aca - 1 : aca / contra - 1) * 100;
+  // El recorrido es cronológico siempre (ver `puntosDelRecorrido`), así que los porcentajes
+  // salen solos: cada fila divide su índice por el de la anterior y eso **es** la inflación de
+  // ese tramo, en las dos direcciones. Lo único que la dirección decide es dónde se apoya el
+  // monto que la persona escribió.
+  //
+  // Deflactando, ese anclaje es la **última** fila: "cobré $1.000.000 el 15 de julio" pone el
+  // millón en julio, y el resto de la columna sale de ahí para atrás hasta la respuesta, que
+  // queda arriba de todo. Con `ventana_reciente` el anclaje no es `desde` sino la punta de la
+  // ventana que le corresponde, porque las filas son el tramo de referencia y no el pedido.
+  const deflacta = ordenReal(hasta, desde) < 0;
+  const anclaje = deflacta ? puntos.at(-1)! : puntos[0]!;
+  const destino = deflacta ? puntos[0]! : puntos.at(-1)!;
+  const indiceBase = idx.valorEn(anclaje);
+  const indicePrimero = idx.valorEn(puntos[0]!);
 
   const desglose: Fila[] = puntos.map((punto, i) => {
     const indice = idx.valorEn(punto);
@@ -599,20 +624,20 @@ function armarResultado(
     return {
       punto,
       indice,
-      varMensualPct: previo === null ? null : inflacion(indice, previo),
-      acumuladoPct: i === 0 ? null : inflacion(indice, indiceBase),
+      varMensualPct: previo === null ? null : (indice / previo - 1) * 100,
+      // Acumulado desde la **primera** fila, que es la más vieja. Deflactando ésa no es
+      // donde se apoya el monto —el monto está abajo— pero sí es desde donde se acumula la
+      // inflación, que es lo que esta columna dice.
+      acumuladoPct: i === 0 ? null : (indice / indicePrimero - 1) * 100,
       monto: (monto * indice) / indiceBase,
       esProyeccion: proyectado,
-      // El sello de un tramo sale del extremo **viejo**, no del punto de llegada, y por eso
-      // no depende de la dirección de la pregunta. La variación de diciembre de 2016 sale de
-      // dividir el índice de diciembre —el primero que publicó el INDEC, 100— por el de
-      // noviembre, que no existe y `splice.ts` retropola con el BCRA: el +1,20% es del BCRA.
-      // Preguntando de septiembre 2016 a enero 2017 salía `INDEC ✓` y al revés `BCRA ✓`, con
-      // el mismo porcentaje en la misma fila. La fila de partida no tiene tramo y conserva el
-      // origen de su propio punto, que es lo que describe su índice.
-      origen: proyectado
-        ? "proyeccion"
-        : idx.origenDe(mesDe(i === 0 ? punto : extremoViejo(puntos[i - 1]!, punto))),
+      // El sello de un tramo sale del extremo **viejo**, que con el recorrido cronológico es
+      // siempre la fila anterior. La variación de diciembre de 2016 sale de dividir el índice
+      // de diciembre —el primero que publicó el INDEC, 100— por el de noviembre, que no existe
+      // y `splice.ts` retropola con el BCRA: el +1,20% es del BCRA, y con el origen sacado del
+      // punto de llegada salía `INDEC ✓`. La primera fila no tiene tramo y conserva el origen
+      // de su propio punto, que es lo que describe su índice.
+      origen: proyectado ? "proyeccion" : idx.origenDe(mesDe(i === 0 ? punto : puntos[i - 1]!)),
       // La fila de partida también es parcial cuando su índice no es un dato publicado.
       //
       // Una fila lleva el sello del organismo si el número que muestra salió de él. Para
@@ -633,7 +658,7 @@ function armarResultado(
     };
   });
 
-  const factor = idx.valorEn(puntos.at(-1)!) / indiceBase;
+  const factor = idx.valorEn(destino) / indiceBase;
   return {
     // Lo pisa `adjust`, que es quien sabe qué se pidió.
     metodologia: "sin_proyectar",
@@ -642,7 +667,7 @@ function armarResultado(
     hasta,
     montoAjustado: monto * factor,
     variacionPct: (factor - 1) * 100,
-    inflacionPct: haciaAtras ? (1 / factor - 1) * 100 : (factor - 1) * 100,
+    inflacionPct: (idx.valorEn(puntos.at(-1)!) / indicePrimero - 1) * 100,
     metodo,
     desglose,
     ...idx.fuentes,

@@ -41,10 +41,35 @@ googlea, se me cae todo, incluidos los presupuestos que sí estaban bien"*.
 ## La decisión
 
 **Los porcentajes de la tabla son la inflación que hubo, siempre cronológica.** La inflación
-de un mes es una sola y no depende de en qué dirección se pregunte. Preguntar de febrero a
-julio y de julio a febrero da **la misma tabla de porcentajes, con el mismo sello**, en orden
-invertido. Hay dos tests que atan exactamente eso, uno por mitad — la primera versión afirmaba
-atar el sello y sólo ataba los porcentajes.
+de un mes es una sola y no depende de en qué dirección se pregunte.
+
+**Y el desglose se recorre siempre del mes más viejo al más nuevo, también deflactando.** Con
+eso, preguntar de febrero a julio y de julio a febrero da **la misma tabla**: los mismos meses,
+los mismos porcentajes, los mismos sellos, en el mismo orden. Lo único que cambia con la
+dirección es **dónde se apoya el monto** que la persona escribió: yendo para adelante está en
+la primera fila, y deflactando en la última, marcada `← tu monto`. Hay tests que atan las tres
+mitades por separado — los porcentajes, el sello, y el anclaje del monto.
+
+> **Esta parte se decidió dos veces, y la primera estaba mal.** La versión que se publicó el
+> 17 de agosto mantenía el recorrido en el orden de la pregunta y sólo corregía los
+> porcentajes y el rótulo. Era coherente en su propio marco y aun así rompía tres cosas, que
+> los tres revisores encontraron por caminos distintos:
+>
+> - **La columna Índice IPC se contradecía a sí misma.** La fila `jun 2026` mostraba
+>   11.826,41 preguntando al derecho y 11.607,39 al revés. Es la columna que se puede ir a
+>   comprobar contra la publicación oficial.
+> - **El mes preguntado no aparecía en ninguna fila.** Pidiendo febrero, la última fila decía
+>   `mar 2026` con los $887.237 al lado.
+> - **Un índice publicado terminaba en una fila marcada `estimado`.** Deflactando de septiembre
+>   a abril, la fila rotulada "ago 2026" mostraba 12.076,39 —el índice real de julio— con el
+>   cartel de estimación.
+>
+> Las tres son la misma cosa: con el recorrido invertido, la fila mezclaba dos meses. El
+> rótulo y el porcentaje salían del tramo; el índice, el monto y el sello, del punto. Un
+> rótulo por tramo sólo es coherente si **toda** la fila pertenece a ese mes, y eso es cierto
+> yendo para adelante y falso yendo para atrás. El recorrido cronológico es el único diseño
+> donde cada fila es de un solo mes, y encima saca un caso especial del motor en vez de
+> agregarlo.
 
 **El sello de un tramo sale del extremo viejo, no del punto de llegada.** Es la misma corrida
 de un mes, en otra columna. La variación de diciembre de 2016 sale de dividir el índice de
@@ -76,28 +101,25 @@ deflactando.
 
 ## Lo que esto cuesta, dicho de frente
 
-Deflactando, **la columna de porcentajes sube y la de montos baja**, y en una misma fila el
-porcentaje es de un mes y el monto es del anterior: la fila "jun 2026" dice +1,89% —lo que
-subieron los precios en junio— y al lado tiene el monto de **mayo**, que es dónde se llega
-después de sacarle ese 1,89%.
+Deflactando, **la primera fila de la tabla ya no es el monto que la persona escribió**: es la
+respuesta. El monto pedido queda abajo de todo, marcado `← tu monto`, y el pie lo dice: *"La
+tabla va del mes más viejo al más nuevo, así que el monto que pediste ajustar está en la última
+fila y el resultado, en la primera."*
 
-Las dos cosas son ciertas y juntas se leen como un error si nadie las nombra, así que el pie
-lo nombra: *"Vas para atrás en el tiempo, así que los porcentajes son la inflación que hubo
-—la que publicó el INDEC— y cada monto es el que queda después de sacársela."*
+Es un costo real y se eligió a conciencia contra el de la alternativa. La otra opción evaluada
+—mantener el orden de la pregunta— deja el monto arriba, que es lo que la interfaz venía
+suponiendo en todos lados, pero paga con que cada fila hable de dos meses a la vez. Entre "la
+primera fila no es la tuya" y "el índice del INDEC de esta fila no es el de este mes", la
+segunda es la que rompe la promesa del sitio.
 
-Se evaluó la alternativa de **dar vuelta la tabla** y mostrarla siempre cronológica, de lo
-viejo a lo nuevo, arrancando en la respuesta ($887.237) y terminando en el monto que la persona
-escribió. Alinea el rótulo, el porcentaje y el monto de cada fila, y se descartó por una razón
-de producto: la primera fila deja de ser el monto que se tipeó, y toda la interfaz está
-construida alrededor de eso —el número grande, el punto de partida de la tabla, el nombre del
-CSV, la primera barra del gráfico—. Queda anotada acá porque es una alternativa razonable y no
-un error, y si algún día la tabla se lee mal en el celular es la primera que hay que volver a
-mirar.
+## Un caso que se cerró solo
 
-Hay un caso donde el rótulo se rompe solo: deflactando, el primer tramo saca la inflación del
-mes en el que arranca el período, así que su rótulo repetiría el de la fila de partida —dos
-filas seguidas diciendo "jul 2026", una con guiones y la otra con +2,11%—. Ahí, y sólo ahí, la
-fila se nombra por sus dos puntas (`jun 2026 → jul 2026`), igual que un tramo de días.
+Con el recorrido en el orden de la pregunta hubo que agregarle a `rotularFila` una rama para
+un choque de nombres: deflactando, el primer tramo sacaba la inflación del mes en el que
+arrancaba el período, así que su rótulo repetía el de la fila de partida y había que nombrarlo
+por sus dos puntas (`jun 2026 → jul 2026`). La revisora usuaria lo rechazó con razón —dejaba
+dos renglones seguidos empezando con "jun" y queriendo decir meses distintos, en la tabla y en
+el gráfico—. Con el recorrido cronológico el choque no existe y la rama se borró.
 
 ## Lo que se barrió con esto
 
@@ -109,7 +131,12 @@ fila se nombra por sus dos puntas (`jun 2026 → jul 2026`), igual que un tramo 
   fuera la versión bien hecha del otro. Ahora se compara contra la inflación acumulada, y hay
   un test que exige que los dos números que la nota contrapone sean del mismo signo.
 - Las flechas de las filas prorrateadas apuntaban para atrás en el tiempo (`15 jul 2026 → 1
-  jul 2026`). Una flecha se lee "de acá hasta acá".
+  jul 2026`). Una flecha se lee "de acá hasta acá". Con el recorrido cronológico ya no se
+  pueden escribir mal, pero el test se queda: ata la promesa, no la implementación.
+- `ordenReal`, que compara dos puntos por el instante que representan y no por su día 1. Es lo
+  que decide la dirección, y con `compararPuntos` un mes contra un día de ese mismo mes daba
+  al revés: `adjust(x, "2026-07", "2026-07-01")` mostraba **−1,56%** bajo "Subió" cuando julio
+  subió +2,11%. No se llegaba desde la interfaz, que normaliza el mes a su día 1.
 - El párrafo del resultado decía *"con una baja de 11,28%"* arriba de una tabla con todos los
   porcentajes positivos. Ahora dice *"con 12,71% de inflación en el medio"*, y el resultado más
   chico ya está en el número grande.
@@ -120,5 +147,9 @@ fila se nombra por sus dos puntas (`jun 2026 → jul 2026`), igual que un tramo 
 ## Lo que no cambia
 
 El número. `montoAjustado` y `variacionPct` dan exactamente lo mismo que antes: el error era
-entero de presentación y de atribución. Los 700 tests que había pasaban con la tabla mintiendo,
-que es la razón por la que ahora hay uno que compara la ida contra la vuelta.
+entero de presentación y de atribución. El economista lo comprobó barriendo 13.475 consultas
+—5 series × 3 metodologías × 35×35 pares de puntos, meses y días, ida y vuelta— contra el árbol
+anterior, campo por campo: cero diferencias.
+
+Y la tabla mintiendo pasaba **todos** los tests que había. Ésa es la razón de los que se
+agregaron: comparan la ida contra la vuelta en vez de fijar un número.
