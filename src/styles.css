@@ -426,6 +426,34 @@ button:focus-visible {
   font-size: 1rem;
 }
 
+/* Zoom temporal del gráfico de una serie: dos sliders separados en vez de uno con
+ * las dos manijas superpuestas, porque en pantallas táctiles dos manijas pisadas
+ * son difíciles de agarrar por separado. */
+.rango {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin-top: 0.75rem;
+}
+
+.rango__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 180px;
+}
+
+.rango__campo label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.rango__campo input[type="range"] {
+  accent-color: var(--series-1);
+  width: 100%;
+}
+
 .leyenda-inline {
   margin: 0;
   font-size: 0.8rem;

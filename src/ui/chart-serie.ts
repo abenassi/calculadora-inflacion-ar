@@ -54,6 +54,12 @@ export function dibujarSerieActualizada(
       plugins: {
         tooltip: {
           backgroundColor: t.texto,
+          // El fondo del tooltip es `t.texto` (blanco en modo oscuro), así que el
+          // texto tiene que ir con `t.superficie` —su opuesto— para no quedar
+          // blanco sobre blanco: Chart.js no hereda el color del tema, así que sin
+          // esto usa su propio default (también blanco).
+          titleColor: t.superficie,
+          bodyColor: t.superficie,
           padding: 10,
           callbacks: {
             label: (item) => pesosRedondo(Number(item.raw)),

@@ -163,6 +163,11 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
       plugins: {
         tooltip: {
           backgroundColor: t.texto,
+          // Mismo motivo que en `chart-serie.ts`: el fondo es `t.texto` (blanco en
+          // modo oscuro), así que el texto necesita el color opuesto o queda
+          // blanco sobre blanco con el default de Chart.js.
+          titleColor: t.superficie,
+          bodyColor: t.superficie,
           padding: 10,
           displayColors: false,
           callbacks: {

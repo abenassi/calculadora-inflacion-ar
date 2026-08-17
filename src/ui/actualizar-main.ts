@@ -4,10 +4,13 @@
  * `actualizarSerie`, que a su vez reusa `adjust()` tal cual.
  */
 import { actualizarSerie } from "../engine/actualizar.js";
-import { nombrarMes } from "../engine/mes.js";
+import type { PuntoActualizado } from "../engine/actualizar.js";
+import { abreviarMes, nombrarMes } from "../engine/mes.js";
 import type { Mes, SerieIndice, SerieValores } from "../engine/types.js";
 import { dibujarSerieActualizada } from "./chart-serie.js";
 import { fechaLarga } from "./format.js";
+import { moverSlider, rangoInicial, reajustarRango } from "./rango-slider.js";
+import type { EstadoRango } from "./rango-slider.js";
 
 const NOMBRES_MES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -31,6 +34,11 @@ const el = <T extends HTMLElement>(id: string): T => {
 
 let ipc: SerieIndice;
 let dolarBlue: SerieValores;
+
+/** Los puntos ya reindexados al mes objetivo, sin recortar por el slider. */
+let puntosCompletos: PuntoActualizado[] = [];
+let mesObjetivoTexto = "";
+let rango: EstadoRango | null = null;
 
 /**
  * El rango de meses objetivo que el motor puede resolver sin estimar nada: nunca
@@ -93,10 +101,42 @@ function leerObjetivo(): string {
   return `${anio}-${mes}`;
 }
 
+/**
+ * Refleja `rango` en los dos `<input type="range">` (topes y valores) y recorta
+ * `puntosCompletos` para redibujar.
+ */
+function redibujar(): void {
+  const { desdeIdx, hastaIdx } = rango!;
+  const maximo = puntosCompletos.length - 1;
+
+  const inputDesde = el<HTMLInputElement>("rango-desde");
+  const inputHasta = el<HTMLInputElement>("rango-hasta");
+  inputDesde.max = inputHasta.max = String(maximo);
+  inputDesde.value = String(desdeIdx);
+  inputHasta.value = String(hastaIdx);
+
+  el("rango-desde-texto").textContent = abreviarMes(puntosCompletos[desdeIdx]!.mes);
+  el("rango-hasta-texto").textContent = abreviarMes(puntosCompletos[hastaIdx]!.mes);
+
+  const puntos = puntosCompletos.slice(desdeIdx, hastaIdx + 1);
+  dibujarSerieActualizada(el<HTMLCanvasElement>("grafico"), puntos, mesObjetivoTexto);
+}
+
+function manejarInputRango(origen: "desde" | "hasta"): void {
+  const desdeIdx = Number(el<HTMLInputElement>("rango-desde").value);
+  const hastaIdx = Number(el<HTMLInputElement>("rango-hasta").value);
+  rango = moverSlider(origen, desdeIdx, hastaIdx, puntosCompletos.length);
+  redibujar();
+}
+
 function actualizar(): void {
   const mesObjetivo = leerObjetivo();
-  const puntos = actualizarSerie(dolarBlue.datos, mesObjetivo, ipc);
-  dibujarSerieActualizada(el<HTMLCanvasElement>("grafico"), puntos, nombrarMes(mesObjetivo));
+  mesObjetivoTexto = nombrarMes(mesObjetivo);
+  puntosCompletos = actualizarSerie(dolarBlue.datos, mesObjetivo, ipc);
+  rango = rango === null
+    ? rangoInicial(puntosCompletos.length)
+    : reajustarRango(rango, puntosCompletos.length);
+  redibujar();
 }
 
 async function iniciar(): Promise<void> {
@@ -129,6 +169,8 @@ async function iniciar(): Promise<void> {
     if (objetivo.id === "objetivo-anio") acotarMesesObjetivo();
     actualizar();
   });
+  el<HTMLInputElement>("rango-desde").addEventListener("input", () => manejarInputRango("desde"));
+  el<HTMLInputElement>("rango-hasta").addEventListener("input", () => manejarInputRango("hasta"));
   actualizar();
 }
 
