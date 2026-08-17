@@ -106,6 +106,13 @@ respuesta. El monto pedido queda abajo de todo, marcado `← tu monto`, y el pie
 tabla va del mes más viejo al más nuevo, así que el monto que pediste ajustar está en la última
 fila y el resultado, en la primera."*
 
+La marca aparece **sólo cuando la fila es de verdad el punto que se pidió**. Con la ventana de
+referencia las filas son el tramo publicado y no el período pedido, así que ninguna lo es:
+pidiendo de agosto a marzo, la última fila dice "jul 2026" y la marca la firmaba como el monto
+de la persona, con `INDEC ✓` al lado. Sin la marca la tabla mostraba otros meses y se quedaba
+callada, que es incómodo; señalar uno y llamarlo tuyo es mentir. Hay un barrido que exige que
+ninguna marca caiga sobre una fila cuyo punto no sea el pedido.
+
 Es un costo real y se eligió a conciencia contra el de la alternativa. La otra opción evaluada
 —mantener el orden de la pregunta— deja el monto arriba, que es lo que la interfaz venía
 suponiendo en todos lados, pero paga con que cada fila hable de dos meses a la vez. Entre "la

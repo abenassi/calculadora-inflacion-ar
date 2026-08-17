@@ -14,6 +14,7 @@ import {
   hayAlgoEstimado,
   hayMesPublicado,
   resumir,
+  rotuloDeAnclaje,
 } from "../src/ui/explicaciones.js";
 import { abreviarMes, mesDe, nombrarMes } from "../src/engine/mes.js";
 import { mesDelTramo, rotularFila, selloDeFila } from "../src/ui/etiquetas.js";
@@ -482,4 +483,60 @@ describe("la aclaración de la deflación no atribuye nada", () => {
       }
     });
   }
+});
+
+/**
+ * Las marcas `← tu monto` y `← el resultado` de la tabla deflactando.
+ *
+ * Sólo pueden aparecer sobre la fila que **es** el punto que la persona pidió. Con
+ * `ventana_reciente` las filas son el tramo de referencia: pidiendo de agosto a marzo, la
+ * última dice "jul 2026" y la marca la firmaba como el monto de la persona, con `INDEC ✓` al
+ * lado. Antes de la marca la tabla mostraba otros meses y se quedaba callada; señalar uno y
+ * llamarlo tuyo es peor que no mostrarlo.
+ */
+describe("las marcas de la tabla no señalan un mes que no es el pedido", () => {
+  it("deflactando sobre el período pedido, marcan las dos puntas", () => {
+    const r = adjust(1_000_000, "2026-07", "2026-02", serie, { metodologia: "sin_proyectar" });
+    expect(r.metodo.tipo).toBe("directo");
+    const marcas = r.desglose.map((_, i) => rotuloDeAnclaje(r, i));
+    expect(marcas).toEqual(["el resultado", null, null, null, null, "tu monto"]);
+    // Y señalan lo que dicen señalar.
+    expect(r.desglose.at(-1)!.monto).toBeCloseTo(r.monto, 6);
+    expect(r.desglose[0]!.monto).toBeCloseTo(r.montoAjustado, 6);
+  });
+
+  it("con el tramo de referencia no marcan nada, porque ninguna fila es la pedida", () => {
+    const r = adjust(1_000_000, "2026-08", "2026-03", serie, { metodologia: "sin_proyectar" });
+    expect(r.metodo.tipo).toBe("ventana_reciente");
+    expect(r.desglose.map((_, i) => rotuloDeAnclaje(r, i))).toEqual(r.desglose.map(() => null));
+  });
+
+  it("yendo para adelante no marcan nada: están donde cualquiera las busca", () => {
+    const r = adjust(1_000_000, "2026-02", "2026-07", serie, { metodologia: "sin_proyectar" });
+    expect(r.desglose.map((_, i) => rotuloDeAnclaje(r, i))).toEqual(r.desglose.map(() => null));
+  });
+
+  /**
+   * El barrido: en ninguna consulta puede quedar una marca sobre una fila cuyo punto no sea
+   * exactamente el que se pidió. Es la aserción que no depende de acordarse de los casos.
+   */
+  it("nunca marcan una fila cuyo punto no es el pedido", () => {
+    for (const desde of [ultimo, menos(3), mas(2), `${ultimo}-15` as Punto]) {
+      for (const hasta of [menos(6), menos(1), mas(1), `${menos(2)}-10` as Punto]) {
+        for (const metodologia of ["sin_proyectar", "repite_ultimo"] as const) {
+          let r: Resultado;
+          try {
+            r = adjust(520_000, desde, hasta, serie, { metodologia });
+          } catch {
+            continue;
+          }
+          for (const [i, f] of r.desglose.entries()) {
+            const marca = rotuloDeAnclaje(r, i);
+            if (marca === "tu monto") expect(f.punto).toBe(r.desde);
+            if (marca === "el resultado") expect(f.punto).toBe(r.hasta);
+          }
+        }
+      }
+    }
+  });
 });

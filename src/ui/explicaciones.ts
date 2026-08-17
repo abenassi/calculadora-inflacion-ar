@@ -405,6 +405,38 @@ function deDondeSalenLasFilas(r: Resultado): string {
 }
 
 /**
+ * Si la pregunta va para atrás en el tiempo.
+ *
+ * Sale de `comoInstante` y no de `compararPuntos`: el primero valúa un mes por su cierre, que
+ * es lo que hace el motor (0004), y el segundo por su día 1. Se separan justo cuando se mezclan
+ * un mes y un día de ese mismo mes.
+ */
+export function esDeflacion(r: Resultado): boolean {
+  return comoInstante(r.hasta) < comoInstante(r.desde);
+}
+
+/**
+ * Las dos marcas de la tabla deflactando: dónde está el monto y dónde está la respuesta.
+ *
+ * Sólo cuando el punto de la fila **es** el que la persona pidió. Con `ventana_reciente` las
+ * filas son el tramo de referencia y no el período pedido, así que ninguna lo es: pidiendo de
+ * agosto a marzo, la última fila dice "jul 2026" y la marca la firmaba como el monto de la
+ * persona, con el sello del INDEC al lado. Antes de esta marca la tabla mostraba otros meses y
+ * se quedaba callada; señalar uno y llamarlo tuyo es peor que no mostrarlo. Es la regla 2
+ * aplicada a las fechas en vez de a los números.
+ *
+ * Y sólo deflactando, que es cuando el orden sorprende: la primera fila deja de ser la del
+ * monto y pasa a ser la de la respuesta. Yendo para adelante están donde cualquiera las busca.
+ */
+export function rotuloDeAnclaje(r: Resultado, i: number): string | null {
+  if (!esDeflacion(r)) return null;
+  const punto = r.desglose[i]!.punto;
+  if (i === r.desglose.length - 1 && punto === r.desde) return "tu monto";
+  if (i === 0 && punto === r.hasta) return "el resultado";
+  return null;
+}
+
+/**
  * Deflactando, la tabla arranca en la respuesta y termina en el monto que la persona escribió.
  *
  * Es la contracara de leer siempre del mes más viejo al más nuevo (0014). La tabla es la misma
@@ -413,7 +445,7 @@ function deDondeSalenLasFilas(r: Resultado): string {
  * Sin decirlo, la primera fila muestra un número que nadie tipeó.
  */
 function aclararDeflacion(r: Resultado): string {
-  if (comoInstante(r.hasta) >= comoInstante(r.desde)) return "";
+  if (!esDeflacion(r)) return "";
   return (
     ` La tabla va del mes más viejo al más nuevo, así que el monto que pediste ajustar está ` +
     `en la última fila y el resultado, en la primera.`
