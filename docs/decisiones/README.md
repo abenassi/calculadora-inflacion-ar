@@ -26,6 +26,7 @@ arquitectura y la que probablemente quieras copiar tal cual.
 | [0011](0011-csv-de-descarga-sin-metadata.md) | El CSV de descarga se queda sin metadata | Las filas `#` rompían la lectura en algunos programas; se sacrifica contexto (fecha, método) para que el archivo abra bien en cualquier lado |
 | [0012](0012-atajos-de-fecha.md) | Atajos de fecha: "ahora" y 1m/3m/6m/12m | Mueven fechas, no cambian el cálculo — no reviven los presets que sacó la 0002 |
 | [0013](0013-la-ventana-de-referencia-en-modo-por-dia.md) | La ventana de referencia por día | Correr meses enteros conservando el día dejaba el tramo terminando a mitad del último mes publicado, y volvía falso el pie de la tabla |
+| [0014](0014-los-porcentajes-cuando-se-va-para-atras.md) | Los porcentajes cuando se va para atrás | Deflactando, la tabla mostraba el recíproco de la inflación del mes de al lado, con el sello del organismo; ahora los porcentajes son cronológicos y el rótulo nombra el mes de su propio número |
 
 ## Formato
 

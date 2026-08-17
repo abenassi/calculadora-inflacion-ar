@@ -14,8 +14,14 @@ archivo era un problema de formato, no del cálculo.
 
 ## Decisión
 
-El CSV pasa a ser tabla pura: una fila de encabezado (`punto,indice_ipc,variacion_pct,
-acumulado_pct,monto,origen`) y una fila por punto. Nada de metadata arriba, en medio ni
+El CSV pasa a ser tabla pura: una fila de encabezado y una fila por punto.
+
+> El encabezado creció dos veces desde entonces, siempre por la misma razón —un porcentaje
+> suelto no dice de qué tramo es— y hoy es
+> `punto,tramo_desde,tramo_hasta,indice_ipc,variacion_pct,acumulado_pct,monto,origen`.
+> `tramo_desde`/`tramo_hasta` van cronológicas, igual que el signo de `variacion_pct`, y
+> vacías en la fila de partida; `origen` distingue `indec` de `indec-prorrateado`. Ver 0013 y
+> 0014. Nada de metadata arriba, en medio ni
 abajo.
 
 ## Lo que no se pierde

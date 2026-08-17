@@ -7,3 +7,4 @@ dist/
 
 # Artefactos de las sesiones de browser de los revisores
 .playwright-mcp/
+.claude/worktrees/

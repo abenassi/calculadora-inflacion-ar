@@ -15,7 +15,8 @@ import {
   hayMesPublicado,
   resumir,
 } from "../src/ui/explicaciones.js";
-import { selloDeFila } from "../src/ui/etiquetas.js";
+import { abreviarMes } from "../src/engine/mes.js";
+import { mesDelTramo, rotularFila, selloDeFila } from "../src/ui/etiquetas.js";
 import { porcentaje } from "../src/ui/format.js";
 import type { Metodologia, Punto, Resultado, SerieIndice } from "../src/engine/types.js";
 
@@ -314,13 +315,102 @@ describe("la nota del interés compuesto", () => {
   for (const { que, r } of resultados) {
     it(`no se contradice a sí misma en ${que}`, () => {
       const suma = porcentaje(sumaDeVariaciones(r.desglose), false);
-      const acumulado = porcentaje(r.variacionPct, false);
+      // Contra `inflacionPct`: la columna suma inflación mensual, así que el número con el
+      // que se contrapone es la inflación acumulada. Deflactando eran de signo distinto —"te
+      // va a dar 61,33%, no −44,61%"— y la nota se leía como si uno fuera la versión mal
+      // hecha del otro, cuando son dos cosas.
+      const acumulado = porcentaje(r.inflacionPct, false);
       // La nota sólo se muestra cuando los dos difieren (ver `pintarResultado`), pero si
       // se muestra, tiene que decir dos números distintos.
       if (suma === acumulado) return;
       const texto = explicarCompuesto(r);
       expect(texto).toContain(suma);
       expect(texto).toContain(acumulado);
+      // Y los dos tienen que ser del mismo signo: sumar inflación no puede dar lo contrario
+      // de acumularla.
+      expect(Math.sign(sumaDeVariaciones(r.desglose))).toBe(Math.sign(r.inflacionPct));
     });
   }
+});
+
+/**
+ * Los rótulos de la tabla yendo para atrás.
+ *
+ * El rótulo nombraba el punto de **llegada** y el porcentaje pertenecía al mes que se estaba
+ * deshaciendo. Yendo para adelante los dos coinciden, así que nadie lo vio; deflactando se
+ * separan y la fila "jun 2026" mostraba el +2,11% de julio invertido, con `INDEC ✓` al lado.
+ */
+describe("los rótulos no dependen de la dirección de la pregunta", () => {
+  const ida = adjust(1_000_000, "2026-02", "2026-07", serie, { hoy: "2026-08" });
+  const vuelta = adjust(1_000_000, "2026-07", "2026-02", serie, { hoy: "2026-08" });
+
+  it("cada fila se llama como el mes de su porcentaje, en las dos direcciones", () => {
+    expect(ida.desglose.slice(1).map((_, i) => rotularFila(ida.desglose, i + 1))).toEqual([
+      "mar 2026",
+      "abr 2026",
+      "may 2026",
+      "jun 2026",
+      "jul 2026",
+    ]);
+    // Deflactando, el primer tramo saca la inflación de julio, que es el mes de la fila de
+    // partida: ahí el rótulo pasa a nombrar las dos puntas para no repetirse.
+    expect(vuelta.desglose.map((_, i) => rotularFila(vuelta.desglose, i))).toEqual([
+      "jul 2026",
+      "jun 2026 → jul 2026",
+      "jun 2026",
+      "may 2026",
+      "abr 2026",
+      "mar 2026",
+    ]);
+  });
+
+  it("ninguna fila repite el rótulo de la de arriba", () => {
+    for (const r of [ida, vuelta]) {
+      const rotulos = r.desglose.map((_, i) => rotularFila(r.desglose, i));
+      expect(new Set(rotulos).size).toBe(rotulos.length);
+    }
+  });
+
+  it("las flechas van del punto viejo al nuevo, aunque el recorrido vaya al revés", () => {
+    const r = adjust(1_000_000, "2026-07-15", "2026-02-15", serie, { hoy: "2026-08" });
+    const rotulos = r.desglose.map((_, i) => rotularFila(r.desglose, i));
+    // Decía "15 jul 2026 → 1 jul 2026": la flecha se lee "de acá hasta acá" y apuntaba para
+    // atrás en el tiempo.
+    expect(rotulos).toContain("1 jul 2026 → 15 jul 2026");
+    expect(rotulos).toContain("15 feb 2026 → 1 mar 2026");
+    expect(rotulos.filter((x) => x.includes("→")).length).toBe(2);
+  });
+
+  /**
+   * El sello promete que el número de la fila lo publicó el organismo. Con el recíproco eso
+   * era falso en toda deflación, y es el caso que la revisora usuaria dijo que no le mandaba
+   * a una clienta: "junio bajó 1,85% según el INDEC" por escrito.
+   */
+  it("una fila sellada nombra el mes cuya inflación muestra", () => {
+    for (const [i, f] of vuelta.desglose.entries()) {
+      if (i === 0 || selloDeFila(f, vuelta) === null) continue;
+      // O es el mes pelado, o el rango que termina en ese mes cuando el rótulo se repetiría
+      // con el de la fila de partida. Lo que no puede es nombrar otro mes.
+      expect(rotularFila(vuelta.desglose, i)).toContain(abreviarMes(mesDelTramo(vuelta.desglose, i)));
+      expect(f.varMensualPct).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe("el renglón del acumulado deflactando", () => {
+  const vuelta = adjust(1_000_000, "2026-07", "2026-02", serie, { hoy: "2026-08" });
+
+  it("la nota del compuesto contrapone dos números del mismo signo", () => {
+    const texto = explicarCompuesto(vuelta);
+    expect(texto).toContain(porcentaje(vuelta.inflacionPct, false));
+    // Decía "te va a dar 12,11%, no −11,28%".
+    expect(texto).not.toContain(porcentaje(vuelta.variacionPct, false));
+  });
+
+  it("el pie avisa que los montos bajan mientras los porcentajes suben", () => {
+    expect(explicarTabla(vuelta)).toContain("cada monto es el que queda después de sacársela");
+    // Yendo para adelante no hay nada que aclarar.
+    const ida = adjust(1_000_000, "2026-02", "2026-07", serie, { hoy: "2026-08" });
+    expect(explicarTabla(ida)).not.toContain("Vas para atrás");
+  });
 });

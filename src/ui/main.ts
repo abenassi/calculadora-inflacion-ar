@@ -69,7 +69,15 @@ import {
   hayTramoOficial,
   MESES_PROYECCION_LARGA,
 } from "./explicaciones.js";
-import { fechaLarga, indice, pesos, pesosRedondo, porcentaje, seVenDistintos } from "./format.js";
+import {
+  comoSeMuestra,
+  fechaLarga,
+  indice,
+  pesos,
+  pesosRedondo,
+  porcentaje,
+  seVenDistintos,
+} from "./format.js";
 
 const NOMBRES_MES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -449,9 +457,26 @@ function pintarResultado(r: Resultado): void {
   el("pie-tabla").textContent = explicarTabla(r);
   // Solo cuando los dos números que la nota contrapone se ven distintos. Con una sola
   // variación son el mismo número, y en tramos cortos caen en el mismo redondeo.
-  el("nota-compuesto").hidden = !seVenDistintos(sumaDeVariaciones(r.desglose), r.variacionPct);
+  el("nota-compuesto").hidden = !seVenDistintos(sumaDeVariaciones(r.desglose), r.inflacionPct);
   el("nota-compuesto").textContent = explicarCompuesto(r);
   dibujar(el<HTMLCanvasElement>("grafico"), r);
+}
+
+/**
+ * La segunda mitad del renglón del acumulado, cuando el monto no se mueve como los precios.
+ *
+ * Deflactando son dos números distintos y los dos hacen falta: la inflación entre febrero y
+ * julio fue +12,71%, y sacársela a un millón lo deja en 11,28% menos. El renglón decía
+ * `Inflación acumulada: −11,28% (IPC del INDEC)`, que le pone el nombre del organismo al
+ * segundo número y la palabra "inflación" a algo que no lo es. La cifra que cita al organismo
+ * es la que el organismo publicó; el efecto sobre el monto va después y sin atribución.
+ *
+ * Yendo para adelante los dos números son el mismo y esto devuelve `""`: repetirlo sería
+ * decir dos veces lo mismo en el renglón que más se lee.
+ */
+function efectoEnElMonto(r: Resultado): string {
+  if (comoSeMuestra(r.inflacionPct) === comoSeMuestra(r.variacionPct)) return "";
+  return ` Sacarle esa inflación al monto lo baja ${porcentaje(Math.abs(r.variacionPct), false)}.`;
 }
 
 /**
@@ -510,11 +535,12 @@ function armarExplicacion(r: Resultado): string {
     // pone el nombre del organismo a un número que tres renglones más abajo se aclara que
     // no es el del período pedido: el que lo recibe se queda con el primero.
     estimado
-      ? `Inflación acumulada estimada: ${porcentaje(r.variacionPct)}.`
+      ? `Inflación acumulada estimada: ${porcentaje(r.inflacionPct)}.${efectoEnElMonto(r)}`
       : r.metodo.tipo === "ventana_reciente"
-        ? `Inflación acumulada del tramo de referencia: ${porcentaje(r.variacionPct)} ` +
-          `(${fuenteDe(r.desglose, r).corta}).`
-        : `Inflación acumulada: ${porcentaje(r.variacionPct)} (${fuenteDe(r.desglose, r).corta}).`,
+        ? `Inflación acumulada del tramo de referencia: ${porcentaje(r.inflacionPct)} ` +
+          `(${fuenteDe(r.desglose, r).corta}).${efectoEnElMonto(r)}`
+        : `Inflación acumulada: ${porcentaje(r.inflacionPct)} ` +
+          `(${fuenteDe(r.desglose, r).corta}).${efectoEnElMonto(r)}`,
     "",
     encabezadoDelDesglose(r),
   );
@@ -1071,15 +1097,34 @@ function descargarCsv(): void {
   // diciendo de quién es el dato de fondo, porque el prorrateo se hace sobre un dato suyo.
   const origenCsv = (f: Fila) => (f.esParcial && !f.esProyeccion ? `${f.origen}-prorrateado` : f.origen);
 
-  // `punto_inicial` es dónde arranca el tramo que mide `variacion_pct`. Sin él, la fila
-  // `2026-06-01, 2.08` se lee como "junio subió 2,08%" —el INDEC publicó 2,15% para mayo y
-  // nunca publicó 2,08%—, que es el mismo error que la tabla arregló rotulando el rango.
-  // Vacía en la fila de partida, que no mide ningún tramo.
+  // `tramo_desde`/`tramo_hasta` son las puntas del tramo que mide `variacion_pct`. Sin ellas,
+  // la fila `2026-06-01, 2.08` se lee como "junio subió 2,08%" —el INDEC publicó 2,15% para
+  // mayo y nunca publicó 2,08%—, que es el mismo error que la tabla arregló rotulando el
+  // rango. Vacías en la fila de partida, que no mide ningún tramo.
+  //
+  // Y van **cronológicas**, no en el orden del recorrido, porque `variacion_pct` es la
+  // inflación del tramo y también es cronológica (0014). Con la columna vieja `punto_inicial`
+  // fija en la fila anterior, deflactando salía el par `2026-07, 2026-06` con `+2.11`: el
+  // signo mirando para un lado y las fechas para el otro, en un archivo que se abre lejos
+  // del sitio y sin nada que lo aclare al lado.
+  const tramo = (i: number): [string, string] =>
+    i === 0
+      ? ["", ""]
+      : ([r.desglose[i - 1]!.punto, r.desglose[i]!.punto].sort(compararPuntos) as [string, string]);
   const filas: string[][] = [
-    ["punto", "punto_inicial", "indice_ipc", "variacion_pct", "acumulado_pct", "monto", "origen"],
+    [
+      "punto",
+      "tramo_desde",
+      "tramo_hasta",
+      "indice_ipc",
+      "variacion_pct",
+      "acumulado_pct",
+      "monto",
+      "origen",
+    ],
     ...r.desglose.map((f, i) => [
       f.punto,
-      i === 0 ? "" : r.desglose[i - 1]!.punto,
+      ...tramo(i),
       f.indice.toFixed(4),
       f.varMensualPct?.toFixed(2) ?? "",
       f.acumuladoPct?.toFixed(2) ?? "",

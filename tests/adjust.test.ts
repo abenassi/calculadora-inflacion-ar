@@ -2,8 +2,15 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { adjust, RangoError, sePuedeEvitarEstimar, tasaMensualDelRem } from "../src/engine/adjust.js";
-import { largoEnDias } from "../src/engine/mes.js";
+import {
+  adjust,
+  RangoError,
+  sePuedeEvitarEstimar,
+  sumaDeVariaciones,
+  tasaMensualDelRem,
+} from "../src/engine/adjust.js";
+import { aOrdinal, deOrdinal, largoEnDias } from "../src/engine/mes.js";
+import { mesDelTramo } from "../src/ui/etiquetas.js";
 import type { SerieIndice } from "../src/engine/types.js";
 
 const serie = JSON.parse(
@@ -789,5 +796,83 @@ describe("sePuedeEvitarEstimar — lo que gobierna el desplegable", () => {
       const r = adjust(1000, desde, hasta, sintetica, { metodologia: "sin_proyectar", hoy: "2020-06" });
       expect(r.metodo.tipo === "proyeccion").toBe(!puede);
     }
+  });
+});
+
+/**
+ * La deflación mostraba el recíproco de la inflación de cada mes, sellado por el organismo.
+ *
+ * Junio de 2026 publicó +1,89% y la tabla decía −1,85% con `INDEC ✓` al lado, abajo de una
+ * columna que se llama "Subió". Y encima corrido un mes: ese −1,85% era el +2,11% de **julio**
+ * invertido, porque el rótulo nombraba el punto de llegada y el porcentaje pertenecía al mes
+ * que se estaba deshaciendo. Yendo para adelante los dos coinciden; para atrás, no.
+ *
+ * El invariante que lo ata: la inflación de un mes es una sola. Preguntar de febrero a julio o
+ * de julio a febrero tiene que dar **la misma tabla de porcentajes**.
+ */
+describe("deflactar — los porcentajes son la inflación que hubo, no su recíproco", () => {
+  const ida = adjust(1_000_000, "2026-02", "2026-07", serie, { hoy: "2026-08" });
+  const vuelta = adjust(1_000_000, "2026-07", "2026-02", serie, { hoy: "2026-08" });
+
+  it("la ida y la vuelta muestran los mismos meses con los mismos porcentajes", () => {
+    const porMes = (r: typeof ida) =>
+      r.desglose
+        .slice(1)
+        .map((f, i) => [mesDelTramo(r.desglose, i + 1), (f.varMensualPct ?? 0).toFixed(6)]);
+    // Los cinco meses del período: febrero es el ancla y su propia inflación no entra.
+    expect(porMes(ida).map(([mes]) => mes)).toEqual([
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07",
+    ]);
+    // Y son los mismos pares mes/porcentaje, en el orden en que se recorren. Ésta es la
+    // aserción que importa: no que los números sean tal o cual, sino que la dirección de la
+    // pregunta no los cambie.
+    expect(porMes(vuelta)).toEqual([...porMes(ida)].reverse());
+  });
+
+  it("cada porcentaje sellado es el que se saca de los índices publicados de ese mes", () => {
+    const indices = new Map(serie.datos.map((d) => [d.mes, d.indice]));
+    for (const [i, f] of vuelta.desglose.entries()) {
+      if (i === 0 || f.esParcial || f.esProyeccion) continue;
+      const mes = mesDelTramo(vuelta.desglose, i);
+      const previo = deOrdinal(aOrdinal(mes) - 1);
+      const publicado = (indices.get(mes)! / indices.get(previo)! - 1) * 100;
+      expect(f.varMensualPct).toBeCloseTo(publicado, 10);
+    }
+  });
+
+  it("el acumulado de cada fila también es inflación, y crece", () => {
+    const acumulados = vuelta.desglose.slice(1).map((f) => f.acumuladoPct!);
+    expect(acumulados.every((a) => a > 0)).toBe(true);
+    expect([...acumulados].sort((a, b) => a - b)).toEqual(acumulados);
+    expect(acumulados.at(-1)).toBeCloseTo(vuelta.inflacionPct, 10);
+  });
+
+  /**
+   * Son dos números y hacen falta los dos: la inflación del período y lo que le pasa al monto.
+   * El renglón que cita al organismo lleva el primero; el segundo va sin atribución.
+   */
+  it("separa la inflación del período del cambio del monto", () => {
+    expect(vuelta.inflacionPct).toBeCloseTo(12.709, 2);
+    expect(vuelta.variacionPct).toBeCloseTo(-11.276, 2);
+    // Uno es el recíproco del otro, y por eso no se pueden decir con la misma palabra.
+    expect((1 + vuelta.inflacionPct / 100) * (1 + vuelta.variacionPct / 100)).toBeCloseTo(1, 10);
+    // Yendo para adelante son el mismo número, y entonces sólo se dice una vez.
+    expect(ida.inflacionPct).toBeCloseTo(ida.variacionPct, 10);
+  });
+
+  it("suma y acumulado quedan del mismo signo, que es lo que la nota contrapone", () => {
+    expect(Math.sign(sumaDeVariaciones(vuelta.desglose))).toBe(Math.sign(vuelta.inflacionPct));
+  });
+
+  it("en modo por día vale lo mismo, con las puntas prorrateadas", () => {
+    const r = adjust(1_000_000, "2026-07-15", "2026-02-15", serie, { hoy: "2026-08" });
+    expect(r.desglose.slice(1).every((f) => (f.varMensualPct ?? 0) > 0)).toBe(true);
+    expect(r.inflacionPct).toBeGreaterThan(0);
+    expect(r.variacionPct).toBeLessThan(0);
+    expect(r.montoAjustado).toBeCloseTo(884_751.97, 2);
   });
 });

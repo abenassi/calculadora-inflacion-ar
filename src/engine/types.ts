@@ -134,9 +134,20 @@ export type SerieIndice = {
 export type Fila = {
   punto: Punto;
   indice: number;
-  /** Variación respecto de la fila anterior. `null` en la fila de origen. */
+  /**
+   * La **inflación del tramo** que va de la fila anterior a ésta. `null` en la de origen.
+   *
+   * Cronológica siempre, no en el orden del recorrido. Deflactando, el desglose va del punto
+   * nuevo al viejo y dividir en ese orden daba el recíproco: junio publicó +1,89% y la tabla
+   * mostraba −1,85% con el sello del organismo al lado, abajo de una columna que se llama
+   * "Subió". La inflación de un mes es una sola, y no depende de en qué dirección se pregunte.
+   *
+   * La contracara es que, deflactando, el rótulo de la fila nombra el mes de **este**
+   * porcentaje y la columna Monto muestra dónde se llega después de sacárselo, que es el mes
+   * anterior. Es una elección, no un descuido: ver 0014.
+   */
   varMensualPct: number | null;
-  /** Variación acumulada desde el origen. `null` en la fila de origen. */
+  /** La inflación acumulada desde el origen, con el mismo criterio. `null` en la de origen. */
   acumuladoPct: number | null;
   monto: number;
   esProyeccion: boolean;
@@ -290,7 +301,20 @@ export type Resultado = FuentesDeSerie & {
   desde: Punto;
   hasta: Punto;
   montoAjustado: number;
+  /**
+   * Cuánto cambió el **monto**: `montoAjustado / monto - 1`.
+   *
+   * Deflactando es negativo, y ése es el número honesto para el monto: llevar $1.000.000 de
+   * julio a febrero deja $887.237, un 11,28% menos. Lo que **no** es es la inflación del
+   * período —ésa fue +12,71%—, y por eso hay dos campos: el renglón que cita al organismo
+   * tiene que llevar la cifra que el organismo publicó.
+   */
   variacionPct: number;
+  /**
+   * La inflación del período, siempre cronológica y siempre con el signo del movimiento
+   * de precios. Yendo para adelante coincide con `variacionPct`; deflactando es su recíproco.
+   */
+  inflacionPct: number;
   metodo: Metodo;
   /**
    * El cálculo mostrado paso a paso.

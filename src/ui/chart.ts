@@ -134,8 +134,9 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
           borderColor: t.serie,
           borderWidth: filas.map((f) => (llevaSello(f) ? 0 : 1)),
           // Punta redondeada del lado del dato; el extremo apoyado en la línea de
-          // cero queda recto. Con deflación la barra baja y Chart.js invierte el
-          // lado sin que haya que hacer nada.
+          // cero queda recto. Las barras son inflación mensual, así que suben también
+          // deflactando (0014); bajan sólo cuando el mes tuvo deflación de verdad, y ahí
+          // Chart.js invierte el lado sin que haya que hacer nada.
           borderRadius: 4,
           borderSkipped: "start",
           // Con tres o cuatro meses, barras finas quedan como islas en un

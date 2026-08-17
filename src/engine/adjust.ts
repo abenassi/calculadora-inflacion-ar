@@ -581,6 +581,16 @@ function armarResultado(
   esProyeccion: (punto: Punto, anterior: Punto | null) => boolean,
 ): Resultado {
   const indiceBase = idx.valorEn(puntos[0]!);
+  // Deflactando, el recorrido va del punto nuevo al viejo. Los porcentajes de la tabla se
+  // calculan **siempre** en orden cronológico, no en el orden del recorrido, porque son la
+  // inflación de un mes y la inflación de un mes es una sola: la que publicó el organismo.
+  // Dividiendo en el orden del recorrido salían invertidos —junio publicó +1,89% y la tabla
+  // decía −1,85%, con `INDEC ✓` al lado y abajo de una columna que se llama "Subió"—, y de
+  // paso quedaban corridos un mes respecto del rótulo. Ver 0014.
+  const haciaAtras = compararPuntos(puntos.at(-1)!, puntos[0]!) < 0;
+  /** Del índice de esta fila y el de la fila con la que se compara, el cociente cronológico. */
+  const inflacion = (aca: number, contra: number) =>
+    (haciaAtras ? contra / aca - 1 : aca / contra - 1) * 100;
 
   const desglose: Fila[] = puntos.map((punto, i) => {
     const indice = idx.valorEn(punto);
@@ -589,8 +599,8 @@ function armarResultado(
     return {
       punto,
       indice,
-      varMensualPct: previo === null ? null : (indice / previo - 1) * 100,
-      acumuladoPct: i === 0 ? null : (indice / indiceBase - 1) * 100,
+      varMensualPct: previo === null ? null : inflacion(indice, previo),
+      acumuladoPct: i === 0 ? null : inflacion(indice, indiceBase),
       monto: (monto * indice) / indiceBase,
       esProyeccion: proyectado,
       origen: proyectado ? "proyeccion" : idx.origenDe(mesDe(punto)),
@@ -623,6 +633,7 @@ function armarResultado(
     hasta,
     montoAjustado: monto * factor,
     variacionPct: (factor - 1) * 100,
+    inflacionPct: haciaAtras ? (1 / factor - 1) * 100 : (factor - 1) * 100,
     metodo,
     desglose,
     ...idx.fuentes,

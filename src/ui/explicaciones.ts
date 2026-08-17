@@ -73,9 +73,20 @@ export function plural(n: number, singular: string, plural: string): string {
   return n === 1 ? singular : plural;
 }
 
-/** El resultado dicho en una línea, antes de explicar de dónde sale. */
+/**
+ * El resultado dicho en una línea, antes de explicar de dónde sale.
+ *
+ * Deflactando no dice "una baja de 11,28%". Es cierto del monto y falso de los precios, y
+ * arriba de una tabla en la que ahora todos los porcentajes son positivos se leía como una
+ * contradicción. Lo que pasó entre las dos fechas es que hubo inflación, y el resultado más
+ * chico ya está en el número grande, dos renglones arriba.
+ */
 export function resumir(r: Resultado): string {
-  return `${pesos(r.monto)} ${conPreposicion("de", r.desde)}, con ${frasearVariacion(r.variacionPct)}.`;
+  const conQue =
+    comoSeMuestra(r.inflacionPct) === comoSeMuestra(r.variacionPct)
+      ? frasearVariacion(r.variacionPct)
+      : `${porcentaje(r.inflacionPct, false)} de inflación en el medio`;
+  return `${pesos(r.monto)} ${conPreposicion("de", r.desde)}, con ${conQue}.`;
 }
 
 /**
@@ -379,6 +390,26 @@ function deDondeSalenLasFilas(r: Resultado): string {
   return ` Ningún porcentaje de esta tabla es un dato publicado: son todos estimaciones.`;
 }
 
+/**
+ * Deflactando, la columna de porcentajes sube y la de montos baja. Hay que decirlo.
+ *
+ * Es el precio de mostrar la inflación que el organismo publicó en vez de su recíproco: la
+ * fila "jun 2026" dice +1,89% —lo que subieron los precios en junio— y el monto que tiene al
+ * lado es el de **mayo**, porque es dónde se llega después de sacarle ese 1,89%. Las dos
+ * cosas son ciertas y juntas se leen como un error si nadie las nombra.
+ *
+ * La alternativa era invertir los porcentajes, y eso le atribuía al organismo cifras que
+ * nunca publicó: junio salía como −1,85% con `INDEC ✓` al lado. Ver 0014.
+ */
+function aclararDeflacion(r: Resultado): string {
+  if (compararPuntos(r.hasta, r.desde) >= 0) return "";
+  return (
+    ` Vas para atrás en el tiempo, así que los porcentajes son la inflación que hubo —la que ` +
+    `publicó ${fuenteDe(r.desglose, r).publicadosPor}— y cada monto es el que queda después ` +
+    `de sacársela.`
+  );
+}
+
 /** El pie de la tabla, que dice qué está mirando el lector. */
 export function explicarTabla(r: Resultado): string {
   switch (r.metodo.tipo) {
@@ -388,9 +419,9 @@ export function explicarTabla(r: Resultado): string {
       // frase de siempre prometía filas oficiales que ahí no se pueden señalar.
       return hayTramoOficial(r)
         ? `Todas las filas salen de datos oficiales publicados por ${fuenteDe(r.desglose, r).publicadosPor}. ` +
-            `Acá no hay nada estimado.` + aclararParciales(r)
+            `Acá no hay nada estimado.` + aclararParciales(r) + aclararDeflacion(r)
         : `Acá no hay nada estimado: todo sale de meses que ${fuenteDe(r.desglose, r).publicadosPor} ` +
-            `ya publicó.` + aclararParciales(r);
+            `ya publicó.` + aclararParciales(r) + aclararDeflacion(r);
     case "ventana_reciente":
       // Qué se está mirando lo dice `avisarTramoAjeno`, arriba de la tabla. Acá abajo queda
       // lo que sólo se puede decir habiendo visto las filas: de dónde salió cada número.
@@ -398,7 +429,8 @@ export function explicarTabla(r: Resultado): string {
         `Es el tramo publicado más reciente del mismo largo que el que pediste, y por eso ` +
         `sirve de referencia. Ningún porcentaje de esta tabla es una estimación: los meses ` +
         `de los que salen ya los publicó ${fuenteDe(r.desglose, r).publicadosPor}.` +
-        aclararParciales(r)
+        aclararParciales(r) +
+        aclararDeflacion(r)
       );
     case "proyeccion": {
       const { base, tasaMensualPct } = r.metodo;
@@ -421,7 +453,7 @@ export function explicarTabla(r: Resultado): string {
               `sale marcada como estimada. Como el período empieza y termina en el mismo ` +
               `punto, el monto no cambia y esa estimación no entra en ninguna cuenta.`
           : `El período que pediste ya está publicado entero, así que no hubo nada que ` +
-              `estimar.${deDondeSalenLasFilas(r)}` + aclararParciales(r);
+              `estimar.${deDondeSalenLasFilas(r)}` + aclararParciales(r) + aclararDeflacion(r);
       }
       const de =
         base.fuente === "rem"
@@ -446,7 +478,7 @@ export function explicarTabla(r: Resultado): string {
         `${plural(proyectadas, "es un tramo proyectado", "son tramos proyectados")}, que ` +
         `${quienPublicaAhora(r)} todavía no publicó: ` +
         `${plural(proyectadas, "se estimó", "se estimaron")} con ${de}` +
-        `${aQueTasa}.${cierre}` + aclararParciales(r)
+        `${aQueTasa}.${cierre}` + aclararParciales(r) + aclararDeflacion(r)
       );
     }
   }
@@ -461,9 +493,13 @@ export function explicarTabla(r: Resultado): string {
  * Decir los dos números no requiere que la relación entre ellos sea siempre la misma.
  */
 export function explicarCompuesto(r: Resultado): string {
+  // Contra `inflacionPct` y no contra `variacionPct`: la columna suma inflación, así que el
+  // número con el que hay que compararla es la inflación acumulada. Deflactando, comparar
+  // contra el cambio del monto daba "te va a dar 12,11%, no −11,28%", dos números de signo
+  // distinto presentados como si uno fuera la versión bien hecha del otro.
   return (
     `Si sumás la columna Subió te va a dar ${porcentaje(sumaDeVariaciones(r.desglose), false)}, ` +
-    `no ${porcentaje(r.variacionPct, false)}. No es un error de la tabla: los porcentajes ` +
+    `no ${porcentaje(r.inflacionPct, false)}. No es un error de la tabla: los porcentajes ` +
     `mensuales no se suman entre sí, porque cada mes se aplica sobre el monto que dejó el ` +
     `anterior. El número que vale es el acumulado.`
   );

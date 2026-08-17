@@ -12,8 +12,23 @@
  * puntas, que son días sueltos, muestran el rango explícito.
  */
 
-import { abreviarMes, abreviarPunto, compararMeses, esFecha, mesDe } from "../engine/mes.js";
-import type { EtiquetaFuente, Fila, FuentesDeSerie, FuenteSerie } from "../engine/types.js";
+import {
+  abreviarMes,
+  abreviarPunto,
+  comoInstante,
+  compararPuntos,
+  esFecha,
+  mesDe,
+  restarDias,
+} from "../engine/mes.js";
+import type {
+  EtiquetaFuente,
+  Fila,
+  FuentesDeSerie,
+  FuenteSerie,
+  Mes,
+  Punto,
+} from "../engine/types.js";
 
 /* ------------------------------------------------------------- de quién es el dato */
 
@@ -170,17 +185,28 @@ export function organismoDeFila(fila: Fila, serie: FuentesDeSerie): string | nul
 }
 
 /**
- * El mes calendario que cubre un tramo: el más viejo de sus dos extremos.
+ * El mes calendario cuya inflación muestra un tramo.
  *
- * Exportada porque el `title` de la fila prorrateada la necesitaba y tenía su propia copia
- * del criterio, hecha con `mesDe(fila.punto)` — el mes del punto **final**. El tramo
- * "2 may → 1 jun" con +2,08% quedaba explicado como "parte proporcional de la inflación de
- * junio", cuando ese número es de mayo y junio está en la fila de abajo con +1,89%.
+ * No es "el mes del punto de llegada" ni "el más viejo de los dos extremos": las dos reglas
+ * anteriores acertaban en un caso y erraban en el otro, porque un punto puede ser un mes o
+ * un día y significan cosas distintas. Un mes vale por su **cierre** (0004) y un día 1 es,
+ * por construcción, el cierre del mes anterior. Así que el criterio único es: se toma el
+ * extremo cronológicamente más nuevo como instante, y se nombra el mes que termina ahí.
+ *
+ * | tramo | instante nuevo | mes |
+ * |---|---|---|
+ * | `2026-02` → `2026-03` | 1 abr | marzo |
+ * | `2026-07` → `2026-06` (deflactando) | 1 ago | **julio** |
+ * | `2 may` → `1 jun` | 1 jun | mayo |
+ * | `15 jul` → `20 jul` | 20 jul | julio |
+ *
+ * La regla vieja para meses —el punto de llegada— acertaba yendo para adelante y erraba
+ * deflactando: la fila "jun 2026" mostraba el +2,11% de julio invertido. La regla vieja para
+ * días —el más viejo— acertaba siempre pero no servía para meses.
  */
-export function mesDelTramo(desglose: Fila[], i: number): string {
-  const anterior = desglose[i - 1]!.punto;
-  const actual = desglose[i]!.punto;
-  return compararMeses(mesDe(anterior), mesDe(actual)) < 0 ? mesDe(anterior) : mesDe(actual);
+export function mesDelTramo(desglose: Fila[], i: number): Mes {
+  const nuevo = [desglose[i - 1]!.punto, desglose[i]!.punto].sort(compararPuntos).at(-1)!;
+  return mesDe(restarDias(comoInstante(nuevo), 1));
 }
 
 /**
@@ -191,11 +217,28 @@ export function mesDelTramo(desglose: Fila[], i: number): string {
  */
 export function rotularFila(desglose: Fila[], i: number, corto = false): string {
   const fila = desglose[i]!;
-  if (i === 0 || !esFecha(fila.punto)) return abreviarPunto(fila.punto);
-  if (!fila.esParcial) return abreviarMes(mesDelTramo(desglose, i));
+  if (i === 0) return abreviarPunto(fila.punto);
 
-  const anterior = abreviarPunto(desglose[i - 1]!.punto);
-  const actual = abreviarPunto(fila.punto);
   const sinAnio = (s: string) => s.replace(/ \d{4}$/, "");
-  return corto ? `${sinAnio(anterior)} → ${sinAnio(actual)}` : `${anterior} → ${actual}`;
+  const comoRango = (a: Punto, b: Punto) => {
+    // Cronológico, no en el orden del recorrido. Deflactando salía "15 jul 2026 → 1 jul 2026",
+    // con la flecha apuntando para atrás en el tiempo, y la flecha se lee "de acá hasta acá".
+    const [ini, fin] = [a, b].sort(compararPuntos).map(abreviarPunto) as [string, string];
+    return corto ? `${sinAnio(ini)} → ${sinAnio(fin)}` : `${ini} → ${fin}`;
+  };
+
+  if (fila.esParcial && esFecha(fila.punto)) {
+    return comoRango(desglose[i - 1]!.punto, fila.punto);
+  }
+
+  // El tramo se nombra por el mes de su inflación, que es el número que la fila muestra.
+  // Deflactando, el primer tramo saca la inflación del mes en el que arranca el período, así
+  // que ese rótulo repetiría el de la fila de partida —dos filas seguidas diciendo "jul
+  // 2026", una con guiones y la otra con +2,11%—. Cuando pasa, la fila se nombra por sus dos
+  // puntas, igual que un tramo de días.
+  const mes = mesDelTramo(desglose, i);
+  if (i === 1 && !esFecha(desglose[0]!.punto) && mesDe(desglose[0]!.punto) === mes) {
+    return comoRango(desglose[0]!.punto, fila.punto);
+  }
+  return abreviarMes(mes);
 }
