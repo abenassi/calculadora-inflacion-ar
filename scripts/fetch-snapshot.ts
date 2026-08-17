@@ -16,9 +16,9 @@ import { fileURLToPath } from "node:url";
 import { empalmar, type PuntoCrudo } from "../src/engine/splice.js";
 import { aMes, diffMeses, nombrarMes } from "../src/engine/mes.js";
 import { SLUG_NACIONAL, type CatalogoIndices, type EntradaCatalogo } from "../src/engine/indices.js";
-import type { ExpectativaRem, SerieIndice } from "../src/engine/types.js";
+import type { ExpectativaRem, SerieIndice, SerieValores } from "../src/engine/types.js";
 import { INDICES, type IndiceDeclarado } from "./indices-declarados.js";
-import { traerSerie } from "./mcp-client.js";
+import { traerDolarHistorico, traerSerie } from "./mcp-client.js";
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 // Vive bajo `public/` porque Vite sirve ese directorio en la raíz del sitio: así el
@@ -404,6 +404,40 @@ async function construirAuxiliar(id: string, nombre: string) {
 }
 
 /**
+ * El dólar blue, promedio mensual, para la sección `/actualizar.html` — todavía sin
+ * link desde ningún lado del sitio. Va en su propio `try/catch` en `main()`: si el
+ * tool falla un día, el resto del pipeline se escribe igual y esto se queda con el
+ * snapshot de ayer, el mismo trato que ya reciben los índices jurisdiccionales.
+ */
+async function construirSerieDolarBlue(): Promise<SerieValores> {
+  console.log("Dólar blue: bajando dolar_historico…");
+  const r = await traerDolarHistorico("blue", {
+    fecha_desde: "2002-01-01",
+    frecuencia: "mensual",
+    funcion_colapso: "avg",
+  });
+
+  // El mes en curso viene con `periodo_incompleto` mientras no terminó: promediarlo
+  // ya es engañoso (es el promedio de un puñado de días, no del mes), así que se
+  // descarta — el mismo criterio que ya sigue el IPC, que nunca muestra el mes que
+  // el INDEC no cerró.
+  const datos = r.datos
+    .filter((d) => !d.periodo_incompleto)
+    .map((d) => ({ mes: aMes(d.fecha), valor: d.venta }))
+    .sort((a, b) => a.mes.localeCompare(b.mes));
+
+  return {
+    serie: "dolar_blue",
+    unidad: "pesos_por_usd",
+    fuentes: [
+      { id: "ambito", organismo: r.fuente, rango: `${datos[0]!.mes}/${datos.at(-1)!.mes}` },
+    ],
+    actualizado: new Date().toISOString(),
+    datos,
+  };
+}
+
+/**
  * Los quince índices jurisdiccionales, cada uno a su archivo, y el catálogo.
  *
  * Dos reglas que importan más que el código:
@@ -486,6 +520,16 @@ async function main(): Promise<void> {
 
   const dolar = await construirAuxiliar("dolar_oficial", "dolar_oficial");
   await escribirSiMejora("dolar.json", dolar, 100);
+
+  try {
+    await mkdir(resolve(DIR_DATOS, "series"), { recursive: true });
+    const dolarBlue = await construirSerieDolarBlue();
+    await escribirSiMejora("series/dolar-blue.json", dolarBlue, 100);
+  } catch (e: unknown) {
+    console.warn(
+      `  dólar blue: NO se pudo actualizar (${(e as Error).message}) — se sigue con el resto del pipeline`,
+    );
+  }
 
   await construirCatalogo(ipc);
 

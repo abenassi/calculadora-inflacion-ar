@@ -89,3 +89,27 @@ export async function traerSerie(
   if (!serie.datos?.length) throw new McpError(`La serie ${id} vino sin datos`);
   return serie;
 }
+
+export type RespuestaDolarHistorico = {
+  tipo: string;
+  fuente: string;
+  datos: {
+    fecha: string;
+    compra: number | null;
+    venta: number;
+    periodo_incompleto?: boolean;
+  }[];
+};
+
+/**
+ * Trae la serie histórica de un tipo de dólar. Es un tool aparte de `series`
+ * (`dolar_historico`), así que `traerSerie` no sirve para esto.
+ */
+export async function traerDolarHistorico(
+  tipo: string,
+  extra: Record<string, unknown> = {},
+): Promise<RespuestaDolarHistorico> {
+  const r = await llamarTool<RespuestaDolarHistorico>("dolar_historico", { tipo, ...extra });
+  if (!r.datos?.length) throw new McpError(`dolar_historico(${tipo}) vino sin datos`);
+  return r;
+}
