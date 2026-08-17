@@ -8,6 +8,7 @@ import {
   avisarTramoAjeno,
   efectoEnElMonto,
   esAproximado,
+  esDeflacion,
   explicarCompuesto,
   explicarMetodo,
   explicarTabla,
@@ -450,6 +451,22 @@ describe("el renglón del acumulado deflactando", () => {
     const ida = adjust(1_000_000, "2026-02", "2026-07", serie, { hoy: "2026-08" });
     expect(explicarTabla(ida)).not.toContain("la última fila");
   });
+
+  /**
+   * Y se calla cuando las filas no son el período pedido.
+   *
+   * Es la misma afirmación que las marcas `← tu monto` / `← el resultado`, así que tiene que
+   * callarse en los mismos casos: con la ventana de referencia la última fila dice "jul 2026" y
+   * la persona preguntó por agosto. Las marcas se arreglaron y el párrafo de abajo lo seguía
+   * diciendo con palabras. Sale del mismo criterio, no de uno propio (regla 4).
+   */
+  it("no dice dónde quedó el monto cuando las filas no son las pedidas", () => {
+    const r = adjust(1_000_000, "2026-08", "2026-03", serie, { hoy: "2026-08" });
+    expect(r.metodo.tipo).toBe("ventana_reciente");
+    expect(esDeflacion(r)).toBe(true);
+    expect(rotuloDeAnclaje(r, r.desglose.length - 1)).toBeNull();
+    expect(explicarTabla(r)).not.toContain("la última fila");
+  });
 });
 
 /**
@@ -557,8 +574,11 @@ describe("las marcas de la tabla no señalan un mes que no es el pedido", () => 
    * exactamente el que se pidió. Es la aserción que no depende de acordarse de los casos.
    */
   it("nunca marcan una fila cuyo punto no es el pedido", () => {
-    for (const desde of [ultimo, menos(3), mas(2), `${ultimo}-15` as Punto]) {
-      for (const hasta of [menos(6), menos(1), mas(1), `${menos(2)}-10` as Punto]) {
+    // `mas(1) → menos(4)` es el cuadrante que motivó el arreglo y que faltaba: deflactar
+    // hacia un destino sin publicar, que es lo que entra por `ventana_reciente`. Sin él, la
+    // mutación que saca la condición sólo ponía en rojo el test nombrado, no este barrido.
+    for (const desde of [ultimo, menos(3), mas(1), mas(2), `${ultimo}-15` as Punto]) {
+      for (const hasta of [menos(6), menos(4), menos(1), mas(1), `${menos(2)}-10` as Punto]) {
         for (const metodologia of ["sin_proyectar", "repite_ultimo"] as const) {
           let r: Resultado;
           try {
@@ -628,4 +648,33 @@ describe("el efecto sobre el monto dice para qué lado se movió", () => {
       }
     }
   });
+});
+
+
+/**
+ * `esDeflacion` decide por el **instante**, igual que el motor.
+ *
+ * Con una comparación de strings o con `compararPuntos`, un mes contra un día de ese mismo mes
+ * contesta al revés: `2026-07` termina el 31 y `2026-07-01` es el cierre de junio, así que
+ * pedir "de julio al 1 de julio" **es** ir para atrás. Nada ataba esto: cambiarlo al criterio
+ * de día 1 dejaba la suite entera en verde.
+ */
+describe("esDeflacion usa el mismo criterio que el motor", () => {
+  for (const [que, desde, hasta, esperado] of [
+    ["mes contra el día 1 de ese mes", "2026-07", "2026-07-01", true],
+    ["el día 1 contra su mes", "2026-07-01", "2026-07", false],
+    ["dos meses, para atrás", "2026-07", "2026-05", true],
+    ["dos meses, para adelante", "2026-05", "2026-07", false],
+    ["dos días, para atrás", "2026-07-15", "2026-05-10", true],
+  ] as const) {
+    it(que, () => {
+      const r = adjust(1_000_000, desde, hasta, serie, { metodologia: "sin_proyectar" });
+      expect(esDeflacion(r)).toBe(esperado);
+      // Y coincide con lo que el motor efectivamente hizo: deflactar es que el monto pedido
+      // haya quedado en la última fila del recorrido.
+      if (r.desglose.length > 1) {
+        expect(r.desglose.at(-1)!.punto === r.desde).toBe(esperado);
+      }
+    });
+  }
 });

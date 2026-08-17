@@ -44,7 +44,6 @@ import { PROYECCION } from "./types.js";
 import {
   aOrdinal,
   compararMeses,
-  compararPuntos,
   ordenReal,
   deOrdinal,
   diaDe,
@@ -238,9 +237,13 @@ function ventanaDeReferencia(
   // mes por su día 1 y el motor lo valúa en su cierre. La ventana de `2026-07 → 2026-08-15`
   // salía de 45 días cuando el período pedido son 14, o sea 3,2 veces más larga.
   const inicio = restarDias(fin, largoEnDias(desde, hasta));
-  // Deflactando, el extremo viejo es `hasta`: la ventana se recorre al revés para que el
-  // resultado siga dividiendo, no multiplicando.
-  return compararPuntos(desde, hasta) <= 0 ? [inicio, fin] : [fin, inicio];
+  // Cronológica, sin mirar la dirección de la pregunta. Acá hubo un ternario que devolvía la
+  // ventana dada vuelta al deflactar, de cuando el desglose se recorría en el orden del pedido;
+  // desde la 0014 `puntosDelRecorrido` la reordena igual y la dirección la decide `armarResultado`
+  // con el par original. Forzar `[inicio, fin]` dejaba 3.072 consultas idénticas campo por campo
+  // y la suite en verde: era una rama que no cambiaba nada y un comentario que describía un
+  // recorrido que ya no existe.
+  return [inicio, fin];
 }
 
 /**

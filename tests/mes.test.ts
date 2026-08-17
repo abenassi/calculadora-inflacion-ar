@@ -2,12 +2,20 @@ import { describe, expect, it } from "vitest";
 
 import {
   compararPuntos,
+  ordenReal,
   largoEnDias,
   restarDias,
   restarMesesAFecha,
   ultimoDia,
 } from "../src/engine/mes.js";
-import { hoyFecha, mesActual } from "../src/engine/adjust.js";
+import { adjust, hoyFecha, mesActual } from "../src/engine/adjust.js";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import type { SerieIndice } from "../src/engine/types.js";
+
+const serie = JSON.parse(
+  readFileSync(resolve(import.meta.dirname, "../public/data/ipc.json"), "utf8"),
+) as SerieIndice;
 
 describe("restarMesesAFecha", () => {
   it("resta meses dentro del mismo año", () => {
@@ -59,6 +67,57 @@ describe("compararPuntos", () => {
   it("un mes vale por su día 1, así que empata con él y va antes que cualquier otro día", () => {
     expect(compararPuntos("2026-08", "2026-08-01")).toBe(0);
     expect(compararPuntos("2026-08", "2026-08-15")).toBeLessThan(0);
+  });
+});
+
+/**
+ * El comparador que usa todo lo que tiene que coincidir con un número del índice.
+ *
+ * Es el reparto que documenta `mes.ts`: `compararPuntos` ordena puntos como están escritos y
+ * `ordenReal` como los valúa el motor, donde un mes vale por su cierre (0004). Sin este test,
+ * degradar `ordenReal` a `compararPuntos` dejaba las 387 pruebas en verde y devolvía el bug
+ * que la 0014 dice que `ordenReal` existe para arreglar: `adjust(1000, "2026-07", "2026-07-01")`
+ * pasaba de +2,11% a −2,07% y daba vuelta el orden de las filas.
+ */
+describe("ordenReal — un mes vale por su cierre", () => {
+  it("un mes va DESPUÉS del día 1 de ese mismo mes, donde compararPuntos empata", () => {
+    expect(compararPuntos("2026-08", "2026-08-01")).toBe(0);
+    expect(ordenReal("2026-08", "2026-08-01")).toBeGreaterThan(0);
+    // Y empata con el día 1 del mes siguiente, que es el mismo instante.
+    expect(ordenReal("2026-08", "2026-09-01")).toBe(0);
+  });
+
+  it("con un mes y un día de ESE mes, los dos se separan y ordenReal es el que acierta", () => {
+    // El mes termina el 31; el día 15 cae adentro. `compararPuntos` lo pone antes porque lo
+    // valúa por su día 1.
+    expect(compararPuntos("2026-08", "2026-08-15")).toBeLessThan(0);
+    expect(ordenReal("2026-08", "2026-08-15")).toBeGreaterThan(0);
+  });
+
+  it("coincide con compararPuntos en todo lo demás", () => {
+    for (const [a, b] of [
+      ["2026-05", "2026-08"],
+      ["2026-08-15", "2026-08-31"],
+      ["2026-07-31", "2026-08-01"],
+      ["2026-05", "2026-08-15"],
+      ["2026-09-02", "2026-08"],
+    ] as const) {
+      expect(Math.sign(ordenReal(a, b))).toBe(Math.sign(compararPuntos(a, b)));
+    }
+  });
+
+  it("es el criterio con el que el motor decide la dirección", () => {
+    // La punta que `ordenReal` dice que es más nueva es la que el desglose deja al final.
+    for (const [a, b] of [
+      ["2026-07", "2026-07-01"],
+      ["2026-07-01", "2026-07"],
+      ["2026-05", "2026-07"],
+      ["2026-07", "2026-05"],
+    ] as const) {
+      const r = adjust(1000, a, b, serie, { metodologia: "sin_proyectar" });
+      const nuevo = ordenReal(a, b) >= 0 ? a : b;
+      expect(ordenReal(r.desglose.at(-1)!.punto, nuevo)).toBe(0);
+    }
   });
 });
 

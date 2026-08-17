@@ -168,6 +168,28 @@ da idéntico (1000,00000000) porque el período tiene largo cero; lo que cambia 
 clasifica como `ventana_reciente` en vez de `proyeccion`, que es lo correcto: no hay nada que
 estimar. Cae adentro de las puntas mixtas, que no son alcanzables desde la interfaz.
 
+## El techo, y qué quedó afuera
+
+Este cambio llegó al techo de tres vueltas que encuentran cosas. Lo que la vuelta 3 levantó y
+**no** entró queda anotado acá, con la razón:
+
+- **Dos `sort` que no pueden permutar siguen en pie**, uno en `mesDelTramo` y otro en el CSV,
+  mientras que los otros cuatro se sacaron. Medido: 29.318 pares adyacentes del desglose, cero
+  desordenados. No mienten y no tocan ningún número; lo que hay que decidir es una sola
+  doctrina —o se sacan los tres, o se quedan los tres con la razón escrita— y hoy conviven las
+  dos en el mismo archivo.
+- Sigue en pie lo diferido de la 0013: el guard `sesgoDeLaVentana`, el layout en el celular, la
+  metodología por default, el día ≠ 1 del primer mes de la serie, y si "tramo de referencia"
+  debería decirse "el último período comparable".
+- **Puntas mixtas mes+día**, con la razón corregida: se difería diciendo que no son alcanzables
+  desde la interfaz, y es cierto de las mixtas, pero no cubre la fila fantasma de largo cero,
+  que también sale de `?desde=2026-05-15&hasta=2026-05-15` —el mismo punto contra sí mismo— sin
+  ninguna punta mixta. Pre-existente e idéntica antes y después de este cambio.
+- Y el pendiente de la revisora usuaria: por fechas exactas la tabla sigue teniendo filas que
+  nombran dos cosas (`15 feb 2026` como fila y otra vez adentro del rango `15 feb → 1 mar`).
+  Ella misma verificó que pasa igual en las dos direcciones: no es regresión, es cómo funciona
+  el modo por día desde siempre.
+
 ## Lo que no cambia
 
 El número. `montoAjustado` y `variacionPct` dan exactamente lo mismo que antes: el error era

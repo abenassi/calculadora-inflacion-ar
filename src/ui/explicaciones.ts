@@ -14,7 +14,6 @@
 
 import { sumaDeVariaciones, tasaMensualDelRem } from "../engine/adjust.js";
 import {
-  comoInstante,
   conPreposicion,
   diasEnMes,
   diasEntre,
@@ -23,6 +22,7 @@ import {
   mesConAnio,
   mesDe,
   nombrarMes,
+  ordenReal,
   soloMes,
 } from "../engine/mes.js";
 import type { Mes, Resultado } from "../engine/types.js";
@@ -432,12 +432,12 @@ export function efectoEnElMonto(r: Resultado): string {
 /**
  * Si la pregunta va para atrás en el tiempo.
  *
- * Sale de `comoInstante` y no de `compararPuntos`: el primero valúa un mes por su cierre, que
- * es lo que hace el motor (0004), y el segundo por su día 1. Se separan justo cuando se mezclan
- * un mes y un día de ese mismo mes.
+ * Por `ordenReal`, que es esa comparación con nombre: el motor decide lo mismo escribiendo
+ * `ordenReal(hasta, desde) < 0`. Estaba deletreada a mano con `comoInstante` acá, y con eso
+ * eran dos copias del criterio y ningún test atándolas.
  */
 export function esDeflacion(r: Resultado): boolean {
-  return comoInstante(r.hasta) < comoInstante(r.desde);
+  return ordenReal(r.hasta, r.desde) < 0;
 }
 
 /**
@@ -470,7 +470,12 @@ export function rotuloDeAnclaje(r: Resultado, i: number): string | null {
  * Sin decirlo, la primera fila muestra un número que nadie tipeó.
  */
 function aclararDeflacion(r: Resultado): string {
-  if (!esDeflacion(r)) return "";
+  // Del mismo criterio que las marcas, y no de uno propio: la frase dice exactamente lo que
+  // ellas señalan, y preguntándolo por su cuenta se quedaba diciéndolo con la ventana de
+  // referencia, donde las filas no son el período pedido. Las marcas se callaban —para eso se
+  // arreglaron— y el párrafo de abajo lo afirmaba igual, con palabras. Qué se está mirando ahí
+  // lo dice `avisarTramoAjeno`, arriba de la tabla.
+  if (rotuloDeAnclaje(r, r.desglose.length - 1) === null) return "";
   return (
     ` La tabla va del mes más viejo al más nuevo, así que el monto que pediste ajustar está ` +
     `en la última fila y el resultado, en la primera.`
