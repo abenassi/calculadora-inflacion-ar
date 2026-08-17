@@ -325,3 +325,23 @@ export type Resultado = FuentesDeSerie & {
    */
   desglose: Fila[];
 };
+
+/**
+ * Una serie de valores crudos (no un índice): dólar, UVA, y lo que se sume después.
+ *
+ * Es la forma que ya escriben `dolar.json`/`uva.json` en el pipeline, ahora con
+ * nombre propio porque el frontend empieza a leerla (antes sólo se guardaba, sin
+ * consumidor).
+ */
+export type PuntoValor = {
+  mes: Mes;
+  valor: number;
+};
+
+export type SerieValores = {
+  serie: string;
+  unidad: string;
+  fuentes: { id: string; organismo: string; rango: string }[];
+  actualizado: string;
+  datos: PuntoValor[];
+};
