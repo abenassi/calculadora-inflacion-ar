@@ -42,8 +42,16 @@ googlea, se me cae todo, incluidos los presupuestos que sí estaban bien"*.
 
 **Los porcentajes de la tabla son la inflación que hubo, siempre cronológica.** La inflación
 de un mes es una sola y no depende de en qué dirección se pregunte. Preguntar de febrero a
-julio y de julio a febrero da **la misma tabla de porcentajes**, con el mismo sello, en orden
-invertido. Hay un test que ata exactamente eso.
+julio y de julio a febrero da **la misma tabla de porcentajes, con el mismo sello**, en orden
+invertido. Hay dos tests que atan exactamente eso, uno por mitad — la primera versión afirmaba
+atar el sello y sólo ataba los porcentajes.
+
+**El sello de un tramo sale del extremo viejo, no del punto de llegada.** Es la misma corrida
+de un mes, en otra columna. La variación de diciembre de 2016 sale de dividir el índice de
+diciembre —el primero que publicó el INDEC, 100— por el de noviembre, que no existe y
+`splice.ts` retropola con el BCRA: el +1,20% es del BCRA. Preguntando de septiembre 2016 a
+enero 2017 salía `INDEC ✓` y al revés `BCRA ✓`, con el mismo porcentaje en la misma fila. Toca
+cualquier rango que cruce nov/dic 2016 en la serie nacional, en las dos direcciones.
 
 **El rótulo de cada fila nombra el mes de su propio porcentaje.** El criterio quedó uno solo,
 `mesDelTramo`, y ya no es "el punto de llegada" ni "el más viejo de los dos extremos" —las dos

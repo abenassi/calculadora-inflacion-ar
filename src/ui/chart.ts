@@ -174,9 +174,10 @@ export function dibujar(canvas: HTMLCanvasElement, r: Resultado): void {
             },
             label: (item) => {
               const fila = filas[item.dataIndex]!;
-              // Por fila y no por tabla: el rótulo de arriba ya distingue "5 jul → 20 jul"
-              // de "jun 2026" con este mismo criterio, y decir "del mes" sobre un tramo de
-              // 15 días le pone el nombre de julio (+2,11%) a un número que es +1,02%.
+              // Por fila y no por tabla: decir "del mes" sobre un tramo de 15 días le pone
+              // el nombre de julio (+2,11%) a un número que es +1,02%. Es la misma pregunta
+              // que se hace `rotularFila` para elegir entre un mes y un rango, aunque desde
+              // la 0014 esa función tiene además un caso propio (ver `hayTramosDeDias`).
               const de = fila.esParcial ? "Inflación del tramo" : "Inflación del mes";
               const partes = [`${de}: ${porcentaje(fila.varMensualPct ?? 0)}`];
               if (fila.acumuladoPct !== null) {

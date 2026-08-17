@@ -15,7 +15,7 @@ import {
   hayMesPublicado,
   resumir,
 } from "../src/ui/explicaciones.js";
-import { abreviarMes } from "../src/engine/mes.js";
+import { abreviarMes, mesDe, nombrarMes } from "../src/engine/mes.js";
 import { mesDelTramo, rotularFila, selloDeFila } from "../src/ui/etiquetas.js";
 import { porcentaje } from "../src/ui/format.js";
 import type { Metodologia, Punto, Resultado, SerieIndice } from "../src/engine/types.js";
@@ -412,5 +412,73 @@ describe("el renglón del acumulado deflactando", () => {
     // Yendo para adelante no hay nada que aclarar.
     const ida = adjust(1_000_000, "2026-02", "2026-07", serie, { hoy: "2026-08" });
     expect(explicarTabla(ida)).not.toContain("Vas para atrás");
+  });
+});
+
+/**
+ * Los meses que la frase nombra tienen que ser los que la tabla muestra (regla 2).
+ *
+ * Deflactando salían corridos un mes para los dos lados: "los 5 meses que van de junio 2026 a
+ * febrero 2026" arriba de una tabla con julio, junio, mayo, abril y marzo. La revisora usuaria
+ * fue a buscar febrero y no lo encontró. Salía de `mesDe(f.punto)`, que coincide con el mes
+ * del porcentaje sólo yendo para adelante.
+ */
+describe("los meses que se nombran son los que se pueden contar en la tabla", () => {
+  for (const [desde, hasta] of [
+    ["2026-08", "2026-03"],
+    ["2026-03", "2026-08"],
+    ["2026-09", "2026-04"],
+    ["2026-04", "2026-09"],
+  ] as const) {
+    it(`${desde} → ${hasta}`, () => {
+      const r = adjust(1_000_000, desde, hasta, serie, { metodologia: "sin_proyectar" });
+      const enLaTabla = r.desglose.slice(1).map((_, i) => mesDelTramo(r.desglose, i + 1));
+      const textos = [explicarMetodo(r), explicarTabla(r), avisarTramoAjeno(r)].join(" ");
+      // Sólo `ventana_reciente` enumera los meses que se usaron; `proyeccion` nombra los que
+      // estimó, que son otros, y `directo` no nombra ninguno.
+      if (r.metodo.tipo === "ventana_reciente") {
+        // Las dos puntas de la enumeración, que es lo que la frase nombra cuando son muchos.
+        for (const mes of [enLaTabla[0]!, enLaTabla.at(-1)!]) {
+          expect(textos).toContain(nombrarMes(mes));
+        }
+      }
+      // Y ningún mes de más: el que quedó afuera de la tabla no puede aparecer nombrado.
+      const afuera = mesDe(r.desglose[0]!.punto);
+      if (!enLaTabla.includes(afuera)) expect(textos).not.toContain(nombrarMes(afuera));
+    });
+  }
+});
+
+/**
+ * El pie que explica la deflación no puede prometer dato oficial donde no hay ninguno.
+ *
+ * La frase era incondicional y con un período enteramente estimado quedaba pegada a la
+ * anterior contradiciéndola: "Ningún porcentaje de esta tabla es un dato publicado: son todos
+ * estimaciones. Vas para atrás en el tiempo, así que los porcentajes son la inflación que hubo
+ * —la que publicó el INDEC—". Y en pasado, sobre meses que todavía no llegaron.
+ */
+describe("la aclaración de la deflación no atribuye de más", () => {
+  it("nombra al organismo cuando hay algún tramo suyo en la tabla", () => {
+    const r = adjust(1_000_000, "2026-07", "2026-02", serie, { metodologia: "sin_proyectar" });
+    expect(explicarTabla(r)).toContain("la que publicó el INDEC");
+  });
+
+  it("no lo nombra cuando la tabla entera está estimada", () => {
+    const r = adjust(1_000_000, mas(9), mas(2), serie, { metodologia: "repite_ultimo" });
+    expect(r.desglose.every((f) => f.esProyeccion)).toBe(true);
+    const pie = explicarTabla(r);
+    expect(pie).toContain("Vas para atrás en el tiempo");
+    for (const promesa of ["la que publicó", "la inflación que hubo"]) {
+      expect(pie).not.toContain(promesa);
+    }
+  });
+
+  it("tampoco lo nombra cuando ningún porcentaje lleva sello", () => {
+    // Todas las filas prorrateadas: el número no lo publicó nadie, aunque el mes sí esté.
+    const r = adjust(1_000_000, `${menos(1)}-20`, `${menos(1)}-10`, serie, {
+      metodologia: "sin_proyectar",
+    });
+    expect(r.desglose.slice(1).every((f) => f.esParcial)).toBe(true);
+    expect(explicarTabla(r)).not.toContain("la que publicó");
   });
 });

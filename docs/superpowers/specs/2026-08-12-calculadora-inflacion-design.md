@@ -141,6 +141,7 @@ adjust(monto: number, desde: Punto, hasta: Punto, serie: SerieIndice,
 type Resultado = {
   monto: number; desde: Punto; hasta: Punto;
   montoAjustado: number; variacionPct: number;
+ inflacionPct: number;   // la inflación del período; distinta de variacionPct al deflactar (0014)
   metodo: Metodo; desglose: Fila[];
 };
 

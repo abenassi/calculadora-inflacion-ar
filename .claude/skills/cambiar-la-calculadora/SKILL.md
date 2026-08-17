@@ -46,6 +46,10 @@ existen porque la alternativa obvia ya se probó y estaba mal.
 | El REM | 0006 |
 | Cómo se revisa (el loop de acá) | 0007 |
 | Analytics, privacidad, qué se mide | 0008 |
+| Los índices provinciales, el guard de sesgo | 0010 |
+| El CSV de descarga | 0011 · 0014 |
+| La ventana de referencia, el prorrateo por día | 0013 |
+| Los rótulos de la tabla, el sello, deflactar | 0014 |
 
 ## Las reglas que no se negocian
 

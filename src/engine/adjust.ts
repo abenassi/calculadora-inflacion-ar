@@ -603,7 +603,16 @@ function armarResultado(
       acumuladoPct: i === 0 ? null : inflacion(indice, indiceBase),
       monto: (monto * indice) / indiceBase,
       esProyeccion: proyectado,
-      origen: proyectado ? "proyeccion" : idx.origenDe(mesDe(punto)),
+      // El sello de un tramo sale del extremo **viejo**, no del punto de llegada, y por eso
+      // no depende de la dirección de la pregunta. La variación de diciembre de 2016 sale de
+      // dividir el índice de diciembre —el primero que publicó el INDEC, 100— por el de
+      // noviembre, que no existe y `splice.ts` retropola con el BCRA: el +1,20% es del BCRA.
+      // Preguntando de septiembre 2016 a enero 2017 salía `INDEC ✓` y al revés `BCRA ✓`, con
+      // el mismo porcentaje en la misma fila. La fila de partida no tiene tramo y conserva el
+      // origen de su propio punto, que es lo que describe su índice.
+      origen: proyectado
+        ? "proyeccion"
+        : idx.origenDe(mesDe(i === 0 ? punto : extremoViejo(puntos[i - 1]!, punto))),
       // La fila de partida también es parcial cuando su índice no es un dato publicado.
       //
       // Una fila lleva el sello del organismo si el número que muestra salió de él. Para

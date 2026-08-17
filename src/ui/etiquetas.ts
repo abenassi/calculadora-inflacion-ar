@@ -166,9 +166,15 @@ export function llevaSello(fila: Fila): boolean {
  * mes" arriba de un tramo de 15 días cuyo porcentaje no es el del mes.
  *
  * Mira `slice(1)` porque la fila de partida no muestra ningún porcentaje, y `esParcial`
- * porque es el mismo criterio con el que `rotularFila` decide si el rótulo es un mes o un
- * tramo: una fila `1 jun → 1 jul` cubre un mes entero y se rotula "jun 2026" aunque el
- * período se haya pedido con fechas exactas.
+ * porque es lo que separa un tramo de días de un mes calendario: una fila `1 jun → 1 jul`
+ * cubre un mes entero y se rotula "jun 2026" aunque el período se haya pedido con fechas
+ * exactas.
+ *
+ * **No** es exactamente el criterio de `rotularFila`, aunque lo fue: desde la 0014 esa función
+ * también emite un rango para una fila que no es parcial, cuando el rótulo del primer tramo
+ * repetiría el de la fila de partida. Por eso el texto que se copia puede decir "Mes a mes:"
+ * arriba de una línea con flecha. Los dos son ciertos —esa fila **es** un mes— pero si algún
+ * día hay que elegir uno solo, el de acá es el que responde "¿estas filas son meses?".
  */
 export function hayTramosDeDias(desglose: Fila[]): boolean {
   return desglose.slice(1).some((f) => f.esParcial);

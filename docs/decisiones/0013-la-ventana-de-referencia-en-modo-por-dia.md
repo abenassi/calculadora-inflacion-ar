@@ -161,11 +161,11 @@ predicado a su versión equivocada.
 Este cambio llegó al techo que fija el skill: tres vueltas que encuentran cosas. Lo que la
 vuelta 3 levantó y **no** entró acá va como cambios propios, y está anotado para no perderse:
 
-- **Deflactando, la tabla le pone a cada porcentaje el mes de al lado.** Yendo para atrás, la
-  fila rotulada "jun 2026" muestra el índice de junio y la variación jul→jun: −2,07%, que es
-  julio dado vuelta. Junio fue +1,89%. Con `INDEC ✓` al lado, y así viaja al texto que se
-  copia. Es pre-existente —el camino de deflactar no lo tocó este cambio— y es una violación
-  de la regla 2 de las caras: le atribuye al INDEC una cifra de un mes que no es. La razón
+- ~~**Deflactando, la tabla le pone a cada porcentaje el mes de al lado.**~~ **Resuelto en la
+  [0014](0014-los-porcentajes-cuando-se-va-para-atras.md).** Yendo para atrás, la fila rotulada
+  "jun 2026" mostraba la variación jul→jun: −2,07%, que es julio dado vuelta. Junio fue +1,89%.
+  Con `INDEC ✓` al lado, y así viajaba al texto que se copia. Era pre-existente —el camino de
+  deflactar no lo tocó este cambio— y era una violación de la regla 2 de las caras. La razón
   con la que se difirió en la vuelta 2, *"es el mismo dato leído en la dirección que se
   pidió"*, era **falsa**.
 - **Puntas mixtas mes+día.** `adjust("2026-06", "2026-07-15")` produce una fila fantasma

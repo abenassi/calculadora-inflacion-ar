@@ -26,7 +26,7 @@ import {
   soloMes,
 } from "../engine/mes.js";
 import type { Mes, Resultado } from "../engine/types.js";
-import { fuenteDe, llevaSello, quienPublicaAhora } from "./etiquetas.js";
+import { fuenteDe, llevaSello, mesDelTramo, quienPublicaAhora } from "./etiquetas.js";
 
 /** Para arrancar una oración con el organismo, que viene con el artículo en minúscula. */
 export const capitalizar = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
@@ -160,7 +160,7 @@ export function explicarMetodo(r: Resultado): string {
         );
       }
 
-      const usados = frasearMeses(r.desglose.slice(1).map((f) => mesDe(f.punto)));
+      const usados = frasearMeses(mesesConPorcentaje(r));
       // "de" + "el" es "del". Con un período de un solo mes la frase salía "usamos la
       // inflación de el último mes publicado": la contracción no se puede dejar armada
       // afuera cuando la parte que sigue cambia de número.
@@ -305,6 +305,19 @@ export function hayMesPublicado(r: Resultado): boolean {
   return r.desglose.some((f) => !f.esProyeccion);
 }
 
+/**
+ * Los meses que aportan un porcentaje a la tabla, en el orden en que se muestran.
+ *
+ * Sale de `mesDelTramo` y no de `mesDe(f.punto)`, que es lo mismo yendo para adelante y está
+ * corrido un mes yendo para atrás: deflactando de agosto a marzo, la frase decía "los 5 meses
+ * que van de junio 2026 a febrero 2026" mientras la tabla mostraba julio, junio, mayo, abril y
+ * marzo. La regla 2 pide que lo que se nombra se pueda contar en pantalla, y acá no coincidía
+ * ni una de las dos puntas.
+ */
+function mesesConPorcentaje(r: Resultado): Mes[] {
+  return r.desglose.slice(1).map((_, i) => mesDelTramo(r.desglose, i + 1));
+}
+
 /** Si algo de lo que se muestra es efectivamente una estimación. */
 export function hayAlgoEstimado(r: Resultado): boolean {
   return r.desglose.some((f) => f.esProyeccion);
@@ -345,7 +358,7 @@ export function avisarTramoAjeno(r: Resultado): string {
   const [ini, fin] = [r.desglose[0]!.punto, r.desglose.at(-1)!.punto].sort(compararPuntos);
   const tramo = porDia
     ? `${conPreposicion("de", ini!)} ${conPreposicion("a", fin!)}`
-    : `la inflación de ${frasearMeses(r.desglose.slice(1).map((f) => mesDe(f.punto)))}`;
+    : `la inflación de ${frasearMeses(mesesConPorcentaje(r))}`;
 
   // Ni "Pediste" ni "Abajo no vas a encontrar esos meses". Lo primero porque el aviso
   // encabeza el texto que se copia y se manda, y quien lo recibe no pidió nada: lee
@@ -403,10 +416,17 @@ function deDondeSalenLasFilas(r: Resultado): string {
  */
 function aclararDeflacion(r: Resultado): string {
   if (compararPuntos(r.hasta, r.desde) >= 0) return "";
+  // La atribución cuelga del sello y no de la dirección. La frase era incondicional y con un
+  // período enteramente estimado quedaba pegada a la anterior contradiciéndola: "Ningún
+  // porcentaje de esta tabla es un dato publicado: son todos estimaciones. Vas para atrás en
+  // el tiempo, así que los porcentajes son la inflación que hubo —la que publicó el INDEC—".
+  // Y en pasado, sobre meses de 2027. Es la regla 2 del lado que se olvida, en código nuevo.
+  const deQuien = hayTramoOficial(r)
+    ? `la inflación que hubo —la que publicó ${fuenteDe(r.desglose, r).publicadosPor}—`
+    : `inflación, no descuentos`;
   return (
-    ` Vas para atrás en el tiempo, así que los porcentajes son la inflación que hubo —la que ` +
-    `publicó ${fuenteDe(r.desglose, r).publicadosPor}— y cada monto es el que queda después ` +
-    `de sacársela.`
+    ` Vas para atrás en el tiempo, así que los porcentajes son ${deQuien} y cada monto es el ` +
+    `que queda después de sacársela.`
   );
 }
 

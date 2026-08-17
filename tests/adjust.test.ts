@@ -10,7 +10,7 @@ import {
   tasaMensualDelRem,
 } from "../src/engine/adjust.js";
 import { aOrdinal, deOrdinal, largoEnDias } from "../src/engine/mes.js";
-import { mesDelTramo } from "../src/ui/etiquetas.js";
+import { mesDelTramo, selloDeFila } from "../src/ui/etiquetas.js";
 import type { SerieIndice } from "../src/engine/types.js";
 
 const serie = JSON.parse(
@@ -831,6 +831,33 @@ describe("deflactar — los porcentajes son la inflación que hubo, no su recíp
     // aserción que importa: no que los números sean tal o cual, sino que la dirección de la
     // pregunta no los cambie.
     expect(porMes(vuelta)).toEqual([...porMes(ida)].reverse());
+  });
+
+  /**
+   * El sello también, que es la mitad que la 0014 decía atar y no ataba nadie.
+   *
+   * El caso que lo rompía es el empalme: la variación de diciembre de 2016 sale de dividir el
+   * índice de diciembre —el primero que publicó el INDEC, 100— por el de noviembre, que
+   * `splice.ts` retropola con el BCRA. Es un número del BCRA. Preguntando de septiembre 2016 a
+   * enero 2017 salía `INDEC ✓` y al revés `BCRA ✓`, con el mismo porcentaje en la misma fila,
+   * porque el origen salía del punto de llegada.
+   */
+  it("el sello tampoco depende de la dirección, ni siquiera en el empalme", () => {
+    const conSello = (r: ReturnType<typeof adjust>) =>
+      r.desglose
+        .slice(1)
+        .map((f, i) => [mesDelTramo(r.desglose, i + 1), selloDeFila(f, r)] as const);
+
+    expect(conSello(vuelta)).toEqual([...conSello(ida)].reverse());
+
+    const cruza = ["2016-09", "2017-01"] as const;
+    const alDerecho = conSello(adjust(1_000_000, cruza[0], cruza[1], serie, { hoy: "2026-08" }));
+    const alReves = conSello(adjust(1_000_000, cruza[1], cruza[0], serie, { hoy: "2026-08" }));
+    expect(alReves).toEqual([...alDerecho].reverse());
+    // Y el que vale es BCRA: el INDEC no publicó ninguna variación para diciembre de 2016 en
+    // esta serie, porque su índice de nivel arranca ahí.
+    expect(alDerecho.find(([mes]) => mes === "2016-12")?.[1]).toBe("BCRA");
+    expect(alDerecho.find(([mes]) => mes === "2017-01")?.[1]).toBe("INDEC");
   });
 
   it("cada porcentaje sellado es el que se saca de los índices publicados de ese mes", () => {
