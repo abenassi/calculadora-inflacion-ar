@@ -162,11 +162,20 @@ el gráfico—. Con el recorrido cronológico el choque no existe y la rama se b
 Pasarlas a `ordenReal` toca el ancla de `sesgoDeLaVentana` y el cálculo de `esFuturo`, así que
 se barrió aparte: 9.408 consultas (48 puntos × 48 × 3 metodologías), comparando `metodo.tipo`,
 `montoAjustado`, `inflacionPct`, cantidad de filas, desplazamiento y `sePuedeEvitarEstimar`.
-Cambian **3**, y son la misma consulta con las tres metodologías: `2026-09-01 → 2026-08`, dos
-puntos que son **el mismo instante** —el día 1 de septiembre es el cierre de agosto—. El monto
-da idéntico (1000,00000000) porque el período tiene largo cero; lo que cambia es que ahora se
-clasifica como `ventana_reciente` en vez de `proyeccion`, que es lo correcto: no hay nada que
-estimar. Cae adentro de las puntas mixtas, que no son alcanzables desde la interfaz.
+Cambian **3**, y son la misma consulta: `2026-09-01 → 2026-08`, dos puntos que son **el mismo
+instante** —el día 1 de septiembre es el cierre de agosto—. El monto da idéntico
+(1000,00000000) porque el período tiene largo cero; lo que cambia es que se clasifica como
+`ventana_reciente` en vez de `proyeccion`. Cae adentro de las puntas mixtas, que no son
+alcanzables desde la interfaz.
+
+> **Y ahí la clasificación nueva es peor, no mejor.** Lo escribí al revés en la primera versión
+> de esta ADR y el revisor económico lo refutó comparando el texto renderizado: la vieja decía
+> *"el período empieza y termina en el mismo punto, así que el monto no cambia"*, que es cierto.
+> La nueva dice *"usamos el tramo de **0 días** más reciente… la inflación de julio prorrateada
+> a **0 de sus 31 días**"*, con `~` sobre un millón exacto, dos filas idénticas y el sitio
+> afirmando "ninguno de estos porcentajes es una estimación" sobre una consulta cuya punta es
+> agosto, sin publicar. No bloquea nada porque no se llega desde la interfaz, pero refuerza el
+> caso para normalizar las puntas mixtas algún día, no para darlas por resueltas.
 
 ## El techo, y qué quedó afuera
 
@@ -189,6 +198,24 @@ Este cambio llegó al techo de tres vueltas que encuentran cosas. Lo que la vuel
   nombran dos cosas (`15 feb 2026` como fila y otra vez adentro del rango `15 feb → 1 mar`).
   Ella misma verificó que pasa igual en las dos direcciones: no es regresión, es cómo funciona
   el modo por día desde siempre.
+
+## Dos arreglos que el barrido no vio, y que sí se llegan desde el sitio
+
+Los dos salen del recorrido cronológico y ninguno figuraba acá. Los encontró el revisor
+económico en la vuelta 3, y aparecieron porque el barrido de la vuelta 2 comparaba
+`metodo.tipo` y no `metodo` entero:
+
+- **`?desde=2026-09-01&hasta=2026-08-15`** —un período de 17 días, perfectamente alcanzable—
+  decía *"El período empieza y termina en el mismo punto, así que el monto no cambia"* sobre
+  una tabla donde el monto va de $1.000.000 a $988.594,70. `mesesEstimados` pasó de `[]` a
+  `["2026-08"]` y ahora dice lo que corresponde: que agosto no está publicado y se estima.
+- **El mensaje de `RangoError`** nombraba un mes que la persona nunca escribió: *"No hay datos
+  anteriores a julio 2012. Pediste **junio 2012**"* cuando había pedido marzo de 1990. Cambia
+  en 849 consultas de su grilla.
+
+Los dos son mentiras que estaban en producción y que este cambio corrigió de rebote. Van acá
+porque una ADR que declara un alcance menor del real es la clase de texto que hace que el
+próximo "arregle" algo que ya está bien.
 
 ## Lo que no cambia
 

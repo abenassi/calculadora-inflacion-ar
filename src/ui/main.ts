@@ -22,7 +22,6 @@ import {
   aOrdinal,
   compararMeses,
   comoDestino,
-  compararPuntos,
   ordenReal,
   conPreposicion,
   deOrdinal,
@@ -291,9 +290,16 @@ function fueraDelRangoPedible(mes: Mes, dias: boolean): boolean {
  * (por ejemplo un contrato que arranca en octubre, hoy agosto), "ahora"
  * dejaba el período invertido y el sitio lo calculaba igual —matemáticamente
  * válido, pero sin decir que el período había quedado dado vuelta—. La
- * comparación usa `compararPuntos`, la misma función de la que salen
- * `extremoNuevo`/`extremoViejo` en `adjust.ts` para decidir qué punta es la más
- * nueva: dos lugares de acuerdo sobre el mismo criterio, no dos criterios.
+ * comparación usa `ordenReal`, la misma de la que salen `extremoNuevo` y
+ * `extremoViejo` en `adjust.ts` para decidir qué punta es la más nueva: dos
+ * lugares de acuerdo sobre el mismo criterio, no dos criterios.
+ *
+ * Estuvo en `compararPuntos` un rato, y hoy los dos contestan igual porque
+ * `usaDias()` decide las dos puntas a la vez y nunca se mezclan un mes y un día.
+ * Es el criterio de `adjust.ts` el que se movió a `ordenReal` (0014), y este
+ * comentario quedó jurando una coincidencia que había dejado de ser cierta — la
+ * tercera vez en el mismo loop. Con `ordenReal` la frase vuelve a ser verdad y,
+ * si algún día se mezclan, no se invierte en silencio.
  *
  * El `title` en el atajo deshabilitado dice por qué: un control gris sin
  * explicación manda a buscar la razón en otro lado, y la mayoría no la busca.
@@ -303,7 +309,7 @@ function sincronizarAtajos(desde: Punto, hasta: Punto): void {
   const objetivoAhora = dias ? hoyFecha() : mesActual();
   const botonAhora = el<HTMLButtonElement>("atajo-ahora");
   const ahoraFueraDeRango = fueraDelRangoPedible(mesDe(objetivoAhora), dias);
-  const ahoraInvertiria = !ahoraFueraDeRango && compararPuntos(objetivoAhora, desde) < 0;
+  const ahoraInvertiria = !ahoraFueraDeRango && ordenReal(objetivoAhora, desde) < 0;
   botonAhora.disabled = ahoraFueraDeRango || ahoraInvertiria;
   botonAhora.title = ahoraFueraDeRango
     ? `No hay datos disponibles todavía para ${dias ? "hoy" : "el mes actual"}.`
