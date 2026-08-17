@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Actualizar una serie — Calculadora de inflación</title>
+    <!-- Página de prueba: no se linkea desde ningún lado del sitio ni del sitemap,
+         y esto es una capa extra para que tampoco la indexe un buscador que la
+         encuentre igual. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <header class="cabecera">
+      <div class="contenido">
+        <h1>Actualizar una serie</h1>
+        <p class="bajada">
+          En vez de un monto entre dos fechas, una serie entera —por ahora, el dólar
+          blue— reexpresada en los pesos de un único mes. Cada punto se ajusta con
+          el mismo motor que usa la calculadora principal.
+        </p>
+      </div>
+    </header>
+
+    <main class="contenido">
+      <form class="tarjeta formulario" id="formulario">
+        <div class="campo">
+          <label for="objetivo-mes">Expresar en pesos de</label>
+          <div class="entrada-fecha">
+            <select id="objetivo-mes" aria-label="Mes objetivo"></select>
+            <select id="objetivo-anio" aria-label="Año objetivo"></select>
+          </div>
+        </div>
+      </form>
+
+      <p class="error" id="error" hidden></p>
+
+      <section class="tarjeta panel">
+        <div class="panel__cabecera">
+          <h2 id="titulo-grafico">Dólar blue</h2>
+        </div>
+        <div class="grafico">
+          <canvas
+            id="grafico"
+            role="img"
+            aria-label="Dólar blue promedio mensual, reexpresado en los pesos del mes elegido"
+          ></canvas>
+        </div>
+        <p class="badge">
+          Dólar blue promedio mensual, fuente Ámbito Financiero · actualizado a
+          pesos de cada mes según el IPC del INDEC y el BCRA · datos vía
+          <a href="https://argentinadata.mymcps.dev" rel="noopener">Argentina Data MCP</a>
+          · actualizado <span id="actualizado">—</span>
+        </p>
+      </section>
+    </main>
+
+    <footer class="pie">
+      <div class="contenido">
+        <p>
+          Página de prueba, sin terminar. <a href="./">Volver a la calculadora</a> ·
+          <a href="https://github.com/abenassi/calculadora-inflacion-ar" rel="noopener"
+            >Código en GitHub</a
+          >
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="./src/ui/actualizar-main.ts"></script>
+  </body>
+</html>
