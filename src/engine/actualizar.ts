@@ -8,7 +8,7 @@
  * mezclada en silencio entre los que sí son cálculo directo.
  */
 import { adjust, motivoParaEstimar } from "./adjust.js";
-import type { Mes, SerieIndice } from "./types.js";
+import type { Mes, PuntoValor, SerieIndice } from "./types.js";
 
 export type PuntoActualizado = {
   mes: Mes;
@@ -17,7 +17,7 @@ export type PuntoActualizado = {
 };
 
 export function actualizarSerie(
-  datos: { mes: Mes; valor: number }[],
+  datos: PuntoValor[],
   mesObjetivo: Mes,
   ipc: SerieIndice,
 ): PuntoActualizado[] {

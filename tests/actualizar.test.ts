@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { actualizarSerie } from "../src/engine/actualizar.js";
+import { adjust } from "../src/engine/adjust.js";
 import type { SerieIndice } from "../src/engine/types.js";
 
 /**
@@ -71,5 +72,24 @@ describe("actualizarSerie", () => {
       ipc,
     );
     expect(r.map((p) => p.mes)).toEqual(["2020-02", "2020-01"]);
+  });
+
+  it("con el objetivo en ultimo_oficial no descarta ningún punto ni usa ventana_reciente", () => {
+    // Ésta es la configuración que corre en producción por default: `/actualizar.html`
+    // arranca con el objetivo en `ipc.ultimo_oficial`, nunca en el mes calendario en
+    // curso. Con ese objetivo, todo punto entre el primero y el último mes publicado
+    // es cálculo directo — nada necesita la ventana de referencia ni se cae por el
+    // guard de sesgo. Las cinco pruebas de arriba nunca corrieron con el objetivo
+    // pegado al último mes publicado, que es justo el punto donde un desfasaje de un
+    // mes (el bug real: default en `mesActual()`) hacía que todo resolviera por
+    // `ventana_reciente` y 6 meses se descartaran en silencio.
+    const puntos = ipc.datos.map((p) => ({ mes: p.mes, valor: p.indice }));
+    const r = actualizarSerie(puntos, ipc.ultimo_oficial, ipc);
+
+    expect(r).toHaveLength(puntos.length);
+    for (const punto of puntos) {
+      const metodo = adjust(punto.valor, punto.mes, ipc.ultimo_oficial, ipc).metodo;
+      expect(metodo.tipo).toBe("directo");
+    }
   });
 });
