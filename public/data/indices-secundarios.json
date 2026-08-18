@@ -1,0 +1,12 @@
+{
+  "indices": [
+    {
+      "slug": "cpi-eeuu",
+      "nombre": "Inflación de Estados Unidos",
+      "direccion": "multiplicar",
+      "requiereIndiceBase": "nacional",
+      "tieneCrossCheck": true
+    }
+  ],
+  "actualizado": "2026-08-18T00:27:20.629Z"
+}

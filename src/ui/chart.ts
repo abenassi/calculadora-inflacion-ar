@@ -34,6 +34,8 @@ Chart.register(CategoryScale, LinearScale, BarController, BarElement, Tooltip);
 
 type Tokens = {
   serie: string;
+  /** Segunda serie categórica, para el overlay del cross-check en `chart-serie.ts`. */
+  serie2: string;
   grilla: string;
   eje: string;
   texto: string;
@@ -45,6 +47,7 @@ export function tokens(): Tokens {
   const leer = (n: string, fallback: string) => cs.getPropertyValue(n).trim() || fallback;
   return {
     serie: leer("--series-1", "#2a78d6"),
+    serie2: leer("--series-2", "#c96a1f"),
     grilla: leer("--gridline", "#e1e0d9"),
     eje: leer("--muted", "#898781"),
     texto: leer("--text-primary", "#0b0b0b"),
@@ -72,7 +75,7 @@ export function tokens(): Tokens {
  * futura podría traer `oklch()`—, se devuelve el color tal cual y la barra queda
  * distinguida igual por el contorno.
  */
-function conAlfa(color: string, alfa: number): string {
+export function conAlfa(color: string, alfa: number): string {
   const hex = /^#([0-9a-f]{6})$/i.exec(color.trim());
   if (!hex) return color;
   return `#${hex[1]}${Math.round(alfa * 255).toString(16).padStart(2, "0")}`;

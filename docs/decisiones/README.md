@@ -27,6 +27,7 @@ arquitectura y la que probablemente quieras copiar tal cual.
 | [0012](0012-atajos-de-fecha.md) | Atajos de fecha: "ahora" y 1m/3m/6m/12m | Mueven fechas, no cambian el cálculo — no reviven los presets que sacó la 0002 |
 | [0013](0013-la-ventana-de-referencia-en-modo-por-dia.md) | La ventana de referencia por día | Correr meses enteros conservando el día dejaba el tramo terminando a mitad del último mes publicado, y volvía falso el pie de la tabla |
 | [0014](0014-los-porcentajes-cuando-se-va-para-atras.md) | Los porcentajes cuando se va para atrás | Deflactando, la tabla mostraba el recíproco de la inflación del mes de al lado, con el sello del organismo; ahora los porcentajes son cronológicos y el rótulo nombra el mes de su propio número |
+| [0015](0015-tipo-cambio-real.md) | Tipo de cambio real: un segundo índice, opcional | `/actualizar.html` puede ajustar también por inflación de EE.UU., con la serie del BCRA de cruce visual |
 
 ## Formato
 

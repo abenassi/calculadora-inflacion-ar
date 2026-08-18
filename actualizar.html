@@ -18,7 +18,9 @@
         <p class="bajada">
           En vez de un monto entre dos fechas, una serie entera —por ahora, el dólar
           blue— reexpresada en los pesos de un único mes. Cada punto se ajusta con
-          el mismo motor que usa la calculadora principal.
+          el mismo motor que usa la calculadora principal. Opcionalmente, se puede
+          ajustar también por un segundo índice para pasar de "pesos constantes" a
+          un tipo de cambio real bilateral.
         </p>
       </div>
     </header>
@@ -32,9 +34,14 @@
             <select id="objetivo-anio" aria-label="Año objetivo"></select>
           </div>
         </div>
+        <div class="campo" id="campo-indice-secundario" hidden>
+          <label for="indice-secundario">Ajustar también por</label>
+          <select id="indice-secundario"></select>
+        </div>
       </form>
 
       <p class="error" id="error" hidden></p>
+      <p class="error" id="error-indice-secundario" hidden></p>
 
       <section class="tarjeta panel">
         <div class="panel__cabecera">
@@ -46,6 +53,12 @@
             role="img"
             aria-label="Dólar blue promedio mensual, reexpresado en los pesos del mes elegido"
           ></canvas>
+          <!-- Reemplaza al canvas —nunca conviven— cuando no hay nada que graficar:
+               sin puntos (el mes objetivo elegido cae fuera de lo que cubre el índice
+               secundario) o con menos de dos puntos en el rango visible (las dos puntas
+               del slider en el mismo mes). El texto lo arma `redibujar` en
+               actualizar-main.ts. -->
+          <p class="error" id="aviso-grafico" hidden></p>
         </div>
         <div class="rango" id="rango">
           <div class="rango__campo">
@@ -57,7 +70,10 @@
             <input type="range" id="rango-hasta" min="0" max="0" value="0" />
           </div>
         </div>
-        <p class="badge">
+        <!-- El texto lo arma `actualizarTextosDeCabecera`/`armarOverlay` en actualizar-main.ts:
+             cambia según si el cross-check está disponible para el mes objetivo elegido o no. -->
+        <p class="nota-metodologia" id="nota-cross-check" hidden></p>
+        <p class="badge" id="badge-serie">
           Dólar blue promedio mensual, fuente Ámbito Financiero · actualizado a
           pesos de cada mes según el IPC del INDEC y el BCRA · datos vía
           <a href="https://argentinadata.mymcps.dev" rel="noopener">Argentina Data MCP</a>

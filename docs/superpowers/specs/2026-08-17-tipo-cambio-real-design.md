@@ -223,11 +223,19 @@ propias — el overlay es un adicional, nunca un bloqueante.
   fórmula de la sección "La cuenta" con una calculadora aparte antes de confiar en el
   test (exactamente el mismo cuidado que ya existe en `adjust.test.ts` para el
   motor de un solo índice — buscar un caso ahí para copiar el estilo).
-- Dirección `"dividir"` vs `"multiplicar"`: test que verifica que el resultado sea
-  MAYOR que `valorSoloBase` cuando el CPI de EE.UU. sube más que el IPC argentino en
-  el tramo (peso relativamente más fuerte en términos reales) y menor en el caso
-  contrario — no sólo el número exacto, también el signo del efecto, porque un signo
-  invertido pasa un test de "da tal número" si el número también está mal.
+- Dirección `"dividir"` vs `"multiplicar"`: test que verifica el signo del efecto, no
+  sólo el número exacto — un signo invertido pasa un test de "da tal número" si el
+  número también está mal. **Corrección post-implementación:** una primera versión de
+  este párrafo decía que el resultado debía ser MAYOR que `valorSoloBase` "cuando el
+  CPI de EE.UU. sube más que el IPC argentino en el tramo", comparando las dos tasas
+  entre sí. Es falso: con `direccion: "multiplicar"`,
+  `valorActualizado = soloBase × CPI_US(t)/CPI_US(t0)` (t = mes del punto, t0 = mes
+  objetivo), y ese cociente sólo depende del signo de la inflación de EE.UU. en el
+  tramo — nunca de compararla contra la de Argentina. El test correcto (implementado
+  en `tests/actualizar.test.ts`) aísla la variable: con el mismo IPC argentino en los
+  dos casos, el resultado da MAYOR que `valorSoloBase` cuando el CPI de EE.UU. tuvo
+  **deflación neta** en el tramo, y MENOR cuando tuvo **inflación neta positiva** —
+  encontrado por `revisor-economista` en la vuelta 1 del review de este cambio.
 - Reescalado del cross-check: `crossCheck_reescalado(mesObjetivo) === 100` siempre,
   por construcción — test directo.
 - Fallback: snapshot sin `secundario-*.json` → el desplegable no ofrece la opción

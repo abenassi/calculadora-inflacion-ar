@@ -1,8 +1,9 @@
 /**
  * Baja las series de Argentina Data MCP y escribe el snapshot que consume el sitio.
  *
- * Corre en GitHub Actions una vez por día. Veintiuna llamadas de quota: cuatro del índice
- * nacional y el REM, dos auxiliares, y una por cada índice jurisdiccional.
+ * Corre en GitHub Actions una vez por día. Veinticuatro llamadas de quota: cuatro del
+ * índice nacional y el REM, dos auxiliares, una por cada índice jurisdiccional, el
+ * dólar blue, y dos por cada índice secundario declarado (la serie y su cross-check).
  *
  * Invariante que este script protege: **ni un snapshot ni el catálogo pueden encoger**. Si el MCP responde raro, o el INDEC revisa la serie hacia atrás, o una
  * fuente se cae, preferimos fallar ruidosamente y seguir sirviendo el último
@@ -16,8 +17,10 @@ import { fileURLToPath } from "node:url";
 import { empalmar, type PuntoCrudo } from "../src/engine/splice.js";
 import { aMes, diffMeses, nombrarMes } from "../src/engine/mes.js";
 import { SLUG_NACIONAL, type CatalogoIndices, type EntradaCatalogo } from "../src/engine/indices.js";
+import type { EntradaCatalogoSecundario } from "../src/engine/indices-secundarios.js";
 import type { ExpectativaRem, SerieIndice, SerieValores } from "../src/engine/types.js";
 import { INDICES, type IndiceDeclarado } from "./indices-declarados.js";
+import { INDICES_SECUNDARIOS, type IndiceSecundarioDeclarado } from "./indices-secundarios-declarados.js";
 import { traerDolarHistorico, traerSerie } from "./mcp-client.js";
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -438,6 +441,117 @@ async function construirSerieDolarBlue(): Promise<SerieValores> {
 }
 
 /**
+ * Un índice secundario declarado (hoy sólo el CPI de EE.UU.), con la MISMA forma que
+ * `ipc.json` (`SerieIndice`) para poder pasarlo tal cual a `adjust()` /
+ * `actualizarSerieDoble`. Mismo piso que el dólar blue (2002) para poder componer los
+ * dos sobre toda la serie.
+ *
+ * Va en su propio `try/catch` en `main()`, igual que `construirSerieDolarBlue`: si
+ * FRED falla un día, el resto del pipeline se escribe igual y el selector del índice
+ * secundario simplemente no aparece hasta que el snapshot tenga el archivo.
+ */
+async function construirSerieSecundaria(declarada: IndiceSecundarioDeclarado): Promise<SerieIndice> {
+  console.log(`Índice secundario ${declarada.slug}: bajando ${declarada.serie}…`);
+  const serie = await traerSerie(declarada.serie, { fecha_desde: "2002-01-01" });
+  const puntos = recortarContinuo(recortarRepresentable(aPuntos(serie.datos), declarada.slug), declarada.slug);
+  const datos = puntos.map((p) => ({ mes: p.mes, indice: p.valor, origen: declarada.slug }));
+  const ultimoOficial = datos.at(-1)!.mes;
+
+  console.log(
+    `  ${declarada.slug}: ${nombrarMes(datos[0]!.mes)} → ${nombrarMes(ultimoOficial)} ` +
+      `(${datos.length} meses, ${declarada.organismo})`,
+  );
+
+  return {
+    serie: declarada.slug,
+    base: serie.unidad,
+    fuentes: [
+      {
+        id: declarada.slug,
+        serie: declarada.serie,
+        organismo: declarada.organismo,
+        organismoCorto: declarada.organismo,
+        url: declarada.url,
+        rango: `${datos[0]!.mes}/${ultimoOficial}`,
+        etiqueta: declarada.etiqueta,
+      },
+    ],
+    ultimo_oficial: ultimoOficial,
+    actualizado: new Date().toISOString(),
+    datos,
+  };
+}
+
+/**
+ * El cross-check oficial de un índice secundario (hoy, `tipo_cambio_real_estados_unidos`
+ * del BCRA) — una serie de VALORES, no un índice con el que se ajusta nada: se
+ * reescala en la interfaz (`reescalarCrossCheck`) para superponerla como comparación
+ * de forma, nunca para calcular.
+ *
+ * La serie de origen es diaria; se mensualiza con el mismo criterio que ya usa
+ * `construirAuxiliar` para UVA y dólar oficial (último valor del mes), porque el resto
+ * del pipeline —y el gráfico que la muestra al lado de series mensuales— trabaja en
+ * meses.
+ */
+async function construirCrossCheck(declarada: IndiceSecundarioDeclarado): Promise<SerieValores | null> {
+  if (!declarada.serieCrossCheck) return null;
+  console.log(`Cross-check de ${declarada.slug}: bajando ${declarada.serieCrossCheck}…`);
+  const serie = await traerSerie(declarada.serieCrossCheck, {
+    fecha_desde: "2002-01-01",
+    frecuencia: "mensual",
+    funcion_colapso: "last",
+  });
+  const datos = aPuntos(serie.datos);
+
+  console.log(`  ${declarada.slug}: cross-check ${datos[0]!.mes} → ${datos.at(-1)!.mes} (${datos.length} meses)`);
+
+  return {
+    serie: `crosscheck-${declarada.slug}`,
+    unidad: serie.unidad,
+    fuentes: [
+      { id: "bcra", organismo: serie.fuente, rango: `${datos[0]!.mes}/${datos.at(-1)!.mes}` },
+    ],
+    actualizado: new Date().toISOString(),
+    datos,
+  };
+}
+
+/**
+ * El catálogo chico de índices secundarios, en el mismo espíritu que `indices.json`
+ * para los primarios: la interfaz nunca lee `scripts/indices-secundarios-declarados.ts`
+ * directo —es código de pipeline, no se empaqueta para el browser— sino este archivo,
+ * que sólo lista lo que el pipeline **efectivamente pudo escribir**, esta corrida o
+ * una anterior. Así el desplegable de `/actualizar.html` no ofrece nunca una opción
+ * cuyo archivo de datos no existe.
+ */
+async function construirCatalogoSecundarios(): Promise<void> {
+  const existeArchivo = (archivo: string) =>
+    readFile(resolve(DIR_DATOS, archivo), "utf8")
+      .then(() => true)
+      .catch(() => false);
+
+  const entradas: EntradaCatalogoSecundario[] = [];
+  for (const decl of INDICES_SECUNDARIOS) {
+    if (!(await existeArchivo(`series/secundario-${decl.slug}.json`))) {
+      console.warn(`  ${decl.slug}: sin archivo de datos, no entra al catálogo de índices secundarios`);
+      continue;
+    }
+    entradas.push({
+      slug: decl.slug,
+      nombre: decl.nombre,
+      direccion: decl.direccion,
+      requiereIndiceBase: decl.requiereIndiceBase,
+      tieneCrossCheck: await existeArchivo(`series/crosscheck-${decl.slug}.json`),
+    });
+  }
+
+  await escribirSiMejora("indices-secundarios.json", {
+    indices: entradas,
+    actualizado: new Date().toISOString(),
+  });
+}
+
+/**
  * Los quince índices jurisdiccionales, cada uno a su archivo, y el catálogo.
  *
  * Dos reglas que importan más que el código:
@@ -531,7 +645,36 @@ async function main(): Promise<void> {
     );
   }
 
+  // Cada índice secundario (y su cross-check, si declara uno) en su propio try/catch:
+  // si FRED o el BCRA fallan un día, el resto del pipeline no se cae con ellos, y el
+  // selector "Ajustar también por" de `/actualizar.html` simplemente no ofrece la
+  // opción hasta que el snapshot tenga el archivo (ver `construirSerieSecundaria`).
+  for (const declarada of INDICES_SECUNDARIOS) {
+    try {
+      await mkdir(resolve(DIR_DATOS, "series"), { recursive: true });
+      const secundaria = await construirSerieSecundaria(declarada);
+      await escribirSiMejora(`series/secundario-${declarada.slug}.json`, secundaria, 100);
+    } catch (e: unknown) {
+      console.warn(
+        `  ${declarada.slug}: NO se pudo actualizar (${(e as Error).message}) — se sigue con el resto del pipeline`,
+      );
+    }
+
+    try {
+      const crossCheck = await construirCrossCheck(declarada);
+      if (crossCheck) {
+        await escribirSiMejora(`series/crosscheck-${declarada.slug}.json`, crossCheck, 12);
+      }
+    } catch (e: unknown) {
+      console.warn(
+        `  ${declarada.slug}: NO se pudo actualizar el cross-check (${(e as Error).message}) — ` +
+          `el overlay de comparación no aparece, el resto sigue igual`,
+      );
+    }
+  }
+
   await construirCatalogo(ipc);
+  await construirCatalogoSecundarios();
 
   await escribirSiMejora("meta.json", {
     actualizado: ipc.actualizado,
