@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tipo de cambio real — Calculadora de inflación</title>
+    <!-- Página de prueba: no se linkea desde ningún lado del sitio ni del sitemap,
+         y esto es una capa extra para que tampoco la indexe un buscador que la
+         encuentre igual. Mismo criterio que actualizar.html. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <header class="cabecera">
+      <div class="contenido">
+        <h1>Tipo de cambio real</h1>
+        <p class="bajada">
+          El dólar blue y el dólar oficial, medidos en tipo de cambio real bilateral
+          contra Estados Unidos, comparados con la serie que publica el BCRA. Elegí a
+          qué mes se reexpresan los pesos — las tres series y sus limitaciones están
+          fijas, no hay nada más para elegir.
+        </p>
+      </div>
+    </header>
+
+    <main class="contenido">
+      <form class="tarjeta formulario" id="formulario">
+        <div class="campo">
+          <label for="objetivo-mes">Expresar en pesos de</label>
+          <div class="entrada-fecha">
+            <select id="objetivo-mes" aria-label="Mes objetivo"></select>
+            <select id="objetivo-anio" aria-label="Año objetivo"></select>
+          </div>
+        </div>
+      </form>
+
+      <p class="error" id="error" hidden></p>
+
+      <section class="tarjeta panel">
+        <div class="panel__cabecera">
+          <h2>Tipo de cambio real bilateral vs. Estados Unidos</h2>
+        </div>
+        <div class="grafico">
+          <canvas
+            id="grafico"
+            role="img"
+            aria-label="Dólar blue y dólar oficial en tipo de cambio real bilateral contra Estados Unidos, con la serie del BCRA de referencia"
+          ></canvas>
+          <!-- Reemplaza al canvas —nunca conviven— cuando no hay nada que graficar:
+               sin meses (el mes objetivo cae antes de 2002-01, piso del CPI de
+               EE.UU.) o con menos de dos meses en el rango visible. El texto lo arma
+               `redibujar` en tcr-main.ts. -->
+          <p class="error" id="aviso-grafico" hidden></p>
+        </div>
+        <div class="rango" id="rango">
+          <div class="rango__campo">
+            <label for="rango-desde">Desde <span id="rango-desde-texto"></span></label>
+            <input type="range" id="rango-desde" min="0" max="0" value="0" />
+          </div>
+          <div class="rango__campo">
+            <label for="rango-hasta">Hasta <span id="rango-hasta-texto"></span></label>
+            <input type="range" id="rango-hasta" min="0" max="0" value="0" />
+          </div>
+        </div>
+        <!-- Las dos notas las arma `redibujar`/`armarCrossCheck` en tcr-main.ts: la
+             primera avisa cuando el rango visible queda antes de junio de 2010 (TCR-
+             oficial no tiene dato ahí); la segunda explica el reescalado del BCRA. -->
+        <p class="nota-metodologia" id="nota-cobertura-oficial" hidden></p>
+        <p class="nota-metodologia" id="nota-cross-check" hidden></p>
+        <p class="badge" id="badge-serie">
+          Dólar blue y dólar oficial (Ámbito Financiero), a tipo de cambio real según
+          el IPC del INDEC y el BCRA y la inflación de Estados Unidos (BLS/FRED) ·
+          datos vía
+          <a href="https://argentinadata.mymcps.dev" rel="noopener">Argentina Data MCP</a>
+          · actualizado <span id="actualizado">—</span>
+        </p>
+      </section>
+
+      <section class="fichas-series" aria-label="Qué es cada serie">
+        <article class="tarjeta ficha-serie">
+          <h3>TCR-blue</h3>
+          <p>
+            El dólar blue medido en tipo de cambio real. Incluye la brecha del
+            mercado informal, así que se aleja mucho de la serie del BCRA en los
+            períodos con cepo cambiario — no porque el cálculo esté mal, sino porque
+            el BCRA no mide el blue.
+          </p>
+        </article>
+        <article class="tarjeta ficha-serie">
+          <h3>TCR-oficial</h3>
+          <p>
+            El dólar oficial minorista medido en tipo de cambio real. Es la que
+            mejor reproduce a la del BCRA: en la comparación mes a mes desde 2016,
+            coinciden en un 99,7%.
+          </p>
+        </article>
+        <article class="tarjeta ficha-serie">
+          <h3>BCRA (oficial)</h3>
+          <p>
+            La serie de tipo de cambio real que publica el Banco Central
+            (tipo_cambio_real_estados_unidos). Tiene varios meses de rezago de
+            publicación: el último dato casi nunca es del mes en curso.
+          </p>
+        </article>
+      </section>
+    </main>
+
+    <footer class="pie">
+      <div class="contenido">
+        <p>
+          Página de prueba, sin terminar. <a href="./">Volver a la calculadora</a> ·
+          <a href="https://github.com/abenassi/calculadora-inflacion-ar" rel="noopener"
+            >Código en GitHub</a
+          >
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="./src/ui/tcr-main.ts"></script>
+  </body>
+</html>

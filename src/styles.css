@@ -134,6 +134,29 @@ h1 {
   padding: 1.25rem;
 }
 
+/*
+ * Las fichas explicativas de /tcr.html: qué mide cada serie y su limitación
+ * principal, fijas y sin interacción — mismo criterio de grid que `.datos-clave`
+ * (auto-fit, nunca una columna fija) pero con lugar para prosa en vez de un número.
+ */
+.fichas-series {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.ficha-serie h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+}
+
+.ficha-serie p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
 .formulario {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
