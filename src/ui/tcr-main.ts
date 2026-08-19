@@ -12,7 +12,7 @@
 import { calcularTcrBilateral, reescalarCrossCheck } from "../engine/actualizar.js";
 import type { PuntoActualizadoDoble } from "../engine/actualizar.js";
 import { abreviarMes, esMesValido, nombrarMes } from "../engine/mes.js";
-import type { Mes, SerieIndice, SerieValores } from "../engine/types.js";
+import type { Mes, PuntoValor, SerieIndice, SerieValores } from "../engine/types.js";
 import { dibujarComparacionTcr } from "./chart-tcr.js";
 import { fechaLarga } from "./format.js";
 import { moverSlider, rangoDesdeIndices, rangoInicial, reajustarRango } from "./rango-slider.js";
@@ -111,7 +111,14 @@ function faltaOficialEnRango(desdeIdx: number, hastaIdx: number): boolean {
 }
 
 type ResultadoCrossCheck = {
-  serie: { label: string; valores: (number | null)[] };
+  /**
+   * `undefined` cuando el rango visible no se superpone con la cobertura del
+   * cross-check: no hay nada que graficar, y una serie toda en `null` igual haría
+   * que `chart-tcr.ts` sume una entrada de leyenda que no dibuja nada y un eje `y1`
+   * completo con el rango 0–1 por default de Chart.js — visualmente roto. Mismo
+   * criterio que `armarOverlay` en `actualizar-main.ts`.
+   */
+  serie?: { label: string; valores: (number | null)[] };
   /** `undefined` = no mostrar ninguna nota. */
   nota?: string;
 };
@@ -129,11 +136,9 @@ function armarCrossCheck(mesesVisibles: Mes[]): ResultadoCrossCheck | undefined 
   const reescalado = reescalarCrossCheck(crossCheckDatos.datos, mesAncla);
   const valores = alinearPorMes(reescalado, mesesVisibles);
 
-  const serie = { label: "Tipo de cambio real vs. EE.UU. (BCRA, índice)", valores };
-
   if (valores.some((v) => v !== null)) {
     return {
-      serie,
+      serie: { label: "Tipo de cambio real vs. EE.UU. (BCRA, índice)", valores },
       nota:
         `La línea del BCRA es una comparación de forma, no de nivel: está reescalada a 100 en ` +
         `${nombrarMes(mesAncla)} (su último dato disponible), porque es un índice y no un monto ` +
@@ -142,7 +147,6 @@ function armarCrossCheck(mesesVisibles: Mes[]): ResultadoCrossCheck | undefined 
   }
 
   return {
-    serie,
     nota:
       `El BCRA no tiene dato de tipo de cambio real en el rango que se está mostrando ` +
       `(su serie llega hasta ${nombrarMes(mesAncla)}); el gráfico muestra igual las dos curvas propias.`,
@@ -233,12 +237,40 @@ function indiceDeMes(mes: string | null): number {
   return meses.findIndex((m) => m === mes);
 }
 
+/**
+ * Descarta los puntos de un mes todavía no publicado por IPC o CPI de EE.UU.
+ *
+ * `dolar.json` (oficial) y `dolar-blue.json` se cachean con `funcion_colapso: "last"`/
+ * `"avg"` sobre el mes en curso, sin filtrar `periodo_incompleto` en el caso del
+ * oficial (ver `construirAuxiliar` en `scripts/fetch-snapshot.ts`) — así que pueden
+ * traer un mes corriente, sin cerrar, que nadie publicó todavía. Pasarlo tal cual a
+ * `calcularTcrBilateral` hace que el motor complete ese mes con `ventana_reciente`
+ * (la tasa del mes anterior, prestada) sin ninguna marca visual de que ese punto es
+ * distinto al resto — mezclando dato y estimación sin decirlo. Recortar acá, contra
+ * el último mes oficial de las dos series de inflación que entran en la cuenta, es
+ * más barato que tocar el pipeline (que es un cambio más grande, fuera de alcance).
+ */
+function sinMesesIncompletos(datos: PuntoValor[]): PuntoValor[] {
+  const tope = ipc.ultimo_oficial < cpiUs.ultimo_oficial ? ipc.ultimo_oficial : cpiUs.ultimo_oficial;
+  return datos.filter((p) => p.mes <= tope);
+}
+
 function calcular(rangoUrl?: { desde: string | null; hasta: string | null }): void {
   const mesObjetivo = leerObjetivo();
   mesObjetivoTexto = nombrarMes(mesObjetivo);
 
-  const blue: PuntoActualizadoDoble[] = calcularTcrBilateral(dolarBlue.datos, mesObjetivo, ipc, cpiUs);
-  const oficial: PuntoActualizadoDoble[] = calcularTcrBilateral(dolarOficial.datos, mesObjetivo, ipc, cpiUs);
+  const blue: PuntoActualizadoDoble[] = calcularTcrBilateral(
+    sinMesesIncompletos(dolarBlue.datos),
+    mesObjetivo,
+    ipc,
+    cpiUs,
+  );
+  const oficial: PuntoActualizadoDoble[] = calcularTcrBilateral(
+    sinMesesIncompletos(dolarOficial.datos),
+    mesObjetivo,
+    ipc,
+    cpiUs,
+  );
 
   const eje = armarEjeYSeries(blue, oficial);
   meses = eje.meses;
@@ -287,8 +319,8 @@ function actualizarBadge(): void {
   const badge = el("badge-serie");
   badge.replaceChildren(
     document.createTextNode(
-      "Dólar blue y dólar oficial (Ámbito Financiero), a tipo de cambio real según el IPC del " +
-        "INDEC y el BCRA y la inflación de Estados Unidos (BLS/FRED) · datos vía ",
+      "Dólar blue (Ámbito Financiero) y dólar oficial (BCRA), a tipo de cambio real según el IPC " +
+        "del INDEC y la inflación de Estados Unidos (BLS/FRED) · datos vía ",
     ),
     (() => {
       const a = document.createElement("a");
