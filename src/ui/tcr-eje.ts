@@ -7,7 +7,9 @@
  * meses que no cubre en vez de recortar el gráfico entero a su propio piso.
  */
 import type { PuntoActualizadoDoble } from "../engine/actualizar.js";
-import type { Mes } from "../engine/types.js";
+import { reescalarCrossCheck } from "../engine/actualizar.js";
+import { nombrarMes } from "../engine/mes.js";
+import type { Mes, SerieValores } from "../engine/types.js";
 
 /** Un punto con mes y valor — lo mínimo que hace falta para alinear contra un eje. */
 type ConMes = { mes: Mes; valor: number };
@@ -43,5 +45,46 @@ export function armarEjeYSeries(
     meses,
     blue: alinearPorMes(aConMes(blue), meses),
     oficial: alinearPorMes(aConMes(oficial), meses),
+  };
+}
+
+export type LineaBcra = {
+  /** Ausente si el snapshot no trae la serie, o si no cubre ningún mes del rango visible. */
+  serie?: { label: string; valores: (number | null)[] };
+  /** Ausente = no mostrar ninguna nota. */
+  nota?: string;
+};
+
+/**
+ * Arma una línea del BCRA (el cross-check bilateral o el multilateral, mismo trato
+ * para las dos) alineada a `mesesVisibles`. Se reancla al ÚLTIMO DATO PROPIO de la
+ * serie, no al mes objetivo que eligió quien usa la página: es una comparación de
+ * forma, no de nivel (el BCRA publica con rezago), y reanclar al mes objetivo haría
+ * que la línea desapareciera cada vez que ese mes todavía no tiene dato del BCRA.
+ * Mismo criterio que ya usaba `armarCrossCheck` en `tcr-main.ts` antes de que hubiera
+ * una segunda línea del BCRA — factorizado acá para no repetir el mismo cálculo dos
+ * veces (regla 4 de AGENTS.md).
+ */
+export function armarLineaBcra(datos: SerieValores | null, mesesVisibles: Mes[], label: string): LineaBcra {
+  if (!datos) return {};
+
+  const mesAncla = datos.datos.at(-1)!.mes;
+  const reescalado = reescalarCrossCheck(datos.datos, mesAncla);
+  const valores = alinearPorMes(reescalado, mesesVisibles);
+
+  if (valores.some((v) => v !== null)) {
+    return {
+      serie: { label, valores },
+      nota:
+        `La línea del BCRA es una comparación de forma, no de nivel: está reescalada a 100 en ` +
+        `${nombrarMes(mesAncla)} (su último dato disponible), porque es un índice y no un monto ` +
+        `en pesos. Que las curvas se muevan parecido no significa que valgan lo mismo.`,
+    };
+  }
+
+  return {
+    nota:
+      `El BCRA no tiene dato de tipo de cambio real en el rango que se está mostrando ` +
+      `(su serie llega hasta ${nombrarMes(mesAncla)}); el gráfico muestra igual las otras curvas.`,
   };
 }

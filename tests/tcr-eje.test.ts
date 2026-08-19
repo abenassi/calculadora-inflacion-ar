@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import type { PuntoActualizadoDoble } from "../src/engine/actualizar.js";
-import { alinearPorMes, armarEjeYSeries } from "../src/ui/tcr-eje.js";
+import type { SerieValores } from "../src/engine/types.js";
+import { alinearPorMes, armarEjeYSeries, armarLineaBcra } from "../src/ui/tcr-eje.js";
 
 describe("alinearPorMes", () => {
   it("devuelve el valor de cada mes del eje cuando está presente", () => {
@@ -62,5 +63,37 @@ describe("armarEjeYSeries", () => {
     expect(r.meses).toEqual(["2020-01"]);
     expect(r.blue).toEqual([111]);
     expect(r.oficial).toEqual([222]);
+  });
+});
+
+describe("armarLineaBcra", () => {
+  const serie = (datos: { mes: string; valor: number }[]): SerieValores => ({
+    serie: "test",
+    unidad: "Índice 17-Dic-2015=100",
+    fuentes: [{ id: "bcra", organismo: "BCRA", rango: "2020-01/2020-03" }],
+    actualizado: "2026-01-01T00:00:00.000Z",
+    datos,
+  });
+
+  it("sin datos (archivo ausente del snapshot), no hay serie ni nota", () => {
+    const r = armarLineaBcra(null, ["2020-01", "2020-02"], "Test (BCRA, índice)");
+    expect(r).toEqual({});
+  });
+
+  it("con datos que cubren el rango visible, reescala a 100 en el último dato propio", () => {
+    const datos = serie([
+      { mes: "2020-01", valor: 50 },
+      { mes: "2020-02", valor: 100 },
+    ]);
+    const r = armarLineaBcra(datos, ["2020-01", "2020-02"], "Test (BCRA, índice)");
+    expect(r.serie).toEqual({ label: "Test (BCRA, índice)", valores: [50, 100] });
+    expect(r.nota).toMatch(/comparación de forma, no de nivel/);
+  });
+
+  it("con datos que no cubren el rango visible, no hay serie y avisa por qué", () => {
+    const datos = serie([{ mes: "2019-06", valor: 80 }]);
+    const r = armarLineaBcra(datos, ["2020-01", "2020-02"], "Test (BCRA, índice)");
+    expect(r.serie).toBeUndefined();
+    expect(r.nota).toMatch(/no tiene dato de tipo de cambio real/);
   });
 });
