@@ -36,6 +36,9 @@ type Tokens = {
   serie: string;
   /** Segunda serie categórica, para el overlay del cross-check en `chart-serie.ts`. */
   serie2: string;
+  /** Tercera serie categórica: en `/tcr.html`, el cross-check del BCRA (las dos
+   *  curvas reales ya usan `serie`/`serie2`). */
+  serie3: string;
   grilla: string;
   eje: string;
   texto: string;
@@ -48,6 +51,7 @@ export function tokens(): Tokens {
   return {
     serie: leer("--series-1", "#2a78d6"),
     serie2: leer("--series-2", "#c96a1f"),
+    serie3: leer("--series-3", "#9c4ea1"),
     grilla: leer("--gridline", "#e1e0d9"),
     eje: leer("--muted", "#898781"),
     texto: leer("--text-primary", "#0b0b0b"),

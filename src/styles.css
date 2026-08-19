@@ -23,6 +23,18 @@
      el par más distinguible del azul de `--series-1` para daltonismo (protanopía y
      deuteranopía), y una tercera serie nunca se confunde con la principal. */
   --series-2: #c96a1f;
+  /* Tercera serie categórica, para el cross-check del BCRA en `/tcr.html` — ahí
+     `--series-1`/`--series-2` ya están ocupados por las dos curvas reales (blue,
+     oficial), así que el cross-check necesita un tercer color. Violeta-magenta,
+     validado con el script del skill de dataviz contra las dos superficies. El
+     punto de partida (#7a63c9) pasaba el chequeo de pares *adyacentes*, pero
+     `/tcr.html` muestra las tres series juntas en el mismo gráfico, así que lo que
+     importa es el par 1↔3 (nunca comparado por default): con `--pairs all` ese
+     violeta quedaba a ΔE 9.7 de `--series-1`, por debajo del piso de 15 y
+     indistinguible incluso con visión normal. Este tono, corrido de matiz
+     ~325° OKLCH (más magenta, más lejos del azul y del naranja a la vez), pasa
+     los 5 checks con `--pairs all` en claro (ΔE normal 18.0, CVD 9.5). */
+  --series-3: #9c4ea1;
   --warning: #fab219;
   --critical: #d03b3b;
 
@@ -48,6 +60,13 @@
 
     --series-1: #3987e5;
     --series-2: #e8935c;
+    /* Mismo matiz que en claro (~325° OKLCH), corrido a L=0.60/C=0.15 para caer
+       dentro de la banda de luminosidad oscura del validador. Con `--pairs all`:
+       ΔE normal 18.0 y CVD (peor de protan/deutan) 9.1 contra `--series-1`. Nota:
+       `--series-2` en este mismo bloque (#e8935c, L≈0.74) no pasa el chequeo de
+       banda de luminosidad de la versión actual del validador — preexistente a
+       este cambio y fuera de alcance acá; ver el reporte de esta tarea. */
+    --series-3: #ac5db1;
 
     --wash-estimado: #2a2415;
     --wash-hover: #242422;
