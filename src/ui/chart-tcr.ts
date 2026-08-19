@@ -52,6 +52,14 @@ export function dibujarComparacionTcr(
 ): void {
   const t = tokens();
   const coloresIndice = [t.serie3, t.serie4];
+  if (lineasIndice.length > coloresIndice.length) {
+    // Sin este guard, una tercera línea de índice se dibujaría con `borderColor:
+    // undefined` en silencio — Chart.js no tira ningún error, sólo pierde el color
+    // de esa serie. Mejor fallar fuerte acá que dejar que el gráfico mienta.
+    throw new Error(
+      `dibujarComparacionTcr: ${lineasIndice.length} líneas de índice, sólo hay ${coloresIndice.length} colores`,
+    );
+  }
   const hayLineasIndice = lineasIndice.length > 0;
 
   const datasets: ChartDataset<"line", (number | null)[]>[] = [

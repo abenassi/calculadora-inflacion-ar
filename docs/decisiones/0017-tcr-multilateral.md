@@ -76,3 +76,43 @@ datos.gob.ar dejó de republicar esta familia de series.
   bilateral (pregunta abierta de 0016, sigue abierta, no es parte de este
   cambio).
 - No se toca `/actualizar.html`.
+
+## El loop de revisión
+
+Los tres agentes especializados de `.claude/agents/` no se registraron en esta
+sesión — la misma limitación ya anotada en 0016 (se necesita abrir Claude Code
+directo en este directorio, no desde uno padre). Se reemplazaron por agentes
+genéricos que leyeron cada definición (`revisor-economista.md`,
+`revisora-usuaria.md`, `revisor-codigo.md`) y adoptaron esa persona antes de
+revisar — mismo criterio y mismo formato de reporte, con la salvedad de que no
+son el agente nativo.
+
+Los tres, de forma independiente, encontraron el mismo hallazgo Bloqueante:
+las dos notas de metodología del BCRA (bilateral y multilateral) usaban el
+mismo texto genérico sin decir a cuál línea se referían — y como las dos
+series comparten hoy el mismo último dato (el atraso de 7 meses de arriba),
+quedaban como el mismo párrafo repetido dos veces en la vista por defecto, sin
+ningún parámetro especial en la URL. Se corrigió: `armarLineaBcra` ahora recibe
+un `nombreCorto` ("bilateral"/"multilateral") y lo incluye en la nota.
+
+De paso se corrigieron tres Importantes que salieron de la misma vuelta:
+
+- El `<h2>` del panel decía "bilateral vs. Estados Unidos" a pesar de que el
+  gráfico debajo ya incluía la línea multilateral (economista, usuaria).
+- La nota de "sin dato en el rango" sólo reportaba dónde termina la cobertura
+  de la serie (`mesAncla`), nunca dónde empieza — con el multilateral, que
+  arranca diez años más tarde que el resto de la página (2012-05, no 2002-01),
+  eso hacía leer "El BCRA no tiene dato... llega hasta enero 2026" como si el
+  problema fuera que la serie terminó, cuando en realidad todavía no había
+  empezado (economista). Ahora reporta las dos puntas.
+- `coloresIndice[i]!` en `chart-tcr.ts` asumía sin verificarlo que nunca iba a
+  haber más de dos líneas de índice; se agregó un guard que tira si esa
+  invariante se rompe, en vez de dejar que Chart.js dibuje un color
+  `undefined` en silencio (código).
+
+Quedaron anotados y **no se tocaron**, por menores y no bloqueantes:
+
+- El pie de fuente (`badge-serie`) sigue sin mencionar al BCRA como fuente de
+  ninguna de las dos líneas — así era desde 0016, no lo introdujo este cambio.
+- "Varios meses de rezago" en las fichas, sin cuantificar el número — decisión
+  de estilo (no atarse a un número que cambia solo), no un error.

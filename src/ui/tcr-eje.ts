@@ -64,10 +64,22 @@ export type LineaBcra = {
  * Mismo criterio que ya usaba `armarCrossCheck` en `tcr-main.ts` antes de que hubiera
  * una segunda línea del BCRA — factorizado acá para no repetir el mismo cálculo dos
  * veces (regla 4 de AGENTS.md).
+ *
+ * `nombreCorto` ("bilateral"/"multilateral") va en la nota, no en `label`: las dos
+ * líneas del BCRA hoy terminan en el mismo mes (la misma familia de series, mismo
+ * rezago de publicación — ver docs/decisiones/0017), así que sin identificar a cuál
+ * línea se refiere cada nota, las dos quedan como el mismo párrafo repetido dos
+ * veces — hallazgo de los tres revisores en la vuelta que agregó la segunda línea.
  */
-export function armarLineaBcra(datos: SerieValores | null, mesesVisibles: Mes[], label: string): LineaBcra {
+export function armarLineaBcra(
+  datos: SerieValores | null,
+  mesesVisibles: Mes[],
+  label: string,
+  nombreCorto: string,
+): LineaBcra {
   if (!datos) return {};
 
+  const primerMes = datos.datos[0]!.mes;
   const mesAncla = datos.datos.at(-1)!.mes;
   const reescalado = reescalarCrossCheck(datos.datos, mesAncla);
   const valores = alinearPorMes(reescalado, mesesVisibles);
@@ -76,15 +88,20 @@ export function armarLineaBcra(datos: SerieValores | null, mesesVisibles: Mes[],
     return {
       serie: { label, valores },
       nota:
-        `La línea del BCRA es una comparación de forma, no de nivel: está reescalada a 100 en ` +
-        `${nombrarMes(mesAncla)} (su último dato disponible), porque es un índice y no un monto ` +
-        `en pesos. Que las curvas se muevan parecido no significa que valgan lo mismo.`,
+        `La línea del BCRA (${nombreCorto}) es una comparación de forma, no de nivel: está reescalada ` +
+        `a 100 en ${nombrarMes(mesAncla)} (su último dato disponible), porque es un índice y no un ` +
+        `monto en pesos. Que las curvas se muevan parecido no significa que valgan lo mismo.`,
     };
   }
 
   return {
+    // Reporta las dos puntas de cobertura (no sólo dónde termina la serie): con el
+    // multilateral, que arranca recién en 2012, un rango de antes de esa fecha no
+    // tiene dato porque la serie TODAVÍA no empezó, no porque ya haya terminado —
+    // decir sólo "llega hasta <mesAncla>" sugeriría lo segundo.
     nota:
-      `El BCRA no tiene dato de tipo de cambio real en el rango que se está mostrando ` +
-      `(su serie llega hasta ${nombrarMes(mesAncla)}); el gráfico muestra igual las otras curvas.`,
+      `El BCRA (${nombreCorto}) no tiene dato de tipo de cambio real en el rango que se está mostrando ` +
+      `(su serie cubre ${nombrarMes(primerMes)}–${nombrarMes(mesAncla)}); el gráfico muestra igual las ` +
+      `otras curvas.`,
   };
 }

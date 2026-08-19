@@ -76,7 +76,7 @@ describe("armarLineaBcra", () => {
   });
 
   it("sin datos (archivo ausente del snapshot), no hay serie ni nota", () => {
-    const r = armarLineaBcra(null, ["2020-01", "2020-02"], "Test (BCRA, índice)");
+    const r = armarLineaBcra(null, ["2020-01", "2020-02"], "Test (BCRA, índice)", "bilateral");
     expect(r).toEqual({});
   });
 
@@ -85,15 +85,33 @@ describe("armarLineaBcra", () => {
       { mes: "2020-01", valor: 50 },
       { mes: "2020-02", valor: 100 },
     ]);
-    const r = armarLineaBcra(datos, ["2020-01", "2020-02"], "Test (BCRA, índice)");
+    const r = armarLineaBcra(datos, ["2020-01", "2020-02"], "Test (BCRA, índice)", "bilateral");
     expect(r.serie).toEqual({ label: "Test (BCRA, índice)", valores: [50, 100] });
     expect(r.nota).toMatch(/comparación de forma, no de nivel/);
   });
 
   it("con datos que no cubren el rango visible, no hay serie y avisa por qué", () => {
     const datos = serie([{ mes: "2019-06", valor: 80 }]);
-    const r = armarLineaBcra(datos, ["2020-01", "2020-02"], "Test (BCRA, índice)");
+    const r = armarLineaBcra(datos, ["2020-01", "2020-02"], "Test (BCRA, índice)", "bilateral");
     expect(r.serie).toBeUndefined();
     expect(r.nota).toMatch(/no tiene dato de tipo de cambio real/);
+  });
+
+  it("la nota identifica a cuál línea se refiere, para no repetir el mismo texto en las dos", () => {
+    const datos = serie([
+      { mes: "2020-01", valor: 50 },
+      { mes: "2020-02", valor: 100 },
+    ]);
+    const bilateral = armarLineaBcra(datos, ["2020-01", "2020-02"], "Bilateral (BCRA, índice)", "bilateral");
+    const multilateral = armarLineaBcra(datos, ["2020-01", "2020-02"], "Multilateral (BCRA, índice)", "multilateral");
+    expect(bilateral.nota).toMatch(/\(bilateral\)/);
+    expect(multilateral.nota).toMatch(/\(multilateral\)/);
+    expect(bilateral.nota).not.toEqual(multilateral.nota);
+  });
+
+  it("cuando no cubre el rango, la nota reporta las dos puntas de cobertura, no sólo dónde termina", () => {
+    const datos = serie([{ mes: "2012-05", valor: 80 }]);
+    const r = armarLineaBcra(datos, ["2005-01", "2005-02"], "Test (BCRA, índice)", "multilateral");
+    expect(r.nota).toMatch(/cubre mayo 2012–mayo 2012/);
   });
 });

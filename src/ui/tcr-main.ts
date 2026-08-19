@@ -168,10 +168,15 @@ function redibujar(): void {
   if (!notaCobertura.hidden) {
     notaCobertura.textContent =
       "El dólar oficial minorista tiene serie desde junio de 2010; antes de esa fecha " +
-      "el gráfico muestra sólo TCR-blue y BCRA.";
+      "el gráfico muestra sólo TCR-blue y las líneas del BCRA.";
   }
 
-  const bilateral = armarLineaBcra(crossCheckDatos, mesesVisibles, "Tipo de cambio real vs. EE.UU. (BCRA, índice)");
+  const bilateral = armarLineaBcra(
+    crossCheckDatos,
+    mesesVisibles,
+    "Tipo de cambio real vs. EE.UU. (BCRA, índice)",
+    "bilateral",
+  );
   notaCrossCheck.hidden = bilateral.nota === undefined;
   notaCrossCheck.textContent = bilateral.nota ?? "";
 
@@ -179,6 +184,7 @@ function redibujar(): void {
     multilateralDatos,
     mesesVisibles,
     "Tipo de cambio real multilateral (BCRA, índice)",
+    "multilateral",
   );
   notaMultilateral.hidden = multilateral.nota === undefined;
   notaMultilateral.textContent = multilateral.nota ?? "";
