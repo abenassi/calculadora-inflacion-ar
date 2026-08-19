@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   actualizarSerie,
   actualizarSerieDoble,
+  calcularTcrBilateral,
   reescalarCrossCheck,
 } from "../src/engine/actualizar.js";
 import { adjust } from "../src/engine/adjust.js";
@@ -340,5 +341,42 @@ describe("reescalarCrossCheck", () => {
 
   it("devuelve vacío si el mes objetivo no está en la serie, en vez de tirar", () => {
     expect(reescalarCrossCheck(serie, "2025-01")).toEqual([]);
+  });
+});
+
+describe("calcularTcrBilateral", () => {
+  // Mismo CPI de EE.UU. sintético que usa el describe de `actualizarSerieDoble` más
+  // arriba en este archivo: 2% mensual clavado (ene 100 · feb 102 · mar 104,04 · abr
+  // 106,1208). Duplicado a propósito, no importado del otro `describe`, para no
+  // acoplar los dos bloques de test entre sí — mismo criterio que ya sigue el resto
+  // del archivo con el fixture de `ipc`.
+  const cpiUs: SerieIndice = {
+    serie: "test-cpi-us",
+    base: "2020-01=100",
+    fuentes: [],
+    ultimo_oficial: "2020-04",
+    actualizado: "2020-06-01T00:00:00Z",
+    datos: [
+      { mes: "2020-01", indice: 100, origen: "fred" },
+      { mes: "2020-02", indice: 102, origen: "fred" },
+      { mes: "2020-03", indice: 104.04, origen: "fred" },
+      { mes: "2020-04", indice: 106.1208, origen: "fred" },
+    ],
+  };
+
+  it("da exactamente lo mismo que actualizarSerieDoble con dirección 'multiplicar'", () => {
+    const datos = [{ mes: "2020-01", valor: 50 }];
+    const r = calcularTcrBilateral(datos, "2020-04", ipc, cpiUs);
+    const esperado = actualizarSerieDoble(datos, "2020-04", ipc, cpiUs, "multiplicar");
+    expect(r).toEqual(esperado);
+  });
+
+  it("reproduce el punto de control ya verificado a mano (62,711551)", () => {
+    // Mismo punto de control que el describe de `actualizarSerieDoble`: dólar de $50
+    // en enero de 2020 a pesos-TCR de abril de 2020.
+    const r = calcularTcrBilateral([{ mes: "2020-01", valor: 50 }], "2020-04", ipc, cpiUs);
+    expect(r).toHaveLength(1);
+    expect(r[0]!.valorSoloBase).toBeCloseTo(66.55, 6);
+    expect(r[0]!.valorActualizado).toBeCloseTo(62.711551, 4);
   });
 });

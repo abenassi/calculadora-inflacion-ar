@@ -140,6 +140,23 @@ export function actualizarSerieDoble(
 }
 
 /**
+ * `actualizarSerieDoble` con la dirección fija en `"multiplicar"` — la única que
+ * tiene sentido económico para un tipo de cambio real (ver
+ * `docs/superpowers/specs/2026-08-17-tipo-cambio-real-design.md`, sección "La
+ * cuenta": la primera versión de ese spec tuvo el signo invertido dos veces antes de
+ * llegar a código). `/tcr.html` nunca necesita elegir dirección porque sólo compone
+ * un índice de precios de otro país sobre una cotización — no hay un segundo caso.
+ */
+export function calcularTcrBilateral(
+  datos: PuntoValor[],
+  mesObjetivo: Mes,
+  ipc: SerieIndice,
+  cpiUs: SerieIndice,
+): PuntoActualizadoDoble[] {
+  return actualizarSerieDoble(datos, mesObjetivo, ipc, cpiUs, "multiplicar");
+}
+
+/**
  * Reescala una serie de valores para que el punto de `mesObjetivo` valga exactamente
  * 100 — usado para superponer el cross-check del BCRA (que es un índice en su propia
  * base) sobre el gráfico de `valorActualizado` (que está en pesos), en un eje
