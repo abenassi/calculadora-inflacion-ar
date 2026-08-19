@@ -9,7 +9,7 @@
  * objetivo: las tres series (TCR-blue, TCR-oficial, BCRA) están fijas — ver
  * `docs/superpowers/specs/2026-08-19-tcr-page-design.md`.
  */
-import { calcularTcrBilateral } from "../engine/actualizar.js";
+import { calcularTcrBilateral, reescalarCrossCheck } from "../engine/actualizar.js";
 import type { PuntoActualizadoDoble } from "../engine/actualizar.js";
 import { abreviarMes, esMesValido, nombrarMes } from "../engine/mes.js";
 import type { Mes, SerieIndice, SerieValores } from "../engine/types.js";
@@ -126,8 +126,7 @@ function armarCrossCheck(mesesVisibles: Mes[]): ResultadoCrossCheck | undefined 
   if (!crossCheckDatos) return undefined;
 
   const mesAncla = crossCheckDatos.datos.at(-1)!.mes;
-  const base = crossCheckDatos.datos.find((p) => p.mes === mesAncla)!.valor;
-  const reescalado = crossCheckDatos.datos.map((p) => ({ mes: p.mes, valor: (p.valor / base) * 100 }));
+  const reescalado = reescalarCrossCheck(crossCheckDatos.datos, mesAncla);
   const valores = alinearPorMes(reescalado, mesesVisibles);
 
   const serie = { label: "Tipo de cambio real vs. EE.UU. (BCRA, índice)", valores };
