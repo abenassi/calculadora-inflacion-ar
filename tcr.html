@@ -17,9 +17,9 @@
         <h1>Tipo de cambio real</h1>
         <p class="bajada">
           El dólar blue y el dólar oficial, medidos en tipo de cambio real bilateral
-          contra Estados Unidos, comparados con la serie que publica el BCRA. Elegí a
-          qué mes se reexpresan los pesos — las tres series y sus limitaciones están
-          fijas, no hay nada más para elegir.
+          contra Estados Unidos, comparados con las series que publica el BCRA
+          (bilateral y multilateral). Elegí a qué mes se reexpresan los pesos — las
+          series y sus limitaciones están fijas, no hay nada más para elegir.
         </p>
       </div>
     </header>
@@ -45,7 +45,7 @@
           <canvas
             id="grafico"
             role="img"
-            aria-label="Dólar blue y dólar oficial en tipo de cambio real bilateral contra Estados Unidos, con la serie del BCRA de referencia"
+            aria-label="Dólar blue y dólar oficial en tipo de cambio real bilateral contra Estados Unidos, con las series bilateral y multilateral del BCRA de referencia"
           ></canvas>
           <!-- Reemplaza al canvas —nunca conviven— cuando no hay nada que graficar:
                sin meses (el mes objetivo cae antes de 2002-01, piso del CPI de
@@ -63,11 +63,13 @@
             <input type="range" id="rango-hasta" min="0" max="0" value="0" />
           </div>
         </div>
-        <!-- Las dos notas las arma `redibujar`/`armarCrossCheck` en tcr-main.ts: la
+        <!-- Las tres notas las arma `redibujar`/`armarLineaBcra` en tcr-main.ts: la
              primera avisa cuando el rango visible queda antes de junio de 2010 (TCR-
-             oficial no tiene dato ahí); la segunda explica el reescalado del BCRA. -->
+             oficial no tiene dato ahí); la segunda y la tercera explican el
+             reescalado de cada línea del BCRA (bilateral, multilateral). -->
         <p class="nota-metodologia" id="nota-cobertura-oficial" hidden></p>
         <p class="nota-metodologia" id="nota-cross-check" hidden></p>
+        <p class="nota-metodologia" id="nota-multilateral" hidden></p>
         <p class="badge" id="badge-serie">
           Dólar blue (Ámbito Financiero) y dólar oficial (BCRA), a tipo de cambio real
           según el IPC del INDEC y la inflación de Estados Unidos (BLS/FRED) · datos
@@ -96,11 +98,22 @@
           </p>
         </article>
         <article class="tarjeta ficha-serie">
-          <h3>BCRA (oficial)</h3>
+          <h3>BCRA (bilateral)</h3>
           <p>
-            La serie de tipo de cambio real que publica el Banco Central
-            (tipo_cambio_real_estados_unidos). Tiene varios meses de rezago de
-            publicación: el último dato casi nunca es del mes en curso.
+            La serie de tipo de cambio real bilateral contra Estados Unidos que
+            publica el Banco Central (tipo_cambio_real_estados_unidos). Tiene varios
+            meses de rezago de publicación: el último dato casi nunca es del mes en
+            curso.
+          </p>
+        </article>
+        <article class="tarjeta ficha-serie">
+          <h3>BCRA (multilateral)</h3>
+          <p>
+            El Índice de Tipo de Cambio Real Multilateral que publica el Banco
+            Central: pondera el tipo de cambio real contra la canasta de monedas de
+            los principales socios comerciales, no sólo el dólar. Es la referencia
+            que el propio BCRA usa para medir competitividad. Tiene el mismo rezago
+            de publicación que el resto de las líneas del BCRA en esta página.
           </p>
         </article>
       </section>

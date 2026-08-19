@@ -35,6 +35,14 @@
      ~325° OKLCH (más magenta, más lejos del azul y del naranja a la vez), pasa
      los 5 checks con `--pairs all` en claro (ΔE normal 18.0, CVD 9.5). */
   --series-3: #9c4ea1;
+  /* Cuarto color categórico, para el cross-check multilateral del BCRA en
+     `/tcr.html`, que ahora muestra hasta cuatro series a la vez — se valida con
+     `--pairs all`, igual que `--series-3` (ver su nota arriba), porque las cuatro
+     conviven en el mismo gráfico. Verde azulado (~172° OKLCH), matiz sin usar por
+     ninguna otra serie del sitio, elegido barriendo el espacio OKLCH por L/C similar
+     al resto y confirmado con el validador: `--pairs all` en claro pasa los 5 checks
+     sin ningún WARN (peor par #9c4ea1↔#2a78d6, ΔE normal 18.0, CVD 9.5). */
+  --series-4: #329e82;
   --warning: #fab219;
   --critical: #d03b3b;
 
@@ -67,6 +75,10 @@
        banda de luminosidad de la versión actual del validador — preexistente a
        este cambio y fuera de alcance acá; ver el reporte de esta tarea. */
     --series-3: #ac5db1;
+    /* Mismo matiz que en claro, corrido a la banda de luminosidad oscura. Con
+       `--pairs all`: CVD 9.1, normal-vision 18.0, ambos por encima del piso —
+       ver la nota completa en `--series-4` del bloque claro. */
+    --series-4: #288e6c;
 
     --wash-estimado: #2a2415;
     --wash-hover: #242422;

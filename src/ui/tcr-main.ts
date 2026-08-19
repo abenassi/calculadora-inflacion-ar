@@ -1,23 +1,26 @@
 /**
  * Orquestación de `/tcr.html`: lee el mes objetivo, calcula el tipo de cambio real
  * bilateral (vs. Estados Unidos) del dólar blue y del dólar oficial, y los grafica
- * junto a la serie oficial del BCRA. Ninguna cuenta de inflación se hace acá — vive
- * en `calcularTcrBilateral` (motor) y en `armarEjeYSeries`/`alinearPorMes`
- * (alineación de series para el gráfico, en `tcr-eje.ts`).
+ * junto a las líneas del BCRA (bilateral y multilateral). Ninguna cuenta de
+ * inflación se hace acá — vive en `calcularTcrBilateral` (motor) y en
+ * `armarEjeYSeries`/`alinearPorMes`/`armarLineaBcra` (alineación de series para el
+ * gráfico, en `tcr-eje.ts`).
  *
  * A diferencia de `/actualizar.html`, acá no hay nada para elegir salvo el mes
- * objetivo: las tres series (TCR-blue, TCR-oficial, BCRA) están fijas — ver
- * `docs/superpowers/specs/2026-08-19-tcr-page-design.md`.
+ * objetivo: las series (TCR-blue, TCR-oficial, BCRA bilateral, BCRA multilateral)
+ * están fijas — ver `docs/superpowers/specs/2026-08-19-tcr-page-design.md` y
+ * `docs/decisiones/0017-tcr-multilateral.md`.
  */
-import { calcularTcrBilateral, reescalarCrossCheck } from "../engine/actualizar.js";
+import { calcularTcrBilateral } from "../engine/actualizar.js";
 import type { PuntoActualizadoDoble } from "../engine/actualizar.js";
 import { abreviarMes, esMesValido, nombrarMes } from "../engine/mes.js";
 import type { Mes, PuntoValor, SerieIndice, SerieValores } from "../engine/types.js";
+import type { SerieTcrGraficada } from "./chart-tcr.js";
 import { dibujarComparacionTcr } from "./chart-tcr.js";
 import { fechaLarga } from "./format.js";
 import { moverSlider, rangoDesdeIndices, rangoInicial, reajustarRango } from "./rango-slider.js";
 import type { EstadoRango } from "./rango-slider.js";
-import { alinearPorMes, armarEjeYSeries } from "./tcr-eje.js";
+import { armarEjeYSeries, armarLineaBcra } from "./tcr-eje.js";
 
 const NOMBRES_MES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -43,6 +46,7 @@ let cpiUs: SerieIndice;
 let dolarBlue: SerieValores;
 let dolarOficial: SerieValores;
 let crossCheckDatos: SerieValores | null = null;
+let multilateralDatos: SerieValores | null = null;
 
 /** El eje temporal completo (unión de meses de blue y oficial), sin recortar por el slider. */
 let meses: Mes[] = [];
@@ -110,55 +114,13 @@ function faltaOficialEnRango(desdeIdx: number, hastaIdx: number): boolean {
   return valoresOficial.slice(desdeIdx, hastaIdx + 1).every((v) => v === null);
 }
 
-type ResultadoCrossCheck = {
-  /**
-   * `undefined` cuando el rango visible no se superpone con la cobertura del
-   * cross-check: no hay nada que graficar, y una serie toda en `null` igual haría
-   * que `chart-tcr.ts` sume una entrada de leyenda que no dibuja nada y un eje `y1`
-   * completo con el rango 0–1 por default de Chart.js — visualmente roto. Mismo
-   * criterio que `armarOverlay` en `actualizar-main.ts`.
-   */
-  serie?: { label: string; valores: (number | null)[] };
-  /** `undefined` = no mostrar ninguna nota. */
-  nota?: string;
-};
-
-/**
- * Arma la línea del BCRA alineada a `mesesVisibles`, o `undefined` si el snapshot no
- * trae cross-check. Mismo criterio que la decisión 0015: se reancla al último dato
- * del propio cross-check, no al mes objetivo, para que la línea no desaparezca por
- * default (el BCRA publica con meses de rezago).
- */
-function armarCrossCheck(mesesVisibles: Mes[]): ResultadoCrossCheck | undefined {
-  if (!crossCheckDatos) return undefined;
-
-  const mesAncla = crossCheckDatos.datos.at(-1)!.mes;
-  const reescalado = reescalarCrossCheck(crossCheckDatos.datos, mesAncla);
-  const valores = alinearPorMes(reescalado, mesesVisibles);
-
-  if (valores.some((v) => v !== null)) {
-    return {
-      serie: { label: "Tipo de cambio real vs. EE.UU. (BCRA, índice)", valores },
-      nota:
-        `La línea del BCRA es una comparación de forma, no de nivel: está reescalada a 100 en ` +
-        `${nombrarMes(mesAncla)} (su último dato disponible), porque es un índice y no un monto ` +
-        `en pesos. Que las curvas se muevan parecido no significa que valgan lo mismo.`,
-    };
-  }
-
-  return {
-    nota:
-      `El BCRA no tiene dato de tipo de cambio real en el rango que se está mostrando ` +
-      `(su serie llega hasta ${nombrarMes(mesAncla)}); el gráfico muestra igual las dos curvas propias.`,
-  };
-}
-
 function redibujar(): void {
   const canvas = el<HTMLCanvasElement>("grafico");
   const aviso = el("aviso-grafico");
   const rangoEl = el("rango");
   const notaCobertura = el("nota-cobertura-oficial");
   const notaCrossCheck = el("nota-cross-check");
+  const notaMultilateral = el("nota-multilateral");
 
   if (meses.length === 0) {
     canvas.hidden = true;
@@ -169,6 +131,7 @@ function redibujar(): void {
       "antes de enero de 2002 — elegí un mes objetivo posterior.";
     notaCobertura.hidden = true;
     notaCrossCheck.hidden = true;
+    notaMultilateral.hidden = true;
     sincronizarUrl();
     return;
   }
@@ -193,6 +156,7 @@ function redibujar(): void {
     aviso.textContent = "Elegí un rango más largo: con un solo mes no hay nada que graficar.";
     notaCobertura.hidden = true;
     notaCrossCheck.hidden = true;
+    notaMultilateral.hidden = true;
     sincronizarUrl();
     return;
   }
@@ -207,9 +171,21 @@ function redibujar(): void {
       "el gráfico muestra sólo TCR-blue y BCRA.";
   }
 
-  const crossCheck = armarCrossCheck(mesesVisibles);
-  notaCrossCheck.hidden = crossCheck?.nota === undefined;
-  notaCrossCheck.textContent = crossCheck?.nota ?? "";
+  const bilateral = armarLineaBcra(crossCheckDatos, mesesVisibles, "Tipo de cambio real vs. EE.UU. (BCRA, índice)");
+  notaCrossCheck.hidden = bilateral.nota === undefined;
+  notaCrossCheck.textContent = bilateral.nota ?? "";
+
+  const multilateral = armarLineaBcra(
+    multilateralDatos,
+    mesesVisibles,
+    "Tipo de cambio real multilateral (BCRA, índice)",
+  );
+  notaMultilateral.hidden = multilateral.nota === undefined;
+  notaMultilateral.textContent = multilateral.nota ?? "";
+
+  const lineasIndice: SerieTcrGraficada[] = [bilateral.serie, multilateral.serie].filter(
+    (s): s is SerieTcrGraficada => s !== undefined,
+  );
 
   dibujarComparacionTcr(
     canvas,
@@ -219,7 +195,7 @@ function redibujar(): void {
       label: `Dólar oficial, TCR a ${mesObjetivoTexto}`,
       valores: valoresOficial.slice(desdeIdx, hastaIdx + 1),
     },
-    crossCheck?.serie,
+    lineasIndice,
   );
 
   sincronizarUrl();
@@ -340,12 +316,13 @@ function actualizarBadge(): void {
 }
 
 async function iniciar(): Promise<void> {
-  const [rIpc, rCpiUs, rBlue, rOficial, rCrossCheck] = await Promise.all([
+  const [rIpc, rCpiUs, rBlue, rOficial, rCrossCheck, rMultilateral] = await Promise.all([
     fetch(`${import.meta.env.BASE_URL}data/ipc.json`),
     fetch(`${import.meta.env.BASE_URL}data/series/secundario-cpi-eeuu.json`),
     fetch(`${import.meta.env.BASE_URL}data/series/dolar-blue.json`),
     fetch(`${import.meta.env.BASE_URL}data/dolar.json`),
     fetch(`${import.meta.env.BASE_URL}data/series/crosscheck-cpi-eeuu.json`),
+    fetch(`${import.meta.env.BASE_URL}data/series/tcr-multilateral.json`),
   ]);
   if (!rIpc.ok) throw new Error(`No se pudo cargar el IPC (HTTP ${rIpc.status})`);
   if (!rCpiUs.ok) throw new Error(`No se pudo cargar la inflación de EE.UU. (HTTP ${rCpiUs.status})`);
@@ -356,10 +333,11 @@ async function iniciar(): Promise<void> {
   cpiUs = (await rCpiUs.json()) as SerieIndice;
   dolarBlue = (await rBlue.json()) as SerieValores;
   dolarOficial = (await rOficial.json()) as SerieValores;
-  // El cross-check es un adicional, nunca bloqueante: si el snapshot no lo trae (FRED
-  // o BCRA caídos el día del pipeline), la página funciona igual con las dos curvas
-  // propias — mismo criterio que ya usa `/actualizar.html`.
+  // Las dos líneas del BCRA son un adicional, nunca bloqueante: si el snapshot no las
+  // trae (BCRA caído el día del pipeline), la página funciona igual con las dos
+  // curvas propias — mismo criterio que ya usa `/actualizar.html`.
   crossCheckDatos = rCrossCheck.ok ? ((await rCrossCheck.json()) as SerieValores) : null;
+  multilateralDatos = rMultilateral.ok ? ((await rMultilateral.json()) as SerieValores) : null;
 
   poblarSelectorObjetivo();
   const { ultimo } = limiteObjetivo();

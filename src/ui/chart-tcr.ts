@@ -1,8 +1,8 @@
 /**
- * Gráfico de línea de `/tcr.html`: siempre tres series fijas — TCR-blue, TCR-oficial
- * y, si el snapshot lo trae, el cross-check del BCRA en un eje secundario (es un
- * índice, no un monto en pesos — mismo criterio que `reescalarCrossCheck` en
- * `src/engine/actualizar.ts`).
+ * Gráfico de línea de `/tcr.html`: siempre dos series reales — TCR-blue, TCR-oficial —
+ * más, si el snapshot las trae, hasta dos líneas del BCRA (bilateral y multilateral)
+ * en un eje secundario, porque son un índice y no un monto en pesos — mismo criterio
+ * que `reescalarCrossCheck` en `src/engine/actualizar.ts`.
  *
  * No reusa `dibujarSerieActualizada` de `chart-serie.ts`: esa función está armada
  * para el caso de `/actualizar.html` (una sola serie real, con el label "Dólar blue"
@@ -37,15 +37,22 @@ export type SerieTcrGraficada = {
 
 let grafico: Chart | null = null;
 
+/**
+ * `lineasIndice` trae hasta dos líneas del BCRA (bilateral, multilateral) en ese
+ * orden fijo — el orden es el que decide el color: la primera va con `serie3`, la
+ * segunda con `serie4`. No llevan color propio en el dato porque ya son series con
+ * nombre fijo (siempre bilateral primero) y no una lista arbitraria.
+ */
 export function dibujarComparacionTcr(
   canvas: HTMLCanvasElement,
   meses: Mes[],
   blue: SerieTcrGraficada,
   oficial: SerieTcrGraficada,
-  crossCheck?: SerieTcrGraficada,
+  lineasIndice: SerieTcrGraficada[] = [],
 ): void {
   const t = tokens();
-  const hayCrossCheck = crossCheck !== undefined;
+  const coloresIndice = [t.serie3, t.serie4];
+  const hayLineasIndice = lineasIndice.length > 0;
 
   const datasets: ChartDataset<"line", (number | null)[]>[] = [
     {
@@ -68,12 +75,13 @@ export function dibujarComparacionTcr(
     },
   ];
 
-  if (crossCheck) {
+  lineasIndice.forEach((linea, i) => {
+    const color = coloresIndice[i]!;
     datasets.push({
-      label: crossCheck.label,
-      data: crossCheck.valores,
-      borderColor: t.serie3,
-      backgroundColor: t.serie3,
+      label: linea.label,
+      data: linea.valores,
+      borderColor: color,
+      backgroundColor: color,
       pointRadius: 0,
       borderWidth: 2,
       // Eje secundario: esta serie es un índice (base 100), no está en pesos de
@@ -81,7 +89,7 @@ export function dibujarComparacionTcr(
       // según la escala de las dos curvas en pesos.
       yAxisID: "y1",
     });
-  }
+  });
 
   grafico?.destroy();
   grafico = new Chart(canvas, {
@@ -137,14 +145,17 @@ export function dibujarComparacionTcr(
             callback: (v) => pesosRedondo(Number(v)),
           },
         },
-        ...(hayCrossCheck
+        ...(hayLineasIndice
           ? {
               y1: {
                 position: "right" as const,
                 grid: { display: false },
                 border: { display: false },
-                ticks: { color: t.serie3, font: { size: 11 }, callback: (v) => indice(Number(v)) },
-                title: { display: true, text: "Índice (base 100)", color: t.serie3 },
+                // Color neutro y no el de una línea puntual: puede haber una o dos
+                // líneas del BCRA en este eje (bilateral, multilateral), cada una ya
+                // distinguida por su propio color en la leyenda y el tooltip.
+                ticks: { color: t.eje, font: { size: 11 }, callback: (v) => indice(Number(v)) },
+                title: { display: true, text: "Índice (base 100)", color: t.eje },
               },
             }
           : {}),
