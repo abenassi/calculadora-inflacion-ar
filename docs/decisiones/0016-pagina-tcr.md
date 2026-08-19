@@ -31,6 +31,18 @@ exactamente. El mayorista ajustó peor de lo esperable (el BCRA usa una referenc
 mayorista para su ITCRM) y quedó afuera del catálogo por eso — sin una explicación
 firme de por qué.
 
+La serie "oficial" validada arriba, y la que usa `/tcr.html` (TCR-oficial), es la
+que el pipeline guarda en `public/data/dolar.json` (serie `dolar_oficial` del MCP,
+fuente BCRA) — el dólar oficial minorista, no el mayorista. Otra asimetría a tener
+presente al leer la tabla: el dólar blue se mensualiza con el promedio del mes
+(`funcion_colapso: "avg"`, en `construirSerieDolarBlue`), mientras que el oficial y
+la serie del BCRA usan el cierre de mes (`funcion_colapso: "last"`, en
+`construirAuxiliar` y en el cross-check) — así que TCR-blue compara un promedio
+contra dos valores de fin de mes, no la misma clase de número. No cambia el
+0,997 de arriba (oficial↔BCRA es "last" contra "last", consistente), pero conviene
+tenerlo anotado para no leer TCR-blue vs. TCR-oficial como si fueran la misma
+cuenta con otro dólar adentro.
+
 Un hallazgo colateral: anclar el índice en diciembre de 2015 (la fecha base del
 BCRA) da un nivel sesgado, porque ese mes promedia días de antes y de después de la
 megadevaluación del 17 de diciembre de 2015. Con cualquier ancla sin salto cambiario
