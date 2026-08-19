@@ -28,6 +28,7 @@ export default defineConfig({
         main: resolve(raiz, "index.html"),
         datos: resolve(raiz, "datos.html"),
         actualizar: resolve(raiz, "actualizar.html"),
+        tcr: resolve(raiz, "tcr.html"),
         // Entry propio de las páginas por año: sólo analytics, sin motor ni gráfico.
         paginas: resolve(raiz, "src/ui/paginas.ts"),
       },
