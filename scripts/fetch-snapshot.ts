@@ -516,6 +516,35 @@ async function construirCrossCheck(declarada: IndiceSecundarioDeclarado): Promis
   };
 }
 
+const SERIE_TCR_MULTILATERAL = "indec:116.4_TCRZE_2015_D_36_4";
+
+/**
+ * El Índice de Tipo de Cambio Real Multilateral que publica el BCRA, para su propia
+ * línea en `/tcr.html` — no es una cuenta de este pipeline, es el número del BCRA tal
+ * cual, mensualizado con el mismo criterio que `construirCrossCheck` (último valor
+ * del mes). A diferencia del cross-check bilateral, no depende de ningún índice
+ * secundario declarado: es su propia serie, no la comparación de otra.
+ */
+async function construirTcrMultilateral(): Promise<SerieValores> {
+  console.log(`TCR multilateral: bajando ${SERIE_TCR_MULTILATERAL}…`);
+  const serie = await traerSerie(SERIE_TCR_MULTILATERAL, {
+    fecha_desde: "2002-01-01",
+    frecuencia: "mensual",
+    funcion_colapso: "last",
+  });
+  const datos = aPuntos(serie.datos);
+
+  console.log(`  TCR multilateral: ${datos[0]!.mes} → ${datos.at(-1)!.mes} (${datos.length} meses)`);
+
+  return {
+    serie: "tcr-multilateral",
+    unidad: serie.unidad,
+    fuentes: [{ id: "bcra", organismo: serie.fuente, rango: `${datos[0]!.mes}/${datos.at(-1)!.mes}` }],
+    actualizado: new Date().toISOString(),
+    datos,
+  };
+}
+
 /**
  * El catálogo chico de índices secundarios, en el mismo espíritu que `indices.json`
  * para los primarios: la interfaz nunca lee `scripts/indices-secundarios-declarados.ts`
@@ -642,6 +671,16 @@ async function main(): Promise<void> {
   } catch (e: unknown) {
     console.warn(
       `  dólar blue: NO se pudo actualizar (${(e as Error).message}) — se sigue con el resto del pipeline`,
+    );
+  }
+
+  try {
+    await mkdir(resolve(DIR_DATOS, "series"), { recursive: true });
+    const tcrMultilateral = await construirTcrMultilateral();
+    await escribirSiMejora("series/tcr-multilateral.json", tcrMultilateral, 12);
+  } catch (e: unknown) {
+    console.warn(
+      `  TCR multilateral: NO se pudo actualizar (${(e as Error).message}) — se sigue con el resto del pipeline`,
     );
   }
 
