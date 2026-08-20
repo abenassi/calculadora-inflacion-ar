@@ -135,7 +135,10 @@ function pintarTabla(resultado: PuntoSerieActualizado[]): void {
 
       const celdaActualizada = document.createElement("td");
       if (p.valorActualizado === null) {
-        celdaActualizada.textContent = "no se pudo actualizar sin estimar";
+        celdaActualizada.textContent =
+          p.motivo === "fuera_de_cobertura"
+            ? "no se puede actualizar: es anterior a la serie de inflación"
+            : "no se pudo actualizar sin estimar";
         celdaActualizada.title = MOTIVOS[p.motivo!];
         fila.classList.add("fila-sin-actualizar");
       } else {
@@ -175,7 +178,19 @@ function recalcular(): void {
 
   const mesObjetivo = leerObjetivo();
   const metodologia = leerMetodologia();
-  const resultado = actualizarSerie(puntos, mesObjetivo, ipc, { metodologia });
+
+  let resultado: PuntoSerieActualizado[];
+  try {
+    resultado = actualizarSerie(puntos, mesObjetivo, ipc, { metodologia });
+  } catch (e: unknown) {
+    canvas.hidden = true;
+    el<HTMLTableElement>("tabla-resultado").hidden = true;
+    aviso.hidden = true;
+    const error = el("error");
+    error.textContent = `No se pudo actualizar la serie: ${(e as Error).message}`;
+    error.hidden = false;
+    return;
+  }
 
   const todoSinResolver = resultado.every((p) => p.valorActualizado === null);
   if (todoSinResolver) {

@@ -72,6 +72,7 @@ describe("actualizarSerie", () => {
     // que la ventana de referencia (ene-abr) cabe entera dentro de la serie.
     expect(r[1]!.valorActualizado).not.toBeNull();
     expect(r[1]!.motivo).toBeNull();
+    expect(r[1]!.esProyeccion).toBe(false); // resolvió por ventana_reciente, no proyectando
   });
 
   it("con metodología repite_ultimo, ese mismo punto SÍ se resuelve, marcado como proyección", () => {
@@ -102,6 +103,45 @@ describe("actualizarSerie", () => {
     const puntos = ipc.datos.map((p) => ({ punto: p.mes, valor: p.indice }));
     const r = actualizarSerie(puntos, ipc.ultimo_oficial, ipc);
     expect(r.every((p) => p.valorActualizado !== null && !p.esProyeccion)).toBe(true);
+  });
+
+  it("marca (no descarta ni revienta) un punto anterior a donde arranca la serie de IPC", () => {
+    const r = actualizarSerie(
+      [
+        { punto: "1985-01", valor: 100 },
+        { punto: "2020-02", valor: 110 },
+      ],
+      "2020-04",
+      ipc,
+    );
+    expect(r).toHaveLength(2); // ninguno desaparece
+    expect(r[0]!.valorActualizado).toBeNull();
+    expect(r[0]!.motivo).toBe("fuera_de_cobertura");
+    expect(r[1]!.valorActualizado).not.toBeNull(); // el otro punto resuelve normal
+  });
+
+  it("con metodología rem, un punto que necesita estimar se proyecta con la senda del REM", () => {
+    const ipcConRem: SerieIndice = {
+      ...ipc,
+      rem: {
+        senda: [{ mes: "2020-05", tasaPct: 5 }],
+        expectativaAnualPct: 60,
+        mes: "2020-04",
+        series: ["bcra:29", "rem:ipc_mensual"],
+        organismo: "BCRA",
+      },
+    };
+    const r = actualizarSerie(
+      [{ punto: "2020-04", valor: 133.1 }],
+      "2020-05",
+      ipcConRem,
+      { metodologia: "rem" },
+    );
+    // ultimo_oficial es abril (133,1); mayo se proyecta con la tasa de la senda del REM
+    // (5%), así que el resultado es 133,1 × 1,05.
+    expect(r[0]!.valorActualizado).toBeCloseTo(133.1 * 1.05, 6);
+    expect(r[0]!.esProyeccion).toBe(true);
+    expect(r[0]!.motivo).toBeNull();
   });
 });
 

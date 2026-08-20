@@ -9,7 +9,7 @@
  */
 import { adjust, motivoParaEstimar } from "./adjust.js";
 import type { OpcionesAjuste } from "./adjust.js";
-import { compararMeses } from "./mes.js";
+import { compararMeses, mesDe } from "./mes.js";
 import type { PuntoSerieUsuario } from "./parse-serie.js";
 import type { Mes, Punto, PuntoValor, SerieIndice } from "./types.js";
 
@@ -21,7 +21,7 @@ export type PuntoSerieActualizado = {
   /** El valor salió de una tasa estimada (metodología repite_ultimo o rem), no de un dato directo o de la ventana de referencia. */
   esProyeccion: boolean;
   /** Por qué `valorActualizado` es `null`. `null` cuando sí se pudo resolver. */
-  motivo: "futuro" | "ventana_no_cabe" | "ventana_sesgada" | null;
+  motivo: "futuro" | "ventana_no_cabe" | "ventana_sesgada" | "fuera_de_cobertura" | null;
 };
 
 export type PuntoActualizado = {
@@ -29,6 +29,24 @@ export type PuntoActualizado = {
   valorOriginal: number;
   valorActualizado: number;
 };
+
+/**
+ * Si `mes` cae antes de donde arranca `serie` — el borde que `motivoParaEstimar` NO
+ * cubre.
+ *
+ * `motivoParaEstimar`/`evaluarPeriodo` (en `adjust.ts`) sólo miden el borde "todavía
+ * no se publicó" (hacia adelante, contra `ultimoOficial`); nunca el de "la serie no
+ * llega tan atrás". Con el IPC nacional eso nunca importó mientras los puntos venían
+ * de un pipeline curado (`dolar-blue.json`, siempre dentro de rango) — pero
+ * `actualizarSerie` ahora recibe puntos que alguien tipeó o subió, sin ninguna cota
+ * previa, y sin este chequeo un punto así hace que `adjust()` reviente con una
+ * `RangoError` sin capturar en vez de simplemente marcarse como no resoluble. Mismo
+ * borde que ya cubre `actualizarSerieDoble` para el índice secundario, acá aplicado
+ * también al índice base.
+ */
+function fueraDeCobertura(mes: Mes, serie: SerieIndice): boolean {
+  return compararMeses(mes, serie.datos[0]!.mes) < 0;
+}
 
 /**
  * Reindexa cada punto de una serie propia contra el IPC.
@@ -48,6 +66,16 @@ export function actualizarSerie(
   const metodologia = opciones.metodologia ?? "sin_proyectar";
 
   return datos.map((dato) => {
+    if (fueraDeCobertura(mesDe(dato.punto), ipc)) {
+      return {
+        punto: dato.punto,
+        valorOriginal: dato.valor,
+        valorActualizado: null,
+        esProyeccion: false,
+        motivo: "fuera_de_cobertura",
+      };
+    }
+
     const motivo = motivoParaEstimar(dato.punto, mesObjetivo, ipc, opciones.hoy);
 
     if (metodologia === "sin_proyectar" && motivo !== null) {
@@ -106,25 +134,6 @@ export type PuntoActualizadoDoble = PuntoActualizado & {
  * cociente que ya resuelve `adjust()` —empalmes, proyección y `metodologia`
  * incluidos— para el índice secundario.
  */
-/**
- * Si `mes` cae antes de donde arranca `serie` — el borde que `motivoParaEstimar` NO
- * cubre.
- *
- * `motivoParaEstimar`/`evaluarPeriodo` (en `adjust.ts`) sólo miden el borde "todavía
- * no se publicó" (hacia adelante, contra `ultimoOficial`); nunca el de "la serie no
- * llega tan atrás". Eso nunca importó para el IPC nacional —arranca en 1990, antes
- * que cualquier otra serie del sitio— pero un índice secundario puede tener un piso
- * más tarde (el CPI de EE.UU. de hoy arranca en 2002, igual que el dólar blue, por
- * pura coincidencia de fechas de corte del pipeline, no por diseño) o, más
- * directamente alcanzable desde la interfaz, la persona puede elegir un mes
- * objetivo anterior a ese piso (el selector de mes objetivo llega hasta 1992). Sin
- * este chequeo, `adjust()` revienta con una `RangoError` sin capturar en vez de
- * simplemente descartar el punto.
- */
-function fueraDeCobertura(mes: Mes, serie: SerieIndice): boolean {
-  return compararMeses(mes, serie.datos[0]!.mes) < 0;
-}
-
 export function actualizarSerieDoble(
   datos: PuntoValor[],
   mesObjetivo: Mes,

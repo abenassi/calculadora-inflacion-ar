@@ -17,36 +17,56 @@ export type ResultadoParseo = { puntos: PuntoSerieUsuario[]; errores: FilaInvali
 const SEPARADORES = ["\t", ",", ";"] as const;
 
 /**
- * Corta en el PRIMER separador encontrado, no en todos: el valor puede repetir el
- * mismo carácter (`1.234,56` con separador de campo `,`), y la fecha nunca lo
- * contiene en ninguno de los cuatro formatos que se aceptan.
+ * Prueba los tres separadores en orden y se queda con el primero que parte la línea en
+ * una fecha Y un valor que efectivamente parsean — no con el primero que simplemente
+ * aparece en el texto. Antes elegía por presencia: con "punto y coma" de campo y coma
+ * decimal en el valor (el CSV que exporta Excel/Sheets en configuración regional
+ * Argentina/España, ej. "15/01/2024;1234,56", donde ";" separa justamente porque la
+ * coma ya es el decimal), la coma aparecía antes en la línea que el separador de campo
+ * real, así que cortaba ahí y partía la fecha al medio. Si ningún separador da un
+ * resultado válido, cae al primero que aparece (mismo comportamiento de antes), para
+ * que el mensaje de error siga señalando la línea entera.
  */
 function separarLinea(linea: string): { fecha: string; valor: string } | null {
-  for (const sep of SEPARADORES) {
+  const candidatos = SEPARADORES.map((sep) => {
     const idx = linea.indexOf(sep);
-    if (idx === -1) continue;
+    if (idx === -1) return null;
     return { fecha: linea.slice(0, idx).trim(), valor: linea.slice(idx + 1).trim() };
-  }
-  return null;
+  }).filter((c): c is { fecha: string; valor: string } => c !== null);
+
+  if (candidatos.length === 0) return null;
+
+  const valido = candidatos.find(
+    (c) => parsearFecha(c.fecha) !== null && parsearValor(c.valor) !== null,
+  );
+  return valido ?? candidatos[0]!;
+}
+
+const ANIO_MINIMO = 1000;
+const ANIO_MAXIMO = 3000;
+
+function anioPlausible(punto: string): boolean {
+  const anio = Number(punto.slice(0, 4));
+  return anio >= ANIO_MINIMO && anio <= ANIO_MAXIMO;
 }
 
 function parsearFecha(crudo: string): Punto | null {
   const texto = crudo.trim();
-  if (esMesValido(texto)) return texto;
-  if (esFechaValida(texto)) return texto;
+  if (esMesValido(texto)) return anioPlausible(texto) ? texto : null;
+  if (esFechaValida(texto)) return anioPlausible(texto) ? texto : null;
 
   const ddmmyyyy = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(texto);
   if (ddmmyyyy) {
     const [, d, m, y] = ddmmyyyy;
     const candidato = `${y}-${m!.padStart(2, "0")}-${d!.padStart(2, "0")}`;
-    return esFechaValida(candidato) ? candidato : null;
+    return esFechaValida(candidato) && anioPlausible(candidato) ? candidato : null;
   }
 
   const mmyyyy = /^(\d{1,2})\/(\d{4})$/.exec(texto);
   if (mmyyyy) {
     const [, m, y] = mmyyyy;
     const candidato = `${y}-${m!.padStart(2, "0")}`;
-    return esMesValido(candidato) ? candidato : null;
+    return esMesValido(candidato) && anioPlausible(candidato) ? candidato : null;
   }
 
   return null;

@@ -38,6 +38,12 @@ describe("parsearSerie: fechas", () => {
     expect(r.puntos).toEqual([]);
     expect(r.errores).toHaveLength(1);
   });
+
+  it("rechaza un año claramente implausible, aunque el formato sea válido", () => {
+    const r = parsearSerie("2024-01\t100\n9999-12\t100");
+    expect(r.puntos).toHaveLength(1);
+    expect(r.errores).toEqual([{ linea: 2, motivo: 'fecha no reconocida: "9999-12"' }]);
+  });
 });
 
 describe("parsearSerie: valores", () => {
@@ -113,6 +119,18 @@ describe("parsearSerie: separadores de campo", () => {
     const r = parsearSerie("2024-01 100");
     expect(r.puntos).toEqual([]);
     expect(r.errores).toHaveLength(1);
+  });
+
+  it("con separador punto y coma y valor con coma decimal, no confunde la coma con el separador de campo", () => {
+    // El CSV que exporta Excel/Sheets en configuración Argentina/España.
+    const r = parsearSerie("15/01/2024;1234,56");
+    expect(r.puntos).toEqual([{ punto: "2024-01-15", valor: 1234.56 }]);
+    expect(r.errores).toEqual([]);
+  });
+
+  it("con separador punto y coma y valor con miles y decimal (Excel AR completo)", () => {
+    const r = parsearSerie("2024-01;1.234,56");
+    expect(r.puntos).toEqual([{ punto: "2024-01", valor: 1234.56 }]);
   });
 });
 

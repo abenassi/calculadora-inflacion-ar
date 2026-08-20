@@ -17,7 +17,10 @@ export function esMetodologia(v: string | null): v is Metodologia {
  * Por qué «no estimar ninguno» no da un resultado para un período dado, en las
  * palabras de cada caso — mismo texto para las dos páginas.
  */
-export const MOTIVOS: Record<NonNullable<ReturnType<typeof motivoParaEstimar>>, string> = {
+export const MOTIVOS: Record<
+  NonNullable<ReturnType<typeof motivoParaEstimar>> | "fuera_de_cobertura",
+  string
+> = {
   futuro:
     "«No estimar ninguno» no está disponible para este período: el mes de destino todavía " +
     "no llegó, así que no existe ningún tramo ya publicado que sirva de referencia. " +
@@ -30,4 +33,7 @@ export const MOTIVOS: Record<NonNullable<ReturnType<typeof motivoParaEstimar>>, 
     "«No estimar ninguno» no está disponible para este período: este índice viene atrasado, " +
     "y esa opción daría un número bastante distinto de la inflación real del período. " +
     "Preferimos estimar y decirlo.",
+  fuera_de_cobertura:
+    "Este punto es anterior a donde arranca la serie de inflación: no hay ningún índice " +
+    "publicado con el que actualizarlo, elijas la metodología que elijas.",
 };
