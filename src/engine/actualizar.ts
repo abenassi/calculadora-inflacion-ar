@@ -4,12 +4,25 @@
  *
  * No hace ninguna cuenta propia: por cada punto llama al `adjust()` que ya existe.
  * Los puntos que `adjust()` sólo podría resolver estimando —lo contesta
- * `motivoParaEstimar`— se descartan en vez de graficarse con una tasa inventada
- * mezclada en silencio entre los que sí son cálculo directo.
+ * `motivoParaEstimar`— se marcan con `valorActualizado: null` y el motivo, en vez
+ * de descartarse en silencio. Regla 3 de AGENTS.md aplicada a una fila de tabla.
  */
 import { adjust, motivoParaEstimar } from "./adjust.js";
+import type { OpcionesAjuste } from "./adjust.js";
 import { compararMeses } from "./mes.js";
-import type { Mes, PuntoValor, SerieIndice } from "./types.js";
+import type { PuntoSerieUsuario } from "./parse-serie.js";
+import type { Mes, Punto, PuntoValor, SerieIndice } from "./types.js";
+
+export type PuntoSerieActualizado = {
+  punto: Punto;
+  valorOriginal: number;
+  /** `null` cuando `metodologia` es `sin_proyectar` y este punto necesitaría estimar. */
+  valorActualizado: number | null;
+  /** El valor salió de una tasa estimada (metodología repite_ultimo o rem), no de un dato directo o de la ventana de referencia. */
+  esProyeccion: boolean;
+  /** Por qué `valorActualizado` es `null`. `null` cuando sí se pudo resolver. */
+  motivo: "futuro" | "ventana_no_cabe" | "ventana_sesgada" | null;
+};
 
 export type PuntoActualizado = {
   mes: Mes;
@@ -17,25 +30,47 @@ export type PuntoActualizado = {
   valorActualizado: number;
 };
 
+/**
+ * Reindexa cada punto de una serie propia contra el IPC.
+ *
+ * A diferencia de la versión que reemplaza, no descarta en silencio los puntos que
+ * necesitarían estimar bajo `sin_proyectar`: los marca con `valorActualizado: null`
+ * y el `motivo` (misma respuesta que ya usa el selector de metodología de la
+ * calculadora principal, `motivoParaEstimar`) — regla 3 de `AGENTS.md` aplicada a
+ * una fila de tabla, no sólo a un control.
+ */
 export function actualizarSerie(
-  datos: PuntoValor[],
+  datos: PuntoSerieUsuario[],
   mesObjetivo: Mes,
   ipc: SerieIndice,
-): PuntoActualizado[] {
-  const salida: PuntoActualizado[] = [];
+  opciones: OpcionesAjuste = {},
+): PuntoSerieActualizado[] {
+  const metodologia = opciones.metodologia ?? "sin_proyectar";
 
-  for (const punto of datos) {
-    if (motivoParaEstimar(punto.mes, mesObjetivo, ipc) !== null) continue;
+  return datos.map((dato) => {
+    const motivo =
+      motivoParaEstimar(dato.punto, mesObjetivo, ipc, opciones.hoy) ||
+      (compararMeses(mesObjetivo, ipc.ultimo_oficial) > 0 ? "futuro" : null);
 
-    const resultado = adjust(punto.valor, punto.mes, mesObjetivo, ipc);
-    salida.push({
-      mes: punto.mes,
-      valorOriginal: punto.valor,
+    if (metodologia === "sin_proyectar" && motivo !== null) {
+      return {
+        punto: dato.punto,
+        valorOriginal: dato.valor,
+        valorActualizado: null,
+        esProyeccion: false,
+        motivo,
+      };
+    }
+
+    const resultado = adjust(dato.valor, dato.punto, mesObjetivo, ipc, opciones);
+    return {
+      punto: dato.punto,
+      valorOriginal: dato.valor,
       valorActualizado: resultado.montoAjustado,
-    });
-  }
-
-  return salida;
+      esProyeccion: resultado.metodo.tipo === "proyeccion",
+      motivo: null,
+    };
+  });
 }
 
 /**

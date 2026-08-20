@@ -30,72 +30,76 @@ const ipc: SerieIndice = {
 
 describe("actualizarSerie", () => {
   it("no cambia el valor de un punto que ya está en el mes objetivo", () => {
-    const r = actualizarSerie([{ mes: "2020-04", valor: 133.1 }], "2020-04", ipc);
+    const r = actualizarSerie([{ punto: "2020-04", valor: 133.1 }], "2020-04", ipc);
     expect(r).toHaveLength(1);
     expect(r[0]!.valorActualizado).toBeCloseTo(133.1, 6);
+    expect(r[0]!.motivo).toBeNull();
   });
 
   it("actualiza un punto viejo a un mes más nuevo (dato directo)", () => {
-    // 100 de enero, llevado a abril: 100 * (133,1 / 100) = 133,1
-    const r = actualizarSerie([{ mes: "2020-01", valor: 100 }], "2020-04", ipc);
-    expect(r).toHaveLength(1);
+    const r = actualizarSerie([{ punto: "2020-01", valor: 100 }], "2020-04", ipc);
     expect(r[0]!.valorOriginal).toBe(100);
     expect(r[0]!.valorActualizado).toBeCloseTo(133.1, 6);
+    expect(r[0]!.esProyeccion).toBe(false);
   });
 
   it("deflacta cuando el objetivo es anterior al punto", () => {
-    // 133,1 de abril, llevado a enero: 133,1 * (100 / 133,1) = 100
-    const r = actualizarSerie([{ mes: "2020-04", valor: 133.1 }], "2020-01", ipc);
-    expect(r).toHaveLength(1);
+    const r = actualizarSerie([{ punto: "2020-04", valor: 133.1 }], "2020-01", ipc);
     expect(r[0]!.valorActualizado).toBeCloseTo(100, 6);
   });
 
-  it("descarta un punto cuyo objetivo sólo se puede resolver estimando", () => {
-    // El objetivo cae 3 meses después del último dato publicado (abr 2020). Para el
-    // punto de enero, la ventana de referencia necesitaría retroceder hasta oct
-    // 2019, antes de donde arranca la serie: no cabe, y no hay ningún tramo
-    // publicado que sirva de referencia sin inventar nada.
+  it("acepta una fecha exacta (Punto = día), no sólo un mes", () => {
+    // El motor de fechas ya está probado en adjust.test.ts; acá sólo se confirma
+    // que actualizarSerie lo deja pasar sin convertirlo a mes primero.
+    const conDia = actualizarSerie([{ punto: "2020-02-15", valor: 100 }], "2020-04", ipc);
+    const conMes = actualizarSerie([{ punto: "2020-02", valor: 100 }], "2020-04", ipc);
+    expect(conDia[0]!.valorActualizado).not.toBeCloseTo(conMes[0]!.valorActualizado!, 2);
+    expect(conDia[0]!.valorActualizado).not.toBeNull();
+  });
+
+  it("con metodología sin_proyectar (default), marca en vez de descartar un punto que necesitaría estimar", () => {
     const r = actualizarSerie(
       [
-        { mes: "2020-01", valor: 100 },
-        { mes: "2020-04", valor: 133.1 },
+        { punto: "2020-01", valor: 100 },
+        { punto: "2020-04", valor: 133.1 },
       ],
       "2020-07",
       ipc,
     );
-    expect(r).toHaveLength(1);
-    expect(r[0]!.mes).toBe("2020-04");
+    expect(r).toHaveLength(2); // las dos filas están, ninguna desaparece
+    expect(r[0]!.valorActualizado).toBeNull();
+    expect(r[0]!.motivo).toBe("ventana_no_cabe");
+    expect(r[1]!.valorActualizado).toBeNull();
+  });
+
+  it("con metodología repite_ultimo, ese mismo punto SÍ se resuelve, marcado como proyección", () => {
+    const r = actualizarSerie(
+      [{ punto: "2020-01", valor: 100 }],
+      "2020-07",
+      ipc,
+      { metodologia: "repite_ultimo" },
+    );
+    expect(r[0]!.valorActualizado).not.toBeNull();
+    expect(r[0]!.esProyeccion).toBe(true);
+    expect(r[0]!.motivo).toBeNull();
   });
 
   it("conserva el orden de los puntos de entrada", () => {
     const r = actualizarSerie(
       [
-        { mes: "2020-02", valor: 110 },
-        { mes: "2020-01", valor: 100 },
+        { punto: "2020-02", valor: 110 },
+        { punto: "2020-01", valor: 100 },
       ],
       "2020-04",
       ipc,
     );
-    expect(r.map((p) => p.mes)).toEqual(["2020-02", "2020-01"]);
+    expect(r.map((p) => p.punto)).toEqual(["2020-02", "2020-01"]);
   });
 
-  it("con el objetivo en ultimo_oficial no descarta ningún punto ni usa ventana_reciente", () => {
-    // Ésta es la configuración que corre en producción por default: `/actualizar.html`
-    // arranca con el objetivo en `ipc.ultimo_oficial`, nunca en el mes calendario en
-    // curso. Con ese objetivo, todo punto entre el primero y el último mes publicado
-    // es cálculo directo — nada necesita la ventana de referencia ni se cae por el
-    // guard de sesgo. Las cinco pruebas de arriba nunca corrieron con el objetivo
-    // pegado al último mes publicado, que es justo el punto donde un desfasaje de un
-    // mes (el bug real: default en `mesActual()`) hacía que todo resolviera por
-    // `ventana_reciente` y 6 meses se descartaran en silencio.
-    const puntos = ipc.datos.map((p) => ({ mes: p.mes, valor: p.indice }));
+  it("con el objetivo en ultimo_oficial, todos los puntos resuelven directo", () => {
+    const puntos = ipc.datos.map((p) => ({ punto: p.mes, valor: p.indice }));
     const r = actualizarSerie(puntos, ipc.ultimo_oficial, ipc);
-
-    expect(r).toHaveLength(puntos.length);
-    for (const punto of puntos) {
-      const metodo = adjust(punto.valor, punto.mes, ipc.ultimo_oficial, ipc).metodo;
-      expect(metodo.tipo).toBe("directo");
-    }
+    expect(r.every((p) => p.valorActualizado !== null && !p.esProyeccion)).toBe(true);
   });
 });
 
@@ -230,8 +234,9 @@ describe("actualizarSerieDoble", () => {
       { mes: "2020-01", valor: 50 },
       { mes: "2020-02", valor: 55 },
     ];
+    const datosConPunto = datos.map((d) => ({ punto: d.mes, valor: d.valor }));
     const doble = actualizarSerieDoble(datos, "2020-04", ipc, cpiUs, "multiplicar");
-    const simple = actualizarSerie(datos, "2020-04", ipc);
+    const simple = actualizarSerie(datosConPunto, "2020-04", ipc);
     expect(doble.map((p) => p.valorSoloBase)).toEqual(simple.map((p) => p.valorActualizado));
   });
 
