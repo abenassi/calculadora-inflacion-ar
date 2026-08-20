@@ -17,7 +17,6 @@ import { fileURLToPath } from "node:url";
 import { empalmar, type PuntoCrudo } from "../src/engine/splice.js";
 import { aMes, diffMeses, nombrarMes } from "../src/engine/mes.js";
 import { SLUG_NACIONAL, type CatalogoIndices, type EntradaCatalogo } from "../src/engine/indices.js";
-import type { EntradaCatalogoSecundario } from "../src/engine/indices-secundarios.js";
 import type { ExpectativaRem, SerieIndice, SerieValores } from "../src/engine/types.js";
 import { INDICES, type IndiceDeclarado } from "./indices-declarados.js";
 import { INDICES_SECUNDARIOS, type IndiceSecundarioDeclarado } from "./indices-secundarios-declarados.js";
@@ -546,41 +545,6 @@ async function construirTcrMultilateral(): Promise<SerieValores> {
 }
 
 /**
- * El catálogo chico de índices secundarios, en el mismo espíritu que `indices.json`
- * para los primarios: la interfaz nunca lee `scripts/indices-secundarios-declarados.ts`
- * directo —es código de pipeline, no se empaqueta para el browser— sino este archivo,
- * que sólo lista lo que el pipeline **efectivamente pudo escribir**, esta corrida o
- * una anterior. Así el desplegable de `/actualizar.html` no ofrece nunca una opción
- * cuyo archivo de datos no existe.
- */
-async function construirCatalogoSecundarios(): Promise<void> {
-  const existeArchivo = (archivo: string) =>
-    readFile(resolve(DIR_DATOS, archivo), "utf8")
-      .then(() => true)
-      .catch(() => false);
-
-  const entradas: EntradaCatalogoSecundario[] = [];
-  for (const decl of INDICES_SECUNDARIOS) {
-    if (!(await existeArchivo(`series/secundario-${decl.slug}.json`))) {
-      console.warn(`  ${decl.slug}: sin archivo de datos, no entra al catálogo de índices secundarios`);
-      continue;
-    }
-    entradas.push({
-      slug: decl.slug,
-      nombre: decl.nombre,
-      direccion: decl.direccion,
-      requiereIndiceBase: decl.requiereIndiceBase,
-      tieneCrossCheck: await existeArchivo(`series/crosscheck-${decl.slug}.json`),
-    });
-  }
-
-  await escribirSiMejora("indices-secundarios.json", {
-    indices: entradas,
-    actualizado: new Date().toISOString(),
-  });
-}
-
-/**
  * Los quince índices jurisdiccionales, cada uno a su archivo, y el catálogo.
  *
  * Dos reglas que importan más que el código:
@@ -685,9 +649,8 @@ async function main(): Promise<void> {
   }
 
   // Cada índice secundario (y su cross-check, si declara uno) en su propio try/catch:
-  // si FRED o el BCRA fallan un día, el resto del pipeline no se cae con ellos, y el
-  // selector "Ajustar también por" de `/actualizar.html` simplemente no ofrece la
-  // opción hasta que el snapshot tenga el archivo (ver `construirSerieSecundaria`).
+  // si FRED o el BCRA fallan un día, el resto del pipeline no se cae con ellos, y
+  // `/tcr.html` simplemente no tiene esa línea hasta que el snapshot tenga el archivo.
   for (const declarada of INDICES_SECUNDARIOS) {
     try {
       await mkdir(resolve(DIR_DATOS, "series"), { recursive: true });
@@ -713,7 +676,6 @@ async function main(): Promise<void> {
   }
 
   await construirCatalogo(ipc);
-  await construirCatalogoSecundarios();
 
   await escribirSiMejora("meta.json", {
     actualizado: ipc.actualizado,
