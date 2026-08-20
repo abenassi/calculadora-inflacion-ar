@@ -48,9 +48,7 @@ export function actualizarSerie(
   const metodologia = opciones.metodologia ?? "sin_proyectar";
 
   return datos.map((dato) => {
-    const motivo =
-      motivoParaEstimar(dato.punto, mesObjetivo, ipc, opciones.hoy) ||
-      (compararMeses(mesObjetivo, ipc.ultimo_oficial) > 0 ? "futuro" : null);
+    const motivo = motivoParaEstimar(dato.punto, mesObjetivo, ipc, opciones.hoy);
 
     if (metodologia === "sin_proyectar" && motivo !== null) {
       return {

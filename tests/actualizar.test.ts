@@ -6,7 +6,6 @@ import {
   calcularTcrBilateral,
   reescalarCrossCheck,
 } from "../src/engine/actualizar.js";
-import { adjust } from "../src/engine/adjust.js";
 import type { SerieIndice } from "../src/engine/types.js";
 
 /**
@@ -69,7 +68,10 @@ describe("actualizarSerie", () => {
     expect(r).toHaveLength(2); // las dos filas están, ninguna desaparece
     expect(r[0]!.valorActualizado).toBeNull();
     expect(r[0]!.motivo).toBe("ventana_no_cabe");
-    expect(r[1]!.valorActualizado).toBeNull();
+    // El punto de abril SÍ resuelve: coincide con el último mes publicado, así
+    // que la ventana de referencia (ene-abr) cabe entera dentro de la serie.
+    expect(r[1]!.valorActualizado).not.toBeNull();
+    expect(r[1]!.motivo).toBeNull();
   });
 
   it("con metodología repite_ultimo, ese mismo punto SÍ se resuelve, marcado como proyección", () => {
