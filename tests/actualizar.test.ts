@@ -162,6 +162,23 @@ describe("actualizarSerie", () => {
     expect(r[0]!.esProyeccion).toBe(true);
     expect(r[0]!.motivo).toBeNull();
   });
+
+  it("con metodología repite_ultimo, un punto absurdamente lejano en el futuro se marca en vez de desbordar la pila", () => {
+    // Encontrado en la revisión final de rama completa: "2999-01" pasa el rango de
+    // año plausible del parser (1000-3000), pero proyectarlo mes a mes desde
+    // ultimo_oficial (2020-04) hace que la recursión de calcularProyectando reviente
+    // con "Maximum call stack size exceeded" bajo repite_ultimo/rem (las únicas
+    // metodologías que intentan proyectar sin importar la distancia).
+    const r = actualizarSerie(
+      [{ punto: "2999-01", valor: 100 }],
+      "2020-04",
+      ipc,
+      { metodologia: "repite_ultimo" },
+    );
+    expect(r).toHaveLength(1);
+    expect(r[0]!.valorActualizado).toBeNull();
+    expect(r[0]!.motivo).toBe("futuro");
+  });
 });
 
 describe("actualizarSerieDoble", () => {

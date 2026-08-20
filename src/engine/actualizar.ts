@@ -9,7 +9,7 @@
  */
 import { adjust, mesPisoNecesario, motivoParaEstimar } from "./adjust.js";
 import type { OpcionesAjuste } from "./adjust.js";
-import { compararMeses } from "./mes.js";
+import { compararMeses, diffMeses, mesDe } from "./mes.js";
 import type { PuntoSerieUsuario } from "./parse-serie.js";
 import type { Mes, Punto, PuntoValor, SerieIndice } from "./types.js";
 
@@ -56,6 +56,28 @@ function fueraDeCobertura(punto: Punto, serie: SerieIndice): boolean {
 }
 
 /**
+ * Encontrado en la revisión final de rama completa: el rango de año plausible que
+ * acepta `parsearSerie` (1000–3000) evita que `mes.ts` corrompa un string de mes,
+ * pero no evita que `repite_ultimo`/`rem` —las únicas metodologías que sí intentan
+ * proyectar sin importar la distancia— desborden la pila. `calcularProyectando`
+ * (`adjust.ts`) encadena el índice mes a mes, recursivamente, desde `ultimoOficial`
+ * hasta el punto pedido: un punto a mil años de distancia todavía pasa el rango
+ * plausible pero exige miles de llamadas recursivas y revienta con "Maximum call
+ * stack size exceeded" en vez de con una `RangoError` prolija.
+ *
+ * `sin_proyectar` nunca llega acá para un punto así —`motivoParaEstimar` ya lo
+ * marca como `"futuro"` sin proyectar nada—, así que el guard es defensa en
+ * profundidad para las dos metodologías que sí proyectan. 600 meses (50 años) es
+ * generoso para cualquier uso real de este sitio: nadie necesita actualizar un
+ * alquiler o un sueldo medio siglo hacia adelante.
+ */
+const MESES_MAXIMOS_A_PROYECTAR = 600;
+
+function demasiadoLejosParaProyectar(punto: Punto, ultimoOficial: Mes): boolean {
+  return Math.abs(diffMeses(ultimoOficial, mesDe(punto))) > MESES_MAXIMOS_A_PROYECTAR;
+}
+
+/**
  * Reindexa cada punto de una serie propia contra el IPC.
  *
  * A diferencia de la versión que reemplaza, no descarta en silencio los puntos que
@@ -80,6 +102,16 @@ export function actualizarSerie(
         valorActualizado: null,
         esProyeccion: false,
         motivo: "fuera_de_cobertura",
+      };
+    }
+
+    if (demasiadoLejosParaProyectar(dato.punto, ipc.ultimo_oficial)) {
+      return {
+        punto: dato.punto,
+        valorOriginal: dato.valor,
+        valorActualizado: null,
+        esProyeccion: false,
+        motivo: "futuro",
       };
     }
 

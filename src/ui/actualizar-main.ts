@@ -158,6 +158,11 @@ function pintarTabla(resultado: PuntoSerieActualizado[]): void {
 /* ------------------------------------------------------------------- cálculo */
 
 function recalcular(): void {
+  // Sin esto, un error de una corrida anterior (archivo ilegible, excepción del
+  // motor) quedaba pegado en pantalla aunque la corrida actual fuera perfecta —
+  // mismo criterio que ya sigue `calcular()` en main.ts.
+  el("error").hidden = true;
+
   const texto = el<HTMLTextAreaElement>("entrada-serie").value;
   const { puntos, errores } = parsearSerie(texto);
   pintarErrores(errores);
