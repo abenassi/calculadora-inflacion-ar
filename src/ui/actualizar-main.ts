@@ -239,10 +239,19 @@ async function iniciar(): Promise<void> {
   el<HTMLInputElement>("entrada-archivo").addEventListener("change", (ev) => {
     const archivo = (ev.target as HTMLInputElement).files?.[0];
     if (!archivo) return;
-    void leerArchivoComoTexto(archivo).then((texto) => {
-      el<HTMLTextAreaElement>("entrada-serie").value = texto;
-      recalcular();
-    });
+    void leerArchivoComoTexto(archivo)
+      .then((texto) => {
+        el<HTMLTextAreaElement>("entrada-serie").value = texto;
+        recalcular();
+      })
+      .catch((e: unknown) => {
+        // Sin esto, un archivo ilegible (permiso revocado, borrado después de
+        // elegirlo, etc.) no cambiaba nada en pantalla — regla 3 de AGENTS.md:
+        // un control no ofrece lo que no puede cumplir sin decirlo al lado.
+        const error = el("error");
+        error.textContent = `No se pudo leer el archivo: ${(e as Error).message}`;
+        error.hidden = false;
+      });
   });
 
   el("formulario").addEventListener("input", (ev) => {
