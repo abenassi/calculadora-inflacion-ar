@@ -4,9 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Actualizar una serie — Calculadora de inflación</title>
-    <!-- Página de prueba: no se linkea desde ningún lado del sitio ni del sitemap,
-         y esto es una capa extra para que tampoco la indexe un buscador que la
-         encuentre igual. -->
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./src/styles.css" />
@@ -16,17 +13,38 @@
       <div class="contenido">
         <h1>Actualizar una serie</h1>
         <p class="bajada">
-          En vez de un monto entre dos fechas, una serie entera —por ahora, el dólar
-          blue— reexpresada en los pesos de un único mes. Cada punto se ajusta con
-          el mismo motor que usa la calculadora principal. Opcionalmente, se puede
-          ajustar también por un segundo índice para pasar de "pesos constantes" a
-          un tipo de cambio real bilateral.
+          En vez de un monto entre dos fechas, una serie entera —un alquiler mes a
+          mes, un sueldo, lo que sea— reexpresada en los pesos de un único mes.
+          Pegá o subí tu serie, cada punto se ajusta con el mismo motor que usa la
+          calculadora principal.
         </p>
       </div>
     </header>
 
     <main class="contenido">
       <form class="tarjeta formulario" id="formulario">
+        <div class="campo campo--ancho">
+          <label for="entrada-serie">
+            Pegá tu serie: una fila por línea, fecha y valor separados por tab,
+            coma o punto y coma
+          </label>
+          <textarea
+            id="entrada-serie"
+            rows="8"
+            placeholder="2024-01&#9;150000&#10;2024-02&#9;155000&#10;2024-03&#9;162000"
+          ></textarea>
+          <p class="ayuda-formato">
+            Fechas: <code>2024-01</code>, <code>2024-01-15</code>,
+            <code>15/01/2024</code> o <code>01/2024</code>. En
+            <code>DD/MM/AAAA</code> el día va primero, nunca el mes. Montos con
+            coma o punto decimal, con o sin separador de miles.
+          </p>
+          <label for="entrada-archivo" class="etiqueta-archivo">
+            o subí un archivo .csv con el mismo formato
+          </label>
+          <input type="file" id="entrada-archivo" accept=".csv,text/csv,text/plain" />
+        </div>
+
         <div class="campo">
           <label for="objetivo-mes">Expresar en pesos de</label>
           <div class="entrada-fecha">
@@ -34,50 +52,51 @@
             <select id="objetivo-anio" aria-label="Año objetivo"></select>
           </div>
         </div>
-        <div class="campo" id="campo-indice-secundario" hidden>
-          <label for="indice-secundario">Ajustar también por</label>
-          <select id="indice-secundario"></select>
-        </div>
+
+        <p class="metodologia">
+          <label for="metodologia" id="rotulo-metodologia">Meses que el INDEC no publicó:</label>
+          <select id="metodologia">
+            <option value="sin_proyectar">no estimar ninguno</option>
+            <option value="repite_ultimo">estimarlos con la inflación del último mes</option>
+            <option value="rem" id="opcion-rem">estimarlos con el REM del BCRA</option>
+          </select>
+          <a href="./datos.html#metodologias">¿cuál me conviene?</a>
+        </p>
       </form>
 
       <p class="error" id="error" hidden></p>
-      <p class="error" id="error-indice-secundario" hidden></p>
+      <ul class="errores-parseo" id="errores-parseo" hidden></ul>
+      <p class="error" id="aviso-serie" hidden></p>
 
       <section class="tarjeta panel">
         <div class="panel__cabecera">
-          <h2 id="titulo-grafico">Dólar blue</h2>
+          <h2>Tu serie, actualizada</h2>
         </div>
         <div class="grafico">
           <canvas
             id="grafico"
             role="img"
-            aria-label="Dólar blue promedio mensual, reexpresado en los pesos del mes elegido"
+            aria-label="La serie que pegaste, original y reexpresada en los pesos del mes elegido"
           ></canvas>
-          <!-- Reemplaza al canvas —nunca conviven— cuando no hay nada que graficar:
-               sin puntos (el mes objetivo elegido cae fuera de lo que cubre el índice
-               secundario) o con menos de dos puntos en el rango visible (las dos puntas
-               del slider en el mismo mes). El texto lo arma `redibujar` en
-               actualizar-main.ts. -->
-          <p class="error" id="aviso-grafico" hidden></p>
         </div>
-        <div class="rango" id="rango">
-          <div class="rango__campo">
-            <label for="rango-desde">Desde <span id="rango-desde-texto"></span></label>
-            <input type="range" id="rango-desde" min="0" max="0" value="0" />
-          </div>
-          <div class="rango__campo">
-            <label for="rango-hasta">Hasta <span id="rango-hasta-texto"></span></label>
-            <input type="range" id="rango-hasta" min="0" max="0" value="0" />
-          </div>
+
+        <div class="tabla-scroll">
+          <table class="desglose" id="tabla-resultado" hidden>
+            <thead>
+              <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Valor original</th>
+                <th scope="col">Valor actualizado</th>
+              </tr>
+            </thead>
+            <tbody id="cuerpo-resultado"></tbody>
+          </table>
         </div>
-        <!-- El texto lo arma `actualizarTextosDeCabecera`/`armarOverlay` en actualizar-main.ts:
-             cambia según si el cross-check está disponible para el mes objetivo elegido o no. -->
-        <p class="nota-metodologia" id="nota-cross-check" hidden></p>
-        <p class="badge" id="badge-serie">
-          Dólar blue promedio mensual, fuente Ámbito Financiero · actualizado a
-          pesos de cada mes según el IPC del INDEC y el BCRA · datos vía
+
+        <p class="badge">
+          Serie propia, pegada o subida por vos · actualizada a pesos de cada mes
+          según el IPC del INDEC y el BCRA · datos de inflación vía
           <a href="https://argentinadata.mymcps.dev" rel="noopener">Argentina Data MCP</a>
-          · actualizado <span id="actualizado">—</span>
         </p>
       </section>
     </main>
@@ -85,7 +104,7 @@
     <footer class="pie">
       <div class="contenido">
         <p>
-          Página de prueba, sin terminar. <a href="./">Volver a la calculadora</a> ·
+          <a href="./">Volver a la calculadora</a> ·
           <a href="https://github.com/abenassi/calculadora-inflacion-ar" rel="noopener"
             >Código en GitHub</a
           >
