@@ -28,6 +28,7 @@ arquitectura y la que probablemente quieras copiar tal cual.
 | [0013](0013-la-ventana-de-referencia-en-modo-por-dia.md) | La ventana de referencia por día | Correr meses enteros conservando el día dejaba el tramo terminando a mitad del último mes publicado, y volvía falso el pie de la tabla |
 | [0014](0014-los-porcentajes-cuando-se-va-para-atras.md) | Los porcentajes cuando se va para atrás | Deflactando, la tabla mostraba el recíproco de la inflación del mes de al lado, con el sello del organismo; ahora los porcentajes son cronológicos y el rótulo nombra el mes de su propio número |
 | [0015](0015-tipo-cambio-real.md) | Tipo de cambio real: un segundo índice, opcional | `/actualizar.html` puede ajustar también por inflación de EE.UU., con la serie del BCRA de cruce visual |
+| [0018](0018-actualizar-serie-propia.md) | Actualizar pasa a ser series propias del usuario | Reemplaza el MVP de dólar blue por la generalización que la 0016 dejó pendiente |
 
 ## Formato
 
