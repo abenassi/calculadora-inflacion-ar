@@ -7,9 +7,9 @@
  * `motivoParaEstimar`— se marcan con `valorActualizado: null` y el motivo, en vez
  * de descartarse en silencio. Regla 3 de AGENTS.md aplicada a una fila de tabla.
  */
-import { adjust, motivoParaEstimar } from "./adjust.js";
+import { adjust, mesPisoNecesario, motivoParaEstimar } from "./adjust.js";
 import type { OpcionesAjuste } from "./adjust.js";
-import { compararMeses, mesDe } from "./mes.js";
+import { compararMeses } from "./mes.js";
 import type { PuntoSerieUsuario } from "./parse-serie.js";
 import type { Mes, Punto, PuntoValor, SerieIndice } from "./types.js";
 
@@ -31,7 +31,7 @@ export type PuntoActualizado = {
 };
 
 /**
- * Si `mes` cae antes de donde arranca `serie` — el borde que `motivoParaEstimar` NO
+ * Si `punto` cae antes de donde arranca `serie` — el borde que `motivoParaEstimar` NO
  * cubre.
  *
  * `motivoParaEstimar`/`evaluarPeriodo` (en `adjust.ts`) sólo miden el borde "todavía
@@ -43,9 +43,16 @@ export type PuntoActualizado = {
  * `RangoError` sin capturar en vez de simplemente marcarse como no resoluble. Mismo
  * borde que ya cubre `actualizarSerieDoble` para el índice secundario, acá aplicado
  * también al índice base.
+ *
+ * Mide sobre `mesPisoNecesario` y no sobre el mes crudo del punto: una fecha exacta
+ * (a diferencia de un mes entero) necesita también el índice del mes ANTERIOR para
+ * prorratear (ver `valorEn` en `adjust.ts`), incluso cuando cae el día 1. Sin esto,
+ * una fecha completa que cae justo en el primer mes publicado (ej. `1990-01-15`, con
+ * la serie arrancando en `1990-01`) pasaba este chequeo pero igual hacía explotar
+ * `adjust()`, porque a `valorEn` le faltaba diciembre de 1989.
  */
-function fueraDeCobertura(mes: Mes, serie: SerieIndice): boolean {
-  return compararMeses(mes, serie.datos[0]!.mes) < 0;
+function fueraDeCobertura(punto: Punto, serie: SerieIndice): boolean {
+  return compararMeses(mesPisoNecesario(punto), serie.datos[0]!.mes) < 0;
 }
 
 /**
@@ -66,7 +73,7 @@ export function actualizarSerie(
   const metodologia = opciones.metodologia ?? "sin_proyectar";
 
   return datos.map((dato) => {
-    if (fueraDeCobertura(mesDe(dato.punto), ipc)) {
+    if (fueraDeCobertura(dato.punto, ipc)) {
       return {
         punto: dato.punto,
         valorOriginal: dato.valor,

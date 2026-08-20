@@ -120,6 +120,25 @@ describe("actualizarSerie", () => {
     expect(r[1]!.valorActualizado).not.toBeNull(); // el otro punto resuelve normal
   });
 
+  it("también marca una fecha exacta que cae en el primer mes de la serie (no sólo un mes anterior)", () => {
+    // Encontrado en la vuelta 2 del loop de revisión: una fecha completa necesita
+    // también el índice del mes ANTERIOR (ver `valorEn` en adjust.ts), incluso cuando
+    // coincide exactamente con el primer mes publicado. Antes de este fix,
+    // `fueraDeCobertura` sólo miraba el mes del punto y este caso se le escapaba.
+    const r = actualizarSerie(
+      [
+        { punto: "2020-01-15", valor: 100 },
+        { punto: "2020-02", valor: 110 },
+      ],
+      "2020-04",
+      ipc,
+    );
+    expect(r).toHaveLength(2);
+    expect(r[0]!.valorActualizado).toBeNull();
+    expect(r[0]!.motivo).toBe("fuera_de_cobertura");
+    expect(r[1]!.valorActualizado).not.toBeNull();
+  });
+
   it("con metodología rem, un punto que necesita estimar se proyecta con la senda del REM", () => {
     const ipcConRem: SerieIndice = {
       ...ipc,

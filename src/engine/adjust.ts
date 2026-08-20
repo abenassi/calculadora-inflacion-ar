@@ -253,7 +253,7 @@ function ventanaDeReferencia(
  * nivel con el que cerró ese mes. Es la contraparte de `mesTopeNecesario`, y decide si la
  * ventana de referencia entra en la serie o hay que proyectar.
  */
-function mesPisoNecesario(punto: Punto): Mes {
+export function mesPisoNecesario(punto: Punto): Mes {
   return esFecha(punto) ? sumarMeses(mesDe(punto), -1) : mesDe(punto);
 }
 
