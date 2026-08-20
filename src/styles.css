@@ -283,6 +283,61 @@ select {
   padding: 0.55rem 0.5rem;
 }
 
+.campo--ancho {
+  grid-column: 1 / -1;
+}
+
+.campo textarea {
+  width: 100%;
+  min-height: 10rem;
+  border: 1px solid var(--baseline);
+  border-radius: 8px;
+  background: var(--plane);
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  padding: 0.55rem 0.6rem;
+  resize: vertical;
+}
+
+.ayuda-formato {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.ayuda-formato code {
+  background: var(--wash-hover);
+  border-radius: 4px;
+  padding: 0.05rem 0.3rem;
+}
+
+.etiqueta-archivo {
+  display: block;
+  margin-top: 0.75rem;
+}
+
+.errores-parseo {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  color: var(--danger, #b3372c);
+  font-size: 0.85rem;
+}
+
+.errores-parseo li {
+  padding: 0.15rem 0;
+}
+
+.fila-sin-actualizar td {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.fila-estimada td {
+  color: var(--text-secondary);
+}
+
 input:focus-visible,
 select:focus-visible,
 button:focus-visible {
