@@ -79,6 +79,7 @@ import {
   porcentaje,
   seVenDistintos,
 } from "./format.js";
+import { esMetodologia, MOTIVOS } from "./metodologia.js";
 
 const NOMBRES_MES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -121,12 +122,6 @@ const MESES_DEL_DEFAULT = 3;
 
 function usaDias(): boolean {
   return el<HTMLInputElement>("usar-dias").checked;
-}
-
-const METODOLOGIAS: Metodologia[] = ["sin_proyectar", "repite_ultimo", "rem"];
-
-function esMetodologia(v: string | null): v is Metodologia {
-  return v !== null && (METODOLOGIAS as string[]).includes(v);
 }
 
 function leerMetodologia(): Metodologia {
@@ -599,35 +594,6 @@ function anotarCalculo(r: Resultado): void {
  * seguir en el REM al cambiar una fecha.
  */
 let metodologiaCambiadaPorNosotros = false;
-
-/**
- * Por qué «no estimar ninguno» quedó gris, en las palabras de cada caso.
- *
- * Antes había un solo texto fijo en el HTML que hablaba del destino futuro. Cuando el guard
- * de la ventana sesgada empezó a deshabilitar la opción, ese texto pasó a explicar una
- * razón que no era: decía "el mes de destino todavía no llegó" sobre un pedido a junio,
- * estando en agosto. El motivo lo contesta el motor, en la misma evaluación que decide si
- * la opción se puede ofrecer.
- */
-const MOTIVOS: Record<NonNullable<ReturnType<typeof motivoParaEstimar>>, string> = {
-  futuro:
-    "«No estimar ninguno» no está disponible para este período: el mes de destino todavía " +
-    "no llegó, así que no existe ningún tramo ya publicado que sirva de referencia. " +
-    "Cualquier respuesta va a ser una estimación.",
-  ventana_no_cabe:
-    "«No estimar ninguno» no está disponible para este período: para tomar como referencia " +
-    "un tramo publicado del mismo largo habría que ir más atrás de donde arranca esta " +
-    "serie. Cualquier respuesta va a ser una estimación.",
-  // Sin la explicación del mecanismo. Estaba en el medio —"el tramo publicado que habría
-  // que usar como referencia arrastra meses muy distintos de los que reemplaza"— y en el
-  // review no dejó nada: "tramo", "referencia" y "reemplaza" no significan nada para quien
-  // no conoce el método. Lo que sí sirvió es la consecuencia, que además es un motivo para
-  // confiar más y no menos: se sacó la opción para no pasarte un número inflado.
-  ventana_sesgada:
-    "«No estimar ninguno» no está disponible para este período: este índice viene atrasado, " +
-    "y esa opción daría un número bastante distinto de la inflación real del período. " +
-    "Preferimos estimar y decirlo.",
-};
 
 /**
  * Deshabilita "no estimar ninguno" cuando el período no admite esa respuesta.
