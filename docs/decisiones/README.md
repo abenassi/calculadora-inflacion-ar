@@ -28,6 +28,8 @@ arquitectura y la que probablemente quieras copiar tal cual.
 | [0013](0013-la-ventana-de-referencia-en-modo-por-dia.md) | La ventana de referencia por día | Correr meses enteros conservando el día dejaba el tramo terminando a mitad del último mes publicado, y volvía falso el pie de la tabla |
 | [0014](0014-los-porcentajes-cuando-se-va-para-atras.md) | Los porcentajes cuando se va para atrás | Deflactando, la tabla mostraba el recíproco de la inflación del mes de al lado, con el sello del organismo; ahora los porcentajes son cronológicos y el rótulo nombra el mes de su propio número |
 | [0015](0015-tipo-cambio-real.md) | Tipo de cambio real: un segundo índice, opcional | `/actualizar.html` puede ajustar también por inflación de EE.UU., con la serie del BCRA de cruce visual |
+| [0016](0016-pagina-tcr.md) | Página TCR, separada de "Actualizar" | `/actualizar.html` mezclaba dos casos de uso distintos; el tipo de cambio real bilateral pasa a `/tcr.html`, con un catálogo fijo de tres series |
+| [0017](0017-tcr-multilateral.md) | TCR multilateral, cuarta línea en `/tcr.html` | Se agrega el ITCRM del BCRA (canasta de monedas, no sólo el dólar) — es el número del BCRA tal cual, sin metodología nueva |
 | [0018](0018-actualizar-serie-propia.md) | Actualizar pasa a ser series propias del usuario | Reemplaza el MVP de dólar blue por la generalización que la 0016 dejó pendiente |
 
 ## Formato
