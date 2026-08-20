@@ -27,4 +27,35 @@ el desplegable "ajustar también por" que esta página ya no tiene.
 
 ## El loop de revisión
 
-_A completar durante la revisión (paso 4 de la skill `cambiar-la-calculadora`)._
+Tres vueltas de `revisor-economista`, `revisora-usuaria` y `revisor-codigo`, en paralelo
+y sin verse entre sí, contra el sitio real (no sólo el código).
+
+**Vuelta 1 — cuatro hallazgos:**
+
+- **Bloqueante, confirmado independientemente por economista y usuaria:** una fecha
+  anterior a donde arranca el IPC (`1985-01`, con la serie arrancando en 1990) o un año
+  extremo (`9999-12`) hacía que `actualizarSerie` reventara con una `RangoError` sin
+  capturar, y el resultado entero desaparecía sin ningún aviso — hasta las filas que sí
+  eran válidas. Fix: un año fuera de un rango plausible (1000–3000) se rechaza al
+  parsear, y `actualizarSerie` gana el mismo guard de cobertura que ya usaba
+  `actualizarSerieDoble` para el índice secundario.
+- **Bloqueante, confirmado independientemente por usuaria y revisor-codigo:** el CSV
+  que exporta Excel/Sheets en configuración Argentina/España (separador de campo `;`,
+  decimal `,`) rompía el parseo completo, porque el detector de separador elegía por
+  presencia en la línea y no por dónde separaba de verdad los campos. Fix: probar los
+  tres separadores y quedarse con el que da una fecha Y un valor que efectivamente
+  parsean.
+- **Importante (revisor-codigo):** faltaba la cobertura de test que el spec pedía
+  explícitamente para los caminos `ventana_reciente`/`rem` de `actualizarSerie`.
+- **Menor (revisor-codigo):** este mismo placeholder, sin completar.
+
+**Vuelta 2 — un hallazgo nuevo:** revisor-codigo encontró que el guard de cobertura de
+la vuelta 1 sólo miraba el mes del punto, no el mes anterior que `adjust()` también
+necesita para cualquier fecha exacta (no sólo mes entero) — una fecha completa cayendo
+justo en el primer mes publicado (`1990-01-15`) seguía reventando el batch entero. Fix:
+reusar `mesPisoNecesario` (ya existía en `adjust.ts` para este mismo propósito, sólo
+faltaba exportarla) en vez de reinventar el criterio.
+
+**Vuelta 3 — nada nuevo.** Cierre del loop con la salida "vuelta que no trae nada
+nuevo", incluida una pasada final sobre los bordes vecinos (mes puro en el primer mes,
+fecha en el último mes publicado, `actualizarSerieDoble` sin cambios de comportamiento).
