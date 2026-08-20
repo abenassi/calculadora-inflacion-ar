@@ -8,3 +8,6 @@ dist/
 # Artefactos de las sesiones de browser de los revisores
 .playwright-mcp/
 .claude/worktrees/
+
+# Scratch de subagent-driven-development (ledger, briefs, reviews de un plan)
+.superpowers/
