@@ -15,9 +15,14 @@
  *
  * QUÉ SE MANDA, EN CONCRETO
  * Qué página se abrió, qué se calculó (monto, período, metodología), y qué botones se tocaron.
- * NO se manda ningún identificador de persona: el servidor deriva un visitante anónimo que rota
- * todos los días y no guarda la IP. El detalle está en /datos y el diseño en el repo del MCP.
- * Por eso mismo el sitio no tiene banner de cookies: no hay ninguna que avisar.
+ * NO se manda ningún identificador de persona: el servidor deriva un visitante anónimo a partir de
+ * una clave que rota cada 30 días, y no guarda la IP. Nada de eso vive en el navegador — no hay
+ * cookie ni localStorage, y por eso el sitio no tiene banner que aceptar. El único identificador
+ * que pone el cliente es el de sesión de acá abajo, que muere al cerrar la pestaña.
+ *
+ * La ventana de rotación era de un día hasta el 2026-08-22. Se subió a 30 para poder saber cuánta
+ * gente distinta hay en un mes y cuánta vuelve, con el costo anotado en docs/decisiones/0008 y
+ * explicado en /datos. Si tocás esto, esos dos textos tienen que cambiar en el mismo commit.
  */
 
 import type { Metodologia, Punto, Resultado } from "../engine/types.js";

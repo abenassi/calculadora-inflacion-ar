@@ -393,10 +393,19 @@
       <p>
         <strong>No se guarda tu dirección IP.</strong> El servidor la usa para derivar un
         identificador anónimo y la descarta en el acto: nunca se escribe. Ese identificador sale de
-        una clave aleatoria que cambia todos los días y <em>se borra a los dos días</em>, así que
-        pasado ese plazo el identificador de anteayer no se puede volver a calcular ni teniendo la
-        base entera y tu IP a mano. El costo, para nosotros, es que no podemos seguir a nadie de un
-        día para el otro. Es a propósito.
+        una clave aleatoria que <em>cambia cada 30 días</em>, y al cambiar se borra la anterior, así
+        que a partir de ahí el identificador viejo no se puede volver a calcular ni teniendo la base
+        entera y tu IP a mano.
+      </p>
+      <p>
+        Hasta agosto de 2026 esa clave cambiaba todos los días. Se pasó a 30 porque con rotación
+        diaria no había forma de saber cuánta gente distinta usa el sitio en un mes ni cuánta
+        vuelve: cada mañana eras alguien nuevo. Y lo que se paga por saberlo conviene decirlo en voz
+        alta: <strong>mientras la clave existe, alguien con acceso a la base y
+        una IP sospechada podría verificar si esa IP estuvo</strong>, y esa ventana pasó de un día a
+        treinta. Lo que no cambia: la IP no se escribe nunca, no hay cookies, no hay nada guardado
+        en tu navegador que te identifique, y pasada la rotación no hay con qué recalcular nada.
+        Cruzada una rotación, volvés a ser alguien nuevo.
       </p>
       <p>
         <strong>No hay cookies, ni banner que aceptar</strong>, y no se comparte nada con Google ni

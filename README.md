@@ -264,8 +264,10 @@ hay red, no hay endpoint, no hay que acordarse de apagar nada ni pedir una key.
 Si querés el tuyo, agregá tu hostname al mapa y apuntá `ENDPOINT` a tu backend. El diseño
 está en [`docs/decisiones/0008`](docs/decisiones/0008-analytics-sin-guardar-la-ip.md) y
 vale la pena aunque uses otra herramienta: el visitante sale de un hash con una sal que
-rota a diario y se borra a los dos días, así que se pueden contar personas sin guardar la
-IP, sin identificador persistente y —esto es lo práctico— **sin banner de cookies**.
+rota cada 30 días y se borra al rotar, así que se pueden contar personas —y ver cuántas
+vuelven— sin guardar la IP, sin identificador persistente en el navegador y —esto es lo
+práctico— **sin banner de cookies**. La misma decisión explica por qué acá no hay Google
+Analytics.
 
 ### Un consejo que nos costó aprender
 
