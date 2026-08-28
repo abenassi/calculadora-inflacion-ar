@@ -4,6 +4,11 @@
  * Corre en GitHub Actions una vez por día. Veinticuatro llamadas de quota: cuatro del
  * índice nacional y el REM, dos auxiliares, una por cada índice jurisdiccional, el
  * dólar blue, y dos por cada índice secundario declarado (la serie y su cross-check).
+ * Son veinticuatro llamadas lógicas, no veinticuatro requests: `mcp-client.ts` reintenta
+ * hasta dos veces las que se caen por red, 429 o 5xx, así que un día con la red del
+ * runner inestable puede llegar a setenta y dos requests. Los que no llegan a destino no
+ * gastan cuota; los 5xx que sí llegaron, no sabemos, y por eso el techo son tres intentos
+ * y no diez.
  *
  * Invariante que este script protege: **ni un snapshot ni el catálogo pueden encoger**. Si el MCP responde raro, o el INDEC revisa la serie hacia atrás, o una
  * fuente se cae, preferimos fallar ruidosamente y seguir sirviendo el último

@@ -49,6 +49,21 @@ y no commitea**. El sitio sigue sirviendo el último snapshot bueno.
 Además los tests corren contra el snapshot recién bajado, antes de publicarlo. Si la
 serie cambió de forma incompatible, se caza ahí.
 
+### Fallar ruidoso no es fallar por un pestañeo de la red
+
+"Fallar ruidosamente" vale cuando lo que falló dice algo. Un `fetch` que se cae por un
+segundo no dice nada: el 2026-08-28 la corrida diaria se cayó entera con un `fetch failed`
+pelado a los nueve segundos —la misma bajada corrió bien a mano un rato después— y el
+resultado fue un mail de build roto por algo que se arregla solo, más un día sin snapshot.
+
+Por eso `mcp-client.ts` reintenta tres veces, con esperas de 2 y 6 segundos, sólo lo que
+puede andar bien en el intento siguiente: errores de red, 429 y 5xx. Un 401 o un 400 vuelven
+en el acto, porque esperar no los arregla. Cada intento tiene un techo de 30 segundos: sin
+eso, una conexión colgada deja el job esperando hasta el límite de seis horas de Actions.
+
+La invariante no se toca: agotados los reintentos, el job **falla y no commitea**. Lo que
+cambia es qué cuenta como motivo para fallar, y que la alarma que suena se pueda creer.
+
 ## Si vas a copiar esto
 
 Es la parte más reusable del repo y funciona para cualquier serie del MCP. Mirá

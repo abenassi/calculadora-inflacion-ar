@@ -12,6 +12,23 @@
 
 const ENDPOINT = process.env.ARGENTINA_DATA_URL ?? "https://argentinadata.mymcps.dev/mcp";
 
+/**
+ * Techo por intento. Sin esto, una conexión que se cuelga sin cerrar deja el job de
+ * Actions esperando hasta el límite de seis horas por un pipeline que tarda medio minuto.
+ */
+const TIMEOUT_MS = 30_000;
+
+/**
+ * Esperas entre reintentos (tres intentos en total).
+ *
+ * El 2026-08-28 la corrida diaria se cayó entera con un `fetch failed` pelado a los
+ * nueve segundos: una falla de red de un instante, sin nada roto de nuestro lado ni
+ * del MCP —la misma bajada corrió bien a mano un rato después—. Como el pipeline no
+ * reintentaba, el snapshot del día no se actualizó y llegó un mail de build roto por
+ * algo que se arregla solo. Reintentar sale mucho más barato que perder el día.
+ */
+const ESPERAS_MS = [2_000, 6_000];
+
 export class McpError extends Error {}
 
 type RespuestaJsonRpc = {
@@ -30,6 +47,64 @@ function desenmarcarSse(cuerpo: string): string {
   throw new McpError(`Respuesta del MCP sin payload reconocible: ${cuerpo.slice(0, 200)}`);
 }
 
+/**
+ * `fetch` de undici tira siempre el mismo "fetch failed" y guarda el motivo real
+ * (ECONNRESET, DNS, timeout de conexión) en `cause`. Sin desenvolverlo, el log del
+ * workflow no dice absolutamente nada sobre por qué se cayó la corrida.
+ */
+function describirFalla(e: unknown): string {
+  const err = e as Error & { cause?: unknown };
+  const causa = err?.cause instanceof Error ? `: ${err.cause.message}` : "";
+  return `${err?.message ?? String(e)}${causa}`;
+}
+
+const dormir = (ms: number) => new Promise((listo) => setTimeout(listo, ms));
+
+/**
+ * POST con reintentos ante fallas transitorias.
+ *
+ * Se reintenta lo que puede andar bien en el intento siguiente: errores de red y
+ * respuestas 429 o 5xx. Un 401 (key mal) o un 400 (argumentos inválidos) no mejoran
+ * esperando, así que vuelven en el acto para fallar ruidosamente.
+ */
+async function postear(nombre: string, cuerpo: string, apiKey: string): Promise<Response> {
+  let motivo = "";
+
+  for (let intento = 0; intento <= ESPERAS_MS.length; intento++) {
+    if (intento > 0) {
+      const espera = ESPERAS_MS[intento - 1]!;
+      console.warn(
+        `  ${nombre}: ${motivo} — reintento ${intento} de ${ESPERAS_MS.length} en ${espera / 1000}s`,
+      );
+      await dormir(espera);
+    }
+
+    let respuesta: Response;
+    try {
+      respuesta = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          Accept: "application/json, text/event-stream",
+        },
+        body: cuerpo,
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      });
+    } catch (e: unknown) {
+      motivo = describirFalla(e);
+      continue;
+    }
+
+    if (respuesta.status !== 429 && respuesta.status < 500) return respuesta;
+    // Leer el cuerpo también libera el socket, que si no queda tomado hasta el final.
+    const detalle = (await respuesta.text().catch(() => "")).slice(0, 200).trim();
+    motivo = `HTTP ${respuesta.status} ${respuesta.statusText}${detalle ? ` — ${detalle}` : ""}`;
+  }
+
+  throw new McpError(`${nombre}: ${motivo} (tras ${ESPERAS_MS.length + 1} intentos)`);
+}
+
 export async function llamarTool<T>(nombre: string, args: Record<string, unknown>): Promise<T> {
   const apiKey = process.env.ARGENTINA_DATA_API_KEY;
   if (!apiKey) {
@@ -38,20 +113,16 @@ export async function llamarTool<T>(nombre: string, args: Record<string, unknown
     );
   }
 
-  const respuesta = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      Accept: "application/json, text/event-stream",
-    },
-    body: JSON.stringify({
+  const respuesta = await postear(
+    nombre,
+    JSON.stringify({
       jsonrpc: "2.0",
       id: 1,
       method: "tools/call",
       params: { name: nombre, arguments: args },
     }),
-  });
+    apiKey,
+  );
 
   if (!respuesta.ok) {
     throw new McpError(`${nombre}: HTTP ${respuesta.status} ${respuesta.statusText}`);
