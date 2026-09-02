@@ -4,11 +4,11 @@
     {
       "id": "dolar_oficial",
       "organismo": "BCRA",
-      "rango": "2010-06/2026-08"
+      "rango": "2010-06/2026-09"
     }
   ],
   "unidad": "pesos_por_usd",
-  "actualizado": "2026-09-01T15:45:17.108Z",
+  "actualizado": "2026-09-02T15:36:28.775Z",
   "datos": [
     {
       "mes": "2010-06",
@@ -789,6 +789,10 @@
     {
       "mes": "2026-08",
       "valor": 1531.51
+    },
+    {
+      "mes": "2026-09",
+      "valor": 1533.63
     }
   ]
 }
