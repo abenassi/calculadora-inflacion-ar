@@ -11,3 +11,4 @@ dist/
 
 # Scratch de subagent-driven-development (ledger, briefs, reviews de un plan)
 .superpowers/
+# smoke test for ci-pr workflow
