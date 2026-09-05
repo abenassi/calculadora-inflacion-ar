@@ -17,7 +17,7 @@
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:26:44.320Z",
+  "actualizado": "2026-09-05T14:13:14.982Z",
   "datos": [
     {
       "mes": "2016-04",
@@ -531,22 +531,22 @@
     },
     {
       "mes": "2024-10",
-      "indice": 39252.462065,
+      "indice": 39252.46206461826,
       "origen": "deie-mendoza"
     },
     {
       "mes": "2024-11",
-      "indice": 40016.257819,
+      "indice": 40016.25781902024,
       "origen": "deie-mendoza"
     },
     {
       "mes": "2024-12",
-      "indice": 41085.037947,
+      "indice": 41085.03794713111,
       "origen": "deie-mendoza"
     },
     {
       "mes": "2025-01",
-      "indice": 41515.033236,
+      "indice": 41515.03323579705,
       "origen": "deie-mendoza"
     },
     {
@@ -571,7 +571,7 @@
     },
     {
       "mes": "2025-06",
-      "indice": 46476.001482,
+      "indice": 46476.00148180272,
       "origen": "deie-mendoza"
     },
     {
@@ -581,7 +581,7 @@
     },
     {
       "mes": "2025-08",
-      "indice": 48304.133721,
+      "indice": 48304.1337205124,
       "origen": "deie-mendoza"
     },
     {
@@ -611,27 +611,27 @@
     },
     {
       "mes": "2026-02",
-      "indice": 56317.800712,
+      "indice": 56317.80071186934,
       "origen": "deie-mendoza"
     },
     {
       "mes": "2026-03",
-      "indice": 58349.057975,
+      "indice": 58349.05797469706,
       "origen": "deie-mendoza"
     },
     {
       "mes": "2026-04",
-      "indice": 59686.693018,
+      "indice": 59686.6930184041,
       "origen": "deie-mendoza"
     },
     {
       "mes": "2026-05",
-      "indice": 60815.187216,
+      "indice": 60815.18721556733,
       "origen": "deie-mendoza"
     },
     {
       "mes": "2026-06",
-      "indice": 61698.727675,
+      "indice": 61698.72767540508,
       "origen": "deie-mendoza"
     }
   ]
