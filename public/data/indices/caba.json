@@ -17,581 +17,581 @@
     }
   ],
   "ultimo_oficial": "2026-07",
-  "actualizado": "2026-08-13T23:26:43.444Z",
+  "actualizado": "2026-09-07T16:51:03.662Z",
   "datos": [
     {
       "mes": "2012-07",
-      "indice": 6.436388,
+      "indice": 6.436387689880368,
       "origen": "idecba"
     },
     {
       "mes": "2012-08",
-      "indice": 6.585093,
+      "indice": 6.585092626209653,
       "origen": "idecba"
     },
     {
       "mes": "2012-09",
-      "indice": 6.683653,
+      "indice": 6.68365287470697,
       "origen": "idecba"
     },
     {
       "mes": "2012-10",
-      "indice": 6.782213,
+      "indice": 6.782213123204288,
       "origen": "idecba"
     },
     {
       "mes": "2012-11",
-      "indice": 6.922849,
+      "indice": 6.922848799422683,
       "origen": "idecba"
     },
     {
       "mes": "2012-12",
-      "indice": 7.05945,
+      "indice": 7.059449845585632,
       "origen": "idecba"
     },
     {
       "mes": "2013-01",
-      "indice": 7.221411,
+      "indice": 7.221411423525667,
       "origen": "idecba"
     },
     {
       "mes": "2013-02",
-      "indice": 7.300375,
+      "indice": 7.300374897467962,
       "origen": "idecba"
     },
     {
       "mes": "2013-03",
-      "indice": 7.413345,
+      "indice": 7.413344539020443,
       "origen": "idecba"
     },
     {
       "mes": "2013-04",
-      "indice": 7.562049,
+      "indice": 7.562049475349728,
       "origen": "idecba"
     },
     {
       "mes": "2013-05",
-      "indice": 7.675019,
+      "indice": 7.675019116902209,
       "origen": "idecba"
     },
     {
       "mes": "2013-06",
-      "indice": 7.819689,
+      "indice": 7.819689423176049,
       "origen": "idecba"
     },
     {
       "mes": "2013-07",
-      "indice": 8.011623,
+      "indice": 8.011622538670826,
       "origen": "idecba"
     },
     {
       "mes": "2013-08",
-      "indice": 8.178195,
+      "indice": 8.178195122388514,
       "origen": "idecba"
     },
     {
       "mes": "2013-09",
-      "indice": 8.352837,
+      "indice": 8.352836966217094,
       "origen": "idecba"
     },
     {
       "mes": "2013-10",
-      "indice": 8.536701,
+      "indice": 8.536700821600979,
       "origen": "idecba"
     },
     {
       "mes": "2013-11",
-      "indice": 8.739585,
+      "indice": 8.739585075817677,
       "origen": "idecba"
     },
     {
       "mes": "2013-12",
-      "indice": 8.937282,
+      "indice": 8.93728194853452,
       "origen": "idecba"
     },
     {
       "mes": "2014-01",
-      "indice": 9.366105,
+      "indice": 9.366105485856181,
       "origen": "idecba"
     },
     {
       "mes": "2014-02",
-      "indice": 9.775909,
+      "indice": 9.775908624345028,
       "origen": "idecba"
     },
     {
       "mes": "2014-03",
-      "indice": 10.132685,
+      "indice": 10.132685196390872,
       "origen": "idecba"
     },
     {
       "mes": "2014-04",
-      "indice": 10.449115,
+      "indice": 10.449115467882258,
       "origen": "idecba"
     },
     {
       "mes": "2014-05",
-      "indice": 10.709637,
+      "indice": 10.709637294319611,
       "origen": "idecba"
     },
     {
       "mes": "2014-06",
-      "indice": 10.959784,
+      "indice": 10.959784357757249,
       "origen": "idecba"
     },
     {
       "mes": "2014-07",
-      "indice": 11.203591,
+      "indice": 11.203591288250612,
       "origen": "idecba"
     },
     {
       "mes": "2014-08",
-      "indice": 11.458349,
+      "indice": 11.4583493574659,
       "origen": "idecba"
     },
     {
       "mes": "2014-09",
-      "indice": 11.715989,
+      "indice": 11.71598930529222,
       "origen": "idecba"
     },
     {
       "mes": "2014-10",
-      "indice": 11.941929,
+      "indice": 11.941928588397182,
       "origen": "idecba"
     },
     {
       "mes": "2014-11",
-      "indice": 12.159799,
+      "indice": 12.159798611391253,
       "origen": "idecba"
     },
     {
       "mes": "2014-12",
-      "indice": 12.336746,
+      "indice": 12.33674595810866,
       "origen": "idecba"
     },
     {
       "mes": "2015-01",
-      "indice": 12.578247,
+      "indice": 12.578247385713196,
       "origen": "idecba"
     },
     {
       "mes": "2015-02",
-      "indice": 12.760958,
+      "indice": 12.760958489652667,
       "origen": "idecba"
     },
     {
       "mes": "2015-03",
-      "indice": 12.973065,
+      "indice": 12.973064755424673,
       "origen": "idecba"
     },
     {
       "mes": "2015-04",
-      "indice": 13.280273,
+      "indice": 13.280273015360756,
       "origen": "idecba"
     },
     {
       "mes": "2015-05",
-      "indice": 13.574225,
+      "indice": 13.574224633686086,
       "origen": "idecba"
     },
     {
       "mes": "2015-06",
-      "indice": 13.757512,
+      "indice": 13.757512113347765,
       "origen": "idecba"
     },
     {
       "mes": "2015-07",
-      "indice": 14.038207,
+      "indice": 14.038207090062349,
       "origen": "idecba"
     },
     {
       "mes": "2015-08",
-      "indice": 14.295271,
+      "indice": 14.295270662166462,
       "origen": "idecba"
     },
     {
       "mes": "2015-09",
-      "indice": 14.532161,
+      "indice": 14.532161083993348,
       "origen": "idecba"
     },
     {
       "mes": "2015-10",
-      "indice": 14.779426,
+      "indice": 14.77942626881995,
       "origen": "idecba"
     },
     {
       "mes": "2015-11",
-      "indice": 15.068191,
+      "indice": 15.068190505645424,
       "origen": "idecba"
     },
     {
       "mes": "2015-12",
-      "indice": 15.658399,
+      "indice": 15.658399245184917,
       "origen": "idecba"
     },
     {
       "mes": "2016-01",
-      "indice": 16.306246,
+      "indice": 16.30624555694506,
       "origen": "idecba"
     },
     {
       "mes": "2016-02",
-      "indice": 16.953515,
+      "indice": 16.953515492982998,
       "origen": "idecba"
     },
     {
       "mes": "2016-03",
-      "indice": 17.516058,
+      "indice": 17.516058197856573,
       "origen": "idecba"
     },
     {
       "mes": "2016-04",
-      "indice": 18.66247,
+      "indice": 18.662469509325373,
       "origen": "idecba"
     },
     {
       "mes": "2016-05",
-      "indice": 19.601962,
+      "indice": 19.60196193652202,
       "origen": "idecba"
     },
     {
       "mes": "2016-06",
-      "indice": 20.23367,
+      "indice": 20.233669728060384,
       "origen": "idecba"
     },
     {
       "mes": "2016-07",
-      "indice": 20.669986,
+      "indice": 20.66998614977073,
       "origen": "idecba"
     },
     {
       "mes": "2016-08",
-      "indice": 20.513212,
+      "indice": 20.51321195333055,
       "origen": "idecba"
     },
     {
       "mes": "2016-09",
-      "indice": 20.78872,
+      "indice": 20.788719548545277,
       "origen": "idecba"
     },
     {
       "mes": "2016-10",
-      "indice": 21.391609,
+      "indice": 21.39160855397331,
       "origen": "idecba"
     },
     {
       "mes": "2016-11",
-      "indice": 21.815245,
+      "indice": 21.815244709795113,
       "origen": "idecba"
     },
     {
       "mes": "2016-12",
-      "indice": 22.086141,
+      "indice": 22.086141299232185,
       "origen": "idecba"
     },
     {
       "mes": "2017-01",
-      "indice": 22.503437,
+      "indice": 22.503437322109715,
       "origen": "idecba"
     },
     {
       "mes": "2017-02",
-      "indice": 22.988169,
+      "indice": 22.98816930448541,
       "origen": "idecba"
     },
     {
       "mes": "2017-03",
-      "indice": 23.652154,
+      "indice": 23.652154136467338,
       "origen": "idecba"
     },
     {
       "mes": "2017-04",
-      "indice": 24.152448,
+      "indice": 24.15244826334261,
       "origen": "idecba"
     },
     {
       "mes": "2017-05",
-      "indice": 24.589341,
+      "indice": 24.589341060775165,
       "origen": "idecba"
     },
     {
       "mes": "2017-06",
-      "indice": 24.965138,
+      "indice": 24.965138031653822,
       "origen": "idecba"
     },
     {
       "mes": "2017-07",
-      "indice": 25.405489,
+      "indice": 25.405489083419614,
       "origen": "idecba"
     },
     {
       "mes": "2017-08",
-      "indice": 25.818174,
+      "indice": 25.818174100519492,
       "origen": "idecba"
     },
     {
       "mes": "2017-09",
-      "indice": 26.227401,
+      "indice": 26.227400863286135,
       "origen": "idecba"
     },
     {
       "mes": "2017-10",
-      "indice": 26.629711,
+      "indice": 26.629711117386293,
       "origen": "idecba"
     },
     {
       "mes": "2017-11",
-      "indice": 26.966315,
+      "indice": 26.96631453915491,
       "origen": "idecba"
     },
     {
       "mes": "2017-12",
-      "indice": 27.856239,
+      "indice": 27.8562386542418,
       "origen": "idecba"
     },
     {
       "mes": "2018-01",
-      "indice": 28.306388,
+      "indice": 28.3063880932851,
       "origen": "idecba"
     },
     {
       "mes": "2018-02",
-      "indice": 29.040114,
+      "indice": 29.040114387654018,
       "origen": "idecba"
     },
     {
       "mes": "2018-03",
-      "indice": 29.659142,
+      "indice": 29.659141913303845,
       "origen": "idecba"
     },
     {
       "mes": "2018-04",
-      "indice": 30.559441,
+      "indice": 30.559440791390447,
       "origen": "idecba"
     },
     {
       "mes": "2018-05",
-      "indice": 31.270112,
+      "indice": 31.270112056871103,
       "origen": "idecba"
     },
     {
       "mes": "2018-06",
-      "indice": 32.413641,
+      "indice": 32.41364148972886,
       "origen": "idecba"
     },
     {
       "mes": "2018-07",
-      "indice": 33.285698,
+      "indice": 33.28569795742735,
       "origen": "idecba"
     },
     {
       "mes": "2018-08",
-      "indice": 34.501274,
+      "indice": 34.50127435556093,
       "origen": "idecba"
     },
     {
       "mes": "2018-09",
-      "indice": 36.575651,
+      "indice": 36.57565057978225,
       "origen": "idecba"
     },
     {
       "mes": "2018-10",
-      "indice": 38.502475,
+      "indice": 38.50247461911869,
       "origen": "idecba"
     },
     {
       "mes": "2018-11",
-      "indice": 39.577415,
+      "indice": 39.57741534103388,
       "origen": "idecba"
     },
     {
       "mes": "2018-12",
-      "indice": 40.51979,
+      "indice": 40.519789646841566,
       "origen": "idecba"
     },
     {
       "mes": "2019-01",
-      "indice": 42.066782,
+      "indice": 42.0667820852439,
       "origen": "idecba"
     },
     {
       "mes": "2019-02",
-      "indice": 43.48409,
+      "indice": 43.48408998614977,
       "origen": "idecba"
     },
     {
       "mes": "2019-03",
-      "indice": 45.217252,
+      "indice": 45.21725178282482,
       "origen": "idecba"
     },
     {
       "mes": "2019-04",
-      "indice": 46.889318,
+      "indice": 46.88931775294597,
       "origen": "idecba"
     },
     {
       "mes": "2019-05",
-      "indice": 48.361381,
+      "indice": 48.36138134746146,
       "origen": "idecba"
     },
     {
       "mes": "2019-06",
-      "indice": 49.697997,
+      "indice": 49.697996647258414,
       "origen": "idecba"
     },
     {
       "mes": "2019-07",
-      "indice": 50.795416,
+      "indice": 50.79541602233965,
       "origen": "idecba"
     },
     {
       "mes": "2019-08",
-      "indice": 52.519356,
+      "indice": 52.519355807459405,
       "origen": "idecba"
     },
     {
       "mes": "2019-09",
-      "indice": 55.159733,
+      "indice": 55.159732990887534,
       "origen": "idecba"
     },
     {
       "mes": "2019-10",
-      "indice": 56.684823,
+      "indice": 56.684823151846025,
       "origen": "idecba"
     },
     {
       "mes": "2019-11",
-      "indice": 58.954591,
+      "indice": 58.95459074589536,
       "origen": "idecba"
     },
     {
       "mes": "2019-12",
-      "indice": 61.00937,
+      "indice": 61.00937019556165,
       "origen": "idecba"
     },
     {
       "mes": "2020-01",
-      "indice": 62.495267,
+      "indice": 62.4952668074101,
       "origen": "idecba"
     },
     {
       "mes": "2020-02",
-      "indice": 63.649747,
+      "indice": 63.64974737898977,
       "origen": "idecba"
     },
     {
       "mes": "2020-03",
-      "indice": 65.397319,
+      "indice": 65.39731856872001,
       "origen": "idecba"
     },
     {
       "mes": "2020-04",
-      "indice": 66.683789,
+      "indice": 66.68378918068498,
       "origen": "idecba"
     },
     {
       "mes": "2020-05",
-      "indice": 67.324143,
+      "indice": 67.32414260805643,
       "origen": "idecba"
     },
     {
       "mes": "2020-06",
-      "indice": 68.278044,
+      "indice": 68.27804442830825,
       "origen": "idecba"
     },
     {
       "mes": "2020-07",
-      "indice": 69.379498,
+      "indice": 69.37949843344494,
       "origen": "idecba"
     },
     {
       "mes": "2020-08",
-      "indice": 71.051564,
+      "indice": 71.05156440356609,
       "origen": "idecba"
     },
     {
       "mes": "2020-09",
-      "indice": 72.644091,
+      "indice": 72.64409052402274,
       "origen": "idecba"
     },
     {
       "mes": "2020-10",
-      "indice": 74.444688,
+      "indice": 74.44468828019595,
       "origen": "idecba"
     },
     {
       "mes": "2020-11",
-      "indice": 76.715609,
+      "indice": 76.71560862568971,
       "origen": "idecba"
     },
     {
       "mes": "2020-12",
-      "indice": 79.59864,
+      "indice": 79.5986399881668,
       "origen": "idecba"
     },
     {
       "mes": "2021-01",
-      "indice": 82.651702,
+      "indice": 82.6517021886948,
       "origen": "idecba"
     },
     {
       "mes": "2021-02",
-      "indice": 85.00735,
+      "indice": 85.0073497653529,
       "origen": "idecba"
     },
     {
       "mes": "2021-03",
-      "indice": 88.312865,
+      "indice": 88.31286453220739,
       "origen": "idecba"
     },
     {
       "mes": "2021-04",
-      "indice": 91.867374,
+      "indice": 91.86737361105509,
       "origen": "idecba"
     },
     {
       "mes": "2021-05",
-      "indice": 95.178652,
+      "indice": 95.17865213513161,
       "origen": "idecba"
     },
     {
       "mes": "2021-06",
-      "indice": 98.233443,
+      "indice": 98.23344346282624,
       "origen": "idecba"
     },
     {
       "mes": "2021-07",
-      "indice": 101.128002,
+      "indice": 101.12800233974745,
       "origen": "idecba"
     },
     {
       "mes": "2021-08",
-      "indice": 104.077317,
+      "indice": 104.0773169102783,
       "origen": "idecba"
     },
     {
       "mes": "2021-09",
-      "indice": 107.601278,
+      "indice": 107.60127807584904,
       "origen": "idecba"
     },
     {
       "mes": "2021-10",
-      "indice": 111.57366,
+      "indice": 111.57365955329648,
       "origen": "idecba"
     },
     {
       "mes": "2021-11",
-      "indice": 114.373116,
+      "indice": 114.3731164360536,
       "origen": "idecba"
     },
     {
       "mes": "2021-12",
-      "indice": 118.765099,
+      "indice": 118.76509943926742,
       "origen": "idecba"
     },
     {
       "mes": "2022-01",
-      "indice": 123.546712,
+      "indice": 123.54671243069284,
       "origen": "idecba"
     },
     {
