@@ -8,7 +8,7 @@
       "organismo": "Instituto de Estadística y Censos de la Ciudad de Buenos Aires (IDECBA)",
       "organismoCorto": "IDECBA",
       "url": "https://www.estadisticaciudad.gob.ar/",
-      "rango": "2012-07/2026-07",
+      "rango": "2012-07/2026-08",
       "etiqueta": {
         "corta": "IPCBA del IDECBA",
         "larga": "el Índice de Precios al Consumidor de la Ciudad de Buenos Aires (IPCBA)",
@@ -16,8 +16,8 @@
       }
     }
   ],
-  "ultimo_oficial": "2026-07",
-  "actualizado": "2026-09-07T16:51:03.662Z",
+  "ultimo_oficial": "2026-08",
+  "actualizado": "2026-09-09T15:33:13.591Z",
   "datos": [
     {
       "mes": "2012-07",
@@ -862,6 +862,11 @@
     {
       "mes": "2026-07",
       "indice": 2553.4,
+      "origen": "idecba"
+    },
+    {
+      "mes": "2026-08",
+      "indice": 2596.6,
       "origen": "idecba"
     }
   ]
