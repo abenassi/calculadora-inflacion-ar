@@ -30,12 +30,31 @@ import { indice, pesosRedondo } from "./format.js";
 Chart.register(CategoryScale, LinearScale, LineController, LineElement, PointElement, Tooltip, Legend);
 
 export type SerieTcrGraficada = {
+  /**
+   * Identifica la serie de forma estable ("blue", "oficial", "bilateral",
+   * "multilateral") para el tracking de visibilidad de abajo — a diferencia de
+   * `label`, que cambia con el mes objetivo ("Dólar blue, TCR a julio 2020"), así que
+   * no sirve para reconocer "es la misma serie que ya estaba oculta" entre un
+   * redibujado y el siguiente.
+   */
+  id: string;
   label: string;
   /** Mismo largo y orden que `meses`; `null` donde esa serie no tiene dato ese mes. */
   valores: (number | null)[];
 };
 
 let grafico: Chart | null = null;
+/** `id` de cada dataset del `grafico` actual, mismo orden — ver `seriesOcultas`. */
+let idsActuales: string[] = [];
+
+/**
+ * Ids de las series que quien usa la página apagó desde la leyenda. Vive fuera de la
+ * instancia de `Chart` a propósito: cada cambio de rango destruye y recrea el gráfico
+ * (ver el comentario sobre `grafico?.destroy()` más abajo), y el estado de "oculta"
+ * que deja un click en la leyenda vive adentro de esa instancia — sin este set, se
+ * pierde en cada redibujado y las series vuelven a aparecer todas.
+ */
+let seriesOcultas = new Set<string>();
 
 /**
  * `lineasIndice` trae hasta dos líneas del BCRA (bilateral, multilateral) en ese
@@ -99,6 +118,16 @@ export function dibujarComparacionTcr(
     });
   });
 
+  const ids = [blue.id, oficial.id, ...lineasIndice.map((l) => l.id)];
+
+  // Se reconstruye entero (no se agrega) para que también capture cuando alguien
+  // reactivó desde la leyenda una serie que antes había ocultado — si sólo
+  // agregáramos, un `.add()` sin su `.delete()` simétrico dejaría la serie oculta
+  // para siempre aunque el gráfico que se está por destruir ya la mostraba de nuevo.
+  if (grafico) {
+    const anterior = grafico;
+    seriesOcultas = new Set(idsActuales.filter((_id, i) => !anterior.isDatasetVisible(i)));
+  }
   grafico?.destroy();
   grafico = new Chart(canvas, {
     type: "line",
@@ -170,4 +199,14 @@ export function dibujarComparacionTcr(
       },
     },
   });
+
+  idsActuales = ids;
+  let huboCambios = false;
+  ids.forEach((id, i) => {
+    if (seriesOcultas.has(id)) {
+      grafico!.setDatasetVisibility(i, false);
+      huboCambios = true;
+    }
+  });
+  if (huboCambios) grafico.update();
 }

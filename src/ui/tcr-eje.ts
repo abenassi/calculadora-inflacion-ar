@@ -50,7 +50,7 @@ export function armarEjeYSeries(
 
 export type LineaBcra = {
   /** Ausente si el snapshot no trae la serie, o si no cubre ningún mes del rango visible. */
-  serie?: { label: string; valores: (number | null)[] };
+  serie?: { id: string; label: string; valores: (number | null)[] };
   /** Ausente = no mostrar ninguna nota. */
   nota?: string;
 };
@@ -86,7 +86,7 @@ export function armarLineaBcra(
 
   if (valores.some((v) => v !== null)) {
     return {
-      serie: { label, valores },
+      serie: { id: nombreCorto, label, valores },
       nota:
         `La línea del BCRA (${nombreCorto}) es una comparación de forma, no de nivel: está reescalada ` +
         `a 100 en ${nombrarMes(mesAncla)} (su último dato disponible), porque es un índice y no un ` +

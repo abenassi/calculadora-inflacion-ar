@@ -86,7 +86,7 @@ describe("armarLineaBcra", () => {
       { mes: "2020-02", valor: 100 },
     ]);
     const r = armarLineaBcra(datos, ["2020-01", "2020-02"], "Test (BCRA, índice)", "bilateral");
-    expect(r.serie).toEqual({ label: "Test (BCRA, índice)", valores: [50, 100] });
+    expect(r.serie).toEqual({ id: "bilateral", label: "Test (BCRA, índice)", valores: [50, 100] });
     expect(r.nota).toMatch(/comparación de forma, no de nivel/);
   });
 

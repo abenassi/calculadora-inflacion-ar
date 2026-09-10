@@ -196,8 +196,13 @@ function redibujar(): void {
   dibujarComparacionTcr(
     canvas,
     mesesVisibles,
-    { label: `Dólar blue, TCR a ${mesObjetivoTexto}`, valores: valoresBlue.slice(desdeIdx, hastaIdx + 1) },
     {
+      id: "blue",
+      label: `Dólar blue, TCR a ${mesObjetivoTexto}`,
+      valores: valoresBlue.slice(desdeIdx, hastaIdx + 1),
+    },
+    {
+      id: "oficial",
       label: `Dólar oficial, TCR a ${mesObjetivoTexto}`,
       valores: valoresOficial.slice(desdeIdx, hastaIdx + 1),
     },
