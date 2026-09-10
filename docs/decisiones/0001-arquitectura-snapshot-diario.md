@@ -37,8 +37,9 @@ Secrets.
   mes con semanas de retraso, es irrelevante.
 - El repo acumula commits de datos. Se mitiga comparando por contenido: el pipeline
   ignora el timestamp `actualizado` al decidir si hubo cambios, así que un día sin
-  novedades en ninguna serie no genera commit. Sin eso serían 365 commits y 365 deploys al
-  año de puro ruido.
+  novedades en ninguna serie no genera commit. Sin eso serían 365 commits al año de puro
+  ruido. (Deploys sí hay uno por noche igual: ver "El push del snapshot no dispara el
+  deploy".)
 
 ## Invariante que protege el pipeline
 
@@ -75,16 +76,32 @@ de agosto estaba en `main` desde el 09 y el sitio seguía en julio, con el últi
 03. Tampoco había llegado al sitio el REM de agosto (commit del 05).
 
 Por eso el paso que commitea termina con `gh workflow run deploy.yml`: `workflow_dispatch` es
-la excepción que el `GITHUB_TOKEN` sí puede disparar, y sólo se llama si hubo commit. Un
-PAT o un `workflow_run` también andarían, pero el PAT es un secreto más que rotar y
-`workflow_run` publicaría también los días sin commit (domingos y lunes, sobre todo: el resto
-de la semana dólar y UVA traen algo nuevo, así que de martes a sábado casi siempre hay
-deploy igual).
+la excepción que el `GITHUB_TOKEN` sí puede disparar, y sólo se llama si hubo commit. Así
+el dato nuevo llega al sitio minutos después de bajarlo. Un PAT también andaría, pero es un
+secreto más que rotar.
 
-Si falla sólo el dispatch, los datos quedan en `main` sin publicar y el job en rojo. **No
-se arregla con "Re-run"**: el re-run usa el mismo commit de partida, de antes de los datos.
-Se arregla con `gh workflow run deploy.yml`, o solo con el próximo commit de datos, que si
-falla un sábado suele llegar recién el martes.
+**Y además `deploy.yml` corre solo todas las noches** (00:23 ART), haya o no datos nuevos.
+Es la red: el sitio tiene que actualizarse sin que nadie intervenga, y el dispatch es un
+eslabón que puede fallar, o que un cambio futuro puede volver a cortar sin que se note.
+Con el deploy nocturno, lo que esté en `main` llega al sitio normalmente esa misma noche, y
+si GitHub descarta esa corrida, la siguiente. Lo único que lo frena es que los tests de
+`main` estén en rojo, y eso ya avisa por su lado. Publicar sin cambios no rompe nada y
+cuesta un minuto de Actions.
+
+Si falla sólo el dispatch, el job del snapshot queda en rojo con los datos ya en `main`.
+**No se arregla con "Re-run"**: el re-run usa el mismo commit de partida, de antes de los
+datos, y no publica nada. Lo publica el deploy de esa noche; para no esperar,
+`gh workflow run deploy.yml`.
+
+Queda un caso que ninguna de las dos cosas cubre: que el MCP deje de traer datos nuevos sin
+dar error. El snapshot dice "Sin cambios", el deploy publica lo mismo, todo en verde, y el
+sitio envejece sin que nadie se entere. Por eso el snapshot termina con
+`scripts/verificar-frescura.ts`, que pone el job en rojo si el IPC nacional tiene más de
+dos meses de atraso (el INDEC publica el mes M a mediados de M+1, así que hasta dos es lo normal).
+Va después de commitear y publicar, para no frenar las demás series, y mira sólo el
+nacional: hay índices provinciales con meses de rezago habitual. Ese aviso también llega
+antes de los 60 días sin actividad con los que GitHub apaga los schedules de un repo
+público.
 
 ## Si vas a copiar esto
 

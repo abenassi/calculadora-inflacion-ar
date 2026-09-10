@@ -4,6 +4,13 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Red de seguridad: publica todas las noches aunque nadie haya pusheado. El snapshot ya
+  # dispara este workflow cuando commitea datos, pero si ese disparo falla, o si algún
+  # cambio futuro corta la cadena, el sitio no puede quedar días atrás de main sin que
+  # nadie se entere. Ver docs/decisiones/0001.
+  schedule:
+    # Fuera del minuto 0: es cuando GitHub tiene más carga y puede descartar corridas.
+    - cron: "23 3 * * *" # 00:23 ART
 
 permissions:
   contents: read
@@ -49,4 +56,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

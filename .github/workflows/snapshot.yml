@@ -4,7 +4,8 @@ name: Actualizar snapshot de datos
 # falta más frecuencia: lo que importa es no perderse el día que sale.
 on:
   schedule:
-    - cron: "0 12 * * *" # 09:00 ART
+    # Fuera del minuto 0: es cuando GitHub tiene más carga y puede descartar corridas.
+    - cron: "17 12 * * *" # 09:17 ART
   workflow_dispatch:
   # Correr también cuando cambia el propio pipeline, para no descubrir que lo
   # rompimos recién al día siguiente a las 9 de la mañana.
@@ -50,8 +51,8 @@ jobs:
       # El push de abajo lo hace el GITHUB_TOKEN, y GitHub no dispara otros workflows por
       # pushes de ese token: "Publicar el sitio" nunca se enteraba de los datos nuevos (ver
       # 0001). El workflow_dispatch es la excepción que sí se puede disparar con ese token.
-      # Si falla sólo el dispatch, los datos ya están en main: se recupera con
-      # `gh workflow run deploy.yml`, no con "Re-run", que vuelve al checkout de antes.
+      # Si falla sólo el dispatch, los datos ya están en main y los publica el deploy de la
+      # noche (schedule de deploy.yml). "Re-run" no sirve: vuelve al checkout de antes.
       - name: Commitear si cambió y publicar
         env:
           GH_TOKEN: ${{ github.token }}
@@ -66,3 +67,8 @@ jobs:
           git commit -m "chore(datos): snapshot al $(date -u +%Y-%m-%d)"
           git push
           gh workflow run deploy.yml --ref main
+
+      # Si el MCP deja de traer el IPC, todo lo de arriba sigue en verde ("Sin cambios") y
+      # el sitio queda viejo sin que nadie se entere. Va último para no frenar el resto.
+      - name: Avisar si el IPC nacional quedó atrasado
+        run: npx tsx scripts/verificar-frescura.ts
