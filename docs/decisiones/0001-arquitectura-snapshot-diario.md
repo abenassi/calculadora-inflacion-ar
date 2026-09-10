@@ -37,7 +37,7 @@ Secrets.
   mes con semanas de retraso, es irrelevante.
 - El repo acumula commits de datos. Se mitiga comparando por contenido: el pipeline
   ignora el timestamp `actualizado` al decidir si hubo cambios, así que un día sin
-  novedades del INDEC no genera commit. Sin eso serían 365 commits y 365 deploys al
+  novedades en ninguna serie no genera commit. Sin eso serían 365 commits y 365 deploys al
   año de puro ruido.
 
 ## Invariante que protege el pipeline
@@ -63,6 +63,28 @@ eso, una conexión colgada deja el job esperando hasta el límite de seis horas 
 
 La invariante no se toca: agotados los reintentos, el job **falla y no commitea**. Lo que
 cambia es qué cuenta como motivo para fallar, y que la alarma que suena se pueda creer.
+
+### El push del snapshot no dispara el deploy
+
+El commit de datos lo pushea el `GITHUB_TOKEN` del workflow, y GitHub **no arranca otros
+workflows por eventos de ese token** (es su freno contra loops). `deploy.yml` escucha
+`push` a `main`, así que nunca se enteraba de los datos nuevos: el sitio sólo se
+republicaba cuando alguien pusheaba código. Hasta el 20/8 eso pasaba casi a diario y el bug
+no se veía; después hubo tramos de 6 y 7 días sin publicar. Se vio el 2026-09-10: el IPCBA
+de agosto estaba en `main` desde el 09 y el sitio seguía en julio, con el último deploy del
+03. Tampoco había llegado al sitio el REM de agosto (commit del 05).
+
+Por eso el paso que commitea termina con `gh workflow run deploy.yml`: `workflow_dispatch` es
+la excepción que el `GITHUB_TOKEN` sí puede disparar, y sólo se llama si hubo commit. Un
+PAT o un `workflow_run` también andarían, pero el PAT es un secreto más que rotar y
+`workflow_run` publicaría también los días sin commit (domingos y lunes, sobre todo: el resto
+de la semana dólar y UVA traen algo nuevo, así que de martes a sábado casi siempre hay
+deploy igual).
+
+Si falla sólo el dispatch, los datos quedan en `main` sin publicar y el job en rojo. **No
+se arregla con "Re-run"**: el re-run usa el mismo commit de partida, de antes de los datos.
+Se arregla con `gh workflow run deploy.yml`, o solo con el próximo commit de datos, que si
+falla un sábado suele llegar recién el martes.
 
 ## Si vas a copiar esto
 

@@ -187,9 +187,10 @@ Dos afirmaciones del sitio que eran falsas antes y que estas páginas ponían en
   publicar páginas sin estilos.
 - **El sitemap se genera, no se versiona.** Cada año nuevo agrega una página; un archivo
   estático se olvida, y un sitemap que anuncia URLs que no existen es peor que no tenerlo.
-- **Las páginas se actualizan solas.** El Action del snapshot commitea los datos nuevos, el
-  push dispara el deploy, y el generador vuelve a correr. El día que el INDEC publica julio,
-  la página de 2026 lo tiene.
+- **Las páginas se actualizan solas.** El Action del snapshot commitea los datos nuevos,
+  dispara el deploy con `gh workflow run`, y el generador vuelve a correr. En la primera
+  corrida exitosa del snapshot después de que el INDEC publica julio, la página de 2026 lo tiene.
+  (No alcanza con el push: ver "El push del snapshot no dispara el deploy" en 0001.)
 - **Falta un paso manual que no puede hacer un agente:** verificar el sitio en Google Search
   Console y pedir la indexación. Requiere la cuenta de Google de Agustín. Lo técnico ya está;
   lo que falta para indexar es autoridad, no código.

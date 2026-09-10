@@ -17,6 +17,8 @@ on:
 
 permissions:
   contents: write
+  # Para disparar "Publicar el sitio" a mano después de commitear (ver el último paso).
+  actions: write
 
 concurrency:
   group: snapshot
@@ -45,7 +47,14 @@ jobs:
       - name: Verificar el snapshot nuevo
         run: npm test
 
-      - name: Commitear si cambió
+      # El push de abajo lo hace el GITHUB_TOKEN, y GitHub no dispara otros workflows por
+      # pushes de ese token: "Publicar el sitio" nunca se enteraba de los datos nuevos (ver
+      # 0001). El workflow_dispatch es la excepción que sí se puede disparar con ese token.
+      # Si falla sólo el dispatch, los datos ya están en main: se recupera con
+      # `gh workflow run deploy.yml`, no con "Re-run", que vuelve al checkout de antes.
+      - name: Commitear si cambió y publicar
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [ -z "$(git status --porcelain public/data)" ]; then
             echo "Sin cambios en los datos."
@@ -56,3 +65,4 @@ jobs:
           git add public/data
           git commit -m "chore(datos): snapshot al $(date -u +%Y-%m-%d)"
           git push
+          gh workflow run deploy.yml --ref main
