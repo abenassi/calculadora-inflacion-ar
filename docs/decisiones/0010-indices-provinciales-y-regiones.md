@@ -142,7 +142,8 @@ una página que no entra:
   más larga de cada columna (`letraDeLaTabla`; a 1280 px la de 1970 medía 960 px en 878, y la
   del modo por día desde junio de 1985, 885), y si igual no entra, la tabla se desplaza. En el
   celular una celda de más de 14 caracteres se parte una sola vez, en el punto de miles más
-  cercano a la mitad y con al menos dos grupos abajo ("$ 68.997." y "501.409,62"). Con un `<wbr>`
+  cercano a la mitad y con al menos dos grupos arriba y abajo ("$ 68.997." y "501.409,62"); con
+  tres grupos no se parte, porque "$ 101." arriba se leía "101 pesos". Con un `<wbr>`
   en cada punto de miles quedaban pedacitos que se leían como otro número ("+6.899.750." y
   "041%", también a 1280 px: Chromium corta en un `<wbr>` aunque la celda diga `nowrap`), así que
   las dos mitades van en dos elementos que sólo se separan de renglón en el celular. Ahí,

@@ -726,9 +726,9 @@ describe("el aviso de moneda", () => {
     const s = serieEntre("1985-06", "2026-08", 1, 1000);
     const r = adjust(1000, "1985-06", "2026-08", s, HOY);
     expect(aviso(r)).toBe(
-      "**En junio 1985 cambió la moneda**, y el número de arriba está en la de tu monto. " +
+      "**En junio 1985 cambió la moneda**, y el número de arriba está en la moneda de tu monto. " +
         "Si era en pesos argentinos (hasta el 14): **$ 0,10** de agosto 2026. " +
-        "Si era en australes (desde el 15): **$ 100**.",
+        "Si era en australes (desde el 15): **$ 100** de agosto 2026.",
     );
     expect(llano(explicarMoneda(r))).toBe(aviso(r)!.replace(/\*\*/g, ""));
   });
@@ -738,7 +738,7 @@ describe("el aviso de moneda", () => {
     const s = serieEntre("1985-06", "1985-07", 1, 1.0809);
     const r = adjust(1000, "1985-06", "1985-07", s, HOY);
     expect(aviso(r)).toBe(
-      "**En junio 1985 cambió la moneda**, y el número de arriba está en la de tu monto. " +
+      "**En junio 1985 cambió la moneda**, y el número de arriba está en la moneda de tu monto. " +
         "Si era en pesos argentinos (hasta el 14): **1,081 australes** de julio 1985. " +
         "Si era en australes (desde el 15): es el número de arriba.",
     );

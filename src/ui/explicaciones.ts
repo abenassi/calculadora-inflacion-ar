@@ -554,18 +554,18 @@ export function avisoDeMoneda(r: Resultado): ParteDelAviso[] | null {
     const a = destino[0]!;
     partes.push(
       destacado(`${capitalizar(cuando(r.desde))} cambió la moneda`),
-      normal(", y el número de arriba está en la de tu monto."),
+      normal(", y el número de arriba está en la moneda de tu monto."),
     );
-    let conFecha = true;
     for (const de of origen) {
       partes.push(normal(` Si era en ${de.plural} (${rango(de, origen)}): `));
       if (de === a) {
         partes.push(normal("es el número de arriba."));
         continue;
       }
+      // La fecha va después de cada cuenta, no sólo de la primera: la usuaria leía "$ 6.341.589"
+      // sin saber de cuándo eran esos pesos.
       const { cifra, aprox } = cuanto(equivalencia(de, a));
-      partes.push(normal(aprox), destacado(cifra), normal(conFecha ? ` ${conPreposicion("de", r.hasta)}.` : "."));
-      conFecha = false;
+      partes.push(normal(aprox), destacado(cifra), normal(` ${conPreposicion("de", r.hasta)}.`));
     }
   } else {
     // Un monto de una sola moneda: se dice cuál, y no se abre con un "si".

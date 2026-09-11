@@ -29,13 +29,14 @@ describe("el rótulo de un tramo de días, partido en el celular", () => {
    * rótulo, a 320 px "ene 2024" quedaba "ene" y "2024": se parte sólo después de la flecha.
    */
   it("se parte después de la flecha, y en ningún otro lado", () => {
-    expect(mitadesDeRotulo("1 ago 2026 → 10 ago 2026")).toEqual(["1 ago 2026 → ", "10 ago 2026"]);
+    expect(mitadesDeRotulo("1 ago 2026 → 10 ago 2026")).toEqual(["1 ago 2026 →", "10 ago 2026"]);
     expect(mitadesDeRotulo("ene 2024")).toBeNull();
     expect(mitadesDeRotulo("20 jun 1985")).toBeNull();
   });
 
   it("las dos mitades juntas son el rótulo entero", () => {
-    expect(mitadesDeRotulo("20 jun 1985 → 1 jul 1985")!.join("")).toBe("20 jun 1985 → 1 jul 1985");
+    // Unidas con el espacio que pone quien las pinta, son el rótulo entero.
+    expect(mitadesDeRotulo("20 jun 1985 → 1 jul 1985")!.join(" ")).toBe("20 jun 1985 → 1 jul 1985");
   });
 });
 
@@ -321,8 +322,10 @@ describe("una celda de la tabla, partida en el celular", () => {
     ]);
   });
 
-  it("abajo quedan siempre al menos dos grupos", () => {
-    expect(mitadesDeCelda("$ 101.002.669,28")).toEqual(["$ 101.", "002.669,28"]);
+  it("arriba y abajo quedan siempre al menos dos grupos, o no se parte", () => {
+    // Con tres grupos "$ 101." arriba se leía "101 pesos", y la tabla se desplazaba igual.
+    expect(mitadesDeCelda("$ 101.002.669,28")).toBeNull();
+    expect(mitadesDeCelda("+6.899.750,04%")).toBeNull();
   });
 
   it("no parte un monto común, ni uno sin dos grupos para dejar abajo", () => {

@@ -334,8 +334,9 @@ export function celdaPartible(texto: string): boolean {
 
 /**
  * Las dos mitades en que se puede partir una celda de la tabla en el celular, o `null` si no se
- * parte: un solo corte, en el punto de miles más cercano a la mitad, y sólo si abajo quedan al
- * menos dos grupos.
+ * parte: un solo corte, en el punto de miles más cercano a la mitad, y sólo si arriba y abajo
+ * quedan al menos dos grupos. Con tres grupos "$ 101." arriba se leía "101 pesos", y partirlo no
+ * alcanzaba para que la tabla dejara de desplazarse: mejor el número entero.
  *
  * Antes iba un <wbr> después de cada punto de miles, y quedaban pedacitos que se leían como otro
  * número: "$ 101.002." y "669,28" (se lee cien mil), "+6.899.750." y "041%" (se lee 41%). Y como
@@ -347,7 +348,7 @@ export function mitadesDeCelda(texto: string): [string, string] | null {
   if (!celdaPartible(texto)) return null;
   const partes = partirEnMiles(texto);
   let mejor: [string, string] | null = null;
-  for (let arriba = 1; arriba <= partes.length - 2; arriba++) {
+  for (let arriba = 2; arriba <= partes.length - 2; arriba++) {
     const par: [string, string] = [partes.slice(0, arriba).join(""), partes.slice(arriba).join("")];
     if (mejor === null || Math.max(...par.map(visibles)) < Math.max(...mejor.map(visibles))) mejor = par;
   }
@@ -359,12 +360,15 @@ export function mitadesDeCelda(texto: string): [string, string] | null {
  * la flecha, o `null` si no es un tramo. Entero, en el modo por día desde junio de 1985 hacía la
  * columna de 179 px a 375 y el monto de todas las filas quedaba fuera de la pantalla; y dejando
  * partir cualquier rótulo, a 320 px "ene 2024" quedaba "ene" y "2024".
+ *
+ * Sin el espacio que va entre las dos: al final de un elemento `inline-block` se come, y a 1280 px
+ * se leía "20 jun 1985 →1 jul 1985". Quien las pinta pone el espacio entre las dos.
  */
 export function mitadesDeRotulo(rotulo: string): [string, string] | null {
   const flecha = rotulo.indexOf(" → ");
   if (flecha === -1) return null;
-  const corte = flecha + " → ".length;
-  return [rotulo.slice(0, corte), rotulo.slice(corte)];
+  const corte = flecha + " →".length;
+  return [rotulo.slice(0, corte), rotulo.slice(corte + 1)];
 }
 
 /**

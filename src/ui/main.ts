@@ -483,7 +483,9 @@ function pintarResultado(r: Resultado): void {
       const rotuloEnDos = mitadesDeRotulo(t.rotulo);
       if (rotuloEnDos) {
         th.classList.add("rotulo--partible");
-        th.append(...enMitades(rotuloEnDos));
+        // El espacio va entre las dos mitades y no adentro: al final de un inline-block se come.
+        const [antes, despues] = enMitades(rotuloEnDos);
+        th.append(antes!, " ", despues!);
       } else {
         th.textContent = t.rotulo;
       }
