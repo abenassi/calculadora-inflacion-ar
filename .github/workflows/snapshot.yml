@@ -15,6 +15,9 @@ on:
       - ".github/workflows/snapshot.yml"
       - "scripts/**"
       - "src/engine/**"
+      # Los tests corren contra el snapshot recién bajado y pueden frenarlo: el push que
+      # arregla un test tiene que volver a intentar, no esperar a la corrida del día siguiente.
+      - "tests/**"
 
 permissions:
   contents: write

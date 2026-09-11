@@ -461,7 +461,9 @@ describe("el renglón del acumulado deflactando", () => {
    * diciendo con palabras. Sale del mismo criterio, no de uno propio (regla 4).
    */
   it("no dice dónde quedó el monto cuando las filas no son las pedidas", () => {
-    const r = adjust(1_000_000, "2026-08", "2026-03", serie, { hoy: "2026-08" });
+    // Relativo al último dato y no "2026-08" fijo: escrito así, el día que el INDEC publicó
+    // agosto el caso pasó a `directo`, el test quedó en rojo y frenó el snapshot con el dato.
+    const r = adjust(1_000_000, mas(1), menos(4), serie, { hoy: mas(1) });
     expect(r.metodo.tipo).toBe("ventana_reciente");
     expect(esDeflacion(r)).toBe(true);
     expect(rotuloDeAnclaje(r, r.desglose.length - 1)).toBeNull();
@@ -559,7 +561,8 @@ describe("las marcas de la tabla no señalan un mes que no es el pedido", () => 
   });
 
   it("con el tramo de referencia no marcan nada, porque ninguna fila es la pedida", () => {
-    const r = adjust(1_000_000, "2026-08", "2026-03", serie, { metodologia: "sin_proyectar" });
+    // Relativo al último dato por la misma razón que el de arriba.
+    const r = adjust(1_000_000, mas(1), menos(4), serie, { metodologia: "sin_proyectar", hoy: mas(1) });
     expect(r.metodo.tipo).toBe("ventana_reciente");
     expect(r.desglose.map((_, i) => rotuloDeAnclaje(r, i))).toEqual(r.desglose.map(() => null));
   });
