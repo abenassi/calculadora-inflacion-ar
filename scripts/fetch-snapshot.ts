@@ -26,6 +26,7 @@ import type { ExpectativaRem, SerieIndice, SerieValores } from "../src/engine/ty
 import { INDICES, type IndiceDeclarado } from "./indices-declarados.js";
 import { INDICES_SECUNDARIOS, type IndiceSecundarioDeclarado } from "./indices-secundarios-declarados.js";
 import { traerDolarHistorico, traerSerie } from "./mcp-client.js";
+import { ultimoCambioEn } from "./ultimo-cambio.js";
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 // Vive bajo `public/` porque Vite sirve ese directorio en la raíz del sitio: así el
@@ -56,7 +57,12 @@ function huella(contenido: unknown): string {
   return JSON.stringify(resto);
 }
 
-async function escribirSiMejora(archivo: string, contenido: unknown, minimoDatos = 0): Promise<void> {
+async function escribirSiMejora(
+  archivo: string,
+  contenido: unknown,
+  minimoDatos = 0,
+  { compararActualizado = false } = {},
+): Promise<void> {
   const ruta = resolve(DIR_DATOS, archivo);
   const nuevo = JSON.stringify(contenido, null, 2) + "\n";
 
@@ -77,10 +83,12 @@ async function escribirSiMejora(archivo: string, contenido: unknown, minimoDatos
     }
     // La comparación ignora `actualizado` a propósito. Ese campo cambia en cada
     // corrida, así que compararlo haría que el snapshot "difiera" todos los días
-    // aunque el INDEC no publique nada: 365 commits y 365 deploys al año de puro
-    // ruido. `actualizado` significa "cuándo cambiaron los datos", no "cuándo
+    // aunque ninguna serie cambie: 365 commits al año de puro ruido. `actualizado`
+    // significa "cuándo cambiaron los datos", no "cuándo
     // miramos"; para lo segundo está el historial de corridas del workflow.
-    if (huella(JSON.parse(previo)) === huella(contenido)) {
+    // La excepción es `meta.json`, donde `actualizado` ES el dato (ver `ultimoCambio`).
+    const comparable = (x: unknown) => (compararActualizado ? JSON.stringify(x) : huella(x));
+    if (comparable(JSON.parse(previo)) === comparable(contenido)) {
       console.log(`  ${archivo}: sin cambios`);
       return;
     }
@@ -682,13 +690,21 @@ async function main(): Promise<void> {
 
   await construirCatalogo(ipc);
 
-  await escribirSiMejora("meta.json", {
-    actualizado: ipc.actualizado,
-    ultimo_oficial: ipc.ultimo_oficial,
-    primer_mes: ipc.datos[0]!.mes,
-    meses: ipc.datos.length,
-    fuente: "Argentina Data MCP · https://argentinadata.mymcps.dev",
-  });
+  // Va último: `actualizado` se lee de los archivos ya escritos, y es el cambio más reciente
+  // de cualquier serie, no el del IPC nacional (ver `ultimoCambio`). Se compara con la fecha
+  // incluida porque es lo único que se mueve cuando cambia otra serie que no es el IPC.
+  await escribirSiMejora(
+    "meta.json",
+    {
+      actualizado: await ultimoCambioEn(DIR_DATOS),
+      ultimo_oficial: ipc.ultimo_oficial,
+      primer_mes: ipc.datos[0]!.mes,
+      meses: ipc.datos.length,
+      fuente: "Argentina Data MCP · https://argentinadata.mymcps.dev",
+    },
+    0,
+    { compararActualizado: true },
+  );
   console.log(`  último dato oficial: ${nombrarMes(ipc.ultimo_oficial)}`);
 }
 

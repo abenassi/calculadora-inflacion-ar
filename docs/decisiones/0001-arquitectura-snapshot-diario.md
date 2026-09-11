@@ -36,7 +36,9 @@ Secrets.
 - Los datos tienen hasta 24 horas de atraso. Para el IPC, que se publica una vez por
   mes con semanas de retraso, es irrelevante.
 - El repo acumula commits de datos. Se mitiga comparando por contenido: el pipeline
-  ignora el timestamp `actualizado` al decidir si hubo cambios, así que un día sin
+  ignora el timestamp `actualizado` al decidir si hubo cambios (salvo en `meta.json`, cuyo
+  `actualizado` sale del de las demás series y es lo que el sitio muestra como "Última
+  actualización"), así que un día sin
   novedades en ninguna serie no genera commit. Sin eso serían 365 commits al año de puro
   ruido. (Deploys sí hay uno por noche igual: ver "El push del snapshot no dispara el
   deploy".)
