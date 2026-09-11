@@ -17,13 +17,56 @@ const NUMERO = new Intl.NumberFormat("es-AR", {
   maximumFractionDigits: 2,
 });
 
+/**
+ * Las cifras significativas que se muestran cuando los decimales fijos no alcanzan: un índice
+ * menor que uno, o un monto que redondeado se leería como cero.
+ *
+ * Cuatro, porque es lo que ya mostraba la columna del índice en el rango donde vivía casi todo
+ * lo menor que uno (0,7625 del nacional en 1990). Sale de una constante porque la pantalla y
+ * el CSV tienen que decir el mismo número.
+ */
+const CIFRAS_SIGNIFICATIVAS = 4;
+
+const PESOS_CIFRAS = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  maximumSignificantDigits: CIFRAS_SIGNIFICATIVAS,
+});
+
+/** Si un número ya impreso no muestra ninguna cifra distinta de cero. */
+const seLeeCero = (texto: string) => !/[1-9]/.test(texto);
+
+/**
+ * Un monto que no es cero nunca se imprime como cero.
+ *
+ * Con Córdoba desde 1968, deflactar $1.000.000 de agosto 2026 a enero 1975 da 0,0000227: la
+ * moneda de 1975 tenía once ceros más que el peso. Redondeado a centavos, el resultado decía
+ * "$ 0" y la tabla "$ 0,00", que es afirmar que ese millón no valía nada. Cuando el redondeo
+ * se come todas las cifras, se muestran las significativas; en cualquier otro caso el formato
+ * es el de siempre.
+ */
+function sinLeerseCero(n: number, formato: Intl.NumberFormat): string {
+  const texto = formato.format(n);
+  return n !== 0 && Number.isFinite(n) && seLeeCero(texto) ? PESOS_CIFRAS.format(n) : texto;
+}
+
 export function pesos(n: number): string {
-  return PESOS.format(n);
+  return sinLeerseCero(n, PESOS);
 }
 
 /** Para el número protagonista: los centavos son ruido a ese tamaño. */
 export function pesosRedondo(n: number): string {
-  return PESOS_REDONDO.format(n);
+  return sinLeerseCero(n, PESOS_REDONDO);
+}
+
+/**
+ * El monto en el CSV: dos decimales con punto, como siempre, salvo que se lean como cero. Es el
+ * mismo criterio que `pesos()`: `toFixed(2)` escribía "0.00" en las filas de 1975 de una
+ * deflación desde 2026, y en una planilla eso es un cero.
+ */
+export function montoCsv(n: number): string {
+  const fijo = n.toFixed(2);
+  return n !== 0 && Number.isFinite(n) && seLeeCero(fijo) ? n.toPrecision(CIFRAS_SIGNIFICATIVAS) : fijo;
 }
 
 /** Los decimales con los que se imprime un porcentaje de esta magnitud. */
@@ -87,22 +130,60 @@ export function seVenDistintos(a: number, b: number): boolean {
   return porcentaje(a, false) !== porcentaje(b, false);
 }
 
-const NUMERO_4 = new Intl.NumberFormat("es-AR", {
-  minimumFractionDigits: 4,
-  maximumFractionDigits: 4,
+const NUMERO_CIFRAS = new Intl.NumberFormat("es-AR", {
+  minimumSignificantDigits: CIFRAS_SIGNIFICATIVAS,
+  maximumSignificantDigits: CIFRAS_SIGNIFICATIVAS,
 });
 
 /**
  * Índices de precios.
  *
- * La serie abarca casi seis órdenes de magnitud —el índice retropolado de enero de
- * 1990 vale 0,76 y el de junio de 2026 pasa los 11.800— así que la cantidad de
- * decimales se adapta. Lo que nunca cambia es el separador: siempre coma decimal.
- * Mezclar `0.7625` con `1.234,56` en la misma columna se lee mal en un país donde
- * el punto separa miles.
+ * La serie abarca veinte órdenes de magnitud —Córdoba vale 4,33e-13 en enero de 1968 y
+ * Río Negro pasa los 16 billones— así que por debajo de uno se imprimen **cifras
+ * significativas y no decimales fijos**. Con cuatro decimales fijos la fila de 1968 decía
+ * "0,0000": un índice en cero es justo lo que haría imposible la cuenta que está al lado, así
+ * que la tabla contradecía a su propio resultado.
+ *
+ * Sin notación exponencial, aunque la cifra quede larga: "4,333e-13" se lee como un número de
+ * cuatro mil a alguien que no la usa, y "0,0000000000004333" no se puede leer como nada
+ * distinto de lo que es. Lo que nunca cambia es el separador: siempre coma decimal. Mezclar
+ * `0.7625` con `1.234,56` en la misma columna se lee mal en un país donde el punto separa
+ * miles.
  */
 export function indice(n: number): string {
-  return n < 1 ? NUMERO_4.format(n) : NUMERO.format(n);
+  return n < 1 ? NUMERO_CIFRAS.format(n) : NUMERO.format(n);
+}
+
+/**
+ * El índice en el CSV: punto decimal, para que una planilla lo lea como número, y las mismas
+ * cifras que la pantalla por debajo de uno.
+ *
+ * `toFixed(4)` escribía "0.0000" en las filas de Córdoba anteriores a 1990, que abierto en
+ * una planilla es un cero. Acá sí va la notación exponencial (`4.333e-13`): el archivo lo lee
+ * un programa, y es la forma en que cualquier planilla lo interpreta como número.
+ */
+export function indiceCsv(n: number): string {
+  return n < 1 ? n.toPrecision(CIFRAS_SIGNIFICATIVAS) : n.toFixed(4);
+}
+
+/**
+ * Cuántos caracteres visibles entran en la cifra protagonista con la letra de siempre.
+ *
+ * Medido en un browser a 375 px de ancho, sobre el índice nacional (que en ese ancho no
+ * desborda por otra cosa): con 2rem entran 15 caracteres —"~$ 1.610.057.520"— y con 16 la
+ * cifra ya empuja la página hacia el costado. Con Córdoba desde 1968, $1.000 de enero de
+ * 1970 dan "$ 255.323.213.736.518.400", 24 caracteres sin un espacio donde cortar, y la
+ * página pasaba a medir 533 px.
+ */
+const CARACTERES_DE_LA_CIFRA_NORMAL = 15;
+
+/**
+ * Si la cifra protagonista necesita la letra chica (`.resultado__cifra--larga`) para entrar
+ * en un celular. Cuenta lo que se ve: los espacios que Intl mete después del signo no ocupan
+ * lo que ocupa un dígito.
+ */
+export function cifraLarga(texto: string): boolean {
+  return texto.replace(/\s/g, "").length > CARACTERES_DE_LA_CIFRA_NORMAL;
 }
 
 export function fechaLarga(iso: string): string {

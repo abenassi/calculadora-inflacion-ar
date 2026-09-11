@@ -93,7 +93,7 @@ margen real es casi una unidad entera y no media, porque el vigente ya guarda el
 redondeado: si era `0.0166145001` (guardado `0.016615`) y se revisa a `0.0166154999`, la
 revisión fue de 1e-6 y da igual. Pega en las filas viejas que el MCP todavía sirve con seis
 decimales (Chaco, Tucumán, Neuquén); el peor caso es Chaco 1988-08 (`0.01064`), 9,4e-5
-relativo, el doble del 0,005% que ya acepta `VALOR_MINIMO_REPRESENTABLE`. Y no se pierde: se
+relativo, el doble del 0,005% que ya acepta el corte de cinco cifras (`CIFRAS_MINIMAS`). Y no se pierde: se
 demora hasta el próximo cambio real del archivo, que lo reescribe entero. Para el otro lado
 el error es inofensivo: si el MCP algún día manda ruido que esta regla no reconoce, se commitea
 de más, como antes, pero nunca se pierde un dato.

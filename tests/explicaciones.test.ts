@@ -633,6 +633,19 @@ describe("el efecto sobre el monto dice para qué lado se movió", () => {
     expect(efectoEnElMonto(r)).toContain("lo baja");
   });
 
+  it("no dice que lo baja 100% cuando no llega a 100", () => {
+    // Con Córdoba desde 1968, $1.000.000 de agosto 2026 llevados a enero de 1975 quedan en
+    // $0,0000000227: bajan 99,9999999977%. Redondeado a dos decimales el texto que se copia
+    // decía "lo baja 100,00%", que es afirmar que ese millón no valía nada.
+    const cordoba = JSON.parse(
+      readFileSync(resolve(import.meta.dirname, "../public/data/indices/cordoba.json"), "utf8"),
+    ) as SerieIndice;
+    const r = adjust(1_000_000, "2026-08", "1975-01", cordoba, { metodologia: "sin_proyectar" });
+    expect(r.variacionPct).toBeGreaterThan(-100);
+    expect(efectoEnElMonto(r)).not.toContain("100,00%");
+    expect(efectoEnElMonto(r)).toContain(`lo baja más de ${porcentaje(99.99, false)}`);
+  });
+
   it("con deflación en el medio, el monto sube al ir para atrás", () => {
     // 1999–2001: el único tramo largo de deflación de la serie.
     const r = adjust(1_000_000, "2001-12", "1999-01", serie, { metodologia: "sin_proyectar" });

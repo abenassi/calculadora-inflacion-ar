@@ -330,8 +330,11 @@ por Decreto 55/2016 la emergencia administrativa del Sistema Estadístico Nacion
 —entre enero y mayo de 2016 no hubo IPC nacional. El sitio usa los números oficiales de
 ese período porque son los que existen, y lo dice en cada lugar donde aparecen.
 
-Antes de 1992 la moneda era el austral (1 peso = 10.000 australes, Ley 23.928). El
-índice es continuo a través de esa redenominación porque mide precios; los **montos**
+Antes de 1992 la moneda no era el peso. Con el índice nacional, que arranca en 1990, era
+el austral (1 peso = 10.000 australes, Decreto 2128/91, dictado bajo la Ley 23.928). Con
+Córdoba, que arranca en 1968, la serie cruza además el peso argentino, el peso ley 18.188
+y el peso moneda nacional: el detalle, con cada norma, está en `datos.html#monedas`. El
+índice es continuo a través de esas redenominaciones porque mide precios; los **montos**
 no, así que un importe anterior a 1992 no se puede leer en pesos.
 
 ## Licencia

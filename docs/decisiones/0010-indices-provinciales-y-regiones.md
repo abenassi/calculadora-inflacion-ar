@@ -82,17 +82,38 @@ cambia. Se notó de casualidad, porque cinco series dieron 365 justo.
 atrás a través de los cambios de moneda cae por debajo de una millonésima y quedaba guardado
 como cero: Chaco tenía 256 puntos en cero, Tucumán 167, Mendoza 148. Un cero ahí no es un
 dato impreciso, es una división por cero en el único cálculo que hace este sitio. El
-pipeline descarta el arranque no representable con umbral `0.01` —que garantiza cinco
-cifras significativas como mínimo, no sólo "que no sea cero"— y **recorta en vez de reescalar**:
-reescalar preservaría los cocientes pero nuestros números dejarían de coincidir con la
-tabla que publica el organismo, que es justo lo que alguien cruza cuando quiere verificar.
-Era un problema del lado del MCP —82 series, 1.888 puntos, la peor es el IPC histórico del
-propio INDEC— y el MCP lo arregló el 2026-09-05: le sacó la escala a la columna y borró los
-ceros. **El corte en 0,01 ya vive sólo en el sitio.** Lo sigue justificando que las filas
-guardadas antes de ese día no se reescribieron: medido el 2026-09-11, Chaco, Mendoza y
-Tucumán todavía traen por debajo de 0,01 valores con seis decimales y de una a cuatro
-cifras. Córdoba, en cambio, ya viene con el float completo y se recorta igual; bajar el corte
-es una decisión aparte (ver `VALOR_MINIMO_REPRESENTABLE` en `scripts/fetch-snapshot.ts`).
+pipeline descarta el arranque que no trae **cinco cifras significativas como mínimo** —no
+sólo "que no sea cero"— y **recorta en vez de reescalar**: reescalar preservaría los
+cocientes pero nuestros números dejarían de coincidir con la tabla que publica el
+organismo, que es justo lo que alguien cruza cuando quiere verificar. Era un problema del
+lado del MCP —82 series, 1.888 puntos, la peor es el IPC histórico del propio INDEC— y el
+MCP lo arregló el 2026-09-05: le sacó la escala a la columna y borró los ceros. **El corte
+ya vive sólo en el sitio.** Lo sigue justificando que las filas guardadas antes de ese día
+no se reescribieron: medido el 2026-09-11, Chaco (87 puntos), Mendoza (97) y Tucumán (87)
+todavía traen por debajo de 0,01 valores con seis decimales y de una a cuatro cifras.
+
+**Hasta el 2026-09-11 el corte era por valor, en 0,01; ese día pasó a ser por cifras.** Para
+las filas de seis decimales es exactamente lo mismo —`0.010640` trae cinco cifras, y
+cualquier valor más chico con seis decimales trae cuatro o menos—, pero por valor también se
+recortaba Córdoba, que no tiene nada truncado: sus 266 puntos por debajo de 0,01 (1968-01 a
+1990-02) vienen con las cifras de la planilla de la provincia, de 6 a 17. Medido contra el
+MCP ese día, el corte por cifras lleva a Córdoba de 438 a 704 meses y deja idénticas las otras
+catorce series y el CPI de EE.UU. El criterio y sus límites están en
+`scripts/recorte-representable.ts`.
+
+Recuperar esa historia destapó cosas que el corte por valor tapaba, y todas son la misma
+mentira —un número que se lee como cero sin serlo— o una página que no entra:
+
+- La columna *Índice IPC* imprimía cuatro decimales fijos, así que enero de 1968 (`4,33e-13`)
+  se leía "0,0000". Ahora imprime cifras significativas, y el CSV también.
+- Deflactando, $1.000.000 de agosto 2026 llevados a enero de 1975 dan 0,0000000227: el
+  resultado decía "$ 0", la tabla "$ 0,00" y el CSV "0.00". Un monto que no es cero ahora
+  muestra sus cifras. Y el texto que se copia decía "lo baja 100,00%" por redondear
+  −99,9999999977%; ahora dice "más de 99,99%".
+- $1.000 de 1970 dan "$ 255.323.213.736.518.400", 24 caracteres sin espacio, que en un
+  celular de 375 px corrían la página a 533 px. Por encima de 15 caracteres la cifra usa una
+  letra más chica, medida en el browser.
+- Entre 1968 y 1992 hay cinco monedas, no sólo el austral (ver `datos.html#monedas`).
 
 **Mendoza no publicó entre marzo de 2012 y abril de 2016.** Sin recortar, el motor habría
 leído ese salto como una variación mensual de cuatro años. Se sirve el tramo continuo que
@@ -112,8 +133,8 @@ sirve para lo único que hace este sitio, que es traer un monto hasta hoy.
   las provincias sería inventar un número y ponerlo al lado de otros que sí publicó
   alguien. La opción se deshabilita y al lado dice por qué, en vez de desaparecer: una
   opción que desaparece se lee como un bug.
-- **Cada índice arranca donde arranca.** Santa Fe mide desde diciembre de 2013 y Chaco
-  desde 1988. Si cambiar de índice deja tu período afuera, se corre y se dice cuál era el
+- **Cada índice arranca donde arranca.** Santa Fe mide desde diciembre de 2013, Chaco
+  desde 1988 y Córdoba desde 1968. Si cambiar de índice deja tu período afuera, se corre y se dice cuál era el
   mes que pediste.
 - **Neuquén viene cinco meses detrás del nacional**, y eso cambia sobre qué ventana se
   calcula. Se avisa a partir de dos meses de atraso: uno es lo normal —los organismos

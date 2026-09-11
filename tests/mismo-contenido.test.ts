@@ -106,9 +106,9 @@ describe("mismoNumero: una revisión real en los decimales que publica la fuente
 });
 
 describe("mismoNumero: valores muy chicos", () => {
-  // Córdoba viene encadenada desde 1968 a través de cuatro cambios de moneda. Hoy se recorta
-  // en 0,01 (`VALOR_MINIMO_REPRESENTABLE`), pero el MCP ya los sirve sin truncar y ese piso
-  // puede bajar: la comparación no puede depender de que no lleguen.
+  // Córdoba viene encadenada desde 1968 a través de cuatro cambios de moneda, y desde que el
+  // corte es por cifras significativas (`recorte-representable.ts`) el snapshot la trae
+  // entera: la comparación tiene que distinguir una revisión de un redondeo también ahí.
   it("un redondeo de un valor chiquísimo es sólo precisión", () => {
     expect(mismoNumero(4.332726297657377e-13, 4.3327263e-13)).toBe(true);
   });

@@ -410,6 +410,18 @@ button:focus-visible {
   line-height: 1.1;
 }
 
+/*
+ * La cifra de un monto de los años setenta con Córdoba: "$ 255.323.213.736.518.400", 24
+ * caracteres sin un espacio donde cortar. Con la letra de arriba empujaba la página a 533 px
+ * en un celular de 375. Medido: con esta entran hasta 25 caracteres a 375 px. El corte en
+ * cualquier lado es la última red, para un monto enorme de 1968; partir una cifra se lee peor
+ * que verla entera, pero mucho mejor que una página que se corre para el costado.
+ */
+.resultado__cifra--larga {
+  font-size: clamp(1.25rem, 4.6vw, 2.5rem);
+  overflow-wrap: anywhere;
+}
+
 .resultado__detalle {
   margin: 0;
   color: var(--text-secondary);

@@ -8,7 +8,7 @@
       "organismo": "Dirección General de Estadística y Censos de la Provincia de Córdoba",
       "organismoCorto": "DGEyC Córdoba",
       "url": "https://estadistica.cba.gov.ar/",
-      "rango": "1990-03/2026-08",
+      "rango": "1968-01/2026-08",
       "etiqueta": {
         "corta": "IPC de Córdoba",
         "larga": "el IPC de la Provincia de Córdoba",
@@ -17,8 +17,1338 @@
     }
   ],
   "ultimo_oficial": "2026-08",
-  "actualizado": "2026-09-11T12:31:07.918Z",
+  "actualizado": "2026-09-11T14:54:48.772Z",
   "datos": [
+    {
+      "mes": "1968-01",
+      "indice": 4.332726297657377e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-02",
+      "indice": 4.3679803765642715e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-03",
+      "indice": 4.371505784454961e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-04",
+      "indice": 4.3397771134387563e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-05",
+      "indice": 4.37503119234565e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-06",
+      "indice": 4.389132823908408e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-07",
+      "indice": 4.389132823908408e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-08",
+      "indice": 4.4067598633618556e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-09",
+      "indice": 4.4490647580501284e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-10",
+      "indice": 4.480793429066334e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-11",
+      "indice": 4.4984204685197824e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1968-12",
+      "indice": 4.526623731645298e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-01",
+      "indice": 4.639436784147361e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-02",
+      "indice": 4.667640047272877e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-03",
+      "indice": 4.720521165633219e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-04",
+      "indice": 4.709944941961152e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-05",
+      "indice": 4.752249836649425e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-06",
+      "indice": 4.780453099774942e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-07",
+      "indice": 4.815707178681836e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-08",
+      "indice": 4.850961257588732e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-09",
+      "indice": 4.963774310090796e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-10",
+      "indice": 4.995502981107002e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-11",
+      "indice": 4.999028388997692e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1969-12",
+      "indice": 5.051909507358034e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-01",
+      "indice": 5.118892257281134e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-02",
+      "indice": 5.178824191422856e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-03",
+      "indice": 5.22465449400182e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-04",
+      "indice": 5.22465449400182e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-05",
+      "indice": 5.288111836034229e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-06",
+      "indice": 5.436178967443188e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-07",
+      "indice": 5.538415796273183e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-08",
+      "indice": 5.62655099354042e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-09",
+      "indice": 5.778143532840067e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-10",
+      "indice": 5.989668006281437e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-11",
+      "indice": 6.074277795657983e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1970-12",
+      "indice": 6.151836769253153e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-01",
+      "indice": 6.550207860901064e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-02",
+      "indice": 6.655970097621749e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-03",
+      "indice": 6.744105294888987e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-04",
+      "indice": 6.867494571063118e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-05",
+      "indice": 7.082544452395176e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-06",
+      "indice": 7.40335657044792e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-07",
+      "indice": 7.650135122796183e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-08",
+      "indice": 7.896913675144448e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-09",
+      "indice": 8.140166819602023e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-10",
+      "indice": 8.263556095776155e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-11",
+      "indice": 8.393996187731667e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1971-12",
+      "indice": 8.757113200472685e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-01",
+      "indice": 9.899345357056078e-13,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-02",
+      "indice": 1.0396427869643297e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-03",
+      "indice": 1.0618528566756735e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-04",
+      "indice": 1.0992221803169822e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-05",
+      "indice": 1.1260152802862223e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-06",
+      "indice": 1.189472622318633e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-07",
+      "indice": 1.2430588222571132e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-08",
+      "indice": 1.2726722485389052e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-09",
+      "indice": 1.2878315024688698e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-10",
+      "indice": 1.3505837629231425e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-11",
+      "indice": 1.4027597997053469e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1972-12",
+      "indice": 1.4337833891434143e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-01",
+      "indice": 1.5296744837701686e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-02",
+      "indice": 1.620982548139026e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-03",
+      "indice": 1.739083712477124e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-04",
+      "indice": 1.7870292597905011e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-05",
+      "indice": 1.8790424057374966e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-06",
+      "indice": 1.8652933149638075e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-07",
+      "indice": 1.8388527557836363e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-08",
+      "indice": 1.862120447862187e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-09",
+      "indice": 1.8934965780893233e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-10",
+      "indice": 1.9280455754180803e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-11",
+      "indice": 1.9280455754180803e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1973-12",
+      "indice": 1.9368590951448038e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-01",
+      "indice": 1.9534285122310444e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-02",
+      "indice": 1.968587766161009e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-03",
+      "indice": 1.986567346403525e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-04",
+      "indice": 2.049319606857798e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-05",
+      "indice": 2.109956622577657e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-06",
+      "indice": 2.214661236931135e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-07",
+      "indice": 2.2872846394793384e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-08",
+      "indice": 2.3546199301915078e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-09",
+      "indice": 2.4603821669121924e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-10",
+      "indice": 2.5224293457883273e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-11",
+      "indice": 2.6694388548300786e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1974-12",
+      "indice": 2.800231487574659e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-01",
+      "indice": 2.9669832808042716e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-02",
+      "indice": 3.2835649093881883e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-03",
+      "indice": 3.504607984134419e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-04",
+      "indice": 3.731291711505753e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-05",
+      "indice": 3.845162386375024e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-06",
+      "indice": 4.202286205701869e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-07",
+      "indice": 5.9470105708040965e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-08",
+      "indice": 7.943801600090624e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-09",
+      "indice": 9.005654456766296e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-10",
+      "indice": 9.77595608088195e-12,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-11",
+      "indice": 1.047962749586357e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1975-12",
+      "indice": 1.1449467206592249e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-01",
+      "indice": 1.3252360801890856e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-02",
+      "indice": 1.5809339145007942e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-03",
+      "indice": 2.1385124264922436e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-04",
+      "indice": 2.6541738386633952e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-05",
+      "indice": 3.13856488284413e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-06",
+      "indice": 3.2496857395586635e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-07",
+      "indice": 3.391583407158915e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-08",
+      "indice": 3.549204393951642e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-09",
+      "indice": 3.931111830750034e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-10",
+      "indice": 4.2844634636338417e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-11",
+      "indice": 4.532088113875872e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1976-12",
+      "indice": 4.8150726052615164e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-01",
+      "indice": 5.400924888536295e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-02",
+      "indice": 5.957939335265236e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-03",
+      "indice": 6.314005532224875e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-04",
+      "indice": 6.772308558014508e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-05",
+      "indice": 7.160103425990351e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-06",
+      "indice": 7.625457267561364e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-07",
+      "indice": 8.348165885152709e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-08",
+      "indice": 8.940434410788544e-11,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-09",
+      "indice": 1.0029785449011596e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-10",
+      "indice": 1.1231949539736712e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-11",
+      "indice": 1.242706281468045e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1977-12",
+      "indice": 1.3125093577036968e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-01",
+      "indice": 1.4418918272920011e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-02",
+      "indice": 1.5740946231928568e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-03",
+      "indice": 1.716168561187643e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-04",
+      "indice": 1.903720260972324e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-05",
+      "indice": 2.0993803989055905e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-06",
+      "indice": 2.2470949895254803e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-07",
+      "indice": 2.3895214683093355e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-08",
+      "indice": 2.536883518140156e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-09",
+      "indice": 2.7649774086677655e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-10",
+      "indice": 3.007878012336271e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-11",
+      "indice": 3.2990767041072233e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1978-12",
+      "indice": 3.574763601159141e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-01",
+      "indice": 4.032714086159705e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-02",
+      "indice": 4.418393709401136e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-03",
+      "indice": 4.843557901018289e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-04",
+      "indice": 5.20526475060303e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-05",
+      "indice": 5.59446978173515e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-06",
+      "indice": 6.076393040392404e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-07",
+      "indice": 6.547034993799449e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-08",
+      "indice": 7.100876573426768e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-09",
+      "indice": 7.816534375236735e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-10",
+      "indice": 8.282240757596816e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-11",
+      "indice": 8.838197581958548e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1979-12",
+      "indice": 9.211890818371635e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-01",
+      "indice": 9.81720335320302e-10,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-02",
+      "indice": 1.0357648382845718e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-03",
+      "indice": 1.0916425533520003e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-04",
+      "indice": 1.146356883815501e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-05",
+      "indice": 1.2046671303275052e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-06",
+      "indice": 1.2864918474704078e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-07",
+      "indice": 1.3726528163188589e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-08",
+      "indice": 1.4167909231102915e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-09",
+      "indice": 1.475665234884806e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-10",
+      "indice": 1.5672905859638254e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-11",
+      "indice": 1.6505254662630041e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1980-12",
+      "indice": 1.7066852139616879e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-01",
+      "indice": 1.7976759916203834e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-02",
+      "indice": 1.8697353289060767e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-03",
+      "indice": 1.946977015791083e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-04",
+      "indice": 2.0688151124933116e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-05",
+      "indice": 2.2880249751363844e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-06",
+      "indice": 2.4593950527028e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-07",
+      "indice": 2.7675509564279683e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-08",
+      "indice": 2.967335821593341e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-09",
+      "indice": 3.1847124721332553e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-10",
+      "indice": 3.403428777671631e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-11",
+      "indice": 3.671747572232008e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1981-12",
+      "indice": 4.030880874056546e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-01",
+      "indice": 4.3856074160177215e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-02",
+      "indice": 4.6535384157101235e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-03",
+      "indice": 4.882689928604941e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-04",
+      "indice": 5.150620928297342e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-05",
+      "indice": 5.323365914941126e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-06",
+      "indice": 5.594822322524217e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-07",
+      "indice": 6.176514624487982e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-08",
+      "indice": 7.537322070294124e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-09",
+      "indice": 8.986264713367505e-9,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-10",
+      "indice": 1.0213106659327448e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-11",
+      "indice": 1.1334186368566704e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1982-12",
+      "indice": 1.2525774235619752e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-01",
+      "indice": 1.375966699736107e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-02",
+      "indice": 1.5867860915993385e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-03",
+      "indice": 1.79760548346257e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-04",
+      "indice": 1.9661199806375274e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-05",
+      "indice": 2.1540242212112767e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-06",
+      "indice": 2.4321789037866777e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-07",
+      "indice": 2.8062246809888325e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-08",
+      "indice": 3.29343605148212e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-09",
+      "indice": 4.04822588087874e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-10",
+      "indice": 4.884805173339355e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-11",
+      "indice": 5.72490987369066e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1983-12",
+      "indice": 6.48639797807959e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-01",
+      "indice": 7.359288971814306e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-02",
+      "indice": 8.340409987793193e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-03",
+      "indice": 9.960334913565012e-8,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-04",
+      "indice": 1.2041383191439018e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-05",
+      "indice": 1.449647724651518e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-06",
+      "indice": 1.7414809898427938e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-07",
+      "indice": 2.0341603529278347e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-08",
+      "indice": 2.447866968900246e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-09",
+      "indice": 3.1402218245527553e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-10",
+      "indice": 3.885422544486699e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-11",
+      "indice": 4.579081801058763e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1984-12",
+      "indice": 5.426625112059423e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-01",
+      "indice": 6.55373326879176e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-02",
+      "indice": 8.133116003820651e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-03",
+      "indice": 9.906396172837464e-7,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-04",
+      "indice": 0.0000012233165380692528,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-05",
+      "indice": 0.000001559992991630099,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-06",
+      "indice": 0.000002060953452897075,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-07",
+      "indice": 0.0000022284103277048263,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-08",
+      "indice": 0.0000022960981592060638,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-09",
+      "indice": 0.0000024268907919506443,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-10",
+      "indice": 0.000002494931164240951,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-11",
+      "indice": 0.0000025347682734057426,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1985-12",
+      "indice": 0.0000026059815127976704,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-01",
+      "indice": 0.0000027128013718855625,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-02",
+      "indice": 0.0000027766112547070423,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-03",
+      "indice": 0.0000028679193190758996,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-04",
+      "indice": 0.0000029722713926403085,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-05",
+      "indice": 0.000003102358943806751,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-06",
+      "indice": 0.000003292378429114915,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-07",
+      "indice": 0.0000034415031828910802,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-08",
+      "indice": 0.00000366959707341869,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-09",
+      "indice": 0.000003983710916479124,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-10",
+      "indice": 0.000004268916414835903,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-11",
+      "indice": 0.00000450793906982465,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1986-12",
+      "indice": 0.000004710650023539296,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-01",
+      "indice": 0.000004940859158801319,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-02",
+      "indice": 0.000005275067826838682,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-03",
+      "indice": 0.000005736896260519004,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-04",
+      "indice": 0.000005924800501092755,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-05",
+      "indice": 0.000006214236488918362,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-06",
+      "indice": 0.000006625651589761827,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-07",
+      "indice": 0.000007066680116887082,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-08",
+      "indice": 0.000007933225376418559,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-09",
+      "indice": 0.000009149491098706433,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-10",
+      "indice": 0.000010862839333581524,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-11",
+      "indice": 0.000012418954376531864,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1987-12",
+      "indice": 0.000013022151666628837,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-01",
+      "indice": 0.000013900330772199589,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-02",
+      "indice": 0.000015330236212663247,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-03",
+      "indice": 0.000017693317121792413,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-04",
+      "indice": 0.000020158987400540643,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-05",
+      "indice": 0.000023337142613997218,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-06",
+      "indice": 0.00002730780952128079,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-07",
+      "indice": 0.00003420421243704757,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-08",
+      "indice": 0.0000436374988709545,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-09",
+      "indice": 0.000047916286427884334,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-10",
+      "indice": 0.0000525715875475398,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-11",
+      "indice": 0.00005612801902766734,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1988-12",
+      "indice": 0.0000605791990304519,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-01",
+      "indice": 0.00006565402368909942,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-02",
+      "indice": 0.00007208366260013892,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-03",
+      "indice": 0.00008387932486159688,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-04",
+      "indice": 0.00011079017345438601,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-05",
+      "indice": 0.000197257147707749,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-06",
+      "indice": 0.00042702278665712393,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-07",
+      "indice": 0.00126139,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-08",
+      "indice": 0.00179708,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-09",
+      "indice": 0.00196164,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-10",
+      "indice": 0.00207037,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-11",
+      "indice": 0.00219824,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1989-12",
+      "indice": 0.00313369,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1990-01",
+      "indice": 0.00528232,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "1990-02",
+      "indice": 0.00866704,
+      "origen": "dgeyc-cordoba"
+    },
     {
       "mes": "1990-03",
       "indice": 0.01661473,

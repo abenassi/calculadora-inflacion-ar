@@ -14,6 +14,7 @@ import {
 import { fuenteDe, organismoDeFila, selloDeFila } from "../src/ui/etiquetas.js";
 import type { SerieIndice } from "../src/engine/types.js";
 import { INDICES } from "../scripts/indices-declarados.js";
+import { esRepresentable } from "../scripts/recorte-representable.js";
 
 const DATOS = resolve(import.meta.dirname, "../public/data");
 const leer = <T>(ruta: string): T => JSON.parse(readFileSync(resolve(DATOS, ruta), "utf8")) as T;
@@ -106,10 +107,12 @@ describe("cada índice del catálogo", () => {
       });
 
       it("no trae ningún índice en cero ni truncado", () => {
-        // El pipeline recorta en 0,01 (`VALOR_MINIMO_REPRESENTABLE`): por debajo, las filas que
-        // el MCP guardó con seis decimales antes del 2026-09-05 traen una a cuatro cifras. Y un
-        // cero acá es una división por cero en el único cálculo que hace el sitio.
-        const malos = serie.datos.filter((p) => !(p.indice >= 0.01) || !Number.isFinite(p.indice));
+        // El mismo criterio con el que recorta el pipeline (`esRepresentable`), no una copia:
+        // por cifras significativas y no por valor. Las filas que el MCP guardó con seis
+        // decimales antes del 2026-09-05 traen una a cuatro cifras por debajo de 0,01; las de
+        // Córdoba traen el float completo y sirven aunque valgan 1e-13. Y un cero acá es una
+        // división por cero en el único cálculo que hace el sitio.
+        const malos = serie.datos.filter((p) => !esRepresentable(p.indice));
         expect(malos.map((p) => `${p.mes}=${p.indice}`)).toEqual([]);
       });
 
@@ -384,10 +387,10 @@ describe("las fechas que las preguntas frecuentes dicen a mano", () => {
   it("siguen siendo verdad", () => {
     // El nacional y Santa Fe llevan mes en la página ("desde enero de 1990", "Santa Fe en
     // diciembre de 2013") y se comparan al mes. Chaco y Córdoba sólo llevan el año ("Chaco
-    // en 1988", "Córdoba arranca en 1990" en `datos.html`) y se comparan sólo al año: si se
-    // compararan al mes, bajar el umbral de cifras significativas —el cambio que ya quedó
-    // anotado como pendiente— podría mover el arranque de Chaco unos meses adentro de 1988
-    // sin volver falso ningún texto, y este test frenaría el pipeline igual.
+    // en 1988", "Córdoba en 1968") y se comparan sólo al año: si el MCP reescribe las filas
+    // viejas de Chaco con el float completo, el corte por cifras puede mover su arranque
+    // unos meses adentro de 1988 sin volver falso ningún texto, y este test frenaría el
+    // pipeline igual.
     expect({
       nacional: arranque(SLUG_NACIONAL),
       santaFe: arranque("santa-fe"),
@@ -397,7 +400,7 @@ describe("las fechas que las preguntas frecuentes dicen a mano", () => {
     });
     expect({ chaco: anioDe("chaco"), cordoba: anioDe("cordoba") }).toEqual({
       chaco: "1988",
-      cordoba: "1990",
+      cordoba: "1968",
     });
   });
 

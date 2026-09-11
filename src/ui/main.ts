@@ -72,8 +72,11 @@ import {
   MESES_PROYECCION_LARGA,
 } from "./explicaciones.js";
 import {
+  cifraLarga,
   fechaLarga,
   indice,
+  indiceCsv,
+  montoCsv,
   pesos,
   pesosRedondo,
   porcentaje,
@@ -376,9 +379,13 @@ function pintarResultado(r: Resultado): void {
     `${queMide} del IPC en ${hayTramosDeDias(r.desglose) ? "los tramos" : "los meses"} usados para el cálculo`,
   );
   el("rotulo-principal").textContent = capitalizar(comoDestino(r.hasta));
-  el("cifra-principal").textContent = esAproximado(r)
+  const cifraPrincipal = el("cifra-principal");
+  cifraPrincipal.textContent = esAproximado(r)
     ? `~${pesosRedondo(r.montoAjustado)}`
     : pesosRedondo(r.montoAjustado);
+  // Con Córdoba desde 1968 la cifra puede tener 24 caracteres sin un espacio donde cortar, y
+  // con la letra de siempre empujaba la página hacia el costado en un celular.
+  cifraPrincipal.classList.toggle("resultado__cifra--larga", cifraLarga(cifraPrincipal.textContent));
   el("detalle-principal").textContent = explicar(r);
 
   // Cuanto más lejos se proyecta, menos es una cuenta y más un pronóstico.
@@ -1090,10 +1097,11 @@ function descargarCsv(): void {
     ...r.desglose.map((f, i) => [
       f.punto,
       ...tramo(i),
-      f.indice.toFixed(4),
+      // No `toFixed(4)`: Córdoba antes de 1990 salía "0.0000", un cero en la planilla.
+      indiceCsv(f.indice),
       f.varMensualPct?.toFixed(2) ?? "",
       f.acumuladoPct?.toFixed(2) ?? "",
-      f.monto.toFixed(2),
+      montoCsv(f.monto),
       origenCsv(f),
     ]),
   ];

@@ -426,7 +426,15 @@ function deDondeSalenLasFilas(r: Resultado): string {
 export function efectoEnElMonto(r: Resultado): string {
   if (comoSeMuestra(r.inflacionPct) === comoSeMuestra(r.variacionPct)) return "";
   const verbo = r.variacionPct < 0 ? "baja" : "sube";
-  return ` Sacarle esa inflación al monto lo ${verbo} ${porcentaje(Math.abs(r.variacionPct), false)}.`;
+  const cuanto = Math.abs(r.variacionPct);
+  // Un monto que baja nunca baja 100%: eso sería que no valía nada. Con Córdoba desde 1968,
+  // llevar un millón de 2026 a 1975 lo baja 99,9999999977%, y redondeado a dos decimales el
+  // texto decía "lo baja 100,00%". "Más de 99,99%" es lo que se puede afirmar sin mentir.
+  const texto =
+    cuanto < 100 && comoSeMuestra(cuanto) >= 100
+      ? `más de ${porcentaje(99.99, false)}`
+      : porcentaje(cuanto, false);
+  return ` Sacarle esa inflación al monto lo ${verbo} ${texto}.`;
 }
 
 /**

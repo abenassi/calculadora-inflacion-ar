@@ -27,6 +27,9 @@ import { INDICES, type IndiceDeclarado } from "./indices-declarados.js";
 import { INDICES_SECUNDARIOS, type IndiceSecundarioDeclarado } from "./indices-secundarios-declarados.js";
 import { traerDolarHistorico, traerSerie } from "./mcp-client.js";
 import { mismoContenido } from "./mismo-contenido.js";
+// El corte del arranque de cada serie, por cifras significativas: el porqué y los números
+// que lo sostienen están en ese archivo.
+import { recortarRepresentable } from "./recorte-representable.js";
 import { ultimoCambioEn } from "./ultimo-cambio.js";
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -276,73 +279,8 @@ async function construirIpc(): Promise<SerieIndice> {
   };
 }
 
-/**
- * El valor más chico con el que un índice todavía trae las cifras que hacen falta.
- *
- * Nació de un problema del MCP que ya está arreglado. Su columna `series_data.valor` era
- * `numeric(20,6)`, y un índice encadenado hacia atrás a través de los cambios de moneda
- * quedaba guardado como cero o con dos o tres cifras significativas (medido el 2026-08-13:
- * Chaco tenía 256 puntos en cero, Tucumán 167 y Mendoza 148). El 2026-09-05 el MCP le sacó la
- * escala a la columna y borró los ceros (su commit `49f185f`, `sql/170` a `sql/172`), y desde
- * ahí sirve los índices sin truncar. **Este corte ya no vive en el MCP: vive sólo acá.**
- *
- * Lo que todavía lo justifica, medido contra el MCP el 2026-09-11: las filas guardadas antes
- * del arreglo siguen como estaban, porque el colector del INDEC sólo reescribe los últimos 24
- * puntos de cada serie. Chaco, Mendoza y Tucumán traen entre 87 y 97 puntos por debajo de
- * 0,01, todos con seis decimales y de una a cuatro cifras significativas (arrancan en
- * `0.000001`). El límite no es "que no sea cero" sino "que queden cifras": con la
- * cuantización de 1e-6 de esas filas, un corte en 1e-2 conserva en el peor caso **cinco**
- * cifras y el error relativo máximo es 0,005%; con 1e-3 quedarían cuatro (0,05%). Y sigue
- * siendo la guarda contra un cero, que sería una división por cero en el único cálculo que
- * hace este sitio, si alguna vez vuelve a llegar uno.
- *
- * Donde ya no justifica nada es Córdoba: sus 266 puntos por debajo de 0,01 (1968-01 a
- * 1990-02) vienen con el float completo, de 6 a 17 cifras, y se recortan igual. Bajar el
- * corte, o hacerlo por cifras significativas en vez de por valor, recuperaría esa historia.
- * Es una decisión aparte, no un arreglo pendiente: toca el test "no trae ningún índice en
- * cero ni truncado" de `indices.test.ts`, la 0010 y el texto que dice desde cuándo arranca
- * Córdoba.
- */
-const VALOR_MINIMO_REPRESENTABLE = 0.01;
-
 /** Cuántos puntos devuelve la tool `series` cuando no se le acota el rango. */
 const LIMITE_IMPLICITO = 365;
-
-/**
- * Recorta la serie al tramo final que se puede usar, y explota si no queda nada.
- *
- * Se corta desde el **último** valor demasiado chico y no desde el primero grande: si
- * apareciera uno chico después de uno grande, lo anterior queda bajo sospecha y lo único
- * que garantiza precisión pareja es quedarse con lo que viene después.
- *
- * Se recorta y no se reescala. Reescalar preservaría los cocientes, pero nuestros números
- * dejarían de coincidir con la tabla que publica el organismo, y eso es justo lo que
- * alguien cruza cuando quiere verificar. Menos historia con los números de la fuente.
- */
-export function recortarRepresentable(puntos: PuntoCrudo[], slug: string): PuntoCrudo[] {
-  let inicio = 0;
-  for (let i = puntos.length - 1; i >= 0; i--) {
-    if (!(puntos[i]!.valor >= VALOR_MINIMO_REPRESENTABLE)) {
-      inicio = i + 1;
-      break;
-    }
-  }
-
-  const out = puntos.slice(inicio);
-  if (out.length === 0) {
-    throw new Error(
-      `${slug}: no quedó ningún valor representable, todos caen por debajo de ` +
-        `${VALOR_MINIMO_REPRESENTABLE}. Revisá qué está sirviendo el MCP para esta serie.`,
-    );
-  }
-  if (out.length < puntos.length) {
-    console.log(
-      `  ${slug}: se descartaron ${puntos.length - out.length} punto(s) del arranque por debajo ` +
-        `de ${VALOR_MINIMO_REPRESENTABLE}; la serie arranca en ${out[0]!.mes}`,
-    );
-  }
-  return out;
-}
 
 /**
  * Recorta la serie a su tramo continuo más reciente.

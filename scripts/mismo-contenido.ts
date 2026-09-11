@@ -16,8 +16,11 @@
  * Por eso un `3.591` que vino de ahí no dice "tres decimales": es `3.591000`. Sin este piso,
  * un dólar de `1528.6` que al día siguiente vale `1528.62` se leería como el mismo número con
  * un decimal más, y se perdería una cotización real.
+ *
+ * Lo usa también `recorte-representable.ts`, por el mismo motivo: para contar cuántas cifras
+ * trae un valor hay que saber que `0.01064` son cinco (`0.010640`) y no cuatro.
  */
-const DECIMALES_MINIMOS = 6;
+export const DECIMALES_MINIMOS = 6;
 
 /** Cuántos decimales tiene la representación más corta de `x`, también en notación exponencial. */
 export function decimales(x: number): number {

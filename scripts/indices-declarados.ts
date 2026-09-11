@@ -125,7 +125,7 @@ export const INDICES: IndiceDeclarado[] = [
     slug: "cordoba",
     nombre: "Córdoba",
     tipo: "provincia",
-    cubre: "Índice provincial de Córdoba, con datos desde 1990.",
+    cubre: "Índice provincial de Córdoba, con datos desde 1968.",
     serie: "ipc:cordoba",
     origen: "dgeyc-cordoba",
     organismo: "Dirección General de Estadística y Censos de la Provincia de Córdoba",
