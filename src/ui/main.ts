@@ -59,6 +59,7 @@ import {
   avisarTramoAjeno,
   avisoDeMoneda,
   capitalizar,
+  cifraDelResultado,
   esAproximado,
   explicar,
   explicarCompuesto,
@@ -74,12 +75,13 @@ import {
   MESES_PROYECCION_LARGA,
 } from "./explicaciones.js";
 import {
-  celdaLarga,
-  celdaPartible,
   cifraLarga,
   fechaLarga,
   indice,
   indiceCsv,
+  letraDeLaTabla,
+  mitadesDeCelda,
+  mitadesDeRotulo,
   montoCsv,
   partirEnMiles,
   pesos,
@@ -394,7 +396,7 @@ function pintarResultado(r: Resultado): void {
   );
   el("rotulo-principal").textContent = capitalizar(comoDestino(r.hasta));
   const cifraPrincipal = el("cifra-principal");
-  const cifra = esAproximado(r) ? `~${pesosRedondo(r.montoAjustado)}` : pesosRedondo(r.montoAjustado);
+  const cifra = cifraDelResultado(r);
   // Con Córdoba desde 1968 la cifra llega a 25 caracteres sin un espacio donde cortar: con la
   // letra de siempre empujaba la página hacia el costado en un celular, y con `anywhere` solo se
   // partía en medio de un grupo ("…736.518.40" y "0"). Letra chica cuando no entra, y de
@@ -403,22 +405,22 @@ function pintarResultado(r: Resultado): void {
   cifraPrincipal.classList.toggle("resultado__cifra--larga", cifraLarga(cifra));
   el("detalle-principal").textContent = explicar(r);
 
-  // Antes de 1992 el monto no está en pesos, y el resultado tampoco (ver `avisoDeMoneda`). Arranca
-  // con la cuenta, destacada, porque es lo que la persona vino a buscar.
+  // Antes de 1992 el monto no está en pesos, y el resultado tampoco (ver `avisoDeMoneda`). Las
+  // cuentas, que son lo que la persona vino a buscar, van en negrita.
   const deMoneda = avisoDeMoneda(r);
   const avisoMoneda = el("aviso-moneda");
   avisoMoneda.hidden = deMoneda === null;
   if (deMoneda) {
-    const partes: (string | HTMLElement)[] = [];
-    if (deMoneda.destacado !== "") {
-      const destacado = document.createElement("strong");
-      destacado.textContent = deMoneda.destacado;
-      partes.push(destacado, " ");
-    }
+    const partes = deMoneda.map((parte) => {
+      if (!parte.destacado) return parte.texto;
+      const fuerte = document.createElement("strong");
+      fuerte.textContent = parte.texto;
+      return fuerte;
+    });
     const link = document.createElement("a");
     link.href = "./datos.html#monedas";
     link.textContent = "Las monedas de antes de 1992";
-    avisoMoneda.replaceChildren(...partes, `${deMoneda.detalle} `, link, ".");
+    avisoMoneda.replaceChildren(...partes, " ", link, ".");
   }
 
   // Cuanto más lejos se proyecta, menos es una cuenta y más un pronóstico.
@@ -431,11 +433,28 @@ function pintarResultado(r: Resultado): void {
       `real de esos meses puede ser bastante distinta.`;
   }
 
-  // Con montos así la tabla no entraba en un escritorio y la columna del índice quedaba cortada
-  // leyéndose "0,00000000": la tabla entera pasa a letra chica y, sólo entonces, sus montos y
-  // acumulados se pueden cortar en los puntos de miles (ver `celdaLarga`).
-  const cifrasLargas = r.desglose.some(
-    (f) => celdaLarga(pesos(f.monto)) || (f.acumuladoPct !== null && celdaLarga(porcentaje(f.acumuladoPct))),
+  const textos = r.desglose.map((f, i) => ({
+    rotulo: rotularFila(r.desglose, i),
+    anclaje: rotuloDeAnclaje(r, i),
+    variacion: f.varMensualPct === null ? "—" : porcentaje(f.varMensualPct),
+    acumulado: f.acumuladoPct === null ? "—" : porcentaje(f.acumuladoPct),
+    monto: pesos(f.monto),
+    // Con espacio duro antes del ✓: a 320 px el sello quedaba "DGEyC" / "Córdoba" / "✓", con la ✓ sola.
+    origen: f.esProyeccion ? "estimado" : f.esParcial ? "prorrateado" : `${selloDeFila(f, r)} ✓`,
+    indice: indice(f.indice),
+  }));
+  // Con montos de décadas atrás, o en el modo por día, la tabla no entraba en un escritorio y la
+  // columna del índice quedaba cortada leyéndose "0,00000000": la letra baja según lo ancha que
+  // es la fila (ver `letraDeLaTabla`).
+  const letra = letraDeLaTabla(
+    textos.map((t) => [
+      t.anclaje ? `${t.rotulo} ← ${t.anclaje}` : t.rotulo,
+      t.variacion,
+      t.acumulado,
+      t.monto,
+      t.origen,
+      t.indice,
+    ]),
   );
 
   // Construido con nodos en vez de innerHTML: la tabla es lo único que se arma a
@@ -443,18 +462,41 @@ function pintarResultado(r: Resultado): void {
   // cambie de forma.
   el("cuerpo-desglose").replaceChildren(
     ...r.desglose.map((f, i) => {
+      const t = textos[i]!;
       const tr = document.createElement("tr");
       if (f.esProyeccion) tr.className = "fila--estimada";
 
+      /** Dos mitades que no se parten por adentro y sólo se separan de renglón en el celular. */
+      const enMitades = (mitades: [string, string]) =>
+        mitades.map((mitad) => {
+          const parte = document.createElement("span");
+          parte.className = "mitad";
+          parte.textContent = mitad;
+          return parte;
+        });
+
       const th = document.createElement("th");
       th.scope = "row";
-      th.textContent = rotularFila(r.desglose, i);
-      const anclaje = rotuloDeAnclaje(r, i);
-      if (anclaje) {
-        const marca = document.createElement("span");
-        marca.className = "fila-anclaje";
-        marca.textContent = ` ← ${anclaje}`;
-        th.append(marca);
+      // Un tramo de días se puede partir después de la flecha, en el celular: entero, en el modo
+      // por día desde junio de 1985 "1 ago 2026 → 10 ago 2026" hacía la columna de 179 px a 375 y
+      // el monto de todas las filas quedaba fuera de la pantalla.
+      const rotuloEnDos = mitadesDeRotulo(t.rotulo);
+      if (rotuloEnDos) {
+        th.classList.add("rotulo--partible");
+        th.append(...enMitades(rotuloEnDos));
+      } else {
+        th.textContent = t.rotulo;
+      }
+      if (t.anclaje) {
+        // "← el resultado" no se parte: partido, la flecha quedaba apuntando a nada. En el celular
+        // va debajo de la fecha, donde la flecha no apunta a ningún lado, y se esconde.
+        const rotuloAnclaje = document.createElement("span");
+        rotuloAnclaje.className = "fila-anclaje";
+        const flecha = document.createElement("span");
+        flecha.className = "fila-anclaje__flecha";
+        flecha.textContent = "← ";
+        rotuloAnclaje.append(flecha, t.anclaje);
+        th.append(" ", rotuloAnclaje);
       }
       tr.append(th);
 
@@ -473,10 +515,9 @@ function pintarResultado(r: Resultado): void {
       // En el celular el sello se puede partir en dos renglones para dejarle lugar al monto.
       tdOrigen.className = "celda-origen";
       const marca = document.createElement("span");
-      const sello = selloDeFila(f, r);
       const clase = f.esProyeccion ? "proyeccion" : f.esParcial ? "prorrateado" : "publicado";
       marca.className = `origen origen--${clase}`;
-      marca.textContent = f.esProyeccion ? "estimado" : f.esParcial ? "prorrateado" : `${sello} ✓`;
+      marca.textContent = t.origen;
       if (f.esParcial && !f.esProyeccion) {
         // El organismo sale del origen de la propia fila: en el tramo reconstruido del
         // nacional el dato de fondo es del BCRA, y decir INDEC acá contradice el sello
@@ -492,34 +533,34 @@ function pintarResultado(r: Resultado): void {
       }
       tdOrigen.append(marca);
 
-      // Un monto o un acumulado de décadas atrás no entra en su columna: se puede cortar de
-      // renglón, pero sólo después de un punto de miles, y sólo si la celda misma es larga
-      // (`celdaPartible`), aunque la tabla sea de cifras largas. Chromium corta en un <wbr>
-      // aunque la celda diga `nowrap`: con los cortes puestos en todas, a 375 px "$ 1.000,00"
-      // se leía "$ 1." y "000,00".
+      // Un monto o un acumulado largo va en sus dos mitades (`mitadesDeCelda`), que sólo se
+      // separan de renglón en el celular. Con un <wbr> en cada punto de miles quedaban pedacitos
+      // que se leían como otro número, "$ 101.002." y "669,28", y también a 1280 px, porque
+      // Chromium corta en un <wbr> aunque la celda diga `nowrap`. Lo que se copia no cambia.
       const celdaCifra = (texto: string, clase?: string) => {
-        const td = celda("", clase);
+        const td = celda(texto, clase);
         td.classList.add("celda-cifra");
-        if (celdaPartible(texto)) {
-          td.append(...conCortesEnMiles(texto));
+        const mitades = mitadesDeCelda(texto);
+        if (mitades) {
           td.classList.add("celda-cifra--partible");
-        } else {
-          td.textContent = texto;
+          td.replaceChildren(...enMitades(mitades));
         }
         return td;
       };
 
       tr.append(
-        celda(f.varMensualPct === null ? "—" : porcentaje(f.varMensualPct)),
-        celdaCifra(f.acumuladoPct === null ? "—" : porcentaje(f.acumuladoPct), "col-acumulado"),
-        celdaCifra(pesos(f.monto)),
+        celda(t.variacion),
+        celdaCifra(t.acumulado, "col-acumulado"),
+        celdaCifra(t.monto),
         tdOrigen,
-        celda(indice(f.indice), "col-tecnica"),
+        celda(t.indice, "col-tecnica"),
       );
       return tr;
     }),
   );
-  el("cuerpo-desglose").closest("table")?.classList.toggle("desglose--cifras-largas", cifrasLargas);
+  const tabla = el("cuerpo-desglose").closest("table");
+  tabla?.classList.toggle("desglose--cifras-largas", letra === "chica");
+  tabla?.classList.toggle("desglose--cifras-enormes", letra === "minima");
 
   // Vanina, en el review: "esa tabla yo no se la puedo mostrar al cliente, lo
   // primero que me dice es '¿qué febrero? yo vine en mayo'". El título es lo

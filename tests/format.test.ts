@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { MONEDAS } from "../src/engine/moneda.js";
 import {
-  celdaLarga,
   celdaPartible,
   cifraLarga,
   indice,
   indiceCsv,
+  letraDeLaTabla,
+  mitadesDeCelda,
+  mitadesDeRotulo,
   montoConvertido,
   montoCsv,
   partirEnMiles,
@@ -18,6 +21,23 @@ import {
 
 /** Normaliza los espacios que Intl mete entre el símbolo y el número (NBSP y afines). */
 const limpio = (s: string) => s.replace(/\s/g, " ");
+
+describe("el rótulo de un tramo de días, partido en el celular", () => {
+  /**
+   * En el modo por día desde junio de 1985, "1 ago 2026 → 10 ago 2026" entero hacía la columna de
+   * 179 px a 375 y el monto de las 496 filas quedaba fuera de la pantalla. Dejando partir cualquier
+   * rótulo, a 320 px "ene 2024" quedaba "ene" y "2024": se parte sólo después de la flecha.
+   */
+  it("se parte después de la flecha, y en ningún otro lado", () => {
+    expect(mitadesDeRotulo("1 ago 2026 → 10 ago 2026")).toEqual(["1 ago 2026 → ", "10 ago 2026"]);
+    expect(mitadesDeRotulo("ene 2024")).toBeNull();
+    expect(mitadesDeRotulo("20 jun 1985")).toBeNull();
+  });
+
+  it("las dos mitades juntas son el rótulo entero", () => {
+    expect(mitadesDeRotulo("20 jun 1985 → 1 jul 1985")!.join("")).toBe("20 jun 1985 → 1 jul 1985");
+  });
+});
 
 describe("formato de moneda", () => {
   it("usa punto de miles y coma decimal", () => {
@@ -71,23 +91,40 @@ describe("la cifra protagonista cuando es muy larga", () => {
   });
 });
 
-describe("la tabla cuando trae montos muy largos", () => {
-  it("pide la letra chica a partir de 19 caracteres visibles en un monto o un acumulado", () => {
-    expect(celdaLarga("$ 16.101.575,00")).toBe(false);
-    expect(celdaLarga("$ 10.000.000.000,00")).toBe(false); // 18: el borde que entra
-    expect(celdaLarga("$ 100.000.000.000,00")).toBe(true); // 19: el primero que no
-    expect(celdaLarga("+4.405.053.544.978.806%")).toBe(true);
-    expect(celdaLarga(pesos(255323213736518400))).toBe(true);
+describe("la letra de la tabla en pantalla ancha", () => {
+  /** Una fila con la celda más larga de cada columna, del ancho que tenía en cada caso medido. */
+  const fila = (...anchos: number[]) => anchos.map((n) => "9".repeat(n));
+
+  /**
+   * Ahí una celda nunca se parte, así que la tabla tiene que entrar entera. Medido a 1280 px: el
+   * modo por día desde el 20 de junio de 1985 medía 885 px en 878 sin ninguna celda de más de 18
+   * caracteres, así que no alcanza con mirar una celda sola.
+   */
+  it("baja la letra según lo ancha que es la fila", () => {
+    expect(letraDeLaTabla([fila(7, 7, 7, 9, 13, 5)])).toBe("normal"); // 2024 → 2025
+    expect(letraDeLaTabla([fila(7, 8, 15, 18, 13, 11)])).toBe("normal"); // junio 1985 → agosto 2026: 72
+    expect(letraDeLaTabla([fila(19, 8, 15, 13, 13, 11)])).toBe("normal"); // agosto 2026 → mayo 1985: 79
+    expect(letraDeLaTabla([fila(18, 8, 15, 18, 13, 11)])).toBe("chica"); // por día desde junio 1985: 83
+    expect(letraDeLaTabla([fila(19, 8, 23, 14, 13, 17)])).toBe("chica"); // agosto 2026 → enero 1975: 94
+    expect(letraDeLaTabla([fila(7, 8, 24, 27, 13, 18)])).toBe("chica"); // enero 1970 → agosto 2026: 97
+    expect(letraDeLaTabla([fila(7, 8, 24, 35, 13, 18)])).toBe("minima"); // $1.000.000.000 de enero 1968: 105
   });
 
-  it("un monto se puede partir en los miles desde 15 caracteres visibles, aunque la tabla no sea de cifras largas", () => {
+  it("suma la celda más larga de cada columna, aunque estén en filas distintas", () => {
+    expect(letraDeLaTabla([fila(18, 8, 1, 1, 13, 11), fila(1, 1, 15, 18, 1, 1)])).toBe("chica");
+  });
+
+  it("cuenta lo que se ve, no los espacios que mete Intl", () => {
+    expect(letraDeLaTabla([[" ".repeat(200), pesos(1206.1)]])).toBe("normal");
+  });
+});
+
+describe("qué celdas de la tabla se pueden partir en el celular", () => {
+  it("desde 15 caracteres visibles", () => {
     // A 375 px "$ 1.000,00" se partía en "$ 1." y "000,00": ningún monto común se puede partir.
     expect(celdaPartible("$ 1.000,00")).toBe(false);
     expect(celdaPartible("$ 16.101.575,20")).toBe(false); // 14: entra entero a 320 px
     expect(celdaPartible("$ 161.015.752,00")).toBe(true); // 15
-    // Con junio 1985 → agosto 2026 la tabla no pasa a cifras largas y a 320 px la columna Monto
-    // quedaba cortada por el costado.
-    expect(celdaPartible("$ 63.415.892.293,00")).toBe(true);
   });
 });
 
@@ -266,24 +303,96 @@ describe("vaConCifras decide sobre el número ya redondeado", () => {
   });
 });
 
+describe("una celda de la tabla, partida en el celular", () => {
+  /**
+   * Con un <wbr> después de cada punto de miles quedaban pedacitos que se leían como otro número:
+   * "$ 101.002." y "669,28" (cien mil), "+6.899.750." y "041%" (41%), y pasaba también a 1280 px
+   * en el modo por día. Ahora es un solo corte, en el punto de miles más cercano a la mitad.
+   */
+  it("un solo corte, en el punto de miles más cercano a la mitad", () => {
+    expect(mitadesDeCelda("$ 68.997.501.409,62")).toEqual(["$ 68.997.", "501.409,62"]);
+    expect(mitadesDeCelda("+6.899.750.041%")).toEqual(["+6.899.", "750.041%"]);
+    expect(mitadesDeCelda("$ 1.060.117.079,89")).toEqual(["$ 1.060.", "117.079,89"]);
+    expect(mitadesDeCelda("$ 61.197.736.015,20")).toEqual(["$ 61.197.", "736.015,20"]);
+    expect(mitadesDeCelda("+25.532.321.373.651.740%")).toEqual(["+25.532.321.", "373.651.740%"]);
+    expect(mitadesDeCelda("$ 301.651.184.984.072.300.000.000,00")).toEqual([
+      "$ 301.651.184.984.",
+      "072.300.000.000,00",
+    ]);
+  });
+
+  it("abajo quedan siempre al menos dos grupos", () => {
+    expect(mitadesDeCelda("$ 101.002.669,28")).toEqual(["$ 101.", "002.669,28"]);
+  });
+
+  it("no parte un monto común, ni uno sin dos grupos para dejar abajo", () => {
+    expect(mitadesDeCelda("$ 1.000,00")).toBeNull();
+    expect(mitadesDeCelda("$ 16.101.575,20")).toBeNull(); // 14 caracteres: entra entero a 320 px
+    expect(mitadesDeCelda("$ 0,0000000000227")).toBeNull(); // sin puntos de miles
+  });
+
+  it("las dos mitades juntas son el número entero, que es lo que se copia", () => {
+    for (const t of ["$ 68.997.501.409,62", "+25.532.321.373.651.740%", pesos(63415892293), pesos(3.0165118498407e23)]) {
+      expect(mitadesDeCelda(t)!.join("")).toBe(t);
+    }
+  });
+});
+
 describe("un monto convertido a otra moneda", () => {
-  it("por debajo de mil lleva cuatro cifras significativas, en pesos y en otra moneda", () => {
+  /** El número de un texto impreso, como lo tipea alguien en la calculadora del celular. */
+  const leer = (impreso: string) => Number(impreso.replace(/[^\d,]/g, "").replace(",", "."));
+
+  it("por debajo de mil lleva hasta cuatro cifras significativas, en pesos y en otra moneda", () => {
     // Redondeado a entero, 1,081 australes eran "1 australes" y $ 1,32 era "$ 1": hasta 30% menos.
-    expect(montoConvertido(1.0809)).toBe("1,081");
-    expect(limpio(montoConvertido(1.3213, { enPesos: true }))).toBe("$ 1,321");
-    expect(montoConvertido(10.13)).toBe("10,13");
-    expect(limpio(montoConvertido(0.1, { enPesos: true }))).toBe("$ 0,10");
-    expect(montoConvertido(1)).toBe("1");
-    expect(limpio(montoConvertido(100, { enPesos: true }))).toBe("$ 100");
+    expect(montoConvertido("$ 1.081", 1e-3)).toBe("1,081");
+    expect(limpio(montoConvertido("$ 1.321", 1e-3, { enPesos: true }))).toBe("$ 1,321");
+    expect(montoConvertido("$ 10.130", 1e-3)).toBe("10,13");
+    expect(limpio(montoConvertido("$ 1.000.000", 1e-7, { enPesos: true }))).toBe("$ 0,10");
+    expect(montoConvertido("$ 1.000", 1e-3)).toBe("1");
+    expect(limpio(montoConvertido("$ 1.000.000", 1e-4, { enPesos: true }))).toBe("$ 100");
   });
 
   it("de mil para arriba, sin decimales", () => {
-    expect(limpio(montoConvertido(6341.589, { enPesos: true }))).toBe("$ 6.342");
-    expect(montoConvertido(2553232.137)).toBe("2.553.232");
+    expect(limpio(montoConvertido("$ 63.415.892.293", 1e-7, { enPesos: true }))).toBe("$ 6.342");
+    expect(montoConvertido("$ 255.323.213.736.518.400", 1e-11)).toBe("2.553.232");
   });
 
-  it("si el resultado se muestra con cifras significativas, la conversión no muestra más cifras que él", () => {
-    expect(montoConvertido(119357.5, { comoElResultado: true })).toBe("119.400");
-    expect(montoConvertido(2270.08, { comoElResultado: true })).toBe("2.270");
+  it("nunca con más cifras que la cifra impresa arriba", () => {
+    // Arriba "$ 0,01194": por 10.000.000 son 119.400 con la calculadora; decía 119.359.
+    expect(montoConvertido("$ 0,01194", 1e7)).toBe("119.400");
+    expect(montoConvertido("$ 0,0000000227", 1e11)).toBe("2.270");
+    // También entre 1 y 999, donde la cifra va redondeada a entero.
+    expect(montoConvertido("$ 921", 1e4)).toBe("9.210.000"); // decía 9.209.100
+    expect(montoConvertido("$ 40", 1e4)).toBe("400.000"); // decía 404.165
+    expect(montoConvertido("$ 925", 1e3)).toBe("925.000"); // decía 924.854
+    expect(montoConvertido("~$ 2.553.232", 1e-4)).toBe("255,3");
+  });
+
+  /**
+   * La regla y no un ejemplo: para cualquier cifra impresa y cualquier par de monedas, la
+   * conversión es lo que da la calculadora con el número de arriba, redondeado a no más cifras
+   * significativas que las que tiene ese número. Con 999,6 arriba dice "$ 1.000": la conversión
+   * sale de ese 1.000 y no de 999,6, que nadie ve.
+   */
+  it("es la cifra impresa por el factor, redondeada a no más cifras que ella", () => {
+    const cifras = (impreso: string) => impreso.replace(/\D/g, "").replace(/^0+/, "").length;
+    const factores = MONEDAS.flatMap((de) => MONEDAS.filter((a) => a !== de).map((a) => de.unidad / a.unidad));
+    const resultados = [
+      2.27e-8, 1.577e-5, 0.0119357, 0.1, 0.5, 0.99994, 0.99996, 1.0809, 1.4, 9.87654, 40.4165, 920.91, 924.854,
+      999.4, 999.6, 1080.9, 1321.3, 6341.589, 16101575.2, 1e6, 63415892293.4, 2.553232137365184e17, 3.0165118498407e23,
+    ];
+    for (const m of resultados) {
+      for (const impreso of [pesosRedondo(m), `~${pesosRedondo(m)}`]) {
+        for (const f of factores) {
+          for (const enPesos of [false, true]) {
+            const mostrado = montoConvertido(impreso, f, { enPesos });
+            const calculadora = leer(impreso) * f;
+            const redondeos = Array.from({ length: cifras(impreso) }, (_, i) => Number(calculadora.toPrecision(i + 1)));
+            const cierra = redondeos.some((v) => Math.abs(v - leer(mostrado)) <= Math.abs(v) * 1e-9);
+            expect(cierra, `${limpio(impreso)} × ${f} → ${limpio(mostrado)}`).toBe(true);
+          }
+        }
+      }
+    }
   });
 });

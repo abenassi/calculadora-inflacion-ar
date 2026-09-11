@@ -137,23 +137,29 @@ una página que no entra:
   metodología (469 px a 375 con cualquier índice provincial, 415 con el nacional estimado),
   que ahora se achica con la pantalla. Medida de nuevo, la cifra usa letra chica desde 12
   caracteres visibles y sólo se corta de renglón después de un punto de miles, en renglones
-  parejos (`text-wrap: balance`) para que no quede un "400" suelto. La tabla, con montos así,
-  medía 960 px en 878 a 1280: pasa a letra chica. Una celda se puede cortar en los puntos de
-  miles sólo si ella misma pasa de 14 caracteres visibles, en cualquier tabla. Con el corte
-  habilitado en todas las celdas, en un celular "$ 1.000,00" se leía "$ 1." y "000,00" (Chromium
-  corta en un `<wbr>` aunque la celda diga `nowrap`); con 14 entra entero a 320 px, y junio 1985
-  → agosto 2026, que no llega a cifras largas, ya no deja la columna Monto cortada por el
-  costado. En el celular, además, "← el resultado" va debajo de la fecha, el sello de origen
-  puede partirse y la tabla usa todo el ancho de la tarjeta: un monto sin puntos de miles como
-  "$ 0,0000000227" quedaba cortado por el costado y se leía "$ 0,00".
+  parejos (`text-wrap: balance`) para que no quede un "400" suelto. En la tabla, en pantalla
+  ancha, una celda nunca se parte: la letra baja según lo ancha que es la fila, sumando la celda
+  más larga de cada columna (`letraDeLaTabla`; a 1280 px la de 1970 medía 960 px en 878, y la
+  del modo por día desde junio de 1985, 885), y si igual no entra, la tabla se desplaza. En el
+  celular una celda de más de 14 caracteres se parte una sola vez, en el punto de miles más
+  cercano a la mitad y con al menos dos grupos abajo ("$ 68.997." y "501.409,62"). Con un `<wbr>`
+  en cada punto de miles quedaban pedacitos que se leían como otro número ("+6.899.750." y
+  "041%", también a 1280 px: Chromium corta en un `<wbr>` aunque la celda diga `nowrap`), así que
+  las dos mitades van en dos elementos que sólo se separan de renglón en el celular. Ahí,
+  además, "el resultado" va debajo de la fecha, entero y sin la flecha, el sello de origen puede
+  partirse (con la ✓ pegada a la última palabra) y la tabla usa todo el ancho de la tarjeta: un
+  monto sin puntos de miles como "$ 0,0000000227" quedaba cortado por el costado y se leía
+  "$ 0,00".
 - Entre 1968 y 1992 hay cinco monedas, no sólo el austral (ver `datos.html#monedas`), y el
   resultado queda en la moneda del monto. Debajo del resultado, y en el texto que se copia, la
-  calculadora arranca con cuánto es en la moneda de la otra punta —destacado; con cuatro cifras
-  significativas por debajo de mil, y nunca con más cifras que el resultado— y después explica
-  en qué moneda está (`src/engine/moneda.ts`, por día). Junio de 1985 tuvo dos monedas y el
-  aviso da las dos cuentas, cortas. Vale también para el nacional desde 1990, que es el caso
-  más peligroso porque el número es creíble: $1.000 de enero de 1990 dan "$ 16.101.575", y en
-  pesos son $ 1.610.
+  calculadora arranca con cuánto es en la moneda de la otra punta, destacado, y después explica
+  en qué moneda está (`src/engine/moneda.ts`, por día). La conversión sale de la cifra impresa
+  arriba y nunca tiene más cifras significativas que ella: con "$ 921" arriba decía 9.209.100
+  australes, y la calculadora da 9.210.000. La moneda va siempre después del número. Junio de
+  1985 tuvo dos monedas: el aviso destaca las dos cuentas y dice que el número de arriba está en
+  la moneda del monto, y con las dos puntas en ese mes no hay nada que convertir. Vale también
+  para el nacional desde 1990, que es el caso más peligroso porque el número es creíble: $1.000
+  de enero de 1990 dan "$ 16.101.575", y en pesos son $ 1.610.
 
 **Mendoza no publicó entre marzo de 2012 y abril de 2016.** Sin recortar, el motor habría
 leído ese salto como una variación mensual de cuatro años. Se sirve el tramo continuo que

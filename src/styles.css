@@ -757,22 +757,28 @@ button:focus-visible {
 }
 
 /*
- * Montos y acumulados de décadas atrás con Córdoba ("$ 255.323.213.736.518.400,00"). Las medidas
- * están en `celdaLarga()`: con esta letra la tabla entra a 1280 px sin partir ninguna fila en los
- * casos probados. Si igual no alcanza, esas dos celdas se cortan de renglón sólo después de un
- * punto de miles, en vez de empujar la columna del índice afuera.
- *
- * El corte sólo va en una celda que por sí sola pasa de 14 caracteres (`celdaPartible`), aun en
- * esta tabla. Con el corte habilitado siempre, a 375 px "$ 1.000,00" de cualquier cálculo se
- * partía en "$ 1." y "000,00", y lo primero que se leía era un peso. Por eso main.ts pone los
- * <wbr> y la clase sólo ahí: Chromium corta en un <wbr> aunque la celda diga `nowrap`.
+ * Montos y acumulados de décadas atrás con Córdoba ("$ 255.323.213.736.518.400,00"), o el modo
+ * por día desde 1985. En pantalla ancha una celda nunca se parte: la tabla baja la letra según lo
+ * ancha que es su fila (`letraDeLaTabla`, que tiene las medidas) y, si igual no entra, se
+ * desplaza. Antes se partía en cada punto de miles y a 1280 px quedaban pedacitos que parecían
+ * otro número: "+6.899.750." y "041%".
  */
 .desglose--cifras-largas {
   font-size: 0.75rem;
 }
 
-.desglose td.celda-cifra--partible {
-  white-space: normal;
+.desglose--cifras-enormes {
+  font-size: 0.7rem;
+}
+
+/*
+ * Las dos mitades de una celda larga (`mitadesDeCelda`). No se parten por adentro, y entre ellas
+ * sólo se corta en el celular (ver la media query): acá la celda sigue en `nowrap`. Con un <wbr>
+ * no alcanzaba, porque Chromium corta en un <wbr> aunque la celda diga `nowrap`.
+ */
+.desglose .mitad {
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .desglose thead th {
@@ -1122,12 +1128,16 @@ button:focus-visible {
    * llevados a enero de 1975 dan "$ 0,0000000227" en cada fila, y la columna Monto quedaba
    * cortada por el costado: se leía "$ 0,00", sin el título a la vista. Medido: a 375 px la
    * tabla entra entera y a 320 el monto se ve entero sin desplazar (lo que queda afuera es el
-   * sello de origen). Para eso "← el resultado" va debajo de la fecha, el sello se puede partir,
-   * la tabla de cifras largas baja un poco más la letra y usa todo el ancho de la tarjeta.
+   * sello de origen). Para eso "el resultado" va debajo de la fecha, entero y sin la flecha (ahí
+   * no apunta a nada, y partido en "← el" / "resultado" menos), el sello se puede partir, la tabla
+   * de cifras largas baja un poco más la letra y usa todo el ancho de la tarjeta.
    */
   .fila-anclaje {
     display: block;
-    white-space: normal;
+  }
+
+  .fila-anclaje__flecha {
+    display: none;
   }
 
   .desglose td.celda-origen {
@@ -1139,7 +1149,17 @@ button:focus-visible {
     border-radius: 0.5rem;
   }
 
-  .desglose.desglose--cifras-largas {
+  /*
+   * Sólo acá una celda larga se separa entre sus dos mitades (`mitadesDeCelda`), y un tramo de
+   * días después de la flecha (`mitadesDeRotulo`), y sólo si no entran.
+   */
+  .desglose td.celda-cifra--partible,
+  .desglose th.rotulo--partible {
+    white-space: normal;
+  }
+
+  .desglose.desglose--cifras-largas,
+  .desglose.desglose--cifras-enormes {
     font-size: 0.72rem;
   }
 

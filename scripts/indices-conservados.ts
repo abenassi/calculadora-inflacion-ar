@@ -1,6 +1,5 @@
 /**
- * Los índices que el snapshot no pudo actualizar y dejó publicados con los datos de la corrida
- * anterior.
+ * Los índices que el snapshot no pudo actualizar y quedaron con los datos de la corrida anterior.
  *
  * `construirCatalogo` atrapa el error de cada índice jurisdiccional para que uno roto no saque a
  * los demás del desplegable, y conserva la entrada de ayer. Eso sigue así. Lo que estaba mal es
@@ -8,8 +7,8 @@
  * de más (ver `recorte-representable.ts`) congelaba a Córdoba para siempre sin que nadie se
  * enterara. Ahora la lista queda en un archivo fuera de `public/`, que nunca se commitea, y el
  * último paso del workflow la lee (`verificar-indices-conservados.ts`) y pone el job en rojo
- * nombrando cada índice, después de commitear y publicar lo demás. Es el patrón de
- * `verificar-frescura.ts`.
+ * nombrando cada índice. Ese paso corre siempre que la bajada haya terminado, aunque después
+ * fallen los tests y no se publique nada. Es el patrón de `verificar-frescura.ts`.
  *
  * Sin nada de `fs` acá: la parte que decide qué se avisa se prueba sin tocar el disco.
  */

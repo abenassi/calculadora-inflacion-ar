@@ -33,7 +33,7 @@ import { fuenteDe, llevaSello, mesDelTramo, quienPublicaAhora } from "./etiqueta
 
 /** Para arrancar una oración con el organismo, que viene con el artículo en minúscula. */
 export const capitalizar = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
-import { cantidad, comoSeMuestra, montoConvertido, pesos, porcentaje, vaConCifras } from "./format.js";
+import { cantidad, comoSeMuestra, montoConvertido, pesos, pesosRedondo, porcentaje } from "./format.js";
 
 /** A partir de cuántos meses proyectados dejamos de tratarlo como una cuenta razonable. */
 export const MESES_PROYECCION_LARGA = 4;
@@ -440,16 +440,23 @@ export function efectoEnElMonto(r: Resultado): string {
   return ` Sacarle esa inflación al monto lo ${verbo} ${texto}.`;
 }
 
-/** El aviso de moneda en dos partes: la cuenta que la persona vino a buscar, y por qué. */
-export type AvisoDeMoneda = {
-  /** Va primero y destacado. Vacío cuando no hay nada que convertir. */
-  destacado: string;
-  detalle: string;
-};
+/** Un pedazo del aviso de moneda. Lo destacado va en negrita en pantalla y sin formato en el texto que se copia. */
+export type ParteDelAviso = { texto: string; destacado: boolean };
+
+/**
+ * La cifra grande del resultado, tal como se imprime. Sale de acá para la pantalla y para el
+ * aviso de moneda, porque las conversiones del aviso se hacen sobre este número y no sobre el
+ * resultado sin redondear (ver `montoConvertido`).
+ */
+export function cifraDelResultado(r: Resultado): string {
+  const cifra = pesosRedondo(r.montoAjustado);
+  return esAproximado(r) ? `~${cifra}` : cifra;
+}
 
 /**
  * En qué moneda están el monto y el resultado cuando alguna punta es anterior al peso, y cuánto
- * es el resultado en la moneda de la otra punta.
+ * es el resultado en la moneda de la otra punta. En partes, porque en pantalla la cuenta va
+ * destacada; el texto que se copia las junta sin formato (`explicarMoneda`).
  *
  * La cuenta no le saca ni le agrega ceros al monto (`datos.html#monedas`): $1.000 de enero de
  * 1970 dan "$ 255.323.213.736.518.400", que se lee como un número roto, y un millón de agosto
@@ -460,60 +467,24 @@ export type AvisoDeMoneda = {
  * **Arranca con la conversión.** La primera versión la dejaba en la tercera frase, en letra
  * chica, detrás de "Esta cuenta no le saca los ceros: si tu monto está en pesos ley, el
  * resultado también", que la revisora usuaria leyó dos veces ("¿también qué?"). Y hacia atrás
- * no pregunta en qué moneda está el monto: uno de 2026 sólo puede estar en pesos.
+ * no pregunta en qué moneda está el monto: uno de 2026 sólo puede estar en pesos. La moneda va
+ * siempre después del número convertido: "1,321" solo, debajo de un "$ 1.321", se leía como el
+ * mismo número.
  *
  * **Junio de 1985 tuvo dos monedas** (el austral arranca el 15), así que un monto de ese mes
- * pudo estar en cualquiera: la frase da las dos cuentas, cortas, en vez de elegir una. La tabla
- * de monedas y la conversión viven en `src/engine/moneda.ts`; acá sólo se arma el texto.
- * Devuelve `null` con las dos puntas en pesos.
+ * pudo estar en cualquiera: el aviso da las dos cuentas, destacadas, y dice que el número de
+ * arriba no es ninguna de ellas. La versión que sólo destacaba "En junio 1985 cambió la moneda."
+ * dejaba "$ 63.415.892.293" sin explicar. La tabla de monedas vive en `src/engine/moneda.ts`; acá
+ * sólo se arma el texto. Devuelve `null` con las dos puntas en pesos.
  */
-export function avisoDeMoneda(r: Resultado): AvisoDeMoneda | null {
+export function avisoDeMoneda(r: Resultado): ParteDelAviso[] | null {
   const periodo = monedasDelPeriodo(r.desde, r.hasta, r.montoAjustado);
   if (!periodo) return null;
   const { origen, destino, equivalencias } = periodo;
   const cuando = (p: Punto) => (esFecha(p) ? `el ${nombrarPunto(p)}` : `en ${nombrarMes(p)}`);
-
-  // Las dos puntas en la misma moneda: no hay nada que convertir, sólo decir cuál es.
-  if (equivalencias.length === 0) {
-    const moneda = origen[0]!;
-    const puntas =
-      r.desde === r.hasta ? capitalizar(cuando(r.desde)) : `${capitalizar(cuando(r.desde))} y ${cuando(r.hasta)}`;
-    return {
-      destacado: "",
-      detalle: `${puntas} la moneda era el ${moneda.nombre}: si tu monto está en ${moneda.plural}, el resultado también.`,
-    };
-  }
-
-  const aproximado = esAproximado(r);
-  /** "2.270 pesos ley", "1 austral", "unos $ 2.553.232", y el verbo que le corresponde. */
-  const cuanto = (e: Equivalencia, conNombre = true) => {
-    const numero = montoConvertido(e.monto, { enPesos: e.a === PESO, comoElResultado: vaConCifras(r.montoAjustado) });
-    const uno = numero.replace(/[^\d,]/g, "") === "1";
-    const nombre = conNombre && e.a !== PESO ? ` ${uno ? e.a.singular : e.a.plural}` : "";
-    const aprox = aproximado ? (uno ? "alrededor de " : "unos ") : "";
-    return { texto: `${aprox}${numero}${nombre}`, verbo: uno ? "es" : "son" };
-  };
-
-  if (origen.length === 1 && destino.length === 1) {
-    const e = equivalencias[0]!;
-    const { texto, verbo } = cuanto(e);
-    const enLaMoneda = e.a === PESO ? "En pesos" : "En la moneda";
-    const equivalencia = `(1 ${e.mayor.singular} = ${cantidad(e.cuantas)} ${e.menor.plural})`;
-    // Pasar a una moneda más nueva le saca ceros; a una más vieja, se los agrega.
-    const ceros = e.de.unidad < e.a.unidad ? "no le saca los ceros" : "no le agrega los ceros";
-    return {
-      destacado: `${enLaMoneda} ${conPreposicion("de", r.hasta)} ${verbo} ${texto}.`,
-      detalle:
-        e.de === PESO
-          ? `El número de arriba está en pesos, igual que tu monto: esta cuenta ${ceros} ${equivalencia}.`
-          : `${capitalizar(cuando(r.desde))} la moneda era el ${e.de.nombre} y esta cuenta ${ceros}: ` +
-            `el número de arriba está en ${e.de.plural}, igual que tu monto ${equivalencia}.`,
-    };
-  }
-
-  // Alguna punta es junio de 1985. "(hasta el 14)" y "(desde el 15)" dicen qué moneda corría
-  // cada día de ese mes; la equivalencia entre monedas se omite para que el aviso no quede más
-  // alto que el resultado (llegó a 14 renglones a 320 px).
+  const normal = (texto: string): ParteDelAviso => ({ texto, destacado: false });
+  const destacado = (texto: string): ParteDelAviso => ({ texto, destacado: true });
+  /** Qué días de un mes con cambio corrió cada moneda: "hasta el 14", "desde el 15". */
   const rango = (moneda: Moneda, monedas: Moneda[]) => {
     const i = monedas.indexOf(moneda);
     const siguiente = monedas[i + 1];
@@ -521,50 +492,105 @@ export function avisoDeMoneda(r: Resultado): AvisoDeMoneda | null {
     if (!siguiente) return `desde el ${diaDe(moneda.desde!)}`;
     return `del ${diaDe(moneda.desde!)} al ${diaDe(siguiente.desde!) - 1}`;
   };
-  const destacado = [
-    ...new Set(
-      [
-        [r.desde, origen] as const,
-        [r.hasta, destino] as const,
-      ]
-        .filter(([, monedas]) => monedas.length > 1)
-        .map(([p]) => `${capitalizar(cuando(p))} cambió la moneda.`),
-    ),
-  ].join(" ");
+
+  // Las dos puntas en junio de 1985, el único mes con dos monedas: el monto y el resultado están
+  // en la misma, sea cual sea, y no hay nada que convertir. Armado como los demás casos decía "Si
+  // tu monto era en pesos argentinos (hasta el 14): en pesos argentinos (hasta el 14) es el
+  // número de arriba; en australes (desde el 15), 1. Si era en australes…".
+  if (origen.length > 1 && destino.length > 1) {
+    const cuales = origen.map((m) => `${rango(m, origen)}, el ${m.nombre}`).join("; ");
+    return [
+      normal(
+        `${capitalizar(cuando(r.desde))} cambió la moneda (${cuales}): el resultado queda en la misma moneda que tu monto.`,
+      ),
+    ];
+  }
+
+  // Las dos puntas en la misma moneda: no hay nada que convertir, sólo decir cuál es.
+  if (equivalencias.length === 0) {
+    const moneda = origen[0]!;
+    const puntas =
+      r.desde === r.hasta ? capitalizar(cuando(r.desde)) : `${capitalizar(cuando(r.desde))} y ${cuando(r.hasta)}`;
+    return [normal(`${puntas} la moneda era el ${moneda.nombre}: si tu monto está en ${moneda.plural}, el resultado también.`)];
+  }
+
+  const impreso = cifraDelResultado(r);
+  const aproximado = esAproximado(r);
+  /** "2.270 pesos ley", "1 austral", "$ 2.553.232", y lo que va antes: el verbo y el "unos". */
+  const cuanto = (e: Equivalencia) => {
+    const numero = montoConvertido(impreso, e.de.unidad / e.a.unidad, { enPesos: e.a === PESO });
+    const uno = numero.replace(/[^\d,]/g, "") === "1";
+    return {
+      cifra: e.a === PESO ? numero : `${numero} ${uno ? e.a.singular : e.a.plural}`,
+      aprox: aproximado ? (uno ? "alrededor de " : "unos ") : "",
+      verbo: uno ? "es" : "son",
+    };
+  };
   const equivalencia = (de: Moneda, a: Moneda) => equivalencias.find((e) => e.de === de && e.a === a)!;
 
-  /** Qué es el resultado en cada moneda posible de destino, para un monto en `de`. */
-  const enCadaDestino = (de: Moneda): string => {
-    if (destino.length === 1) {
-      const a = destino[0]!;
-      return a === de
-        ? `el número de arriba ya está en ${a.plural}`
-        : `${cuanto(equivalencia(de, a)).texto} ${conPreposicion("de", r.hasta)}`;
-    }
-    return destino
-      .map((a, i) => {
-        const cual = `en ${a.plural} (${rango(a, destino)})`;
-        if (a === de) return i === 0 ? `${cual} es el número de arriba` : `${cual}, el número de arriba`;
-        const { texto, verbo } = cuanto(equivalencia(de, a), false);
-        return i === 0 ? `${cual} ${verbo} ${texto}` : `${cual}, ${texto}`;
-      })
-      .join("; ");
-  };
+  if (origen.length === 1 && destino.length === 1) {
+    const e = equivalencias[0]!;
+    const { cifra, aprox, verbo } = cuanto(e);
+    const enLaMoneda = e.a === PESO ? "En pesos" : "En la moneda";
+    const cuantasVale = `(1 ${e.mayor.singular} = ${cantidad(e.cuantas)} ${e.menor.plural})`;
+    // Pasar a una moneda más nueva le saca ceros; a una más vieja, se los agrega.
+    const ceros = e.de.unidad < e.a.unidad ? "no le saca los ceros" : "no le agrega los ceros";
+    return [
+      destacado(`${enLaMoneda} ${conPreposicion("de", r.hasta)} ${verbo} ${aprox}${cifra}.`),
+      normal(
+        e.de === PESO
+          ? ` El número de arriba está en pesos, igual que tu monto: esta cuenta ${ceros} ${cuantasVale}.`
+          : ` ${capitalizar(cuando(r.desde))} la moneda era el ${e.de.nombre} y esta cuenta ${ceros}: ` +
+              `el número de arriba está en ${e.de.plural}, igual que tu monto ${cuantasVale}.`,
+      ),
+    ];
+  }
 
-  // Con una sola moneda de origen no hay nada que suponer sobre el monto: se dice y listo.
-  const detalle =
-    origen.length === 1
-      ? `Tu monto está en ${origen[0]!.plural}: ${enCadaDestino(origen[0]!)}.`
-      : origen
-          .map((de, i) => `${i === 0 ? "Si tu monto era" : "Si era"} en ${de.plural} (${rango(de, origen)}): ${enCadaDestino(de)}.`)
-          .join(" ");
-  return { destacado, detalle };
+  // Una punta es junio de 1985. "(hasta el 14)" y "(desde el 15)" dicen qué moneda corría cada
+  // día de ese mes; la equivalencia entre monedas se omite para que el aviso no quede más alto
+  // que el resultado (llegó a 14 renglones a 320 px).
+  const partes: ParteDelAviso[] = [];
+  if (origen.length > 1) {
+    const a = destino[0]!;
+    partes.push(
+      destacado(`${capitalizar(cuando(r.desde))} cambió la moneda`),
+      normal(", y el número de arriba está en la de tu monto."),
+    );
+    let conFecha = true;
+    for (const de of origen) {
+      partes.push(normal(` Si era en ${de.plural} (${rango(de, origen)}): `));
+      if (de === a) {
+        partes.push(normal("es el número de arriba."));
+        continue;
+      }
+      const { cifra, aprox } = cuanto(equivalencia(de, a));
+      partes.push(normal(aprox), destacado(cifra), normal(conFecha ? ` ${conPreposicion("de", r.hasta)}.` : "."));
+      conFecha = false;
+    }
+  } else {
+    // Un monto de una sola moneda: se dice cuál, y no se abre con un "si".
+    const de = origen[0]!;
+    partes.push(
+      destacado(`${capitalizar(cuando(r.hasta))} cambió la moneda`),
+      normal(`, y el número de arriba está en ${de.plural}, igual que tu monto. `),
+    );
+    destino.forEach((a, i) => {
+      const dias = rango(a, destino);
+      if (a === de) {
+        partes.push(normal(i === 0 ? `${capitalizar(dias)} es el número de arriba` : `; ${dias}, el número de arriba`));
+        return;
+      }
+      const { cifra, aprox, verbo } = cuanto(equivalencia(de, a));
+      partes.push(normal(i === 0 ? `${capitalizar(dias)} ${verbo} ${aprox}` : `; ${dias}, ${aprox}`), destacado(cifra));
+    });
+    partes.push(normal("."));
+  }
+  return partes.filter((p) => p.texto !== "");
 }
 
-/** El aviso de moneda sin formato, para el texto que se copia: la cuenta primero, igual que en pantalla. */
+/** El aviso de moneda sin formato, para el texto que se copia: el mismo texto que en pantalla. */
 export function explicarMoneda(r: Resultado): string {
-  const aviso = avisoDeMoneda(r);
-  return aviso ? [aviso.destacado, aviso.detalle].filter((s) => s !== "").join(" ") : "";
+  return (avisoDeMoneda(r) ?? []).map((p) => p.texto).join("");
 }
 
 /**

@@ -83,26 +83,37 @@ export function cantidad(n: number): string {
   return (vaConCifras(n) ? CANTIDAD_CIFRAS : CANTIDAD).format(n);
 }
 
+/** Intl no acepta más cifras significativas que estas. */
+const MAXIMO_DE_INTL = 21;
+
 /**
  * Un monto pasado a la moneda de la otra punta, en el aviso de moneda: "$ 2.553.232", "1,081"
- * australes.
+ * australes. Sale de la cifra impresa arriba (`resultadoImpreso`) por el factor entre las dos
+ * monedas, que es la cuenta que hace cualquiera con la calculadora del celular.
  *
- * Por debajo de mil, cuatro cifras significativas. Redondeado a entero, como la cifra del
- * resultado, 1,081 australes eran "1 australes" y $ 1,32 era "$ 1": hasta 30% menos, en una
- * frase que existe para decir cuánto es de verdad. De mil para arriba, sin decimales.
+ * **Nunca con más cifras significativas que esa cifra.** Arriba dice "$ 0,01194", y 0,01194 por
+ * 10.000.000 da 119.400: "119.359" no le cerraba a nadie. Pasa lo mismo entre 1 y 999, donde la
+ * cifra va redondeada a entero: con "$ 921" arriba el aviso decía 9.209.100 australes, y la
+ * calculadora da 9.210.000. Por eso sale del texto impreso y no del resultado sin redondear: con
+ * 999,6 arriba dice "$ 1.000", y la cuenta tiene que salir de ese 1.000.
  *
- * Y si el resultado mismo se muestra con cifras significativas (`comoElResultado`), la
- * conversión no muestra más cifras que él: arriba dice "$ 0,01194", y 0,01194 por 10.000.000
- * da 119.400 con la calculadora del celular; "119.359" no le cerraba a nadie.
+ * Dentro de eso, por debajo de mil hasta cuatro cifras significativas: redondeado a entero,
+ * 1,081 australes eran "1 australes" y $ 1,32 era "$ 1", hasta 30% menos, en una frase que
+ * existe para decir cuánto es de verdad. De mil para arriba, sin decimales.
  */
 export function montoConvertido(
-  n: number,
-  opciones: { enPesos?: boolean; comoElResultado?: boolean } = {},
+  resultadoImpreso: string,
+  factor: number,
+  opciones: { enPesos?: boolean } = {},
 ): string {
-  const conCifras = opciones.comoElResultado === true || Math.abs(n) < 1000;
-  const numero: Intl.NumberFormatOptions = conCifras
-    ? { minimumSignificantDigits: vaConCifras(n) ? 2 : 1, maximumSignificantDigits: CIFRAS_SIGNIFICATIVAS }
-    : { maximumFractionDigits: 0 };
+  const n = Number(resultadoImpreso.replace(/[^\d,]/g, "").replace(",", ".")) * factor;
+  const impresas = resultadoImpreso.replace(/\D/g, "").replace(/^0+/, "").length;
+  const delRedondeo = Math.abs(n) >= 1000 ? Math.floor(Math.log10(Math.abs(n))) + 1 : CIFRAS_SIGNIFICATIVAS;
+  const maximo = Math.min(Math.max(impresas, 1), delRedondeo, MAXIMO_DE_INTL);
+  const numero: Intl.NumberFormatOptions = {
+    minimumSignificantDigits: Math.min(vaConCifras(n) ? 2 : 1, maximo),
+    maximumSignificantDigits: maximo,
+  };
   return new Intl.NumberFormat(
     "es-AR",
     opciones.enPesos ? { style: "currency", currency: "ARS", ...numero } : numero,
@@ -246,6 +257,11 @@ export function indiceCsv(n: number): string {
   return (vaConCifras(n) ? CSV_INDICE_CIFRAS : CSV_INDICE).format(n);
 }
 
+/** Los caracteres que ocupan lugar: los espacios que Intl mete después del signo no ocupan lo que un dígito. */
+function visibles(texto: string): number {
+  return texto.replace(/\s/g, "").length;
+}
+
 /**
  * Cuántos caracteres visibles entran en una línea de la cifra protagonista con la letra de
  * siempre.
@@ -268,51 +284,94 @@ const CARACTERES_DE_LA_CIFRA_NORMAL = 11;
  * lo que ocupa un dígito.
  */
 export function cifraLarga(texto: string): boolean {
-  return texto.replace(/\s/g, "").length > CARACTERES_DE_LA_CIFRA_NORMAL;
+  return visibles(texto) > CARACTERES_DE_LA_CIFRA_NORMAL;
 }
 
 /**
- * Cuántos caracteres visibles puede tener un monto o un acumulado de la tabla con la letra de
- * siempre.
+ * Hasta cuántos caracteres visibles, sumando la celda más larga de cada columna, entra la tabla
+ * con cada letra en pantalla ancha.
  *
- * Con Córdoba, $1.000 de enero de 1970 terminan en una fila con "$ 255.323.213.736.518.400,00"
- * y "+25.532.321.373.651.740%": a 1280 px la tabla medía 960 px en un contenedor de 878, y la
- * columna del índice quedaba cortada, leyéndose "0,00000000". Medido: con la letra de
- * `.desglose--cifras-largas` entran sin partir ninguna fila ese caso, el de $1.000.000 de agosto
- * 2026 a enero 1975 (930 px, con un acumulado de 23 caracteres) y el de $1.000.000.000 de enero
- * 1968 (1.022 px, con un monto de 35).
+ * Ahí una celda nunca se parte (ver `mitadesDeCelda`), así que la tabla entra entera o se
+ * desplaza. Medido a 1280 px, con la tabla de 878 px y ninguna celda partida:
+ * - con la letra de siempre entran junio 1985 → agosto 2026 en Córdoba (72) y $1.000.000 de
+ *   agosto 2026 → mayo 1985 (79). El modo por día desde el 20 de junio de 1985 (83) medía 885
+ *   px, sin ninguna celda de más de 18 caracteres: por eso cuenta la fila y no una celda sola;
+ * - con la chica entran ése, $1.000.000 de agosto 2026 → enero 1975 (94) y $1.000 de enero de
+ *   1970 (97, justo: 960 px con la de siempre);
+ * - $1.000.000.000 de enero de 1968 (105) medía 910 px con la chica y entra con la mínima.
+ * Una tabla más ancha que eso se desplaza, igual que todas por debajo de 1280 px.
  */
-const CARACTERES_DE_LA_CELDA_NORMAL = 18;
+const CARACTERES_CON_LA_LETRA_NORMAL = 80;
+const CARACTERES_CON_LA_LETRA_CHICA = 97;
 
-/** Si un monto o un acumulado de la tabla pide la letra chica para toda la tabla. */
-export function celdaLarga(texto: string): boolean {
-  return texto.replace(/\s/g, "").length > CARACTERES_DE_LA_CELDA_NORMAL;
+export type LetraDeLaTabla = "normal" | "chica" | "minima";
+
+/** La letra de la tabla, para las celdas de cada fila tal como se imprimen. */
+export function letraDeLaTabla(filas: readonly (readonly string[])[]): LetraDeLaTabla {
+  const anchos: number[] = [];
+  for (const fila of filas) {
+    fila.forEach((celda, i) => {
+      anchos[i] = Math.max(anchos[i] ?? 0, visibles(celda));
+    });
+  }
+  const total = anchos.reduce((suma, ancho) => suma + ancho, 0);
+  if (total <= CARACTERES_CON_LA_LETRA_NORMAL) return "normal";
+  if (total <= CARACTERES_CON_LA_LETRA_CHICA) return "chica";
+  return "minima";
 }
 
 /**
- * Hasta cuántos caracteres visibles un monto o un acumulado de la tabla nunca se parte.
- *
- * Chromium corta en un `<wbr>` aunque la celda diga `white-space: nowrap`, y en una tabla
- * angosta achica juntas todas las celdas partibles de una columna: con los `<wbr>` puestos en
- * todas las tablas, a 375 px "$ 1.000,00" de un cálculo cualquiera se leía "$ 1." y "000,00", un
- * peso, y con los puestos en toda tabla de cifras largas pasaba lo mismo a 320 px con Córdoba
- * desde 1970. Medido a 320 px: con el nacional desde 1990 el monto más largo, "$ 16.101.575,20"
- * (14), entra entero. Con junio 1985 → agosto 2026 en Córdoba la tabla no llega a cifras largas
- * (su monto más largo tiene 18) y la columna Monto quedaba cortada por el costado. Así que se
- * parte sólo una celda más larga que esto, sea o no de cifras largas la tabla, y el browser la
- * parte sólo si no entra.
+ * Hasta cuántos caracteres visibles un monto o un acumulado de la tabla nunca se parte, ni en
+ * el celular. Medido a 320 px: con el nacional desde 1990 el monto más largo, "$ 16.101.575,20"
+ * (14), entra entero.
  */
 const CARACTERES_DE_UNA_CELDA_ENTERA = 14;
 
-/** Si esta celda en particular se puede partir en sus puntos de miles. */
+/** Si esta celda es lo bastante larga como para partirse en el celular. */
 export function celdaPartible(texto: string): boolean {
-  return texto.replace(/\s/g, "").length > CARACTERES_DE_UNA_CELDA_ENTERA;
+  return visibles(texto) > CARACTERES_DE_UNA_CELDA_ENTERA;
 }
 
 /**
- * Un número partido después de cada punto de miles, para que un monto larguísimo sólo se pueda
- * cortar ahí (con un `<wbr>` entre las partes, que no agrega texto: lo que se copia es el número
- * entero). Un número sin puntos de miles vuelve entero.
+ * Las dos mitades en que se puede partir una celda de la tabla en el celular, o `null` si no se
+ * parte: un solo corte, en el punto de miles más cercano a la mitad, y sólo si abajo quedan al
+ * menos dos grupos.
+ *
+ * Antes iba un <wbr> después de cada punto de miles, y quedaban pedacitos que se leían como otro
+ * número: "$ 101.002." y "669,28" (se lee cien mil), "+6.899.750." y "041%" (se lee 41%). Y como
+ * Chromium corta en un <wbr> aunque la celda diga `nowrap`, pasaba también a 1280 px. Las dos
+ * mitades van en dos elementos que no se parten por adentro, y entre ellos sólo se corta en el
+ * celular (ver `.mitad` en `styles.css`); lo que se copia sigue siendo el número entero.
+ */
+export function mitadesDeCelda(texto: string): [string, string] | null {
+  if (!celdaPartible(texto)) return null;
+  const partes = partirEnMiles(texto);
+  let mejor: [string, string] | null = null;
+  for (let arriba = 1; arriba <= partes.length - 2; arriba++) {
+    const par: [string, string] = [partes.slice(0, arriba).join(""), partes.slice(arriba).join("")];
+    if (mejor === null || Math.max(...par.map(visibles)) < Math.max(...mejor.map(visibles))) mejor = par;
+  }
+  return mejor;
+}
+
+/**
+ * Las dos mitades de un rótulo de tramo de días ("1 ago 2026 → 10 ago 2026"), partido después de
+ * la flecha, o `null` si no es un tramo. Entero, en el modo por día desde junio de 1985 hacía la
+ * columna de 179 px a 375 y el monto de todas las filas quedaba fuera de la pantalla; y dejando
+ * partir cualquier rótulo, a 320 px "ene 2024" quedaba "ene" y "2024".
+ */
+export function mitadesDeRotulo(rotulo: string): [string, string] | null {
+  const flecha = rotulo.indexOf(" → ");
+  if (flecha === -1) return null;
+  const corte = flecha + " → ".length;
+  return [rotulo.slice(0, corte), rotulo.slice(corte)];
+}
+
+/**
+ * Un número partido después de cada punto de miles: son los lugares donde se puede cortar la
+ * cifra protagonista (con un `<wbr>` entre las partes, que no agrega texto: lo que se copia es
+ * el número entero) y de donde `mitadesDeCelda` elige su único corte. Un número sin puntos de
+ * miles vuelve entero.
  *
  * Con `split` y no con una expresión regular que mire para atrás: Safari no las entiende hasta
  * la 16.4, y en un iPhone viejo el módulo entero no cargaba (hay un test que lo vigila).
