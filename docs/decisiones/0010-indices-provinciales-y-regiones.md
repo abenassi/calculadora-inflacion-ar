@@ -78,17 +78,21 @@ Las tres se encontraron bajando los datos de verdad, ninguna la anticipó el dis
 Mendoza tiene 654 meses y llegaban 365, arrancando en 1992 en vez de 1968. `limit` no lo
 cambia. Se notó de casualidad, porque cinco series dieron 365 justo.
 
-**La columna `series_data.valor` del MCP es `numeric(20,6)`.** Un índice encadenado hacia
-atrás a través de los cambios de moneda cae por debajo de una millonésima y queda guardado
+**La columna `series_data.valor` del MCP era `numeric(20,6)`.** Un índice encadenado hacia
+atrás a través de los cambios de moneda cae por debajo de una millonésima y quedaba guardado
 como cero: Chaco tenía 256 puntos en cero, Tucumán 167, Mendoza 148. Un cero ahí no es un
 dato impreciso, es una división por cero en el único cálculo que hace este sitio. El
 pipeline descarta el arranque no representable con umbral `0.01` —que garantiza cinco
 cifras significativas como mínimo, no sólo "que no sea cero"— y **recorta en vez de reescalar**:
 reescalar preservaría los cocientes pero nuestros números dejarían de coincidir con la
 tabla que publica el organismo, que es justo lo que alguien cruza cuando quiere verificar.
-Es un problema del lado del MCP —82 series, 1.888 puntos, la peor es el IPC histórico del
-propio INDEC— y hay que arreglarlo allá; mientras tanto el sitio no puede confiar en lo
-que le llega.
+Era un problema del lado del MCP —82 series, 1.888 puntos, la peor es el IPC histórico del
+propio INDEC— y el MCP lo arregló el 2026-09-05: le sacó la escala a la columna y borró los
+ceros. **El corte en 0,01 ya vive sólo en el sitio.** Lo sigue justificando que las filas
+guardadas antes de ese día no se reescribieron: medido el 2026-09-11, Chaco, Mendoza y
+Tucumán todavía traen por debajo de 0,01 valores con seis decimales y de una a cuatro
+cifras. Córdoba, en cambio, ya viene con el float completo y se recorta igual; bajar el corte
+es una decisión aparte (ver `VALOR_MINIMO_REPRESENTABLE` en `scripts/fetch-snapshot.ts`).
 
 **Mendoza no publicó entre marzo de 2012 y abril de 2016.** Sin recortar, el motor habría
 leído ese salto como una variación mensual de cuatro años. Se sirve el tramo continuo que

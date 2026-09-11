@@ -106,9 +106,9 @@ describe("cada índice del catálogo", () => {
       });
 
       it("no trae ningún índice en cero ni truncado", () => {
-        // La columna del MCP es numeric(20,6) y un índice encadenado hacia atrás a través
-        // de los cambios de moneda entra como cero. Un cero acá es una división por cero
-        // en el único cálculo que hace el sitio.
+        // El pipeline recorta en 0,01 (`VALOR_MINIMO_REPRESENTABLE`): por debajo, las filas que
+        // el MCP guardó con seis decimales antes del 2026-09-05 traen una a cuatro cifras. Y un
+        // cero acá es una división por cero en el único cálculo que hace el sitio.
         const malos = serie.datos.filter((p) => !(p.indice >= 0.01) || !Number.isFinite(p.indice));
         expect(malos.map((p) => `${p.mes}=${p.indice}`)).toEqual([]);
       });

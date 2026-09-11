@@ -277,29 +277,31 @@ async function construirIpc(): Promise<SerieIndice> {
 }
 
 /**
- * El valor más chico que el MCP guarda sin perder las cifras que hacen falta.
+ * El valor más chico con el que un índice todavía trae las cifras que hacen falta.
  *
- * `series_data.valor` es `numeric(20,6)`. Un índice encadenado hacia atrás a través de los
- * cambios de moneda cae por debajo de una millonésima y **queda guardado como cero**.
- * Medido contra producción el 2026-08-13: Chaco tiene 256 puntos en cero, Tucumán 167 y
- * Mendoza 148, y bastantes más quedan con dos o tres cifras significativas.
+ * Nació de un problema del MCP que ya está arreglado. Su columna `series_data.valor` era
+ * `numeric(20,6)`, y un índice encadenado hacia atrás a través de los cambios de moneda
+ * quedaba guardado como cero o con dos o tres cifras significativas (medido el 2026-08-13:
+ * Chaco tenía 256 puntos en cero, Tucumán 167 y Mendoza 148). El 2026-09-05 el MCP le sacó la
+ * escala a la columna y borró los ceros (su commit `49f185f`, `sql/170` a `sql/172`), y desde
+ * ahí sirve los índices sin truncar. **Este corte ya no vive en el MCP: vive sólo acá.**
  *
- * Un cero no es un dato impreciso: es una división por cero en el único cálculo que hace
- * este sitio. El umbral está en 1e-2 y no en 1e-6 porque el límite no es "que no sea cero"
- * sino "que queden cifras significativas": como la cuantización de la columna es 1e-6, con
- * un umbral de 1e-2 el peor caso conserva **cinco** cifras y el error relativo máximo es
- * 0,005%.
+ * Lo que todavía lo justifica, medido contra el MCP el 2026-09-11: las filas guardadas antes
+ * del arreglo siguen como estaban, porque el colector del INDEC sólo reescribe los últimos 24
+ * puntos de cada serie. Chaco, Mendoza y Tucumán traen entre 87 y 97 puntos por debajo de
+ * 0,01, todos con seis decimales y de una a cuatro cifras significativas (arrancan en
+ * `0.000001`). El límite no es "que no sea cero" sino "que queden cifras": con la
+ * cuantización de 1e-6 de esas filas, un corte en 1e-2 conserva en el peor caso **cinco**
+ * cifras y el error relativo máximo es 0,005%; con 1e-3 quedarían cuatro (0,05%). Y sigue
+ * siendo la guarda contra un cero, que sería una división por cero en el único cálculo que
+ * hace este sitio, si alguna vez vuelve a llegar uno.
  *
- * Con 1e-3 quedarían cuatro cifras (0,05% de error) y se recuperarían veinte meses de
- * Chaco y diecinueve de Tucumán, que son los únicos dos índices donde cambiaría algo. Es
- * una mejora real y chica, pero el mismo umbral vive también en los colectores del MCP
- * (`src/collectors/lib/ipc-jurisdiccional.ts`), que son los que recortan Córdoba y Río
- * Negro: bajarlo de un solo lado dejaría dos criterios distintos para lo mismo. Se cambia
- * en los dos repos o en ninguno.
- *
- * Es un problema del lado del MCP —82 series de nivel de índice, 1.888 puntos, la peor es
- * el IPC histórico del propio INDEC— y hay que arreglarlo allá. Mientras tanto el sitio no
- * puede confiar en lo que le llega: publicar un índice en cero rompe la página.
+ * Donde ya no justifica nada es Córdoba: sus 266 puntos por debajo de 0,01 (1968-01 a
+ * 1990-02) vienen con el float completo, de 6 a 17 cifras, y se recortan igual. Bajar el
+ * corte, o hacerlo por cifras significativas en vez de por valor, recuperaría esa historia.
+ * Es una decisión aparte, no un arreglo pendiente: toca el test "no trae ningún índice en
+ * cero ni truncado" de `indices.test.ts`, la 0010 y el texto que dice desde cuándo arranca
+ * Córdoba.
  */
 const VALOR_MINIMO_REPRESENTABLE = 0.01;
 
@@ -330,13 +332,13 @@ export function recortarRepresentable(puntos: PuntoCrudo[], slug: string): Punto
   if (out.length === 0) {
     throw new Error(
       `${slug}: no quedó ningún valor representable, todos caen por debajo de ` +
-        `${VALOR_MINIMO_REPRESENTABLE}. El MCP los está sirviendo truncados a cero.`,
+        `${VALOR_MINIMO_REPRESENTABLE}. Revisá qué está sirviendo el MCP para esta serie.`,
     );
   }
   if (out.length < puntos.length) {
     console.log(
-      `  ${slug}: se descartaron ${puntos.length - out.length} punto(s) del arranque que el ` +
-        `MCP sirve truncados; la serie arranca en ${out[0]!.mes}`,
+      `  ${slug}: se descartaron ${puntos.length - out.length} punto(s) del arranque por debajo ` +
+        `de ${VALOR_MINIMO_REPRESENTABLE}; la serie arranca en ${out[0]!.mes}`,
     );
   }
   return out;
