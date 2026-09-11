@@ -26,6 +26,7 @@ import type { ExpectativaRem, SerieIndice, SerieValores } from "../src/engine/ty
 import { INDICES, type IndiceDeclarado } from "./indices-declarados.js";
 import { INDICES_SECUNDARIOS, type IndiceSecundarioDeclarado } from "./indices-secundarios-declarados.js";
 import { traerDolarHistorico, traerSerie } from "./mcp-client.js";
+import { mismoContenido } from "./mismo-contenido.js";
 import { ultimoCambioEn } from "./ultimo-cambio.js";
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -49,12 +50,6 @@ function aPuntos(datos: { fecha: string; valor: number }[]): PuntoCrudo[] {
   return datos
     .map((d) => ({ mes: aMes(d.fecha), valor: d.valor }))
     .sort((a, b) => a.mes.localeCompare(b.mes));
-}
-
-/** Serializa ignorando `actualizado`, para comparar datos contra datos. */
-function huella(contenido: unknown): string {
-  const { actualizado: _descartado, ...resto } = contenido as Record<string, unknown>;
-  return JSON.stringify(resto);
 }
 
 async function escribirSiMejora(
@@ -87,8 +82,16 @@ async function escribirSiMejora(
     // significa "cuándo cambiaron los datos", no "cuándo
     // miramos"; para lo segundo está el historial de corridas del workflow.
     // La excepción es `meta.json`, donde `actualizado` ES el dato (ver `ultimoCambio`).
-    const comparable = (x: unknown) => (compararActualizado ? JSON.stringify(x) : huella(x));
-    if (comparable(JSON.parse(previo)) === comparable(contenido)) {
+    //
+    // Y compara números, no texto: el MCP sirve el mismo valor con 6, 8 o 18 decimales
+    // según qué escritura tocó la fila por última vez, y como texto eso "cambiaba" el
+    // archivo, lo commiteaba y movía la fecha de "Última actualización" a un día sin
+    // ningún dato nuevo. Un mes nuevo y cualquier revisión visible con los decimales que
+    // publica la fuente siguen contando; lo único que se deja pasar es lo que no se
+    // distingue de un redondeo. El criterio, sus límites y los números que lo justifican
+    // están en `mismo-contenido.ts`.
+    // Se compara contra `nuevo` ya parseado, que es exactamente lo que se escribiría.
+    if (mismoContenido(JSON.parse(previo), JSON.parse(nuevo), { compararActualizado })) {
       console.log(`  ${archivo}: sin cambios`);
       return;
     }

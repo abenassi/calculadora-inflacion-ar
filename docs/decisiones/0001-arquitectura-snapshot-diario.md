@@ -40,8 +40,9 @@ Secrets.
   `actualizado` sale del de las demás series y es lo que el sitio muestra como "Última
   actualización"), así que un día sin
   novedades en ninguna serie no genera commit. Sin eso serían 365 commits al año de puro
-  ruido. (Deploys sí hay uno por noche igual: ver "El push del snapshot no dispara el
-  deploy".)
+  ruido. Y compara números, no texto: el mismo valor escrito con más o menos decimales no
+  es un cambio (ver "Comparar por contenido es comparar números"). (Deploys sí hay uno por
+  noche igual: ver "El push del snapshot no dispara el deploy".)
 
 ## Invariante que protege el pipeline
 
@@ -51,6 +52,45 @@ y no commitea**. El sitio sigue sirviendo el último snapshot bueno.
 
 Además los tests corren contra el snapshot recién bajado, antes de publicarlo. Si la
 serie cambió de forma incompatible, se caza ahí.
+
+### Comparar por contenido es comparar números
+
+Comparar el JSON como texto dejó de alcanzar el 2026-09-05. Ese día el MCP sacó la escala de
+6 decimales de `series_data.valor` (su `sql/170`, para dejar de guardar en cero los índices
+encadenados hacia atrás) y sus colectores empezaron a guardar el float tal cual lo publica la
+fuente. El 09-10 Córdoba pasó a una fuente que redondea a 8. El mismo número llegó con 6, 18 y
+8 decimales (`0.016615` → `0.016614728801318833` → `0.01661473`), y como texto cada vez era un
+cambio: nueve archivos en tres commits (`78dabc6`, `56a955c`, `0a80c59`) sin una sola cifra
+distinta, el del 09-07 entero de ruido, y cada uno movía "Última actualización" a un día sin
+ningún dato nuevo.
+
+Por eso `scripts/mismo-contenido.ts` compara número contra número: dos valores son el mismo
+dato si el más grueso es el más fino redondeado a sus decimales, **contando al menos seis**.
+Seis es la escala con la que el MCP sirvió todo hasta el 09-05, y además no manda los ceros
+finales: `3.591` es `3.591000`, y un dólar de `1528.6` que al otro día vale `1528.62` son dos
+centavos, no un decimal más. Todo lo que no es número se compara exacto, y un mes nuevo es un
+array más largo, así que siempre cuenta.
+
+**No es una tolerancia relativa porque los datos la descartan.** En el historial de
+`public/data` (08-12 a 09-11), el cambio de sólo precisión más grande en términos relativos es
+de 1,77e-5 (Córdoba 1990-05) y la cotización real más chica que se movió, de 6,5e-6 (dólar
+`1533.22` → `1533.21`): ningún umbral relativo separa las dos. El ruido es de decimales, así
+que pesa más cuanto más chico el valor. Medidos en unidades del último decimal del número más
+grueso (con el piso de seis), los 1.068 valores que sólo cambiaron de precisión quedan en
+0,4997 o menos, y los 46 que cambiaron de verdad en 10.000 o más. **Tampoco es redondear a
+decimales fijos**: un valor chiquísimo (Córdoba encadenada desde 1968 llega a `4.3e-13`) se
+compara con los decimales que trae, y una revisión de `3.1e-10` a `3.3e-10` cuenta.
+
+Pasada por el historial, de 86 archivos que la comparación vieja daba por cambiados quedan 77.
+Los nueve que salen son exactamente los de sólo precisión; no se pierde ningún mes nuevo ni
+ninguna revisión, y el commit del 09-07 no habría existido.
+
+Límite conocido, elegido: más allá del sexto decimal, un cero final que JSON no escribe no se
+distingue de un redondeo (`128.3969924` puede ser `128.39699240`), así que una revisión de
+menos de media unidad de ese último decimal se lee como precisión. En un índice de 128 eso es
+2e-10 relativo, por debajo de cualquier cifra que alguien vaya a defender. Para el otro lado
+el error es inofensivo: si el MCP algún día manda ruido que esta regla no reconoce, se commitea
+de más, como antes, pero nunca se pierde un dato.
 
 ### Fallar ruidoso no es fallar por un pestañeo de la red
 
