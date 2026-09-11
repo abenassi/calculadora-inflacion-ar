@@ -47,12 +47,23 @@ describe("mismoNumero: un cambio sólo de precisión no es un cambio", () => {
   });
 
   it("dos floats vecinos son el mismo número", () => {
+    // El float inmediatamente siguiente, sumándole uno a los bits: vecinos de verdad, no
+    // dos decimales que casualmente caen cerca.
+    const siguienteFloat = (x: number) => {
+      const vista = new DataView(new ArrayBuffer(8));
+      vista.setFloat64(0, x);
+      vista.setBigUint64(0, vista.getBigUint64(0) + 1n);
+      return vista.getFloat64(0);
+    };
     expect(mismoNumero(0.1 + 0.2, 0.3)).toBe(true);
-    expect(mismoNumero(17104316246676.8, 17104316246676.797)).toBe(true);
+    for (const x of [0.3, 128.39, 16746051448071.4, 3.5e13]) {
+      expect(siguienteFloat(x)).not.toBe(x);
+      expect(mismoNumero(x, siguienteFloat(x))).toBe(true);
+    }
   });
 });
 
-describe("mismoNumero: una revisión real, aunque sea chica, sí cuenta", () => {
+describe("mismoNumero: una revisión real en los decimales que publica la fuente sí cuenta", () => {
   it("el dólar que se movió un centavo (74dea89): 6,5e-6 relativo", () => {
     expect(mismoNumero(1533.22, 1533.21)).toBe(false);
   });
@@ -69,6 +80,12 @@ describe("mismoNumero: una revisión real, aunque sea chica, sí cuenta", () => 
   it("la última cifra publicada de un índice grande", () => {
     expect(mismoNumero(23127.43, 23127.44)).toBe(false);
     expect(mismoNumero(17104316246676.8, 17104316246676.9)).toBe(false);
+  });
+
+  it("un centavo en el último valor de Río Negro, que publica con dos decimales y ronda 1,67e13", () => {
+    // Con una holgura de cuatro épsilon (0,015 a esta escala) los dos daban `true`.
+    expect(mismoNumero(16746051448071.4, 16746051448071.41)).toBe(false);
+    expect(mismoNumero(16746051448071.4, 16746051448071.39)).toBe(false);
   });
 
   it("una revisión en el octavo decimal de una serie que se publica con ocho", () => {

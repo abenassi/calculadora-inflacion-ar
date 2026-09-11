@@ -44,15 +44,22 @@ export function decimales(x: number): number {
  * 1968, `4.3e-13`) se comparan con los decimales que traen, así que una revisión de `3.1e-10` a
  * `3.3e-10` cuenta. Seis decimales es el piso, no el techo.
  *
- * La holgura de cuatro épsilon es la del float, no una tolerancia: dos floats vecinos no son
- * dos datos, y ninguna cifra publicada vive en ese margen.
+ * La holgura de un épsilon es la del float, no una tolerancia: `ε·|x|` es siempre al menos una
+ * unidad de float de `x`, así que cubre dos floats vecinos y nada más. Con cuatro se comía una
+ * revisión real: Río Negro publica con dos decimales y ya va por `16746051448071.4`, donde
+ * cuatro épsilon son 0,015 (unos ocho floats) y un centavo pasaba por redondeo. Con dos
+ * volvía a pasar en cuanto el índice llegara a 2,25e13, un 35% más de inflación.
+ *
+ * Límite que no se puede evitar: por encima de ~4,5e13 un centavo mide poco más de una unidad
+ * de float, y una revisión en el segundo decimal queda debajo de lo que un float representa.
+ * Hoy el índice más grande es Río Negro, con 1,67e13.
  */
 export function mismoNumero(a: number, b: number): boolean {
   if (a === b) return true;
   if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
   const n = Math.max(Math.min(decimales(a), decimales(b)), DECIMALES_MINIMOS);
   const mediaUnidad = 0.5 * 10 ** -n;
-  const holguraFloat = 4 * Number.EPSILON * Math.max(Math.abs(a), Math.abs(b));
+  const holguraFloat = Number.EPSILON * Math.max(Math.abs(a), Math.abs(b));
   return Math.abs(a - b) <= mediaUnidad + holguraFloat;
 }
 

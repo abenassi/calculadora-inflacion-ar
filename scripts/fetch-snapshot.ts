@@ -90,6 +90,11 @@ async function escribirSiMejora(
     // publica la fuente siguen contando; lo único que se deja pasar es lo que no se
     // distingue de un redondeo. El criterio, sus límites y los números que lo justifican
     // están en `mismo-contenido.ts`.
+    // Más o menos decimales no es un cambio sólo en lo que el MCP sirve tal cual. `ipc.json`
+    // sale de una cuenta: el empalme (`splice.ts`) reescala y divide en cadena, así que un
+    // `bcra:27` que llegue como `3.4000000000000004` se arrastra por todo el tramo 1990-2016
+    // y cuenta como cambio. Es commitear de más, nunca perder un dato, y hoy `bcra:27` viene
+    // con cero o un decimal.
     // Se compara contra `nuevo` ya parseado, que es exactamente lo que se escribiría.
     if (mismoContenido(JSON.parse(previo), JSON.parse(nuevo), { compararActualizado })) {
       console.log(`  ${archivo}: sin cambios`);

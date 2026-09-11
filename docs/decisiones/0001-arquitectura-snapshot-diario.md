@@ -40,8 +40,8 @@ Secrets.
   `actualizado` sale del de las demás series y es lo que el sitio muestra como "Última
   actualización"), así que un día sin
   novedades en ninguna serie no genera commit. Sin eso serían 365 commits al año de puro
-  ruido. Y compara números, no texto: el mismo valor escrito con más o menos decimales no
-  es un cambio (ver "Comparar por contenido es comparar números"). (Deploys sí hay uno por
+  ruido. Y compara números, no texto: el mismo valor que el MCP sirve con más o menos
+  decimales no es un cambio (ver "Comparar por contenido es comparar números"). (Deploys sí hay uno por
   noche igual: ver "El push del snapshot no dispara el deploy".)
 
 ## Invariante que protege el pipeline
@@ -88,9 +88,27 @@ ninguna revisión, y el commit del 09-07 no habría existido.
 Límite conocido, elegido: más allá del sexto decimal, un cero final que JSON no escribe no se
 distingue de un redondeo (`128.3969924` puede ser `128.39699240`), así que una revisión de
 menos de media unidad de ese último decimal se lee como precisión. En un índice de 128 eso es
-2e-10 relativo, por debajo de cualquier cifra que alguien vaya a defender. Para el otro lado
+2e-10 relativo, por debajo de cualquier cifra que alguien vaya a defender. A seis decimales el
+margen real es casi una unidad entera y no media, porque el vigente ya guarda el valor
+redondeado: si era `0.0166145001` (guardado `0.016615`) y se revisa a `0.0166154999`, la
+revisión fue de 1e-6 y da igual. Pega en las filas viejas que el MCP todavía sirve con seis
+decimales (Chaco, Tucumán, Neuquén); el peor caso es Chaco 1988-08 (`0.01064`), 9,4e-5
+relativo, el doble del 0,005% que ya acepta `VALOR_MINIMO_REPRESENTABLE`. Y no se pierde: se
+demora hasta el próximo cambio real del archivo, que lo reescribe entero. Para el otro lado
 el error es inofensivo: si el MCP algún día manda ruido que esta regla no reconoce, se commitea
 de más, como antes, pero nunca se pierde un dato.
+
+La holgura del float es de un épsilon (`ε·|x|`, siempre al menos una unidad de float) y no más.
+Con cuatro se comía un centavo de Río Negro, que publica con dos decimales y va por
+`16746051448071.4`: ahí cuatro épsilon son 0,015. Y hay un límite que no depende de nosotros:
+por encima de ~4,5e13 un centavo mide poco más de una unidad de float, y una revisión en el
+segundo decimal queda debajo de lo que un float puede representar. Hoy el índice más grande es
+Río Negro, con 1,67e13.
+
+Todo esto vale para lo que el MCP sirve tal cual. `ipc.json` sale de una cuenta: el empalme
+(`src/engine/splice.ts`) reescala y divide en cadena, así que un cambio de precisión en
+`bcra:27` (un `3.4000000000000004`) se arrastra por todo el tramo 1990-2016 y cuenta como
+cambio. Es el lado inofensivo, commitear de más, y hoy `bcra:27` viene con cero o un decimal.
 
 ### Fallar ruidoso no es fallar por un pestañeo de la red
 
