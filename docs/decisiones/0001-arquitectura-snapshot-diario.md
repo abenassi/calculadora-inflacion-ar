@@ -166,6 +166,16 @@ provinciales: hay algunos con meses de rezago habitual. Ese aviso también llega
 antes de los 60 días sin actividad con los que GitHub apaga los schedules de un repo
 público.
 
+El otro silencio era el de un índice jurisdiccional que no se puede actualizar.
+`construirCatalogo` atrapa el error, conserva el índice de la corrida anterior para no
+sacarlo del desplegable y sigue con los demás, y eso sigue así. Pero quedaba en un
+`console.warn` con el job en verde, y la invariante de arriba lo vuelve peligroso: si el
+recorte de `recorte-representable.ts` le saca un mes a una serie, la escritura falla por
+encoger y el índice queda congelado para siempre. Ahora `fetch-snapshot.ts` deja la lista en
+`.snapshot/indices-conservados.json` (fuera de `public/`, no se commitea) y el último paso,
+`scripts/verificar-indices-conservados.ts`, pone el job en rojo con un `::error::` por índice
+y su motivo. Corre después de commitear y publicar, y también si falló el de frescura.
+
 ## Si vas a copiar esto
 
 Es la parte más reusable del repo y funciona para cualquier serie del MCP. Mirá

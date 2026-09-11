@@ -411,11 +411,12 @@ button:focus-visible {
 }
 
 /*
- * La cifra de un monto de los años setenta con Córdoba: "$ 255.323.213.736.518.400", 24
- * caracteres sin un espacio donde cortar. Con la letra de arriba empujaba la página a 533 px
- * en un celular de 375. Medido: con esta entran hasta 25 caracteres a 375 px. El corte en
- * cualquier lado es la última red, para un monto enorme de 1968; partir una cifra se lee peor
- * que verla entera, pero mucho mejor que una página que se corre para el costado.
+ * La cifra de un monto de los años setenta con Córdoba: "$ 255.323.213.736.518.400", 25
+ * caracteres con el espacio. La pide `cifraLarga()`, que tiene las medidas: con esta letra
+ * entran 19 caracteres en una línea a 320 y a 375 px. Lo que no entra se corta de renglón sólo
+ * después de un punto de miles, porque main.ts pone un <wbr> ahí. `anywhere` queda como última
+ * red para lo que no tiene puntos de miles —un monto de centavos de 1968 escrito con veinte
+ * cifras—: el browser sólo corta en cualquier lado si no hay otro corte posible en el renglón.
  */
 .resultado__cifra--larga {
   font-size: clamp(1.25rem, 4.6vw, 2.5rem);
@@ -426,6 +427,15 @@ button:focus-visible {
   margin: 0;
   color: var(--text-secondary);
   font-size: 0.9rem;
+}
+
+/* La moneda de un resultado de antes de 1992. Pegada al detalle, porque corrige cómo se lee el número. */
+.resultado__moneda {
+  margin: 0.5rem 0 0;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
 }
 
 .resultado__rotulo {
@@ -639,12 +649,18 @@ button:focus-visible {
   margin: 0.25rem 0 0;
   font-size: 0.85rem;
   color: var(--text-secondary);
+  /* Es un ítem de la grilla de resultados, y un ítem de grilla no se achica por debajo de su
+     contenido: el desplegable mide lo que su opción más larga, y "estimarlos con el REM del
+     BCRA (sólo para el índice nacional)" ensanchaba la página a 469 px en un celular de 375 con
+     cualquier índice provincial (415 con "(no disponible para este período)" en el nacional). */
+  min-width: 0;
 }
 
 .metodologia select {
   /* Los selects del formulario llevan `flex: 1` para repartirse la fila; acá eso
      estiraría el control a media pantalla y dejaría de leerse como una nota. */
   flex: 0 1 auto;
+  max-width: 100%;
   padding: 0.15rem 0.3rem;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -733,6 +749,20 @@ button:focus-visible {
   text-align: right;
   white-space: nowrap;
   border-bottom: 1px solid var(--gridline);
+}
+
+/*
+ * Montos y acumulados de décadas atrás con Córdoba ("$ 255.323.213.736.518.400,00"). Las medidas
+ * están en `celdaLarga()`: con esta letra la tabla entra a 1280 px sin partir ninguna fila en los
+ * casos probados. Si igual no alcanza, esas dos celdas se cortan de renglón sólo después de un
+ * punto de miles (main.ts pone un <wbr> ahí), en vez de empujar la columna del índice afuera.
+ */
+.desglose--cifras-largas {
+  font-size: 0.75rem;
+}
+
+.desglose td.celda-cifra {
+  white-space: normal;
 }
 
 .desglose thead th {

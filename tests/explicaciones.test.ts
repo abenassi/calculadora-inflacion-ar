@@ -3,10 +3,11 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { adjust, sumaDeVariaciones } from "../src/engine/adjust.js";
-import { deOrdinal, aOrdinal } from "../src/engine/mes.js";
+import { deOrdinal, aOrdinal, diffMeses, sumarMeses } from "../src/engine/mes.js";
 import {
   avisarTramoAjeno,
   efectoEnElMonto,
+  explicarMoneda,
   esAproximado,
   esDeflacion,
   explicarCompuesto,
@@ -626,6 +627,108 @@ describe("las marcas de la tabla no señalan un mes que no es el pedido", () => 
  * Y vivía en `main.ts`, donde ningún test la podía tocar. Que esté acá es lo que le da forma
  * de poder fallar en rojo.
  */
+/**
+ * Una serie geométrica entre dos meses, con los extremos exactos. Para las frases que sólo
+ * dependen del resultado: no leen un archivo vivo, así que un dato nuevo no las cambia.
+ */
+function serieEntre(desde: Mes, hasta: Mes, indiceDesde: number, indiceHasta: number): SerieIndice {
+  const n = diffMeses(desde, hasta);
+  const datos = Array.from({ length: n + 1 }, (_, i) => ({
+    mes: sumarMeses(desde, i),
+    indice: i === 0 ? indiceDesde : i === n ? indiceHasta : indiceDesde * Math.pow(indiceHasta / indiceDesde, i / n),
+    origen: "prueba",
+  }));
+  return {
+    serie: "prueba",
+    base: "",
+    fuentes: [],
+    ultimo_oficial: hasta,
+    actualizado: "2026-09-11T00:00:00Z",
+    datos,
+  } as unknown as SerieIndice;
+}
+
+/** Los espacios que mete Intl (NBSP) como espacios comunes, para poder escribir la frase. */
+const llano = (s: string) => s.replace(/\s/g, " ");
+
+describe("el aviso de moneda", () => {
+  const HOY = { metodologia: "sin_proyectar" as const, hoy: "2026-09" };
+
+  it("1970 → 2026: dice la moneda de origen y cuánto es en pesos", () => {
+    const s = serieEntre("1970-01", "2026-08", 1, 2.553232137365184e14);
+    const r = adjust(1000, "1970-01", "2026-08", s, HOY);
+    expect(llano(explicarMoneda(r))).toBe(
+      "En enero 1970 la moneda era el peso ley 18.188. Esta cuenta no le saca los ceros: si tu " +
+        "monto está en pesos ley, el resultado también. En pesos de agosto 2026 son $ 2.553.232 " +
+        "(1 peso = 100.000.000.000 pesos ley).",
+    );
+  });
+
+  it("2026 → 1975: dice la moneda de destino y cuánto es en esa moneda", () => {
+    const s = serieEntre("1975-01", "2026-08", 2.967e-12, 130.7);
+    const r = adjust(1_000_000, "2026-08", "1975-01", s, HOY);
+    expect(llano(explicarMoneda(r))).toBe(
+      "En enero 1975 la moneda era el peso ley 18.188. Esta cuenta no le agrega los ceros: si tu " +
+        "monto está en pesos, el resultado también. En la moneda de enero 1975 son 2.270 pesos ley " +
+        "(1 peso = 100.000.000.000 pesos ley).",
+    );
+  });
+
+  it("1990 → 1991, las dos en australes: sólo dice en qué moneda está", () => {
+    const s = serieEntre("1990-01", "1991-06", 1, 100);
+    const r = adjust(1000, "1990-01", "1991-06", s, HOY);
+    expect(llano(explicarMoneda(r))).toBe(
+      "En enero 1990 y en junio 1991 la moneda era el austral: si tu monto está en australes, el " +
+        "resultado también.",
+    );
+  });
+
+  it("el nacional desde 1990 también lleva el aviso: es el caso más creíble", () => {
+    const s = serieEntre("1990-01", "2026-08", 1, 16101.5752);
+    const r = adjust(1000, "1990-01", "2026-08", s, HOY);
+    expect(llano(explicarMoneda(r))).toContain("En pesos de agosto 2026 son $ 1.610 (1 peso = 10.000 australes).");
+  });
+
+  it("entre dos monedas viejas distintas", () => {
+    const s = serieEntre("1983-05", "1985-07", 1, 230);
+    const r = adjust(1000, "1983-05", "1985-07", s, HOY);
+    expect(llano(explicarMoneda(r))).toBe(
+      "En mayo 1983 la moneda era el peso ley 18.188, y en julio 1985, el austral. Esta cuenta no le " +
+        "saca los ceros: si tu monto está en pesos ley, el resultado también. En la moneda de julio " +
+        "1985 son 0,023 australes (1 austral = 10.000.000 pesos ley).",
+    );
+  });
+
+  it("junio de 1985 tuvo dos monedas: nombra las dos y convierte las dos", () => {
+    const s = serieEntre("1985-06", "2026-08", 1, 1000);
+    const r = adjust(1000, "1985-06", "2026-08", s, HOY);
+    const texto = llano(explicarMoneda(r));
+    expect(texto).toContain("En junio 1985 cambió la moneda: hasta el 14 era el peso argentino y desde el 15, el austral.");
+    expect(texto).toContain("el resultado queda en la misma moneda que tu monto");
+    expect(texto).toContain("Si tu monto está en pesos argentinos, en pesos de agosto 2026 son $ 0,10 (1 peso = 10.000.000 pesos argentinos).");
+    expect(texto).toContain("Si tu monto está en australes, en pesos de agosto 2026 son $ 100 (1 peso = 10.000 australes).");
+  });
+
+  it("en el modo por día nombra el día", () => {
+    const s = serieEntre("1969-12", "2026-08", 1, 2.553232137365184e14);
+    const r = adjust(1000, "1970-01-15", "2026-08-10", s, HOY);
+    const texto = llano(explicarMoneda(r));
+    expect(texto).toMatch(/^El 15 de enero de 1970 la moneda era el peso ley 18\.188\./);
+    expect(texto).toContain("En pesos del 10 de agosto de 2026 son $ ");
+  });
+
+  it("si el resultado va con ~, la conversión también", () => {
+    const s = serieEntre("1970-01", "2026-08", 1, 2.553232137365184e14);
+    const r = adjust(1000, "1970-01", "2026-10", s, { metodologia: "repite_ultimo", hoy: "2026-10" });
+    expect(llano(explicarMoneda(r))).toContain("son unos $ ");
+  });
+
+  it("con las dos puntas en pesos no dice nada", () => {
+    const s = serieEntre("2024-01", "2025-01", 100, 200);
+    expect(explicarMoneda(adjust(1000, "2024-01", "2025-01", s, HOY))).toBe("");
+  });
+});
+
 describe("el efecto sobre el monto dice para qué lado se movió", () => {
   it("con inflación en el medio, el monto baja al ir para atrás", () => {
     const r = adjust(1_000_000, "2026-07", "2026-02", serie, { metodologia: "sin_proyectar" });
@@ -635,12 +738,14 @@ describe("el efecto sobre el monto dice para qué lado se movió", () => {
 
   it("no dice que lo baja 100% cuando no llega a 100", () => {
     // Con Córdoba desde 1968, $1.000.000 de agosto 2026 llevados a enero de 1975 quedan en
-    // $0,0000000227: bajan 99,9999999977%. Redondeado a dos decimales el texto que se copia
+    // $0,0000000227: bajan 99,99999999999773%. Redondeado a dos decimales el texto que se copia
     // decía "lo baja 100,00%", que es afirmar que ese millón no valía nada.
-    const cordoba = JSON.parse(
-      readFileSync(resolve(import.meta.dirname, "../public/data/indices/cordoba.json"), "utf8"),
-    ) as SerieIndice;
-    const r = adjust(1_000_000, "2026-08", "1975-01", cordoba, { metodologia: "sin_proyectar" });
+    // Con dos meses armados acá y no con `cordoba.json`: este test corre contra el snapshot
+    // recién bajado, y una regla de texto no puede frenar la publicación por un dato nuevo.
+    const r = adjust(1_000_000, "2026-08", "2026-07", serieEntre("2026-07", "2026-08", 2.967e-12, 130.7), {
+      metodologia: "sin_proyectar",
+      hoy: "2026-09",
+    });
     expect(r.variacionPct).toBeGreaterThan(-100);
     expect(efectoEnElMonto(r)).not.toContain("100,00%");
     expect(efectoEnElMonto(r)).toContain(`lo baja más de ${porcentaje(99.99, false)}`);

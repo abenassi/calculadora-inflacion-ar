@@ -71,7 +71,8 @@ const MONTO_EJEMPLO = 100_000;
  * Primer año en el que la moneda ya es el peso.
  *
  * El peso convertible reemplaza al austral el 1 de enero de 1992, a razón de 1 peso =
- * 10.000 australes (Ley 23.928). El índice de precios es continuo a través de esa
+ * 10.000 australes (Decreto 2128/91, dictado en uso del art. 12 de la Ley 23.928). El índice
+ * de precios es continuo a través de esa
  * redenominación —mide precios, no billetes— pero **los montos no lo son**: escribir
  * "$100.000 de enero de 1990" pone un signo peso sobre una cantidad que en esa fecha
  * era de australes, y el resultado queda cuatro órdenes de magnitud fuera de escala.

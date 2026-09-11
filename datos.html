@@ -319,13 +319,15 @@
         <strong>Y una salvedad que sólo aplica a los índices provinciales:</strong> algunos vienen
         encadenados hacia atrás a través de los cambios de moneda, y en los primeros meses de la
         serie los números quedan muy chicos. Que sean chicos no es el problema —Córdoba vale
-        0,0000000000004333 en enero de 1968 y trae las cifras que publica la provincia—; el
-        problema es cuando al guardarlos se perdieron cifras, que es lo que les pasó a las filas
-        más viejas de algunas provincias. La calculadora recorta cada serie donde quedan menos de
-        cinco cifras significativas —por eso Chaco arranca en 1988 y no antes—, así que en el
-        primer tramo de lo que sí sirve quedan cinco como mínimo: Chaco arranca en 0,01064. Un
-        acumulado que arranque ahí hereda ese error. Cuanto más cerca del arranque de la serie,
-        menos exacto.
+        0,0000000000004333 en enero de 1968 y trae los números de la planilla que publicaba la
+        provincia—; el problema es cuando al guardarlos se perdieron cifras, que es lo que les
+        pasó a las filas más viejas de algunas provincias. La calculadora recorta cada serie donde
+        el valor guardado trae menos de cinco cifras significativas —por eso Chaco arranca en 1988
+        y no antes—. Eso protege contra lo que se perdió al guardar, no mejora lo que se publicó:
+        Córdoba publicó sus índices de 1968 a mediados de los ochenta con cuatro cifras, así que
+        ahí cada punto puede estar corrido hasta 0,04%. Y si los cruzás contra lo que la provincia
+        publica hoy en su portal, no vas a encontrar esos números: el portal los redondea a ocho
+        decimales, y antes de abril de 1982 eso da cero.
       </p>
       <p>
         <strong>Con otra salvedad que conviene decir:</strong> lo del cociente exacto vale mientras
@@ -353,7 +355,7 @@
         </li>
         <li>
           <strong>Peso argentino</strong>, desde el 1 de junio de 1983: 1 peso argentino = 10.000
-          pesos ley (Ley 22.707).
+          pesos ley (Ley 22.707; la fecha la fijó el Poder Ejecutivo por decreto).
         </li>
         <li>
           <strong>Austral</strong>, desde el 15 de junio de 1985: 1 austral = 1.000 pesos
@@ -372,11 +374,15 @@
       <p>
         Así que si ajustás un monto desde antes de 1992, el resultado te dice cuánto se movieron
         los precios —eso es correcto— pero el signo <code>$</code> de la punta vieja está sobre una
-        cantidad de la moneda que corría en esa fecha, no de pesos. Leelo como una comparación de
-        poder adquisitivo, no como una conversión de moneda. Por eso, con Córdoba, un monto de los
-        años setenta da un resultado con tantas cifras: entre 1970 y 1992 la moneda perdió once
-        ceros, y el cálculo no los saca. Y por eso las páginas por año anteriores a 1992 no
-        muestran el bloque de equivalencia en pesos.
+        cantidad de la moneda que corría en esa fecha, no de pesos. El resultado queda expresado
+        en la moneda de la fecha de origen, no en pesos de hoy: para pasarlo a pesos hay que
+        sacarle los ceros que le quitó cada cambio de moneda (y para llevar un monto de hoy a una
+        fecha vieja, agregárselos). La calculadora hace esa cuenta y la muestra abajo del
+        resultado, con la moneda de cada punta. Por eso, con Córdoba, un monto de los años setenta
+        da un resultado con tantas cifras: del peso ley de 1970 al peso de 1992 la moneda perdió
+        once ceros —trece para un monto de 1968 o 1969, en pesos moneda nacional—, y el cálculo no
+        los saca. Y por eso las páginas por año anteriores a 1992 no muestran el bloque de
+        equivalencia en pesos.
       </p>
 
       <h2>Consultar estos mismos datos desde tu agente de IA</h2>

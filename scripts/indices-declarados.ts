@@ -37,6 +37,16 @@ export type IndiceDeclarado = {
   organismoCorto: string;
   url: string;
   etiqueta: EtiquetaFuente;
+  /**
+   * Con cuántos decimales publica la fuente, sólo cuando son más de seis.
+   *
+   * JSON no escribe los ceros finales: un `0.00126100` de una fuente que publica a ocho llega
+   * como `0.001261`. Sin este dato `cifrasQueTrae` le cuenta cuatro cifras en vez de seis, el
+   * recorte se lleva todo lo anterior, el snapshot no puede encoger y el índice queda con los
+   * datos de la corrida anterior (ver `recorte-representable.ts`). Con seis o menos no hace
+   * falta: seis es el piso que ya se usa.
+   */
+  decimalesDeLaFuente?: number;
 };
 
 const INDEC = {
@@ -128,6 +138,8 @@ export const INDICES: IndiceDeclarado[] = [
     cubre: "Índice provincial de Córdoba, con datos desde 1968.",
     serie: "ipc:cordoba",
     origen: "dgeyc-cordoba",
+    // La provincia publica a ocho decimales: así llegan, por ejemplo, 1989-07 a 1990-02.
+    decimalesDeLaFuente: 8,
     organismo: "Dirección General de Estadística y Censos de la Provincia de Córdoba",
     organismoCorto: "DGEyC Córdoba",
     url: "https://estadistica.cba.gov.ar/",

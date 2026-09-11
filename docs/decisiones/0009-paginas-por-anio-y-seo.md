@@ -107,7 +107,8 @@ que el disclaimer del pie decía lo mismo en las tres plantillas, y se corrigió
 
 `/inflacion-1991/` publicaba "$100.000 de enero de 1991 compran lo mismo que $X de hoy". En
 enero de 1991 la moneda era el **austral**; el peso convertible llega el 1 de enero de 1992
-a razón de 1 peso = 10.000 australes (Ley 23.928). El índice es continuo a través de esa
+a razón de 1 peso = 10.000 australes (Decreto 2128/91, dictado en uso del art. 12 de la Ley
+23.928). El índice es continuo a través de esa
 redenominación porque mide precios, pero el monto no: el número era correcto en unidades de
 precio y cuatro órdenes de magnitud fuera de escala en unidades de dinero.
 

@@ -38,7 +38,7 @@
       "slug": "cordoba",
       "nombre": "Córdoba",
       "tipo": "provincia",
-      "cubre": "Índice provincial de Córdoba, con datos desde 1990.",
+      "cubre": "Índice provincial de Córdoba, con datos desde 1968.",
       "organismos": [
         "DGEyC Córdoba"
       ],
@@ -184,5 +184,5 @@
       "ultimoOficial": "2026-07"
     }
   ],
-  "actualizado": "2026-09-11T14:54:49.646Z"
+  "actualizado": "2026-09-11T16:04:54.157Z"
 }

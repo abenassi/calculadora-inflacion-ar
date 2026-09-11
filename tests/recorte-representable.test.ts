@@ -6,6 +6,7 @@ import {
   esRepresentable,
   recortarRepresentable,
 } from "../scripts/recorte-representable.js";
+import { INDICES } from "../scripts/indices-declarados.js";
 
 const p = (mes: string, valor: number) => ({ mes, valor });
 
@@ -37,6 +38,34 @@ describe("cifrasQueTrae", () => {
     expect(cifrasQueTrae(-0.5)).toBe(0);
     expect(cifrasQueTrae(Number.NaN)).toBe(0);
     expect(cifrasQueTrae(Number.POSITIVE_INFINITY)).toBe(0);
+  });
+});
+
+describe("los decimales con los que publica la fuente", () => {
+  /**
+   * Córdoba publica 1989-07 a 1990-02 redondeado a ocho decimales. Si la provincia revisa uno
+   * y termina en "00", `0.00126100` llega como `0.001261`: con el piso de seis cuenta cuatro
+   * cifras y el corte se lleva 1968-1989 entero. El snapshot no puede encoger, así que Córdoba
+   * se quedaba congelada con los datos de ayer.
+   */
+  it("un cero final de una serie a ocho decimales no es una cifra perdida", () => {
+    expect(cifrasQueTrae(0.001261)).toBe(4);
+    expect(cifrasQueTrae(0.001261, 8)).toBe(6);
+    expect(esRepresentable(0.001261, 8)).toBe(true);
+  });
+
+  it("el piso nunca baja de seis, aunque se declaren menos", () => {
+    expect(cifrasQueTrae(0.01064, 2)).toBe(5);
+  });
+
+  it("el recorte usa ese piso", () => {
+    const s = [p("1968-01", 4.332726297657377e-13), p("1989-07", 0.001261), p("1990-03", 0.01661473)];
+    expect(recortarRepresentable(s, "cordoba", 8)).toEqual(s);
+    expect(recortarRepresentable(s, "cordoba").map((x) => x.mes)).toEqual(["1990-03"]);
+  });
+
+  it("Córdoba declara sus ocho decimales", () => {
+    expect(INDICES.find((i) => i.slug === "cordoba")?.decimalesDeLaFuente).toBe(8);
   });
 });
 

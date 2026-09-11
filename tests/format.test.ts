@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { cifraLarga, indice, indiceCsv, montoCsv, pesos, pesosRedondo, porcentaje } from "../src/ui/format.js";
+import {
+  celdaLarga,
+  cifraLarga,
+  indice,
+  indiceCsv,
+  montoCsv,
+  partirEnMiles,
+  pesos,
+  pesosRedondo,
+  porcentaje,
+  vaConCifras,
+} from "../src/ui/format.js";
 
 /** Normaliza los espacios que Intl mete entre el símbolo y el número (NBSP y afines). */
 const limpio = (s: string) => s.replace(/\s/g, " ");
@@ -14,9 +25,10 @@ describe("formato de moneda", () => {
   });
 
   /**
-   * Deflactar $1.000.000 de agosto 2026 a enero 1975 con Córdoba da 0,0000227: la moneda de
+   * Deflactar $1.000.000 de agosto 2026 a enero 1975 con Córdoba da 0,0000000227: la moneda de
    * 1975 tenía once ceros más. Redondeado, el resultado decía "$ 0" y la tabla "$ 0,00", que
-   * es afirmar que ese millón no valía nada.
+   * es afirmar que ese millón no valía nada. El valor de abajo es otro, igual de ilegible
+   * redondeado a centavos.
    */
   it("un monto que no es cero nunca se imprime como cero", () => {
     expect(limpio(pesosRedondo(0.00002271))).toBe("$ 0,00002271");
@@ -37,19 +49,31 @@ describe("formato de moneda", () => {
 describe("la cifra protagonista cuando es muy larga", () => {
   /**
    * Con Córdoba desde 1968, $1.000 de enero de 1970 dan "$ 255.323.213.736.518.400": 25
-   * caracteres sin un espacio donde cortar. A 2rem, en un celular de 375 px, empujaba la página
-   * a 533 px de ancho. Hasta 15 caracteres entra en esa pantalla con la letra de siempre.
+   * caracteres con el espacio, 24 sin él. Medido con la página sin otro desborde: con la letra
+   * de siempre entran 11 caracteres a 320 px; con la chica, 19.
    */
-  it("pide la letra chica a partir de 16 caracteres", () => {
-    expect(cifraLarga("$ 16.101.575")).toBe(false);
-    expect(cifraLarga("~$ 1.610.057.520")).toBe(false);
+  it("pide la letra chica a partir de 12 caracteres visibles", () => {
+    expect(cifraLarga("$ 16.101.575")).toBe(false); // 11: el borde que entra
+    expect(cifraLarga("~$ 16.101.575")).toBe(true); // 12: el primero que no
+    expect(cifraLarga("$ 161.015.752")).toBe(true);
     expect(cifraLarga("$ 255.323.213.736.518.400")).toBe(true);
-    expect(cifraLarga("$ 0,0000000227")).toBe(false);
+    // Sin puntos de miles no tiene dónde cortarse de renglón: con la letra de siempre no entra.
+    expect(cifraLarga("$ 0,0000000227")).toBe(true);
   });
 
   it("cuenta lo que se ve, no los espacios que mete Intl", () => {
     expect(cifraLarga(pesosRedondo(255323213736518400))).toBe(true);
     expect(cifraLarga(pesosRedondo(16101575))).toBe(false);
+  });
+});
+
+describe("la tabla cuando trae montos muy largos", () => {
+  it("pide la letra chica a partir de 19 caracteres visibles en un monto o un acumulado", () => {
+    expect(celdaLarga("$ 16.101.575,00")).toBe(false);
+    expect(celdaLarga("$ 10.000.000.000,00")).toBe(false); // 18: el borde que entra
+    expect(celdaLarga("$ 100.000.000.000,00")).toBe(true); // 19: el primero que no
+    expect(celdaLarga("+4.405.053.544.978.806%")).toBe(true);
+    expect(celdaLarga(pesos(255323213736518400))).toBe(true);
   });
 });
 
@@ -137,10 +161,66 @@ describe("el índice en el CSV", () => {
     expect(indiceCsv(11826.4103)).toBe("11826.4103");
   });
 
-  it("un índice chiquísimo sale con sus cifras y se puede volver a leer como número", () => {
-    // `toFixed(4)` lo escribía "0.0000": abierto en una planilla, un cero.
+  it("un índice chiquísimo sale con sus cifras, escrito entero, y se puede volver a leer como número", () => {
+    // `toFixed(4)` lo escribía "0.0000": abierto en una planilla, un cero. Y en notación
+    // exponencial ("4.333e-13") era el único valor del archivo escrito distinto del resto.
     const celda = indiceCsv(4.332726297657377e-13);
-    expect(celda).toBe("4.333e-13");
+    expect(celda).toBe("0.0000000000004333");
     expect(Number(celda)).toBeGreaterThan(0);
+  });
+});
+
+describe("un solo criterio para lo que va con cifras significativas", () => {
+  it("todo lo distinto de cero menor que uno, y nada más", () => {
+    for (const n of [0.5, 2.27e-8, 0.999, -0.3]) expect(vaConCifras(n), String(n)).toBe(true);
+    for (const n of [0, 1, 130.7, -2, Number.NaN, Number.POSITIVE_INFINITY]) expect(vaConCifras(n), String(n)).toBe(false);
+  });
+
+  it("el resultado y la tabla muestran el mismo monto cuando es menor que uno", () => {
+    // `?indice=cordoba&monto=1000000&desde=2026-08&hasta=1985-05`: el resultado decía
+    // "$ 0,01194" y la fila "← el resultado" "$ 0,01".
+    for (const n of [0.5, 0.01194, 2.27e-8, 0.004]) {
+      expect(limpio(pesosRedondo(n)), String(n)).toBe(limpio(pesos(n)));
+    }
+    expect(limpio(pesos(0.5))).toBe("$ 0,50");
+    expect(limpio(pesos(0.01194))).toBe("$ 0,01194");
+  });
+
+  /** El número que se ve en pantalla, leído como número: sin signo, sin puntos de miles, coma → punto. */
+  const leer = (s: string) => Number(s.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
+
+  it("el CSV dice el mismo número que la pantalla", () => {
+    for (const n of [2.27e-8, 0.004, 0.01194, 0.5, 0.123456, 1, 1.005, 1234.567, 255323213736518400, 3.0165118498407226e23]) {
+      expect(Number(montoCsv(n)), `monto ${n}`).toBe(leer(pesos(n)));
+    }
+    for (const n of [4.332726297657377e-13, 5.119e-13, 0.00126139, 0.7624574519612553]) {
+      expect(Number(indiceCsv(n)), `índice ${n}`).toBe(leer(indice(n)));
+    }
+    // De uno para arriba el CSV lleva cuatro decimales y la columna dos: la pantalla es ese
+    // mismo número redondeado, nunca otro.
+    for (const n of [1.2321, 130.69720219, 12276.766]) {
+      expect(leer(indice(n)), `índice ${n}`).toBe(Number(Number(indiceCsv(n)).toFixed(2)));
+    }
+  });
+
+  it("el CSV nunca usa notación exponencial", () => {
+    const valores = [4.332726297657377e-13, 2.27e-8, 0.5, 1, 130.7, 255323213736518400, 3.0165118498407226e23];
+    for (const n of valores) {
+      expect(montoCsv(n), `monto ${n}`).not.toMatch(/e/i);
+      expect(indiceCsv(n), `índice ${n}`).not.toMatch(/e/i);
+    }
+    expect(montoCsv(3.0165118498407226e23)).toMatch(/^\d+\.\d\d$/);
+  });
+});
+
+describe("partirEnMiles", () => {
+  it("corta sólo después de cada punto de miles, sin perder ni agregar nada", () => {
+    expect(partirEnMiles("$ 255.323.213.736.518.400")).toEqual(["$ 255.", "323.", "213.", "736.", "518.", "400"]);
+    expect(partirEnMiles("+25.532.321.373.651.740%")).toEqual(["+25.", "532.", "321.", "373.", "651.", "740%"]);
+    expect(partirEnMiles("$ 1.000,00")).toEqual(["$ 1.", "000,00"]);
+    expect(partirEnMiles("0,0000000000004333")).toEqual(["0,0000000000004333"]);
+    for (const t of ["$ 255.323.213.736.518.400", "~$ 1.610.057.520", "+1,79%"]) {
+      expect(partirEnMiles(t).join("")).toBe(t);
+    }
   });
 });

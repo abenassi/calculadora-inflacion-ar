@@ -11,3 +11,6 @@ dist/
 
 # Scratch de subagent-driven-development (ledger, briefs, reviews de un plan)
 .superpowers/
+
+# Lo que el snapshot le deja al último paso del workflow (ver 0001). Nunca se commitea.
+.snapshot/

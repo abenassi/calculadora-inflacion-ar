@@ -67,16 +67,19 @@ import {
   fuenteDelTexto,
   hayAlgoEstimado,
   efectoEnElMonto,
+  explicarMoneda,
   hayTramoOficial,
   rotuloDeAnclaje,
   MESES_PROYECCION_LARGA,
 } from "./explicaciones.js";
 import {
+  celdaLarga,
   cifraLarga,
   fechaLarga,
   indice,
   indiceCsv,
   montoCsv,
+  partirEnMiles,
   pesos,
   pesosRedondo,
   porcentaje,
@@ -94,6 +97,15 @@ const el = <T extends HTMLElement>(id: string): T => {
   if (!nodo) throw new Error(`Falta el elemento #${id}`);
   return nodo as T;
 };
+
+/**
+ * Los nodos de un número que sólo se puede cortar de renglón después de un punto de miles: las
+ * partes de `partirEnMiles` con un `<wbr>` entre ellas. Con nodos y no con innerHTML, y el
+ * `<wbr>` no agrega texto, así que lo que se copia es el número tal cual.
+ */
+function conCortesEnMiles(texto: string): (string | HTMLElement)[] {
+  return partirEnMiles(texto).flatMap((parte, i) => (i === 0 ? [parte] : [document.createElement("wbr"), parte]));
+}
 
 let serie: SerieIndice;
 let catalogo: CatalogoIndices;
@@ -380,13 +392,25 @@ function pintarResultado(r: Resultado): void {
   );
   el("rotulo-principal").textContent = capitalizar(comoDestino(r.hasta));
   const cifraPrincipal = el("cifra-principal");
-  cifraPrincipal.textContent = esAproximado(r)
-    ? `~${pesosRedondo(r.montoAjustado)}`
-    : pesosRedondo(r.montoAjustado);
-  // Con Córdoba desde 1968 la cifra puede tener 24 caracteres sin un espacio donde cortar, y
-  // con la letra de siempre empujaba la página hacia el costado en un celular.
-  cifraPrincipal.classList.toggle("resultado__cifra--larga", cifraLarga(cifraPrincipal.textContent));
+  const cifra = esAproximado(r) ? `~${pesosRedondo(r.montoAjustado)}` : pesosRedondo(r.montoAjustado);
+  // Con Córdoba desde 1968 la cifra llega a 25 caracteres sin un espacio donde cortar: con la
+  // letra de siempre empujaba la página hacia el costado en un celular, y con `anywhere` solo se
+  // partía en medio de un grupo ("…736.518.40" y "0"). Letra chica cuando no entra, y de
+  // renglón sólo se corta después de un punto de miles.
+  cifraPrincipal.replaceChildren(...conCortesEnMiles(cifra));
+  cifraPrincipal.classList.toggle("resultado__cifra--larga", cifraLarga(cifra));
   el("detalle-principal").textContent = explicar(r);
+
+  // Antes de 1992 el monto no está en pesos, y el resultado tampoco (ver `explicarMoneda`).
+  const moneda = explicarMoneda(r);
+  const avisoMoneda = el("aviso-moneda");
+  avisoMoneda.hidden = moneda === "";
+  if (moneda !== "") {
+    const link = document.createElement("a");
+    link.href = "./datos.html#monedas";
+    link.textContent = "Las monedas de antes de 1992";
+    avisoMoneda.replaceChildren(`${moneda} `, link, ".");
+  }
 
   // Cuanto más lejos se proyecta, menos es una cuenta y más un pronóstico.
   const aviso = el("aviso-largo");
@@ -450,16 +474,35 @@ function pintarResultado(r: Resultado): void {
       }
       tdOrigen.append(marca);
 
+      // Un monto o un acumulado de décadas atrás no entra en su columna: se puede cortar de
+      // renglón, pero sólo después de un punto de miles.
+      const celdaCifra = (texto: string, clase?: string) => {
+        const td = celda("", clase);
+        td.append(...conCortesEnMiles(texto));
+        td.classList.add("celda-cifra");
+        return td;
+      };
+
       tr.append(
         celda(f.varMensualPct === null ? "—" : porcentaje(f.varMensualPct)),
-        celda(f.acumuladoPct === null ? "—" : porcentaje(f.acumuladoPct), "col-acumulado"),
-        celda(pesos(f.monto)),
+        celdaCifra(f.acumuladoPct === null ? "—" : porcentaje(f.acumuladoPct), "col-acumulado"),
+        celdaCifra(pesos(f.monto)),
         tdOrigen,
         celda(indice(f.indice), "col-tecnica"),
       );
       return tr;
     }),
   );
+  // Con montos así la tabla no entraba en un escritorio y la columna del índice quedaba cortada
+  // leyéndose "0,00000000": la tabla entera pasa a letra chica (ver `celdaLarga`).
+  el("cuerpo-desglose")
+    .closest("table")
+    ?.classList.toggle(
+      "desglose--cifras-largas",
+      r.desglose.some(
+        (f) => celdaLarga(pesos(f.monto)) || (f.acumuladoPct !== null && celdaLarga(porcentaje(f.acumuladoPct))),
+      ),
+    );
 
   // Vanina, en el review: "esa tabla yo no se la puedo mostrar al cliente, lo
   // primero que me dice es '¿qué febrero? yo vine en mayo'". El título es lo
@@ -532,6 +575,12 @@ function armarExplicacion(r: Resultado): string {
     `${pesos(r.monto)} ${conPreposicion("de", r.desde)} equivalen a ` +
       `${esAproximado(r) ? "unos " : ""}${pesosRedondo(r.montoAjustado)} ` +
       `${comoDestino(r.hasta)}.`,
+  );
+  // Pegada al número, igual que en la pantalla: quien recibe el mensaje lee "$ 16.101.575" de
+  // 1990 y lo toma en pesos si nada le dice que son australes.
+  const moneda = explicarMoneda(r);
+  if (moneda !== "") lineas.push(moneda);
+  lineas.push(
     // Y el porcentaje dice de qué es. "Inflación acumulada: +6,13% (IPC del INDEC)" le
     // pone el nombre del organismo a un número que tres renglones más abajo se aclara que
     // no es el del período pedido: el que lo recibe se queda con el primero.

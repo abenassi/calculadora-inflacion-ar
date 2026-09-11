@@ -67,6 +67,25 @@ describe("agruparParaSelector", () => {
     );
   });
 
+  it("dice de cada índice lo mismo que la lista declarada", () => {
+    // `indices.json` lo escribe el snapshot con los textos de `indices-declarados.ts` del día en
+    // que corrió. Si se cambia un texto sin volver a bajar, el catálogo publicado sigue diciendo
+    // lo viejo: pasó con Córdoba, que decía "con datos desde 1990" arriba de un resultado de 1968.
+    const publicado = INDICES.map((d) => {
+      const p = catalogo.indices.find((i) => i.slug === d.slug);
+      return { slug: d.slug, nombre: p?.nombre, tipo: p?.tipo, enElSelector: p?.enElSelector, cubre: p?.cubre, organismos: p?.organismos };
+    });
+    const declarado = INDICES.map((d) => ({
+      slug: d.slug,
+      nombre: d.nombre,
+      tipo: d.tipo,
+      enElSelector: d.enElSelector,
+      cubre: d.cubre,
+      organismos: [d.organismoCorto],
+    }));
+    expect(publicado).toEqual(declarado);
+  });
+
   it("no deja archivos huérfanos en public/data/indices/", () => {
     // El que queda cuando se renombra un slug: sigue en el repo, no lo anuncia nadie y no
     // lo mira ningún test. Es invisible hasta que alguien lo lee creyendo que está vivo.
@@ -112,7 +131,8 @@ describe("cada índice del catálogo", () => {
         // decimales antes del 2026-09-05 traen una a cuatro cifras por debajo de 0,01; las de
         // Córdoba traen el float completo y sirven aunque valgan 1e-13. Y un cero acá es una
         // división por cero en el único cálculo que hace el sitio.
-        const malos = serie.datos.filter((p) => !esRepresentable(p.indice));
+        const decimales = INDICES.find((i) => i.slug === entrada.slug)?.decimalesDeLaFuente;
+        const malos = serie.datos.filter((p) => !esRepresentable(p.indice, decimales));
         expect(malos.map((p) => `${p.mes}=${p.indice}`)).toEqual([]);
       });
 

@@ -30,6 +30,7 @@ import { mismoContenido } from "./mismo-contenido.js";
 // El corte del arranque de cada serie, por cifras significativas: el porqué y los números
 // que lo sostienen están en ese archivo.
 import { recortarRepresentable } from "./recorte-representable.js";
+import { ARCHIVO_CONSERVADOS, type IndiceConservado } from "./indices-conservados.js";
 import { ultimoCambioEn } from "./ultimo-cambio.js";
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -336,7 +337,10 @@ async function construirIndice(decl: IndiceDeclarado): Promise<SerieIndice> {
         `que el MCP aplica cuando ignora fecha_desde. Puede estar recortada por arriba.`,
     );
   }
-  const puntos = recortarContinuo(recortarRepresentable(aPuntos(serie.datos), decl.slug), decl.slug);
+  const puntos = recortarContinuo(
+    recortarRepresentable(aPuntos(serie.datos), decl.slug, decl.decimalesDeLaFuente),
+    decl.slug,
+  );
   const datos = puntos.map((p) => ({ mes: p.mes, indice: p.valor, origen: decl.origen }));
   const primerMes = datos[0]!.mes;
   const ultimoOficial = datos.at(-1)!.mes;
@@ -555,6 +559,11 @@ async function construirCatalogo(nacional: SerieIndice): Promise<void> {
     },
   ];
 
+  // Los que no se pudieron actualizar. Se escriben siempre, aunque la lista quede vacía: el
+  // último paso del workflow la lee, y que no esté también es un aviso (ver
+  // `indices-conservados.ts`).
+  const conservados: IndiceConservado[] = [];
+
   console.log(`Índices jurisdiccionales: bajando ${INDICES.length} series…`);
   for (const decl of INDICES) {
     try {
@@ -582,8 +591,19 @@ async function construirCatalogo(nacional: SerieIndice): Promise<void> {
           (previa ? "queda el dato de la corrida anterior" : "no está en el catálogo"),
       );
       if (previa) entradas.push(previa);
+      // Y no se queda en el log: el último paso del workflow pone el job en rojo con esto.
+      conservados.push({
+        slug: decl.slug,
+        nombre: decl.nombre,
+        motivo: (e as Error).message,
+        ...(previa ? {} : { fueraDelCatalogo: true }),
+      });
     }
   }
+
+  const archivoConservados = resolve(RAIZ, ARCHIVO_CONSERVADOS);
+  await mkdir(dirname(archivoConservados), { recursive: true });
+  await writeFile(archivoConservados, `${JSON.stringify(conservados, null, 2)}\n`);
 
   const faltantes = INDICES.length + 1 - entradas.length;
   if (faltantes > 0) console.warn(`  OJO: ${faltantes} índice(s) quedaron fuera del catálogo`);

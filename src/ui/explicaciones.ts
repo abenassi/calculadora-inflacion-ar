@@ -15,6 +15,7 @@
 import { sumaDeVariaciones, tasaMensualDelRem } from "../engine/adjust.js";
 import {
   conPreposicion,
+  diaDe,
   diasEnMes,
   diasEntre,
   esFecha,
@@ -22,15 +23,17 @@ import {
   mesConAnio,
   mesDe,
   nombrarMes,
+  nombrarPunto,
   ordenReal,
   soloMes,
 } from "../engine/mes.js";
-import type { Mes, Resultado } from "../engine/types.js";
+import { monedasDelPeriodo, PESO, type Equivalencia, type Moneda } from "../engine/moneda.js";
+import type { Mes, Punto, Resultado } from "../engine/types.js";
 import { fuenteDe, llevaSello, mesDelTramo, quienPublicaAhora } from "./etiquetas.js";
 
 /** Para arrancar una oración con el organismo, que viene con el artículo en minúscula. */
 export const capitalizar = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
-import { comoSeMuestra, pesos, porcentaje } from "./format.js";
+import { cantidad, comoSeMuestra, pesos, pesosRedondo, porcentaje } from "./format.js";
 
 /** A partir de cuántos meses proyectados dejamos de tratarlo como una cuenta razonable. */
 export const MESES_PROYECCION_LARGA = 4;
@@ -428,13 +431,103 @@ export function efectoEnElMonto(r: Resultado): string {
   const verbo = r.variacionPct < 0 ? "baja" : "sube";
   const cuanto = Math.abs(r.variacionPct);
   // Un monto que baja nunca baja 100%: eso sería que no valía nada. Con Córdoba desde 1968,
-  // llevar un millón de 2026 a 1975 lo baja 99,9999999977%, y redondeado a dos decimales el
+  // llevar un millón de 2026 a 1975 lo baja 99,99999999999773%, y redondeado a dos decimales el
   // texto decía "lo baja 100,00%". "Más de 99,99%" es lo que se puede afirmar sin mentir.
   const texto =
     cuanto < 100 && comoSeMuestra(cuanto) >= 100
       ? `más de ${porcentaje(99.99, false)}`
       : porcentaje(cuanto, false);
   return ` Sacarle esa inflación al monto lo ${verbo} ${texto}.`;
+}
+
+/**
+ * En qué moneda están el monto y el resultado cuando alguna punta es anterior al peso, y cuánto
+ * es el resultado en la moneda de la otra punta.
+ *
+ * La cuenta no le saca ni le agrega ceros al monto (`datos.html#monedas`): $1.000 de enero de
+ * 1970 dan "$ 255.323.213.736.518.400", que se lee como un número roto, y un millón de agosto
+ * 2026 llevado a enero de 1975 da "$ 0,0000000227", que lleva a concluir que no valía nada. Con
+ * el índice nacional es peor, porque el número es creíble: $1.000 de enero de 1990 dan
+ * "$ 16.101.575", y en pesos son $ 1.610. "Leelo como poder adquisitivo" no decía cómo leerlo;
+ * esto dice en qué moneda está y hace la cuenta.
+ *
+ * La tabla de monedas y la conversión viven en `src/engine/moneda.ts`: acá sólo se arma la
+ * frase. Un mes con un cambio adentro —junio de 1985— tiene dos monedas posibles, y la frase
+ * nombra las dos en vez de elegir una. Devuelve `""` con las dos puntas en pesos.
+ */
+export function explicarMoneda(r: Resultado): string {
+  const periodo = monedasDelPeriodo(r.desde, r.hasta, r.montoAjustado);
+  if (!periodo) return "";
+  const { origen, destino, equivalencias } = periodo;
+  const unos = esAproximado(r) ? "unos " : "";
+  const cuando = (p: Punto) => (esFecha(p) ? `el ${nombrarPunto(p)}` : `en ${nombrarMes(p)}`);
+
+  // Las dos puntas en la misma moneda: no hay nada que convertir, sólo decir cuál es.
+  if (equivalencias.length === 0) {
+    const moneda = origen[0]!;
+    const puntas =
+      r.desde === r.hasta ? capitalizar(cuando(r.desde)) : `${capitalizar(cuando(r.desde))} y ${cuando(r.hasta)}`;
+    return `${puntas} la moneda era el ${moneda.nombre}: si tu monto está en ${moneda.plural}, el resultado también.`;
+  }
+
+  const monto = (moneda: Moneda, n: number) => (moneda === PESO ? pesosRedondo(n) : `${cantidad(n)} ${moneda.plural}`);
+  const enLaMoneda = (a: Moneda) =>
+    a === PESO
+      ? `en pesos ${conPreposicion("de", r.hasta)}`
+      : destino.length === 1
+        ? `en la moneda ${conPreposicion("de", r.hasta)}`
+        : `en ${a.plural}`;
+  const cuanto = (e: Equivalencia) =>
+    `${enLaMoneda(e.a)} son ${unos}${monto(e.a, e.monto)} ` +
+    `(1 ${e.mayor.singular} = ${cantidad(e.cuantas)} ${e.menor.plural})`;
+
+  // Pasar a una moneda más nueva le saca ceros; a una más vieja, se los agrega.
+  const verbos = new Set(equivalencias.map((e) => (e.de.unidad < e.a.unidad ? "saca" : "agrega")));
+  const noLe = verbos.size === 1 ? `no le ${[...verbos][0]} los ceros` : "no cambia de moneda";
+
+  if (origen.length === 1 && destino.length === 1) {
+    const [de, a] = [origen[0]!, destino[0]!];
+    const queMoneda =
+      de === PESO
+        ? `${capitalizar(cuando(r.hasta))} la moneda era el ${a.nombre}.`
+        : a === PESO
+          ? `${capitalizar(cuando(r.desde))} la moneda era el ${de.nombre}.`
+          : `${capitalizar(cuando(r.desde))} la moneda era el ${de.nombre}, y ${cuando(r.hasta)}, el ${a.nombre}.`;
+    return (
+      `${queMoneda} Esta cuenta ${noLe}: si tu monto está en ${de.plural}, el resultado también. ` +
+      `${capitalizar(cuanto(equivalencias[0]!))}.`
+    );
+  }
+
+  // Alguna punta es un mes con un cambio de moneda adentro. No hay forma de saber en cuál
+  // estaba el monto, así que se dan las dos cuentas y la persona elige la suya.
+  const describir = (p: Punto, monedas: Moneda[]): string => {
+    if (monedas.length > 1) {
+      const cambios = monedas.slice(1).map((moneda, i) => {
+        const dia = diaDe(moneda.desde!);
+        return `hasta el ${dia - 1} era el ${monedas[i]!.nombre} y desde el ${dia}, el ${moneda.nombre}`;
+      });
+      return `${capitalizar(cuando(p))} cambió la moneda: ${listar(cambios)}.`;
+    }
+    return monedas[0] === PESO ? "" : `${capitalizar(cuando(p))} la moneda era el ${monedas[0]!.nombre}.`;
+  };
+  const queMoneda = [...new Set([describir(r.desde, origen), describir(r.hasta, destino)])]
+    .filter((s) => s !== "")
+    .join(" ");
+  const siTuMonto = origen.map((de) => {
+    const opciones = destino.map((a) =>
+      a === de
+        ? destino.length === 1
+          ? "el resultado también"
+          : `en ${a.plural} es el mismo número`
+        : cuanto(equivalencias.find((e) => e.de === de && e.a === a)!),
+    );
+    return `Si tu monto está en ${de.plural}, ${listar(opciones)}.`;
+  });
+  return (
+    `${queMoneda} Esta cuenta ${noLe}: el resultado queda en la misma moneda que tu monto. ` +
+    siTuMonto.join(" ")
+  );
 }
 
 /**

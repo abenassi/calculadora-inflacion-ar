@@ -96,24 +96,53 @@ todavía traen por debajo de 0,01 valores con seis decimales y de una a cuatro c
 las filas de seis decimales es exactamente lo mismo —`0.010640` trae cinco cifras, y
 cualquier valor más chico con seis decimales trae cuatro o menos—, pero por valor también se
 recortaba Córdoba, que no tiene nada truncado: sus 266 puntos por debajo de 0,01 (1968-01 a
-1990-02) vienen con las cifras de la planilla de la provincia, de 6 a 17. Medido contra el
-MCP ese día, el corte por cifras lleva a Córdoba de 438 a 704 meses y deja idénticas las otras
+1990-02) vienen sin truncar de la planilla que publicaba la provincia. Medido contra el MCP
+ese día, el corte por cifras lleva a Córdoba de 438 a 704 meses y deja idénticas las otras
 catorce series y el CPI de EE.UU. El criterio y sus límites están en
 `scripts/recorte-representable.ts`.
 
+Sin truncar no quiere decir preciso. El float trae 16 o 17 cifras, pero de 1968 a mediados de
+los ochenta la provincia publicó el índice con cuatro: los cocientes entre meses son fracciones
+exactas de cuatro cifras (1239/1229, 1452/1433, 5216/5291), y la variación mensual que publica
+la provincia lo confirma. Ahí cada punto puede estar corrido hasta 0,04%, y una variación
+mensual hasta 0,08 puntos. Y el portal que la provincia tiene hoy redondea a ocho decimales,
+que antes de 1982-04 da cero: quien cruce 1968 contra el portal no encuentra nada. El corte
+protege contra lo que se perdió al guardar; no mejora lo que se publicó, y `datos.html` lo dice.
+
+**Cortar de más tampoco es inofensivo.** El snapshot no puede encoger, así que si el recorte le
+saca un mes a una serie la escritura falla y el índice queda con los datos de la corrida
+anterior. Pasaría con un cero final: Córdoba publica 1989-07 a 1990-02 a ocho decimales, y un
+`0.00126100` llega como `0.001261` y cuenta cuatro cifras, lo que cortaría todo 1968-1989. Por
+eso cada índice declara los decimales de su fuente cuando son más de seis
+(`decimalesDeLaFuente`, Córdoba 8) y se usan como piso, y un índice conservado pone el job en
+rojo (ver 0001).
+
 Recuperar esa historia destapó cosas que el corte por valor tapaba, y todas son la misma
-mentira —un número que se lee como cero sin serlo— o una página que no entra:
+mentira —un número que se lee como cero sin serlo, o uno que se lee en la moneda equivocada— o
+una página que no entra:
 
 - La columna *Índice IPC* imprimía cuatro decimales fijos, así que enero de 1968 (`4,33e-13`)
-  se leía "0,0000". Ahora imprime cifras significativas, y el CSV también.
+  se leía "0,0000". Ahora imprime cifras significativas, y el CSV también, escrito entero
+  ("0.0000000000004333") y nunca en notación exponencial.
 - Deflactando, $1.000.000 de agosto 2026 llevados a enero de 1975 dan 0,0000000227: el
-  resultado decía "$ 0", la tabla "$ 0,00" y el CSV "0.00". Un monto que no es cero ahora
-  muestra sus cifras. Y el texto que se copia decía "lo baja 100,00%" por redondear
-  −99,9999999977%; ahora dice "más de 99,99%".
-- $1.000 de 1970 dan "$ 255.323.213.736.518.400", 24 caracteres sin espacio, que en un
-  celular de 375 px corrían la página a 533 px. Por encima de 15 caracteres la cifra usa una
-  letra más chica, medida en el browser.
-- Entre 1968 y 1992 hay cinco monedas, no sólo el austral (ver `datos.html#monedas`).
+  resultado decía "$ 0", la tabla "$ 0,00" y el CSV "0.00". Ahora todo monto distinto de cero
+  menor que uno va con cifras significativas (de dos a cuatro), con un solo criterio
+  (`vaConCifras`) en el resultado, la tabla y el CSV: antes, de mayo de 1985 salía "$ 0,01194"
+  arriba y "$ 0,01" en la fila del resultado. Y el texto que se copia decía "lo baja 100,00%"
+  por redondear −99,99999999999773%; ahora dice "más de 99,99%".
+- $1.000 de 1970 dan "$ 255.323.213.736.518.400", 25 caracteres con el espacio. La primera
+  medición en el celular salió mal: la página ya venía ensanchada por el desplegable de
+  metodología (469 px a 375 con cualquier índice provincial, 415 con el nacional estimado),
+  que ahora se achica con la pantalla. Medida de nuevo, la cifra usa letra chica desde 12
+  caracteres visibles y sólo se corta de renglón después de un punto de miles. La tabla, con
+  montos así, medía 960 px en 878 a 1280: pasa a letra chica y también corta sólo en los
+  puntos de miles.
+- Entre 1968 y 1992 hay cinco monedas, no sólo el austral (ver `datos.html#monedas`), y el
+  resultado queda en la moneda del monto. Debajo del resultado, y en el texto que se copia, la
+  calculadora dice en qué moneda está cada punta y cuánto es en la de la otra
+  (`src/engine/moneda.ts`, por día). Vale también para el nacional desde 1990, que es el caso
+  más peligroso porque el número es creíble: $1.000 de enero de 1990 dan "$ 16.101.575", y en
+  pesos son $ 1.610.
 
 **Mendoza no publicó entre marzo de 2012 y abril de 2016.** Sin recortar, el motor habría
 leído ese salto como una variación mensual de cuatro años. Se sirve el tramo continuo que
