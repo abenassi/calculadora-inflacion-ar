@@ -29,11 +29,13 @@ import { decimales, DECIMALES_MINIMOS } from "./mismo-contenido.js";
  * defenderse de un truncamiento que a ella nunca le pasó.
  *
  * **Lo que este corte no hace.** Protege contra las cifras que se perdieron al guardar; no
- * mejora las que se publicaron. El float de Córdoba trae 16 o 17 cifras, pero de 1968 a
- * mediados de los ochenta la provincia publicó el índice con cuatro: los cocientes entre meses
- * son fracciones exactas de cuatro cifras (1239/1229, 1452/1433, 5216/5291), y la variación
- * mensual que publica la provincia lo confirma. Las demás cifras son artefacto del
- * encadenamiento, y ahí cada punto puede estar corrido hasta 0,04% (lo dice `datos.html`).
+ * mejora las que se publicaron. El float de Córdoba trae 16 o 17 cifras, pero de 1968 a 1974
+ * la provincia publicó el índice con cuatro —los cocientes entre meses son fracciones exactas
+ * de cuatro cifras (1239/1229, 1452/1433, 5216/5291), y la variación mensual que publica la
+ * provincia lo confirma— y muchos meses hasta fines de los ochenta con cuatro o cinco. Las
+ * demás cifras son artefacto del encadenamiento: en ese tramo cada punto puede estar corrido
+ * hasta 0,05% (el máximo medido es 0,0407%), y una variación mensual, hasta una décima de
+ * punto (lo dice `datos.html`).
  *
  * **Por qué cinco.** Es el umbral que declara `datos.html`, y para una serie con seis decimales
  * es exactamente el corte viejo: `0.010640` trae cinco y cualquier valor por debajo de 0,01 con

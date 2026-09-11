@@ -6,6 +6,7 @@ import { adjust, sumaDeVariaciones } from "../src/engine/adjust.js";
 import { deOrdinal, aOrdinal, diffMeses, sumarMeses } from "../src/engine/mes.js";
 import {
   avisarTramoAjeno,
+  avisoDeMoneda,
   efectoEnElMonto,
   explicarMoneda,
   esAproximado,
@@ -653,79 +654,139 @@ const llano = (s: string) => s.replace(/\s/g, " ");
 
 describe("el aviso de moneda", () => {
   const HOY = { metodologia: "sin_proyectar" as const, hoy: "2026-09" };
+  const aviso = (r: Resultado) => {
+    const a = avisoDeMoneda(r);
+    return a && { destacado: llano(a.destacado), detalle: llano(a.detalle) };
+  };
 
-  it("1970 → 2026: dice la moneda de origen y cuánto es en pesos", () => {
+  /**
+   * Arranca con la conversión: es lo que la persona vino a buscar. La primera versión la dejaba
+   * en la tercera frase, en letra chica, detrás de "Esta cuenta no le saca los ceros: si tu monto
+   * está en pesos ley, el resultado también", que hubo que leer dos veces ("¿también qué?").
+   */
+  it("1970 → 2026: arranca con cuánto es en pesos, y después explica por qué", () => {
     const s = serieEntre("1970-01", "2026-08", 1, 2.553232137365184e14);
     const r = adjust(1000, "1970-01", "2026-08", s, HOY);
-    expect(llano(explicarMoneda(r))).toBe(
-      "En enero 1970 la moneda era el peso ley 18.188. Esta cuenta no le saca los ceros: si tu " +
-        "monto está en pesos ley, el resultado también. En pesos de agosto 2026 son $ 2.553.232 " +
-        "(1 peso = 100.000.000.000 pesos ley).",
-    );
+    expect(aviso(r)).toEqual({
+      destacado: "En pesos de agosto 2026 son $ 2.553.232.",
+      detalle:
+        "En enero 1970 la moneda era el peso ley 18.188 y esta cuenta no le saca los ceros: el número " +
+        "de arriba está en pesos ley, igual que tu monto (1 peso = 100.000.000.000 pesos ley).",
+    });
+    // El texto que se copia dice lo mismo, en el mismo orden y sin formato.
+    expect(llano(explicarMoneda(r))).toBe(`${aviso(r)!.destacado} ${aviso(r)!.detalle}`);
   });
 
-  it("2026 → 1975: dice la moneda de destino y cuánto es en esa moneda", () => {
+  it("2026 → 1975: no pregunta en qué moneda está un monto de hoy, que sólo puede estar en pesos", () => {
     const s = serieEntre("1975-01", "2026-08", 2.967e-12, 130.7);
     const r = adjust(1_000_000, "2026-08", "1975-01", s, HOY);
-    expect(llano(explicarMoneda(r))).toBe(
-      "En enero 1975 la moneda era el peso ley 18.188. Esta cuenta no le agrega los ceros: si tu " +
-        "monto está en pesos, el resultado también. En la moneda de enero 1975 son 2.270 pesos ley " +
+    expect(aviso(r)).toEqual({
+      destacado: "En la moneda de enero 1975 son 2.270 pesos ley.",
+      detalle:
+        "El número de arriba está en pesos, igual que tu monto: esta cuenta no le agrega los ceros " +
         "(1 peso = 100.000.000.000 pesos ley).",
-    );
+    });
   });
 
   it("1990 → 1991, las dos en australes: sólo dice en qué moneda está", () => {
     const s = serieEntre("1990-01", "1991-06", 1, 100);
     const r = adjust(1000, "1990-01", "1991-06", s, HOY);
-    expect(llano(explicarMoneda(r))).toBe(
-      "En enero 1990 y en junio 1991 la moneda era el austral: si tu monto está en australes, el " +
-        "resultado también.",
-    );
+    expect(aviso(r)).toEqual({
+      destacado: "",
+      detalle: "En enero 1990 y en junio 1991 la moneda era el austral: si tu monto está en australes, el resultado también.",
+    });
+    expect(llano(explicarMoneda(r))).toBe(aviso(r)!.detalle);
   });
 
   it("el nacional desde 1990 también lleva el aviso: es el caso más creíble", () => {
     const s = serieEntre("1990-01", "2026-08", 1, 16101.5752);
     const r = adjust(1000, "1990-01", "2026-08", s, HOY);
-    expect(llano(explicarMoneda(r))).toContain("En pesos de agosto 2026 son $ 1.610 (1 peso = 10.000 australes).");
+    expect(aviso(r)!.destacado).toBe("En pesos de agosto 2026 son $ 1.610.");
+    expect(aviso(r)!.detalle).toContain("(1 peso = 10.000 australes).");
   });
 
   it("entre dos monedas viejas distintas", () => {
     const s = serieEntre("1983-05", "1985-07", 1, 230);
     const r = adjust(1000, "1983-05", "1985-07", s, HOY);
-    expect(llano(explicarMoneda(r))).toBe(
-      "En mayo 1983 la moneda era el peso ley 18.188, y en julio 1985, el austral. Esta cuenta no le " +
-        "saca los ceros: si tu monto está en pesos ley, el resultado también. En la moneda de julio " +
-        "1985 son 0,023 australes (1 austral = 10.000.000 pesos ley).",
+    expect(aviso(r)).toEqual({
+      destacado: "En la moneda de julio 1985 son 0,023 australes.",
+      detalle:
+        "En mayo 1983 la moneda era el peso ley 18.188 y esta cuenta no le saca los ceros: el número " +
+        "de arriba está en pesos ley, igual que tu monto (1 austral = 10.000.000 pesos ley).",
+    });
+  });
+
+  it("si lo que se imprime es 1, va en singular", () => {
+    const s = serieEntre("1985-05", "1985-07", 1, 1);
+    const r = adjust(1000, "1985-05", "1985-07", s, HOY);
+    expect(aviso(r)!.destacado).toBe("En la moneda de julio 1985 es 1 austral.");
+  });
+
+  it("junio de 1985 como origen: las dos cuentas, cortas", () => {
+    const s = serieEntre("1985-06", "2026-08", 1, 1000);
+    const r = adjust(1000, "1985-06", "2026-08", s, HOY);
+    expect(aviso(r)).toEqual({
+      destacado: "En junio 1985 cambió la moneda.",
+      detalle:
+        "Si tu monto era en pesos argentinos (hasta el 14): $ 0,10 de agosto 2026. " +
+        "Si era en australes (desde el 15): $ 100 de agosto 2026.",
+    });
+  });
+
+  it("una conversión chica no se redondea a entero: 1,081 australes y no 1", () => {
+    // Con $1.000 de junio a julio de 1985 decía "son 1 australes": eran 1,081.
+    const s = serieEntre("1985-06", "1985-07", 1, 1.0809);
+    const r = adjust(1000, "1985-06", "1985-07", s, HOY);
+    expect(aviso(r)!.detalle).toBe(
+      "Si tu monto era en pesos argentinos (hasta el 14): 1,081 australes de julio 1985. " +
+        "Si era en australes (desde el 15): el número de arriba ya está en australes.",
     );
   });
 
-  it("junio de 1985 tuvo dos monedas: nombra las dos y convierte las dos", () => {
+  it("junio de 1985 como destino, con una sola moneda de origen: no abre con un si", () => {
     const s = serieEntre("1985-06", "2026-08", 1, 1000);
-    const r = adjust(1000, "1985-06", "2026-08", s, HOY);
-    const texto = llano(explicarMoneda(r));
-    expect(texto).toContain("En junio 1985 cambió la moneda: hasta el 14 era el peso argentino y desde el 15, el austral.");
-    expect(texto).toContain("el resultado queda en la misma moneda que tu monto");
-    expect(texto).toContain("Si tu monto está en pesos argentinos, en pesos de agosto 2026 son $ 0,10 (1 peso = 10.000.000 pesos argentinos).");
-    expect(texto).toContain("Si tu monto está en australes, en pesos de agosto 2026 son $ 100 (1 peso = 10.000 australes).");
+    const r = adjust(1000, "2026-08", "1985-06", s, HOY);
+    expect(aviso(r)).toEqual({
+      destacado: "En junio 1985 cambió la moneda.",
+      detalle: "Tu monto está en pesos: en pesos argentinos (hasta el 14) son 10.000.000; en australes (desde el 15), 10.000.",
+    });
+  });
+
+  it("1985-05 → 1985-06: en pesos argentinos es el mismo número, y en australes 1,321", () => {
+    // Decía "en australes son 1 australes".
+    const s = serieEntre("1985-05", "1985-06", 1, 1.3213);
+    const r = adjust(1000, "1985-05", "1985-06", s, HOY);
+    expect(aviso(r)!.detalle).toBe(
+      "Tu monto está en pesos argentinos: en pesos argentinos (hasta el 14) es el número de arriba; " +
+        "en australes (desde el 15), 1,321.",
+    );
+  });
+
+  it("si el resultado se muestra con cifras significativas, la conversión no muestra más", () => {
+    // $ 0,01194 por 10.000.000 son 119.400 con la calculadora; decía 119.359 y no cerraba.
+    const s = serieEntre("1985-05", "2026-08", 1.56e-6, 130.7);
+    const r = adjust(1_000_000, "2026-08", "1985-05", s, HOY);
+    expect(aviso(r)!.destacado).toBe("En la moneda de mayo 1985 son 119.400 pesos argentinos.");
   });
 
   it("en el modo por día nombra el día", () => {
     const s = serieEntre("1969-12", "2026-08", 1, 2.553232137365184e14);
     const r = adjust(1000, "1970-01-15", "2026-08-10", s, HOY);
-    const texto = llano(explicarMoneda(r));
-    expect(texto).toMatch(/^El 15 de enero de 1970 la moneda era el peso ley 18\.188\./);
-    expect(texto).toContain("En pesos del 10 de agosto de 2026 son $ ");
+    expect(aviso(r)!.destacado).toMatch(/^En pesos del 10 de agosto de 2026 son \$ /);
+    expect(aviso(r)!.detalle).toMatch(/^El 15 de enero de 1970 la moneda era el peso ley 18\.188 y esta cuenta/);
   });
 
   it("si el resultado va con ~, la conversión también", () => {
     const s = serieEntre("1970-01", "2026-08", 1, 2.553232137365184e14);
     const r = adjust(1000, "1970-01", "2026-10", s, { metodologia: "repite_ultimo", hoy: "2026-10" });
-    expect(llano(explicarMoneda(r))).toContain("son unos $ ");
+    expect(aviso(r)!.destacado).toContain("son unos $ ");
   });
 
   it("con las dos puntas en pesos no dice nada", () => {
     const s = serieEntre("2024-01", "2025-01", 100, 200);
-    expect(explicarMoneda(adjust(1000, "2024-01", "2025-01", s, HOY))).toBe("");
+    const r = adjust(1000, "2024-01", "2025-01", s, HOY);
+    expect(avisoDeMoneda(r)).toBeNull();
+    expect(explicarMoneda(r)).toBe("");
   });
 });
 

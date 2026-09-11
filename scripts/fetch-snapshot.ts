@@ -23,7 +23,7 @@ import { empalmar, type PuntoCrudo } from "../src/engine/splice.js";
 import { aMes, diffMeses, nombrarMes } from "../src/engine/mes.js";
 import { SLUG_NACIONAL, type CatalogoIndices, type EntradaCatalogo } from "../src/engine/indices.js";
 import type { ExpectativaRem, SerieIndice, SerieValores } from "../src/engine/types.js";
-import { INDICES, type IndiceDeclarado } from "./indices-declarados.js";
+import { entradaDeCatalogo, INDICES, type IndiceDeclarado } from "./indices-declarados.js";
 import { INDICES_SECUNDARIOS, type IndiceSecundarioDeclarado } from "./indices-secundarios-declarados.js";
 import { traerDolarHistorico, traerSerie } from "./mcp-client.js";
 import { mismoContenido } from "./mismo-contenido.js";
@@ -570,16 +570,9 @@ async function construirCatalogo(nacional: SerieIndice): Promise<void> {
       const serie = await construirIndice(decl);
       // 12 meses: por debajo de eso no se puede calcular casi nada y seguro se rompió algo.
       await escribirSiMejora(`indices/${decl.slug}.json`, serie, 12);
-      entradas.push({
-        slug: decl.slug,
-        nombre: decl.nombre,
-        tipo: decl.tipo,
-        ...(decl.enElSelector ? { enElSelector: decl.enElSelector } : {}),
-        cubre: decl.cubre,
-        organismos: [decl.organismoCorto],
-        primerMes: serie.datos[0]!.mes,
-        ultimoOficial: serie.ultimo_oficial,
-      });
+      entradas.push(
+        entradaDeCatalogo(decl, { primerMes: serie.datos[0]!.mes, ultimoOficial: serie.ultimo_oficial }),
+      );
     } catch (e: unknown) {
       // Que la bajada de hoy falle no es razón para que el índice desaparezca del
       // desplegable: su archivo sigue en el repo con los datos de ayer, que es
@@ -590,7 +583,11 @@ async function construirCatalogo(nacional: SerieIndice): Promise<void> {
         `  ${decl.slug}: NO se pudo actualizar (${(e as Error).message}) — ` +
           (previa ? "queda el dato de la corrida anterior" : "no está en el catálogo"),
       );
-      if (previa) entradas.push(previa);
+      // De la entrada anterior sólo el rango, que es lo que describe el archivo de ayer. Los
+      // textos salen de la declaración de hoy: si el mismo día cambió un `cubre`, la entrada
+      // vieja chocaba con el test que ata el catálogo a la declaración, y ese rojo frenaba todo
+      // el snapshot —el IPC nacional incluido— mandando a mirar un texto.
+      if (previa) entradas.push(entradaDeCatalogo(decl, previa));
       // Y no se queda en el log: el último paso del workflow pone el job en rojo con esto.
       conservados.push({
         slug: decl.slug,

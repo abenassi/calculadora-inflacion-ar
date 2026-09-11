@@ -28,17 +28,21 @@ const CIFRAS_SIGNIFICATIVAS = 4;
 
 /**
  * Si un número se escribe con cifras significativas en vez de decimales fijos: todo lo que no
- * es cero y está entre −1 y 1. Es el único criterio para montos e índices, en la pantalla, en el
- * texto que se copia y en el CSV (regla 4).
+ * es cero y, redondeado a cuatro cifras, queda entre −1 y 1. Es el único criterio para montos e
+ * índices, en la pantalla, en el texto que se copia y en el CSV (regla 4).
  *
  * Antes eran dos criterios, escritos dos veces. El índice cambiaba de formato por debajo de uno
  * y el monto cuando el redondeo se comía todas sus cifras, que no es el mismo borde para la
  * cifra sin centavos que para la tabla: con Córdoba, $1.000.000 de agosto 2026 llevados a mayo
  * de 1985 daban "$ 0,01194" en el resultado y "$ 0,01" en la fila "← el resultado" y en el CSV,
  * y medio peso era "$ 1" arriba y "$ 0,50" abajo.
+ *
+ * Decide sobre el número redondeado y no sobre el crudo: 0,99995 se imprime 1 con cuatro
+ * cifras, y decidiendo sobre el crudo salía "$ 1,0" y "1.0" contra "$ 1,00" y "1.00" para 1.
  */
 export function vaConCifras(n: number): boolean {
-  return n !== 0 && Number.isFinite(n) && Math.abs(n) < 1;
+  if (n === 0 || !Number.isFinite(n)) return false;
+  return Math.abs(Number(n.toPrecision(CIFRAS_SIGNIFICATIVAS))) < 1;
 }
 
 /**
@@ -74,13 +78,35 @@ const CANTIDAD_CIFRAS = new Intl.NumberFormat("es-AR", {
   maximumSignificantDigits: CIFRAS_SIGNIFICATIVAS,
 });
 
-/**
- * Un monto sin signo `$`, para una moneda que no es el peso ("2.270" pesos ley, "0,023"
- * australes) o para contar unidades ("100.000.000.000"). Con el criterio de `pesosRedondo`, que
- * es el de la cifra que se está convirtiendo.
- */
+/** Un número sin signo `$`, con el criterio de `pesosRedondo`: "100.000.000.000" unidades. */
 export function cantidad(n: number): string {
   return (vaConCifras(n) ? CANTIDAD_CIFRAS : CANTIDAD).format(n);
+}
+
+/**
+ * Un monto pasado a la moneda de la otra punta, en el aviso de moneda: "$ 2.553.232", "1,081"
+ * australes.
+ *
+ * Por debajo de mil, cuatro cifras significativas. Redondeado a entero, como la cifra del
+ * resultado, 1,081 australes eran "1 australes" y $ 1,32 era "$ 1": hasta 30% menos, en una
+ * frase que existe para decir cuánto es de verdad. De mil para arriba, sin decimales.
+ *
+ * Y si el resultado mismo se muestra con cifras significativas (`comoElResultado`), la
+ * conversión no muestra más cifras que él: arriba dice "$ 0,01194", y 0,01194 por 10.000.000
+ * da 119.400 con la calculadora del celular; "119.359" no le cerraba a nadie.
+ */
+export function montoConvertido(
+  n: number,
+  opciones: { enPesos?: boolean; comoElResultado?: boolean } = {},
+): string {
+  const conCifras = opciones.comoElResultado === true || Math.abs(n) < 1000;
+  const numero: Intl.NumberFormatOptions = conCifras
+    ? { minimumSignificantDigits: vaConCifras(n) ? 2 : 1, maximumSignificantDigits: CIFRAS_SIGNIFICATIVAS }
+    : { maximumFractionDigits: 0 };
+  return new Intl.NumberFormat(
+    "es-AR",
+    opciones.enPesos ? { style: "currency", currency: "ARS", ...numero } : numero,
+  ).format(n);
 }
 
 /*
@@ -229,9 +255,10 @@ export function indiceCsv(n: number): string {
  * con 2rem entran 11 caracteres a 320 px y 14 a 375. Con la letra chica
  * (`.resultado__cifra--larga`, 20 px en esos anchos) entran 19 en una línea en los dos. Lo
  * que no entra se parte en renglones, pero sólo después de un punto de miles
- * (`partirEnMiles`): con Córdoba, $1.000 de enero de 1970 dan "$ 255.323.213.736.518.400", 25
- * caracteres con el espacio y 24 sin él, y a la letra de siempre se partía en
- * "$ 255.323.213.736.518.40" y "0".
+ * (`partirEnMiles`), y parejos (`text-wrap: balance`): con Córdoba, $1.000 de enero de 1970 dan
+ * "$ 255.323.213.736.518.400", 25 caracteres con el espacio y 24 sin él, que a la letra de
+ * siempre se partía en "$ 255.323.213.736.518.40" y "0", y con los cortes en los miles dejaba
+ * un "400" suelto que parecía otro número.
  */
 const CARACTERES_DE_LA_CIFRA_NORMAL = 11;
 
@@ -263,12 +290,36 @@ export function celdaLarga(texto: string): boolean {
 }
 
 /**
+ * Hasta cuántos caracteres visibles un monto o un acumulado de la tabla nunca se parte.
+ *
+ * Chromium corta en un `<wbr>` aunque la celda diga `white-space: nowrap`, y en una tabla
+ * angosta achica juntas todas las celdas partibles de una columna: con los `<wbr>` puestos en
+ * todas las tablas, a 375 px "$ 1.000,00" de un cálculo cualquiera se leía "$ 1." y "000,00", un
+ * peso, y con los puestos en toda tabla de cifras largas pasaba lo mismo a 320 px con Córdoba
+ * desde 1970. Medido a 320 px: con el nacional desde 1990 el monto más largo, "$ 16.101.575,20"
+ * (14), entra entero. Con junio 1985 → agosto 2026 en Córdoba la tabla no llega a cifras largas
+ * (su monto más largo tiene 18) y la columna Monto quedaba cortada por el costado. Así que se
+ * parte sólo una celda más larga que esto, sea o no de cifras largas la tabla, y el browser la
+ * parte sólo si no entra.
+ */
+const CARACTERES_DE_UNA_CELDA_ENTERA = 14;
+
+/** Si esta celda en particular se puede partir en sus puntos de miles. */
+export function celdaPartible(texto: string): boolean {
+  return texto.replace(/\s/g, "").length > CARACTERES_DE_UNA_CELDA_ENTERA;
+}
+
+/**
  * Un número partido después de cada punto de miles, para que un monto larguísimo sólo se pueda
  * cortar ahí (con un `<wbr>` entre las partes, que no agrega texto: lo que se copia es el número
  * entero). Un número sin puntos de miles vuelve entero.
+ *
+ * Con `split` y no con una expresión regular que mire para atrás: Safari no las entiende hasta
+ * la 16.4, y en un iPhone viejo el módulo entero no cargaba (hay un test que lo vigila).
  */
 export function partirEnMiles(texto: string): string[] {
-  return texto.split(/(?<=\.)/);
+  const partes = texto.split(".");
+  return partes.map((parte, i) => (i < partes.length - 1 ? `${parte}.` : parte));
 }
 
 export function fechaLarga(iso: string): string {

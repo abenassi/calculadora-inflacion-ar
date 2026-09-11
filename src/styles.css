@@ -408,6 +408,11 @@ button:focus-visible {
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.1;
+  /* Si la cifra no entra en un renglón, renglones parejos: sin esto, a 375 px $1.000 de 1970 en
+     Córdoba quedaba "$ 255.323.213.736.518." y un "400" suelto que parecía otro número. Medido:
+     con esto, "$ 255.323.213." y "736.518.400" a 375 y a 320. Un browser que no lo entiende
+     corta como antes. */
+  text-wrap: balance;
 }
 
 /*
@@ -755,13 +760,18 @@ button:focus-visible {
  * Montos y acumulados de décadas atrás con Córdoba ("$ 255.323.213.736.518.400,00"). Las medidas
  * están en `celdaLarga()`: con esta letra la tabla entra a 1280 px sin partir ninguna fila en los
  * casos probados. Si igual no alcanza, esas dos celdas se cortan de renglón sólo después de un
- * punto de miles (main.ts pone un <wbr> ahí), en vez de empujar la columna del índice afuera.
+ * punto de miles, en vez de empujar la columna del índice afuera.
+ *
+ * El corte sólo va en una celda que por sí sola pasa de 14 caracteres (`celdaPartible`), aun en
+ * esta tabla. Con el corte habilitado siempre, a 375 px "$ 1.000,00" de cualquier cálculo se
+ * partía en "$ 1." y "000,00", y lo primero que se leía era un peso. Por eso main.ts pone los
+ * <wbr> y la clase sólo ahí: Chromium corta en un <wbr> aunque la celda diga `nowrap`.
  */
 .desglose--cifras-largas {
   font-size: 0.75rem;
 }
 
-.desglose td.celda-cifra {
+.desglose td.celda-cifra--partible {
   white-space: normal;
 }
 
@@ -1105,6 +1115,36 @@ button:focus-visible {
   .origen {
     font-size: 0.65rem;
     padding: 0.1rem 0.3rem;
+  }
+
+  /*
+   * Un monto sin puntos de miles no tiene dónde cortarse. Con Córdoba, $1.000.000 de agosto 2026
+   * llevados a enero de 1975 dan "$ 0,0000000227" en cada fila, y la columna Monto quedaba
+   * cortada por el costado: se leía "$ 0,00", sin el título a la vista. Medido: a 375 px la
+   * tabla entra entera y a 320 el monto se ve entero sin desplazar (lo que queda afuera es el
+   * sello de origen). Para eso "← el resultado" va debajo de la fecha, el sello se puede partir,
+   * la tabla de cifras largas baja un poco más la letra y usa todo el ancho de la tarjeta.
+   */
+  .fila-anclaje {
+    display: block;
+    white-space: normal;
+  }
+
+  .desglose td.celda-origen {
+    white-space: normal;
+  }
+
+  .desglose td.celda-origen .origen {
+    display: inline-block;
+    border-radius: 0.5rem;
+  }
+
+  .desglose.desglose--cifras-largas {
+    font-size: 0.72rem;
+  }
+
+  .tarjeta .tabla-scroll {
+    margin-inline: -1.25rem;
   }
 }
 

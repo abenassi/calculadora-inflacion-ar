@@ -54,10 +54,12 @@ export function avisosDeConservados(texto: string | null): string[] {
   } catch {
     return [`::error::${ARCHIVO_CONSERVADOS} no es un JSON válido: no se sabe qué índices quedaron sin actualizar.`];
   }
+  // "Quedó con los datos de la corrida anterior" y no "quedó publicado": el paso corre también
+  // cuando fallaron los tests y no se publicó nada.
   return lista.map(
     (i) =>
-      `::error::${i.nombre} (${i.slug}) no se actualizó en esta corrida y ` +
-      `${i.fueraDelCatalogo ? "quedó fuera del catálogo" : "quedó publicado con los datos de la anterior"}. ` +
+      `::error::${i.nombre} (${i.slug}) no se actualizó y ` +
+      `${i.fueraDelCatalogo ? "quedó fuera del catálogo" : "quedó con los datos de la corrida anterior"}. ` +
       `Motivo: ${escapar(i.motivo)}`,
   );
 }

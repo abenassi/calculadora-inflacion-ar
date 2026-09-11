@@ -57,6 +57,7 @@ import {
 } from "./etiquetas.js";
 import {
   avisarTramoAjeno,
+  avisoDeMoneda,
   capitalizar,
   esAproximado,
   explicar,
@@ -74,6 +75,7 @@ import {
 } from "./explicaciones.js";
 import {
   celdaLarga,
+  celdaPartible,
   cifraLarga,
   fechaLarga,
   indice,
@@ -401,15 +403,22 @@ function pintarResultado(r: Resultado): void {
   cifraPrincipal.classList.toggle("resultado__cifra--larga", cifraLarga(cifra));
   el("detalle-principal").textContent = explicar(r);
 
-  // Antes de 1992 el monto no está en pesos, y el resultado tampoco (ver `explicarMoneda`).
-  const moneda = explicarMoneda(r);
+  // Antes de 1992 el monto no está en pesos, y el resultado tampoco (ver `avisoDeMoneda`). Arranca
+  // con la cuenta, destacada, porque es lo que la persona vino a buscar.
+  const deMoneda = avisoDeMoneda(r);
   const avisoMoneda = el("aviso-moneda");
-  avisoMoneda.hidden = moneda === "";
-  if (moneda !== "") {
+  avisoMoneda.hidden = deMoneda === null;
+  if (deMoneda) {
+    const partes: (string | HTMLElement)[] = [];
+    if (deMoneda.destacado !== "") {
+      const destacado = document.createElement("strong");
+      destacado.textContent = deMoneda.destacado;
+      partes.push(destacado, " ");
+    }
     const link = document.createElement("a");
     link.href = "./datos.html#monedas";
     link.textContent = "Las monedas de antes de 1992";
-    avisoMoneda.replaceChildren(`${moneda} `, link, ".");
+    avisoMoneda.replaceChildren(...partes, `${deMoneda.detalle} `, link, ".");
   }
 
   // Cuanto más lejos se proyecta, menos es una cuenta y más un pronóstico.
@@ -421,6 +430,13 @@ function pintarResultado(r: Resultado): void {
       `Son ${meses} meses sin publicar. Esto es una cuenta, no un pronóstico: la inflación ` +
       `real de esos meses puede ser bastante distinta.`;
   }
+
+  // Con montos así la tabla no entraba en un escritorio y la columna del índice quedaba cortada
+  // leyéndose "0,00000000": la tabla entera pasa a letra chica y, sólo entonces, sus montos y
+  // acumulados se pueden cortar en los puntos de miles (ver `celdaLarga`).
+  const cifrasLargas = r.desglose.some(
+    (f) => celdaLarga(pesos(f.monto)) || (f.acumuladoPct !== null && celdaLarga(porcentaje(f.acumuladoPct))),
+  );
 
   // Construido con nodos en vez de innerHTML: la tabla es lo único que se arma a
   // partir de datos, y así el snapshot nunca puede inyectar markup por más que
@@ -454,6 +470,8 @@ function pintarResultado(r: Resultado): void {
       // atribuirle al organismo una cifra que nunca publicó. `estimado` gana sobre
       // `prorrateado` porque es la advertencia que más importa.
       const tdOrigen = document.createElement("td");
+      // En el celular el sello se puede partir en dos renglones para dejarle lugar al monto.
+      tdOrigen.className = "celda-origen";
       const marca = document.createElement("span");
       const sello = selloDeFila(f, r);
       const clase = f.esProyeccion ? "proyeccion" : f.esParcial ? "prorrateado" : "publicado";
@@ -475,11 +493,19 @@ function pintarResultado(r: Resultado): void {
       tdOrigen.append(marca);
 
       // Un monto o un acumulado de décadas atrás no entra en su columna: se puede cortar de
-      // renglón, pero sólo después de un punto de miles.
+      // renglón, pero sólo después de un punto de miles, y sólo si la celda misma es larga
+      // (`celdaPartible`), aunque la tabla sea de cifras largas. Chromium corta en un <wbr>
+      // aunque la celda diga `nowrap`: con los cortes puestos en todas, a 375 px "$ 1.000,00"
+      // se leía "$ 1." y "000,00".
       const celdaCifra = (texto: string, clase?: string) => {
         const td = celda("", clase);
-        td.append(...conCortesEnMiles(texto));
         td.classList.add("celda-cifra");
+        if (celdaPartible(texto)) {
+          td.append(...conCortesEnMiles(texto));
+          td.classList.add("celda-cifra--partible");
+        } else {
+          td.textContent = texto;
+        }
         return td;
       };
 
@@ -493,16 +519,7 @@ function pintarResultado(r: Resultado): void {
       return tr;
     }),
   );
-  // Con montos así la tabla no entraba en un escritorio y la columna del índice quedaba cortada
-  // leyéndose "0,00000000": la tabla entera pasa a letra chica (ver `celdaLarga`).
-  el("cuerpo-desglose")
-    .closest("table")
-    ?.classList.toggle(
-      "desglose--cifras-largas",
-      r.desglose.some(
-        (f) => celdaLarga(pesos(f.monto)) || (f.acumuladoPct !== null && celdaLarga(porcentaje(f.acumuladoPct))),
-      ),
-    );
+  el("cuerpo-desglose").closest("table")?.classList.toggle("desglose--cifras-largas", cifrasLargas);
 
   // Vanina, en el review: "esa tabla yo no se la puedo mostrar al cliente, lo
   // primero que me dice es '¿qué febrero? yo vine en mayo'". El título es lo

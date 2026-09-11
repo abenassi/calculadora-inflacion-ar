@@ -174,7 +174,12 @@ recorte de `recorte-representable.ts` le saca un mes a una serie, la escritura f
 encoger y el índice queda congelado para siempre. Ahora `fetch-snapshot.ts` deja la lista en
 `.snapshot/indices-conservados.json` (fuera de `public/`, no se commitea) y el último paso,
 `scripts/verificar-indices-conservados.ts`, pone el job en rojo con un `::error::` por índice
-y su motivo. Corre después de commitear y publicar, y también si falló el de frescura.
+y su motivo. Corre siempre que la bajada haya terminado, aunque después hayan fallado los tests,
+la publicación o la frescura: si un índice conservado está detrás de otro rojo, el diagnóstico
+tiene que salir al lado. Y la entrada conservada lleva sólo el rango de datos de la corrida
+anterior; nombre, `cubre` y organismos salen de la declaración de hoy. Con la entrada vieja
+entera, un `cubre` cambiado el mismo día chocaba con el test que ata el catálogo a la
+declaración, y ese rojo frenaba el snapshot entero, IPC nacional incluido.
 
 ## Si vas a copiar esto
 

@@ -39,7 +39,8 @@ export const MONEDAS: readonly Moneda[] = [
     desde: null,
     unidad: 1,
   },
-  // Ley 18.188, art. 1: 1 peso ley = 100 pesos moneda nacional.
+  // 1 peso ley = 100 pesos moneda nacional (Ley 18.188, que fijó el 1 de enero de 1970 como
+  // fecha tope; la fecha de arranque la puso un decreto).
   { nombre: "peso ley 18.188", singular: "peso ley", plural: "pesos ley", desde: "1970-01-01", unidad: 100 },
   // Ley 22.707, art. 1: 1 peso argentino = 10.000 pesos ley. La fecha la fijó el Poder
   // Ejecutivo por decreto; la ley decía "a más tardar el 30 de junio de 1983".

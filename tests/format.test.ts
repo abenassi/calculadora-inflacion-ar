@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
+import { readdirSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   celdaLarga,
+  celdaPartible,
   cifraLarga,
   indice,
   indiceCsv,
+  montoConvertido,
   montoCsv,
   partirEnMiles,
   pesos,
@@ -74,6 +78,16 @@ describe("la tabla cuando trae montos muy largos", () => {
     expect(celdaLarga("$ 100.000.000.000,00")).toBe(true); // 19: el primero que no
     expect(celdaLarga("+4.405.053.544.978.806%")).toBe(true);
     expect(celdaLarga(pesos(255323213736518400))).toBe(true);
+  });
+
+  it("un monto se puede partir en los miles desde 15 caracteres visibles, aunque la tabla no sea de cifras largas", () => {
+    // A 375 px "$ 1.000,00" se partía en "$ 1." y "000,00": ningún monto común se puede partir.
+    expect(celdaPartible("$ 1.000,00")).toBe(false);
+    expect(celdaPartible("$ 16.101.575,20")).toBe(false); // 14: entra entero a 320 px
+    expect(celdaPartible("$ 161.015.752,00")).toBe(true); // 15
+    // Con junio 1985 → agosto 2026 la tabla no pasa a cifras largas y a 320 px la columna Monto
+    // quedaba cortada por el costado.
+    expect(celdaPartible("$ 63.415.892.293,00")).toBe(true);
   });
 });
 
@@ -219,8 +233,57 @@ describe("partirEnMiles", () => {
     expect(partirEnMiles("+25.532.321.373.651.740%")).toEqual(["+25.", "532.", "321.", "373.", "651.", "740%"]);
     expect(partirEnMiles("$ 1.000,00")).toEqual(["$ 1.", "000,00"]);
     expect(partirEnMiles("0,0000000000004333")).toEqual(["0,0000000000004333"]);
-    for (const t of ["$ 255.323.213.736.518.400", "~$ 1.610.057.520", "+1,79%"]) {
+    for (const t of ["$ 255.323.213.736.518.400", "~$ 1.610.057.520", "+1,79%", "", "1."]) {
       expect(partirEnMiles(t).join("")).toBe(t);
     }
+  });
+});
+
+describe("el código que corre en el browser", () => {
+  /**
+   * `partirEnMiles` se escribió con un lookbehind, que Safari no entiende hasta la 16.4. Vite
+   * apunta por defecto a safari14 y no reescribe expresiones regulares: en un iPhone viejo el
+   * módulo entero tira un error de sintaxis y la calculadora no carga. Era el único del repo.
+   */
+  it("no usa lookbehind en ninguna expresión regular", () => {
+    const dir = resolve(import.meta.dirname, "../src");
+    const archivos = (readdirSync(dir, { recursive: true }) as string[]).filter((f) => f.endsWith(".ts"));
+    expect(archivos.length).toBeGreaterThan(10);
+    const conLookbehind = archivos.filter((f) => /\(\?<[=!]/.test(readFileSync(resolve(dir, f), "utf8")));
+    expect(conLookbehind).toEqual([]);
+  });
+});
+
+describe("vaConCifras decide sobre el número ya redondeado", () => {
+  it("0,99995 se imprime 1 con cuatro cifras: va con decimales fijos, igual que 1", () => {
+    // Decidiendo sobre el valor crudo salía "$ 1,0" y "1.0", contra "$ 1,00" para 1.
+    expect(vaConCifras(0.99995)).toBe(false);
+    expect(vaConCifras(0.99994)).toBe(true);
+    expect(limpio(pesos(0.99995))).toBe("$ 1,00");
+    expect(montoCsv(0.99995)).toBe("1.00");
+    expect(indice(0.99995)).toBe("1,00");
+    expect(indiceCsv(0.99995)).toBe("1.0000");
+  });
+});
+
+describe("un monto convertido a otra moneda", () => {
+  it("por debajo de mil lleva cuatro cifras significativas, en pesos y en otra moneda", () => {
+    // Redondeado a entero, 1,081 australes eran "1 australes" y $ 1,32 era "$ 1": hasta 30% menos.
+    expect(montoConvertido(1.0809)).toBe("1,081");
+    expect(limpio(montoConvertido(1.3213, { enPesos: true }))).toBe("$ 1,321");
+    expect(montoConvertido(10.13)).toBe("10,13");
+    expect(limpio(montoConvertido(0.1, { enPesos: true }))).toBe("$ 0,10");
+    expect(montoConvertido(1)).toBe("1");
+    expect(limpio(montoConvertido(100, { enPesos: true }))).toBe("$ 100");
+  });
+
+  it("de mil para arriba, sin decimales", () => {
+    expect(limpio(montoConvertido(6341.589, { enPesos: true }))).toBe("$ 6.342");
+    expect(montoConvertido(2553232.137)).toBe("2.553.232");
+  });
+
+  it("si el resultado se muestra con cifras significativas, la conversión no muestra más cifras que él", () => {
+    expect(montoConvertido(119357.5, { comoElResultado: true })).toBe("119.400");
+    expect(montoConvertido(2270.08, { comoElResultado: true })).toBe("2.270");
   });
 });

@@ -19,7 +19,7 @@
  * fuera el índice de Formosa.
  */
 
-import type { TipoIndice } from "../src/engine/indices.js";
+import type { EntradaCatalogo, TipoIndice } from "../src/engine/indices.js";
 import type { EtiquetaFuente } from "../src/engine/types.js";
 
 export type IndiceDeclarado = {
@@ -48,6 +48,32 @@ export type IndiceDeclarado = {
    */
   decimalesDeLaFuente?: number;
 };
+
+/**
+ * Lo que el catálogo publicado dice de un índice declarado: los textos de la declaración y el
+ * rango de meses de sus datos.
+ *
+ * Es la única forma de armar una entrada, tanto con los datos de hoy como cuando el índice no se
+ * pudo actualizar y se conserva el archivo de ayer. En ese caso de la entrada anterior sirve sólo
+ * el rango, que describe ese archivo: si el mismo día cambió un `cubre` declarado, la entrada
+ * vieja entera chocaba con el test que ata el catálogo a esta lista, y ese rojo frenaba el
+ * snapshot completo mandando a mirar un texto.
+ */
+export function entradaDeCatalogo(
+  decl: IndiceDeclarado,
+  rango: Pick<EntradaCatalogo, "primerMes" | "ultimoOficial">,
+): EntradaCatalogo {
+  return {
+    slug: decl.slug,
+    nombre: decl.nombre,
+    tipo: decl.tipo,
+    ...(decl.enElSelector ? { enElSelector: decl.enElSelector } : {}),
+    cubre: decl.cubre,
+    organismos: [decl.organismoCorto],
+    primerMes: rango.primerMes,
+    ultimoOficial: rango.ultimoOficial,
+  };
+}
 
 const INDEC = {
   organismo: "Instituto Nacional de Estadística y Censos (INDEC)",

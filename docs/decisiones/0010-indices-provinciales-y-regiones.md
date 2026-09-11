@@ -101,11 +101,13 @@ ese día, el corte por cifras lleva a Córdoba de 438 a 704 meses y deja idénti
 catorce series y el CPI de EE.UU. El criterio y sus límites están en
 `scripts/recorte-representable.ts`.
 
-Sin truncar no quiere decir preciso. El float trae 16 o 17 cifras, pero de 1968 a mediados de
-los ochenta la provincia publicó el índice con cuatro: los cocientes entre meses son fracciones
-exactas de cuatro cifras (1239/1229, 1452/1433, 5216/5291), y la variación mensual que publica
-la provincia lo confirma. Ahí cada punto puede estar corrido hasta 0,04%, y una variación
-mensual hasta 0,08 puntos. Y el portal que la provincia tiene hoy redondea a ocho decimales,
+Sin truncar no quiere decir preciso. El float trae 16 o 17 cifras, pero de 1968 a 1974 la
+provincia publicó el índice con cuatro —los cocientes entre meses son fracciones exactas de
+cuatro cifras (1239/1229, 1452/1433, 5216/5291), y la variación mensual que publica la
+provincia lo confirma— y muchos meses hasta fines de los ochenta con cuatro o cinco (desde 1975
+muchos pares necesitan cinco o seis). En ese tramo cada punto puede estar corrido hasta 0,05%
+(el máximo medido es 0,0407%) y una variación mensual hasta una décima de punto (medido:
+0,082). Y el portal que la provincia tiene hoy redondea a ocho decimales,
 que antes de 1982-04 da cero: quien cruce 1968 contra el portal no encuentra nada. El corte
 protege contra lo que se perdió al guardar; no mejora lo que se publicó, y `datos.html` lo dice.
 
@@ -134,13 +136,22 @@ una página que no entra:
   medición en el celular salió mal: la página ya venía ensanchada por el desplegable de
   metodología (469 px a 375 con cualquier índice provincial, 415 con el nacional estimado),
   que ahora se achica con la pantalla. Medida de nuevo, la cifra usa letra chica desde 12
-  caracteres visibles y sólo se corta de renglón después de un punto de miles. La tabla, con
-  montos así, medía 960 px en 878 a 1280: pasa a letra chica y también corta sólo en los
-  puntos de miles.
+  caracteres visibles y sólo se corta de renglón después de un punto de miles, en renglones
+  parejos (`text-wrap: balance`) para que no quede un "400" suelto. La tabla, con montos así,
+  medía 960 px en 878 a 1280: pasa a letra chica. Una celda se puede cortar en los puntos de
+  miles sólo si ella misma pasa de 14 caracteres visibles, en cualquier tabla. Con el corte
+  habilitado en todas las celdas, en un celular "$ 1.000,00" se leía "$ 1." y "000,00" (Chromium
+  corta en un `<wbr>` aunque la celda diga `nowrap`); con 14 entra entero a 320 px, y junio 1985
+  → agosto 2026, que no llega a cifras largas, ya no deja la columna Monto cortada por el
+  costado. En el celular, además, "← el resultado" va debajo de la fecha, el sello de origen
+  puede partirse y la tabla usa todo el ancho de la tarjeta: un monto sin puntos de miles como
+  "$ 0,0000000227" quedaba cortado por el costado y se leía "$ 0,00".
 - Entre 1968 y 1992 hay cinco monedas, no sólo el austral (ver `datos.html#monedas`), y el
   resultado queda en la moneda del monto. Debajo del resultado, y en el texto que se copia, la
-  calculadora dice en qué moneda está cada punta y cuánto es en la de la otra
-  (`src/engine/moneda.ts`, por día). Vale también para el nacional desde 1990, que es el caso
+  calculadora arranca con cuánto es en la moneda de la otra punta —destacado; con cuatro cifras
+  significativas por debajo de mil, y nunca con más cifras que el resultado— y después explica
+  en qué moneda está (`src/engine/moneda.ts`, por día). Junio de 1985 tuvo dos monedas y el
+  aviso da las dos cuentas, cortas. Vale también para el nacional desde 1990, que es el caso
   más peligroso porque el número es creíble: $1.000 de enero de 1990 dan "$ 16.101.575", y en
   pesos son $ 1.610.
 
