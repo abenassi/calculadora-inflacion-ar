@@ -43,7 +43,7 @@
         "DGEyC Córdoba"
       ],
       "primerMes": "1990-03",
-      "ultimoOficial": "2026-07"
+      "ultimoOficial": "2026-08"
     },
     {
       "slug": "mendoza",
@@ -76,7 +76,7 @@
         "DEyC Río Negro"
       ],
       "primerMes": "1989-09",
-      "ultimoOficial": "2026-07"
+      "ultimoOficial": "2026-08"
     },
     {
       "slug": "san-luis",
@@ -184,5 +184,5 @@
       "ultimoOficial": "2026-07"
     }
   ],
-  "actualizado": "2026-09-11T00:56:02.855Z"
+  "actualizado": "2026-09-11T12:31:10.636Z"
 }

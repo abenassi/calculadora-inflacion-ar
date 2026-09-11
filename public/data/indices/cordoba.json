@@ -8,7 +8,7 @@
       "organismo": "Dirección General de Estadística y Censos de la Provincia de Córdoba",
       "organismoCorto": "DGEyC Córdoba",
       "url": "https://estadistica.cba.gov.ar/",
-      "rango": "1990-03/2026-07",
+      "rango": "1990-03/2026-08",
       "etiqueta": {
         "corta": "IPC de Córdoba",
         "larga": "el IPC de la Provincia de Córdoba",
@@ -16,8 +16,8 @@
       }
     }
   ],
-  "ultimo_oficial": "2026-07",
-  "actualizado": "2026-09-10T13:06:54.460Z",
+  "ultimo_oficial": "2026-08",
+  "actualizado": "2026-09-11T12:31:07.918Z",
   "datos": [
     {
       "mes": "1990-03",
@@ -2202,6 +2202,11 @@
     {
       "mes": "2026-07",
       "indice": 128.39699237,
+      "origen": "dgeyc-cordoba"
+    },
+    {
+      "mes": "2026-08",
+      "indice": 130.69720219,
       "origen": "dgeyc-cordoba"
     }
   ]
