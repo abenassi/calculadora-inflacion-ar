@@ -285,9 +285,10 @@ describe("la ventana corrida deja de ofrecerse cuando arrastra meses muy distint
     // De punta a punta de cada archivo el desplazamiento YA da cero — `evaluarPeriodo`
     // corta ahí antes de llegar a `sesgoDeLaVentana` — así que ese pedido no ejercita el
     // guard para nada: pasa con cualquier umbral, cualquier serie y cualquier cambio a la
-    // fórmula. Acá se pide con un desplazamiento real de 3 meses, anclado al
-    // `ultimoOficial` de cada índice y no a una fecha fija, así que no depende de qué
-    // publicó nadie hoy. Tres meses corridos sobre un tramo largo es el caso normal —el de
+    // fórmula. Acá se pide con un desplazamiento real, sobre cada serie recortada en junio de
+    // 2026. Anclado al `ultimoOficial` vivo, un mes de inflación muy alta recién publicado
+    // bloqueaba de verdad, el test lo tomaba por falso positivo y frenaba el snapshot con el
+    // dato nuevo. Tres meses corridos sobre un tramo largo es el caso normal —el de
     // Neuquén y Río Negro entre ellos, sin ir a un caso patológico— y un falso positivo acá
     // sería el guard tapando cálculos que no deberían estar tapados.
     // El desplazamiento tiene que ser CHICO y no cualquiera: a 3 meses de cualquier
@@ -300,14 +301,24 @@ describe("la ventana corrida deja de ofrecerse cuando arrastra meses muy distint
     // borde de `MESES_DE_ATRASO_TOLERADOS`, el atraso que la interfaz todavía no avisa— es
     // el que separa "atraso normal, no bloquea" (acá) de "atraso real, si bloquea" (el
     // caso de Neuquén, de sobra, en el describe de abajo).
-    const bloqueados = catalogo.indices
+    const CONGELADO = "2026-06";
+    const recortadas = catalogo.indices
       .filter((i) => i.slug !== "neuquen")
-      .filter((i) => {
-        const desde = sumarMeses(i.ultimoOficial, -24);
-        const hasta = sumarMeses(i.ultimoOficial, 2);
-        return !sePuedeEvitarEstimar(desde, hasta, serieDe(i.slug), hasta);
+      .map((i) => {
+        const vivo = serieDe(i.slug);
+        const serie: SerieIndice = {
+          ...vivo,
+          ultimo_oficial: CONGELADO,
+          datos: vivo.datos.filter((p) => p.mes <= CONGELADO),
+        };
+        return { slug: i.slug, serie };
       });
-    expect(bloqueados.map((i) => i.slug)).toEqual([]);
+    // Si una serie no llegara a junio, el recorte mediría otra ventana en silencio.
+    expect(recortadas.filter((r) => r.serie.datos.at(-1)?.mes !== CONGELADO).map((r) => r.slug)).toEqual([]);
+    const desde = sumarMeses(CONGELADO, -24);
+    const hasta = sumarMeses(CONGELADO, 2);
+    const bloqueados = recortadas.filter((r) => !sePuedeEvitarEstimar(desde, hasta, r.serie, hasta));
+    expect(bloqueados.map((r) => r.slug)).toEqual([]);
   });
 });
 

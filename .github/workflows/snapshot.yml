@@ -73,5 +73,5 @@ jobs:
 
       # Si el MCP deja de traer el IPC, todo lo de arriba sigue en verde ("Sin cambios") y
       # el sitio queda viejo sin que nadie se entere. Va último para no frenar el resto.
-      - name: Avisar si el IPC nacional quedó atrasado
+      - name: Avisar si el IPC nacional o el REM quedaron atrasados
         run: npx tsx scripts/verificar-frescura.ts

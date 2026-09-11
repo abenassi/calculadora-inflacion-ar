@@ -100,8 +100,11 @@ dar error. El snapshot dice "Sin cambios", el deploy publica lo mismo, todo en v
 sitio envejece sin que nadie se entere. Por eso el snapshot termina con
 `scripts/verificar-frescura.ts`, que pone el job en rojo si el IPC nacional tiene más de
 dos meses de atraso (el INDEC publica el mes M a mediados de M+1, así que hasta dos es lo normal).
-Va después de commitear y publicar, para no frenar las demás series, y mira sólo el
-nacional: hay índices provinciales con meses de rezago habitual. Ese aviso también llega
+Mira también la encuesta del REM con la misma cuenta: si el REM no se puede bajar, el
+snapshot conserva la encuesta vigente en vez de omitirla (omitirla dejaba los tests en rojo
+y el job no commiteaba nada ese día), y sin este aviso esa encuesta envejecería callada.
+Va después de commitear y publicar, para no frenar las demás series, y no mira los índices
+provinciales: hay algunos con meses de rezago habitual. Ese aviso también llega
 antes de los 60 días sin actividad con los que GitHub apaga los schedules de un repo
 público.
 

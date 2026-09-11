@@ -32,6 +32,22 @@ const mas = (meses: number): Punto => deOrdinal(aOrdinal(ultimo) + meses);
 const menos = (meses: number): Punto => deOrdinal(aOrdinal(ultimo) - meses);
 
 /**
+ * `ipc.json` recortado en julio de 2026, para los casos que tienen que quedar fijos.
+ *
+ * `ipc.json` está vivo. Un caso escrito sobre un mes fijo cambia de tipo el día que el INDEC
+ * publica ese mes, y uno escrito relativo al último dato cambia con lo que se publique: un mes
+ * de inflación muy alta dispara el guard de sesgo y pasa a `proyeccion`. En los dos casos el
+ * test queda en rojo contra el snapshot recién bajado y frena la actualización del sitio (pasó
+ * el 2026-09-10 con agosto). Recortada, la serie tiene los números reales y no se mueve.
+ */
+const HASTA_JULIO = "2026-07";
+const julio: SerieIndice = {
+  ...serie,
+  ultimo_oficial: HASTA_JULIO,
+  datos: serie.datos.filter((p) => p.mes <= HASTA_JULIO),
+};
+
+/**
  * Una matriz de períodos, no un caso.
  *
  * El defecto que motivó este archivo aparecía sólo cuando el período empieza y termina
@@ -461,9 +477,8 @@ describe("el renglón del acumulado deflactando", () => {
    * diciendo con palabras. Sale del mismo criterio, no de uno propio (regla 4).
    */
   it("no dice dónde quedó el monto cuando las filas no son las pedidas", () => {
-    // Relativo al último dato y no "2026-08" fijo: escrito así, el día que el INDEC publicó
-    // agosto el caso pasó a `directo`, el test quedó en rojo y frenó el snapshot con el dato.
-    const r = adjust(1_000_000, mas(1), menos(4), serie, { hoy: mas(1) });
+    // Sobre la serie recortada en julio: ver `julio` arriba.
+    const r = adjust(1_000_000, "2026-08", "2026-03", julio, { hoy: "2026-08" });
     expect(r.metodo.tipo).toBe("ventana_reciente");
     expect(esDeflacion(r)).toBe(true);
     expect(rotuloDeAnclaje(r, r.desglose.length - 1)).toBeNull();
@@ -561,8 +576,8 @@ describe("las marcas de la tabla no señalan un mes que no es el pedido", () => 
   });
 
   it("con el tramo de referencia no marcan nada, porque ninguna fila es la pedida", () => {
-    // Relativo al último dato por la misma razón que el de arriba.
-    const r = adjust(1_000_000, mas(1), menos(4), serie, { metodologia: "sin_proyectar", hoy: mas(1) });
+    // Sobre la serie recortada en julio: ver `julio` arriba.
+    const r = adjust(1_000_000, "2026-08", "2026-03", julio, { metodologia: "sin_proyectar", hoy: "2026-08" });
     expect(r.metodo.tipo).toBe("ventana_reciente");
     expect(r.desglose.map((_, i) => rotuloDeAnclaje(r, i))).toEqual(r.desglose.map(() => null));
   });

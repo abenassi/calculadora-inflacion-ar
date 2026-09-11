@@ -107,12 +107,13 @@ async function escribirSiMejora(
 }
 
 /**
- * La expectativa del REM más reciente.
+ * La expectativa del REM más reciente que publica el MCP.
  *
  * Devuelve `undefined` en vez de romper si la serie no viene: el REM es una opción
  * secundaria del sitio, y quedarnos sin snapshot de IPC porque el BCRA no respondió
- * sería cambiar un problema chico por uno grande. Sin este campo, la interfaz
- * esconde la opción.
+ * sería cambiar un problema chico por uno grande. Con `undefined`, `construirIpc`
+ * conserva la encuesta del snapshot vigente; la interfaz esconde la opción sólo si
+ * tampoco hay una ahí.
  */
 async function traerRem(): Promise<ExpectativaRem | undefined> {
   try {
@@ -123,7 +124,7 @@ async function traerRem(): Promise<ExpectativaRem | undefined> {
 
     const ultimo = anual.datos.at(-1);
     if (!ultimo || !Number.isFinite(ultimo.valor)) {
-      console.warn("  REM: la serie a 12 meses vino vacía, se omite");
+      console.warn("  REM: la serie a 12 meses vino vacía, se usa la del snapshot vigente");
       return undefined;
     }
 
@@ -160,18 +161,34 @@ async function traerRem(): Promise<ExpectativaRem | undefined> {
       organismo: anual.fuente,
     };
   } catch (e: unknown) {
-    console.warn(`  REM: no se pudo traer (${(e as Error).message}), se omite`);
+    console.warn(`  REM: no se pudo traer (${(e as Error).message}), se usa el del snapshot vigente`);
     return undefined;
   }
 }
 
+async function remDelSnapshotVigente(): Promise<ExpectativaRem | undefined> {
+  const previo = await readFile(resolve(DIR_DATOS, "ipc.json"), "utf8").catch(() => null);
+  const rem = previo ? (JSON.parse(previo) as SerieIndice).rem : undefined;
+  console.warn(
+    rem
+      ? `  REM: se conserva la encuesta de ${rem.mes} del snapshot vigente`
+      : "  REM: tampoco hay uno en el snapshot vigente, se omite",
+  );
+  return rem;
+}
+
 async function construirIpc(): Promise<SerieIndice> {
   console.log("IPC: bajando bcra:27, índice INDEC y REM…");
-  const [bcra, indec, rem] = await Promise.all([
+  const [bcra, indec, remNuevo] = await Promise.all([
     traerSerie(ID_BCRA_INFLACION, { fecha_desde: "1990-01-01" }),
     traerSerie(ID_INDEC_IPC, { fecha_desde: "2016-12-01" }),
     traerRem(),
   ]);
+  // Si el REM no vino, se conserva el del snapshot vigente en vez de omitirlo. Omitirlo no
+  // publicaba un sitio sin REM: dejaba en rojo los tests que lo usan y el job no commiteaba
+  // nada ese día, ni el dólar ni un mes nuevo del INDEC. La encuesta conservada lleva su
+  // fecha (`mes`), así que el sitio sigue nombrando la encuesta que de verdad usa.
+  const rem = remNuevo ?? (await remDelSnapshotVigente());
 
   const puntosBcra = aPuntos(bcra.datos);
   const puntosIndec = aPuntos(indec.datos);
@@ -356,7 +373,8 @@ function recortarContinuo(puntos: PuntoCrudo[], slug: string): PuntoCrudo[] {
  *
  * El REM del BCRA pronostica el IPC nacional del INDEC. No existe un REM provincial y no
  * lo vamos a inventar promediando nada, así que la serie no trae el campo y la interfaz
- * esconde esa opción sola — el mismo camino que ya recorre cuando el REM no se pudo bajar.
+ * esconde esa opción sola: es el mismo camino que recorre el nacional cuando no hay ningún
+ * REM, ni bajado ni conservado del snapshot vigente.
  */
 async function construirIndice(decl: IndiceDeclarado): Promise<SerieIndice> {
   // `fecha_desde` no es cosmético: **sin él el MCP devuelve los últimos 365 puntos y no
