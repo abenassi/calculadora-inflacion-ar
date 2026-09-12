@@ -54,7 +54,7 @@
         "DEIE"
       ],
       "primerMes": "2016-04",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-07"
     },
     {
       "slug": "neuquen",
@@ -98,7 +98,7 @@
         "IPEC Santa Fe"
       ],
       "primerMes": "2013-12",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-07"
     },
     {
       "slug": "tucuman",
@@ -109,7 +109,7 @@
         "Estadística Tucumán"
       ],
       "primerMes": "1989-03",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-07"
     },
     {
       "slug": "gba",
@@ -121,7 +121,7 @@
         "INDEC Gran Buenos Aires"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-07"
+      "ultimoOficial": "2026-08"
     },
     {
       "slug": "pampeana",
@@ -133,7 +133,7 @@
         "INDEC Pampeana"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-07"
+      "ultimoOficial": "2026-08"
     },
     {
       "slug": "noroeste",
@@ -145,7 +145,7 @@
         "INDEC Noroeste"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-07"
+      "ultimoOficial": "2026-08"
     },
     {
       "slug": "noreste",
@@ -157,7 +157,7 @@
         "INDEC Noreste"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-07"
+      "ultimoOficial": "2026-08"
     },
     {
       "slug": "cuyo",
@@ -169,7 +169,7 @@
         "INDEC Cuyo"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-07"
+      "ultimoOficial": "2026-08"
     },
     {
       "slug": "patagonia",
@@ -181,8 +181,8 @@
         "INDEC Patagónica"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-07"
+      "ultimoOficial": "2026-08"
     }
   ],
-  "actualizado": "2026-09-11T16:04:54.157Z"
+  "actualizado": "2026-09-12T15:36:50.415Z"
 }

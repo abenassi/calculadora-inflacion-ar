@@ -8,7 +8,7 @@
       "organismo": "Dirección de Estadística de la Provincia de Tucumán",
       "organismoCorto": "Estadística Tucumán",
       "url": "https://estadistica.tucuman.gov.ar/",
-      "rango": "1989-03/2026-06",
+      "rango": "1989-03/2026-07",
       "etiqueta": {
         "corta": "IPC de Tucumán",
         "larga": "el IPC de la Provincia de Tucumán",
@@ -16,8 +16,8 @@
       }
     }
   ],
-  "ultimo_oficial": "2026-06",
-  "actualizado": "2026-09-05T14:13:16.789Z",
+  "ultimo_oficial": "2026-07",
+  "actualizado": "2026-09-12T15:36:49.334Z",
   "datos": [
     {
       "mes": "1989-03",
@@ -2257,6 +2257,11 @@
     {
       "mes": "2026-06",
       "indice": 9121.252326558872,
+      "origen": "de-tucuman"
+    },
+    {
+      "mes": "2026-07",
+      "indice": 9290.788530100936,
       "origen": "de-tucuman"
     }
   ]

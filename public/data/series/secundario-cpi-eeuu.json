@@ -8,7 +8,7 @@
       "organismo": "Bureau of Labor Statistics (BLS) vía FRED",
       "organismoCorto": "Bureau of Labor Statistics (BLS) vía FRED",
       "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
-      "rango": "2002-01/2026-07",
+      "rango": "2002-01/2026-08",
       "etiqueta": {
         "corta": "CPI de Estados Unidos (BLS)",
         "larga": "el Índice de Precios al Consumidor de Estados Unidos (BLS, vía FRED). El punto de octubre de 2025 no es un dato relevado —el cierre del gobierno de EE.UU. impidió esa medición— sino una interpolación que hace el propio FRED entre septiembre y noviembre de 2025; el resto de la serie es dato oficial",
@@ -16,8 +16,8 @@
       }
     }
   ],
-  "ultimo_oficial": "2026-07",
-  "actualizado": "2026-09-07T16:51:01.856Z",
+  "ultimo_oficial": "2026-08",
+  "actualizado": "2026-09-12T15:36:46.179Z",
   "datos": [
     {
       "mes": "2002-01",
@@ -1492,6 +1492,11 @@
     {
       "mes": "2026-07",
       "indice": 333.918,
+      "origen": "cpi-eeuu"
+    },
+    {
+      "mes": "2026-08",
+      "indice": 334.98,
       "origen": "cpi-eeuu"
     }
   ]

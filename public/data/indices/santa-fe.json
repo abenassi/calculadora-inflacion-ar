@@ -8,7 +8,7 @@
       "organismo": "Instituto Provincial de Estadística y Censos de Santa Fe (IPEC)",
       "organismoCorto": "IPEC Santa Fe",
       "url": "https://www.santafe.gob.ar/index.php/web/content/view/full/113239",
-      "rango": "2013-12/2026-06",
+      "rango": "2013-12/2026-07",
       "etiqueta": {
         "corta": "IPC de Santa Fe",
         "larga": "el IPC de la Provincia de Santa Fe",
@@ -16,8 +16,8 @@
       }
     }
   ],
-  "ultimo_oficial": "2026-06",
-  "actualizado": "2026-08-13T23:26:54.342Z",
+  "ultimo_oficial": "2026-07",
+  "actualizado": "2026-09-12T15:36:49.153Z",
   "datos": [
     {
       "mes": "2013-12",
@@ -772,6 +772,11 @@
     {
       "mes": "2026-06",
       "indice": 23127.43,
+      "origen": "ipec-santa-fe"
+    },
+    {
+      "mes": "2026-07",
+      "indice": 23577.41,
       "origen": "ipec-santa-fe"
     }
   ]
