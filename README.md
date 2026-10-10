@@ -192,6 +192,15 @@ GitHub Actions (1×/día)  →  Argentina Data MCP  →  public/data/*.json  →
 La API key vive sólo en GitHub Secrets y nunca llega al browser. El sitio no hace una
 sola llamada de red a nadie: lee un JSON que está commiteado en el repo.
 
+**Quién paga las consultas: vos.** En este modelo el autor del sitio sostiene todas las
+consultas con su propia key, y el visitante no necesita cuenta. Sirve cuando los datos
+cambian poco (una vez por día alcanza) y querés que cualquiera use el sitio sin fricción.
+
+Si en cambio necesitás consultas en vivo que dependen de lo que elige cada visitante,
+mirá el otro ejemplo, **[Coyuntura agrícola](https://github.com/abenassi/coyuntura-agricola-ar)**
+([agro.mymcps.dev](https://agro.mymcps.dev)): no tiene backend ni key propia, cada
+visitante entra con su cuenta de Argentina Data (OAuth) y las consultas salen de su cuota.
+
 ### Los cuatro pasos
 
 1. **Conseguí una key.** Escribinos desde [argentinadata.mymcps.dev](https://argentinadata.mymcps.dev).
