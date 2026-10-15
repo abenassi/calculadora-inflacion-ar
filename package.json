@@ -14,11 +14,11 @@
     "verificar": "tsc --noEmit && vitest run && npm run build"
   },
   "devDependencies": {
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vite": "^8.3.2",
-    "vitest": "^5.0.3"
+    "vite": "^8.3.4",
+    "vitest": "^5.0.4"
   },
   "dependencies": {
     "chart.js": "^4.4.7"
