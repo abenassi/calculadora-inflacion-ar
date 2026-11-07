@@ -397,7 +397,7 @@ function pintarResultado(r: Resultado): void {
   el("rotulo-principal").textContent = capitalizar(comoDestino(r.hasta));
   const cifraPrincipal = el("cifra-principal");
   const cifra = cifraDelResultado(r);
-  // Con Córdoba desde 1968 la cifra llega a 25 caracteres sin un espacio donde cortar: con la
+  // Con Chaco desde 1960 la cifra llega a 35 caracteres (con Córdoba desde 1968, 25) sin un espacio donde cortar: con la
   // letra de siempre empujaba la página hacia el costado en un celular, y con `anywhere` solo se
   // partía en medio de un grupo ("…736.518.40" y "0"). Letra chica cuando no entra, y de
   // renglón sólo se corta después de un punto de miles.
@@ -896,7 +896,8 @@ function fraseDelCorrido(c: PeriodoCorrido): string {
   return c.contra === "primero"
     ? // "mide desde" era falso: Mendoza mide desde 1968 y publicó de corrido de 1988 a
       // 2012; lo que arranca en 2016 es la serie que nosotros servimos, después del
-      // recorte por el hueco. Lo mismo para Córdoba y Chaco, que encadenan desde 1968.
+      // recorte por el hueco. Lo mismo para Córdoba y Chaco, que encadenan desde 1968 y
+      // 1960.
       `La serie de ${indiceActivo.nombre} que usamos arranca en ${nombrarMes(primero)}, ` +
         `así que se corrió el período: pediste ${conPreposicion(punta, c.pedido)}.`
     : `${indiceActivo.nombre} publicó hasta ${nombrarMes(indiceActivo.ultimoOficial)} y el ` +
@@ -939,7 +940,7 @@ function pintarTextosDeLaFuente(): void {
  * Cambia el índice con el que se calcula.
  *
  * Los años del desplegable se repueblan porque cada índice arranca donde arranca —Santa
- * Fe mide desde diciembre de 2013 y Chaco desde 1988— y un control no puede ofrecer un
+ * Fe mide desde diciembre de 2013 y Chaco desde 1960— y un control no puede ofrecer un
  * año que el motor va a rechazar. Si el período que había cargado queda afuera, `calcular`
  * lo dice nombrando el mes en vez de recalcular otra cosa en silencio.
  */

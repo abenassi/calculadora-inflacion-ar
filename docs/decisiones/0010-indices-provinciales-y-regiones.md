@@ -91,6 +91,9 @@ MCP lo arregló el 2026-09-05: le sacó la escala a la columna y borró los cero
 ya vive sólo en el sitio.** Lo sigue justificando que las filas guardadas antes de ese día
 no se reescribieron: medido el 2026-09-11, Chaco (87 puntos), Mendoza (97) y Tucumán (87)
 todavía traen por debajo de 0,01 valores con seis decimales y de una a cuatro cifras.
+**Actualización 2026-11-07:** el 2026-10-02 el MCP reescribió esas tres series con el float
+completo (Chaco pasó a arrancar en 1960 y Tucumán en 1968). Hoy el corte no le saca meses a
+ninguna serie por cifras perdidas: queda como defensa por si vuelve a pasar.
 
 **Hasta el 2026-09-11 el corte era por valor, en 0,01; ese día pasó a ser por cifras.** Para
 las filas de seis decimales es exactamente lo mismo —`0.010640` trae cinco cifras, y
@@ -181,7 +184,7 @@ sirve para lo único que hace este sitio, que es traer un monto hasta hoy.
   alguien. La opción se deshabilita y al lado dice por qué, en vez de desaparecer: una
   opción que desaparece se lee como un bug.
 - **Cada índice arranca donde arranca.** Santa Fe mide desde diciembre de 2013, Chaco
-  desde 1988 y Córdoba desde 1968. Si cambiar de índice deja tu período afuera, se corre y se dice cuál era el
+  desde 1960 y Córdoba desde 1968. Si cambiar de índice deja tu período afuera, se corre y se dice cuál era el
   mes que pediste.
 - **Neuquén viene cinco meses detrás del nacional**, y eso cambia sobre qué ventana se
   calcula. Se avisa a partir de dos meses de atraso: uno es lo normal —los organismos

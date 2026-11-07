@@ -25,7 +25,7 @@ export type Moneda = {
   singular: string;
   /** Una cantidad: "2.270 pesos ley". */
   plural: string;
-  /** El primer día en que corre. `null` en la primera: ninguna serie arranca antes de 1968. */
+  /** El primer día en que corre. `null` en la primera: cubre todo lo anterior a la segunda (Chaco arranca en 1960). */
   desde: Fecha | null;
   /** Cuántos pesos moneda nacional vale una unidad. */
   unidad: number;

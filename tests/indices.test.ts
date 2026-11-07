@@ -391,7 +391,7 @@ describe("el caso real que lo destapó, con los datos de Neuquén congelados", (
 
 describe("las fechas que las preguntas frecuentes dicen a mano", () => {
   // El FAQ de `index.html` —y su copia en el JSON-LD, y dos párrafos de `datos.html`—
-  // nombra fechas de arranque: "Chaco en 1988, Santa Fe en diciembre de 2013, las seis
+  // nombra fechas de arranque: "Chaco en 1960, Santa Fe en diciembre de 2013, las seis
   // regiones en diciembre de 2016". Son texto estático, así que si el arranque de una
   // serie cambia, la página sigue afirmando lo viejo y nadie se entera. Ya pasó adentro de
   // este mismo cambio: el recorte por huecos movió a Mendoza de 1968 a 2016.
@@ -407,10 +407,10 @@ describe("las fechas que las preguntas frecuentes dicen a mano", () => {
   it("siguen siendo verdad", () => {
     // El nacional y Santa Fe llevan mes en la página ("desde enero de 1990", "Santa Fe en
     // diciembre de 2013") y se comparan al mes. Chaco y Córdoba sólo llevan el año ("Chaco
-    // en 1988", "Córdoba en 1968") y se comparan sólo al año: si el MCP reescribe las filas
-    // viejas de Chaco con el float completo, el corte por cifras puede mover su arranque
-    // unos meses adentro de 1988 sin volver falso ningún texto, y este test frenaría el
-    // pipeline igual.
+    // en 1960", "Córdoba en 1968") y se comparan sólo al año. Chaco arrancaba en 1988 hasta
+    // que el MCP reescribió sus filas viejas con el float completo (2026-10-02): ahí pasó a
+    // 1960, este test frenó el pipeline cinco semanas y con él todos los índices, CABA
+    // incluido. Cuando se ponga rojo, se arregla el texto el mismo día.
     expect({
       nacional: arranque(SLUG_NACIONAL),
       santaFe: arranque("santa-fe"),
@@ -419,7 +419,7 @@ describe("las fechas que las preguntas frecuentes dicen a mano", () => {
       santaFe: "2013-12",
     });
     expect({ chaco: anioDe("chaco"), cordoba: anioDe("cordoba") }).toEqual({
-      chaco: "1988",
+      chaco: "1960",
       cordoba: "1968",
     });
   });

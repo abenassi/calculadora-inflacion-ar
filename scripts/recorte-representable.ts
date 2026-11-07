@@ -21,7 +21,8 @@ import { decimales, DECIMALES_MINIMOS } from "./mismo-contenido.js";
  * guardadas antes no se reescribieron**: el colector del INDEC sólo reescribe los últimos 24
  * puntos de cada serie. Medido contra el MCP el 2026-09-11, Chaco (87 puntos), Mendoza (97) y
  * Tucumán (87) siguen trayendo por debajo de 0,01 valores con seis decimales o menos y de una
- * a cuatro cifras (arrancan en `0.000001`).
+ * a cuatro cifras (arrancan en `0.000001`). El 2026-10-02 el MCP reescribió las tres con el
+ * float completo: desde entonces el corte no le saca meses a ninguna y queda como defensa.
  *
  * Lo que está mal en esos puntos no es que sean chicos: es que no traen cifras. Córdoba vale
  * lo mismo de chico —`4.33e-13` en enero de 1968— y trae sin truncar el float que sale de la
