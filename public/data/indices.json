@@ -10,7 +10,7 @@
         "INDEC"
       ],
       "primerMes": "1990-01",
-      "ultimoOficial": "2026-08"
+      "ultimoOficial": "2026-09"
     },
     {
       "slug": "caba",
@@ -21,7 +21,7 @@
         "IDECBA"
       ],
       "primerMes": "2012-07",
-      "ultimoOficial": "2026-08"
+      "ultimoOficial": "2026-10"
     },
     {
       "slug": "chaco",
@@ -31,7 +31,7 @@
       "organismos": [
         "IPECD"
       ],
-      "primerMes": "1988-08",
+      "primerMes": "1960-01",
       "ultimoOficial": "2026-06"
     },
     {
@@ -76,7 +76,7 @@
         "DEyC Río Negro"
       ],
       "primerMes": "1989-09",
-      "ultimoOficial": "2026-08"
+      "ultimoOficial": "2026-09"
     },
     {
       "slug": "san-luis",
@@ -108,7 +108,7 @@
       "organismos": [
         "Estadística Tucumán"
       ],
-      "primerMes": "1989-03",
+      "primerMes": "1968-01",
       "ultimoOficial": "2026-07"
     },
     {
@@ -184,5 +184,5 @@
       "ultimoOficial": "2026-08"
     }
   ],
-  "actualizado": "2026-09-12T15:36:50.415Z"
+  "actualizado": "2026-11-07T14:08:45.847Z"
 }

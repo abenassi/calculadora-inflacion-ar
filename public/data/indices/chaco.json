@@ -8,7 +8,7 @@
       "organismo": "Instituto Provincial de Estadísticas y Ciencia de Datos del Chaco",
       "organismoCorto": "IPECD",
       "url": "https://dipiet.chaco.gob.ar/",
-      "rango": "1988-08/2026-06",
+      "rango": "1960-01/2026-06",
       "etiqueta": {
         "corta": "IPC de Chaco",
         "larga": "el IPC de la Provincia del Chaco",
@@ -17,1331 +17,3046 @@
     }
   ],
   "ultimo_oficial": "2026-06",
-  "actualizado": "2026-09-05T14:13:14.395Z",
+  "actualizado": "2026-11-07T14:08:42.742Z",
   "datos": [
     {
+      "mes": "1960-01",
+      "indice": 1.163225e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-02",
+      "indice": 1.16330592e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-03",
+      "indice": 1.1819984400000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-04",
+      "indice": 1.1819984400000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-05",
+      "indice": 1.17884256e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-06",
+      "indice": 1.17261172e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-07",
+      "indice": 1.1819984400000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-08",
+      "indice": 1.18822928e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-09",
+      "indice": 1.19130424e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-10",
+      "indice": 1.2006909600000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-11",
+      "indice": 1.2287702e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1960-12",
+      "indice": 1.34416212e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-01",
+      "indice": 1.2599244e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-02",
+      "indice": 1.27554196e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-03",
+      "indice": 1.2911595200000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-04",
+      "indice": 1.31923876e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-05",
+      "indice": 1.32854456e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-06",
+      "indice": 1.3472370800000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-07",
+      "indice": 1.36601052e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-08",
+      "indice": 1.3784722e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-09",
+      "indice": 1.3909338800000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-10",
+      "indice": 1.3940897600000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-11",
+      "indice": 1.4377056400000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1961-12",
+      "indice": 1.56248428e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-01",
+      "indice": 1.7433404800000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-02",
+      "indice": 1.76518888e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-03",
+      "indice": 1.7838814e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-04",
+      "indice": 1.84627072e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-05",
+      "indice": 1.91804676e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-06",
+      "indice": 1.98351104e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-07",
+      "indice": 2.0459003600000003e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-08",
+      "indice": 2.0926721200000003e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-09",
+      "indice": 2.1488306e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-10",
+      "indice": 2.16129228e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-11",
+      "indice": 2.1488306e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1962-12",
+      "indice": 2.1581364000000004e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-01",
+      "indice": 2.24860496e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-02",
+      "indice": 2.25167992e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-03",
+      "indice": 2.2985326000000003e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-04",
+      "indice": 2.33284268e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-05",
+      "indice": 2.37645856e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-06",
+      "indice": 2.40769368e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-07",
+      "indice": 2.45446544e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-08",
+      "indice": 2.4793888e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-09",
+      "indice": 2.55108392e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-10",
+      "indice": 2.56670148e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-11",
+      "indice": 2.5853940000000003e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1963-12",
+      "indice": 2.61347324e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-01",
+      "indice": 2.8224896000000003e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-02",
+      "indice": 2.84741296e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-03",
+      "indice": 2.8536438000000004e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-04",
+      "indice": 2.9721916e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-05",
+      "indice": 3.08442764e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-06",
+      "indice": 3.16550948e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-07",
+      "indice": 3.22474292e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-08",
+      "indice": 3.2435163600000006e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-09",
+      "indice": 3.2715956e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-10",
+      "indice": 3.26843972e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-11",
+      "indice": 3.333904e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1964-12",
+      "indice": 3.52107196e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-01",
+      "indice": 3.5459953200000005e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-02",
+      "indice": 3.64269472e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-03",
+      "indice": 3.67384892e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-04",
+      "indice": 3.88909612e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-05",
+      "indice": 3.94517368e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-06",
+      "indice": 3.53037776e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-07",
+      "indice": 4.225885160000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-08",
+      "indice": 4.31635372e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-09",
+      "indice": 4.36935632e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-10",
+      "indice": 4.6282194e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-11",
+      "indice": 4.7030704e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1965-12",
+      "indice": 4.94631592e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-01",
+      "indice": 4.99308768e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-02",
+      "indice": 5.11163548e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-03",
+      "indice": 5.17086892e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-04",
+      "indice": 5.401652760000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-05",
+      "indice": 5.54204896e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-06",
+      "indice": 5.766601960000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-07",
+      "indice": 5.96307572e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-08",
+      "indice": 5.93499648e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-09",
+      "indice": 5.94122732e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-10",
+      "indice": 6.103391e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-11",
+      "indice": 6.18762872e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1966-12",
+      "indice": 6.33417484e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-01",
+      "indice": 6.43710508e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-02",
+      "indice": 6.56188372e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-03",
+      "indice": 6.624273040000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-04",
+      "indice": 6.798898400000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-05",
+      "indice": 6.87682436e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-06",
+      "indice": 7.017220560000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-07",
+      "indice": 7.08584072e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-08",
+      "indice": 7.13261248e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-09",
+      "indice": 7.3540096e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-10",
+      "indice": 7.28538944e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-11",
+      "indice": 7.35716548e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1967-12",
+      "indice": 7.51932916e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-01",
+      "indice": 7.61602856e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-02",
+      "indice": 7.6534136e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-03",
+      "indice": 7.66280032e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-04",
+      "indice": 7.622340320000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-05",
+      "indice": 7.722033760000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-06",
+      "indice": 7.622259400000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-07",
+      "indice": 7.58794932e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-08",
+      "indice": 7.57233176e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-09",
+      "indice": 7.58794932e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-10",
+      "indice": 7.650338640000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-11",
+      "indice": 7.74072628e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1968-12",
+      "indice": 7.812502320000002e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-01",
+      "indice": 7.768805520000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-02",
+      "indice": 7.809346440000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-03",
+      "indice": 7.843656520000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-04",
+      "indice": 7.824964e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-05",
+      "indice": 7.87173576e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-06",
+      "indice": 7.9309692e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-07",
+      "indice": 7.97159104e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-08",
+      "indice": 7.98712768e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-09",
+      "indice": 8.12129304e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-10",
+      "indice": 8.19298816e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-11",
+      "indice": 8.2303732e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1969-12",
+      "indice": 8.314610920000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-01",
+      "indice": 8.3707694e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-02",
+      "indice": 8.426927880000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-03",
+      "indice": 8.47054376e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-04",
+      "indice": 8.508009720000001e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-05",
+      "indice": 8.56408728e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-06",
+      "indice": 8.85726044e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-07",
+      "indice": 8.9914258e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-08",
+      "indice": 9.14735864e-11,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-09",
+      "indice": 1.004557064e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-10",
+      "indice": 1.0114190799999999e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-11",
+      "indice": 1.045721068e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1970-12",
+      "indice": 1.048528992e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-01",
+      "indice": 1.1274340840000002e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-02",
+      "indice": 1.1586206520000002e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-03",
+      "indice": 1.190745892e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-04",
+      "indice": 1.213508688e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-05",
+      "indice": 1.244072172e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-06",
+      "indice": 1.2852442680000002e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-07",
+      "indice": 1.357602932e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-08",
+      "indice": 1.4399390320000002e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-09",
+      "indice": 1.477987616e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-10",
+      "indice": 1.487649464e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-11",
+      "indice": 1.5462840960000003e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1971-12",
+      "indice": 1.58870236e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-01",
+      "indice": 1.7181339e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-02",
+      "indice": 1.91367708e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-03",
+      "indice": 1.979796812e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-04",
+      "indice": 2.098935328e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-05",
+      "indice": 2.184702436e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-06",
+      "indice": 2.2554993440000003e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-07",
+      "indice": 2.45353486e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-08",
+      "indice": 2.494706956e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-09",
+      "indice": 2.5118619960000003e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-10",
+      "indice": 2.650016712e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-11",
+      "indice": 2.716759528e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1972-12",
+      "indice": 2.7485772720000003e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-01",
+      "indice": 2.985915632e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-02",
+      "indice": 3.1668042e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-03",
+      "indice": 3.29498148e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-04",
+      "indice": 3.510180128e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-05",
+      "indice": 3.725378776e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-06",
+      "indice": 3.33677666e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-07",
+      "indice": 3.348000264e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-08",
+      "indice": 3.46932362e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-09",
+      "indice": 3.558206148e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-10",
+      "indice": 3.5928237240000006e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-11",
+      "indice": 3.633680232e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1973-12",
+      "indice": 3.63618066e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-01",
+      "indice": 3.6480354400000005e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-02",
+      "indice": 3.74473484e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-03",
+      "indice": 3.75315052e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-04",
+      "indice": 3.8005696400000006e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-05",
+      "indice": 3.83083372e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-06",
+      "indice": 4.037908e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-07",
+      "indice": 4.1750674000000005e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-08",
+      "indice": 4.39468428e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-09",
+      "indice": 4.42397732e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-10",
+      "indice": 4.660992e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-11",
+      "indice": 4.80292568e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1974-12",
+      "indice": 5.10702304e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-01",
+      "indice": 5.6777518e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-02",
+      "indice": 6.27526508e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-03",
+      "indice": 6.947386599999998e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-04",
+      "indice": 7.14386036e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-05",
+      "indice": 7.409601640000001e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-06",
+      "indice": 9.70748688e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-07",
+      "indice": 1.357101228e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-08",
+      "indice": 1.575763252e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-09",
+      "indice": 1.688379616e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-10",
+      "indice": 1.93847906e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-11",
+      "indice": 2.16817048e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1975-12",
+      "indice": 2.730710136e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-01",
+      "indice": 2.94645904e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-02",
+      "indice": 4.02560816e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-03",
+      "indice": 5.54884624e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-04",
+      "indice": 6.735942640000001e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-05",
+      "indice": 7.3682515200000015e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-06",
+      "indice": 7.71766408e-9,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-07",
+      "indice": 8.7207484e-10,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-08",
+      "indice": 1.014793444e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-09",
+      "indice": 1.0911414640000002e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-10",
+      "indice": 1.130161088e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-11",
+      "indice": 1.219958012e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1976-12",
+      "indice": 1.30135544e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-01",
+      "indice": 1.4055804e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-02",
+      "indice": 1.561756e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-03",
+      "indice": 1.6832169200000002e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-04",
+      "indice": 1.7628422000000003e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-05",
+      "indice": 1.81956712e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-06",
+      "indice": 1.93204592e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-07",
+      "indice": 2.1626679200000006e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-08",
+      "indice": 2.31641592e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-09",
+      "indice": 2.45252336e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-10",
+      "indice": 2.83478944e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-11",
+      "indice": 3.119466e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1977-12",
+      "indice": 3.35324388e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-01",
+      "indice": 3.85753732e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-02",
+      "indice": 4.1829166400000004e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-03",
+      "indice": 4.48806596e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-04",
+      "indice": 4.99066008e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-05",
+      "indice": 5.3187906800000016e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-06",
+      "indice": 5.75130808e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-07",
+      "indice": 6.06730068e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-08",
+      "indice": 6.45717324e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-09",
+      "indice": 6.970448800000001e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-10",
+      "indice": 7.63828156e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-11",
+      "indice": 8.29373356e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1978-12",
+      "indice": 8.8109742e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-01",
+      "indice": 9.922086720000001e-8,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-02",
+      "indice": 1.0875648e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-03",
+      "indice": 1.1733480920000001e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-04",
+      "indice": 1.2335930320000004e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-05",
+      "indice": 1.331757084e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-06",
+      "indice": 1.4606950120000004e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-07",
+      "indice": 1.551527712e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-08",
+      "indice": 1.804248964e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-09",
+      "indice": 1.945211604e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-10",
+      "indice": 2.0415468640000002e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-11",
+      "indice": 2.1190844080000002e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1979-12",
+      "indice": 2.243490816e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-01",
+      "indice": 2.3109942800000007e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-02",
+      "indice": 2.4793888e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-03",
+      "indice": 2.61662912e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-04",
+      "indice": 2.744563640000001e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-05",
+      "indice": 2.85679968e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-06",
+      "indice": 3.031425040000001e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-07",
+      "indice": 3.1780520800000005e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-08",
+      "indice": 3.255978040000001e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-09",
+      "indice": 3.411910880000001e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-10",
+      "indice": 3.6895474e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-11",
+      "indice": 3.8485552e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1980-12",
+      "indice": 3.9982572000000004e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-01",
+      "indice": 4.0544156800000003e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-02",
+      "indice": 4.35689464e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-03",
+      "indice": 4.553449320000001e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-04",
+      "indice": 4.96508936e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-05",
+      "indice": 5.39234696e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-06",
+      "indice": 6.16270536e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-07",
+      "indice": 6.83943932e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-08",
+      "indice": 7.41647984e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-09",
+      "indice": 7.95597348e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-10",
+      "indice": 8.458163000000001e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-11",
+      "indice": 9.240902160000002e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1981-12",
+      "indice": 9.82101764e-7,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-01",
+      "indice": 0.000001065376536,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-02",
+      "indice": 0.000001151766728,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-03",
+      "indice": 0.000001214139864,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-04",
+      "indice": 0.000001263420144,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-05",
+      "indice": 0.00000131175366,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-06",
+      "indice": 0.000001489526808,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-07",
+      "indice": 0.00000176741418,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-08",
+      "indice": 0.00000204217804,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-09",
+      "indice": 0.000002388046304,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-10",
+      "indice": 0.000002788810696000001,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-11",
+      "indice": 0.0000030295800640000003,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1982-12",
+      "indice": 0.000003235731856000001,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-01",
+      "indice": 0.000003657389792,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-02",
+      "indice": 0.000004139551612,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-03",
+      "indice": 0.0000045646405560000005,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-04",
+      "indice": 0.000005062711248000001,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-05",
+      "indice": 0.000005592276004,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-06",
+      "indice": 0.00000669196262,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-07",
+      "indice": 0.000007536832156,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-08",
+      "indice": 0.000009017004612,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-09",
+      "indice": 0.000010977785224000002,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-10",
+      "indice": 0.000012733029036,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-11",
+      "indice": 0.000015581413036000003,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1983-12",
+      "indice": 0.000017564948352,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-01",
+      "indice": 0.0000200718014,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-02",
+      "indice": 0.000022885308880000003,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-03",
+      "indice": 0.000027575270240000004,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-04",
+      "indice": 0.00003291963164,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-05",
+      "indice": 0.0000378507346,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-06",
+      "indice": 0.00004466929656,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-07",
+      "indice": 0.00005228289752,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-08",
+      "indice": 0.0000631511818,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-09",
+      "indice": 0.00008010796780000001,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-10",
+      "indice": 0.00009605616692,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-11",
+      "indice": 0.00010900684648,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1984-12",
+      "indice": 0.00012603597496,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-01",
+      "indice": 0.0001627471132,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-02",
+      "indice": 0.00019386069136,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-03",
+      "indice": 0.00023954359184,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-04",
+      "indice": 0.00030340120524,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-05",
+      "indice": 0.00037921928016,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-06",
+      "indice": 0.00048549564308,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-07",
+      "indice": 0.00048972686896,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-08",
+      "indice": 0.00051497552736,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-09",
+      "indice": 0.00051981057828,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-10",
+      "indice": 0.00052769801252,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-11",
+      "indice": 0.0005330151848,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1985-12",
+      "indice": 0.00055498569308,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-01",
+      "indice": 0.00056284132576,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-02",
+      "indice": 0.00058961880572,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-03",
+      "indice": 0.00061400955028,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-04",
+      "indice": 0.0006586669516,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-05",
+      "indice": 0.00068612747728,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-06",
+      "indice": 0.0007075737858,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-07",
+      "indice": 0.00075391440404,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-08",
+      "indice": 0.00083095631304,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-09",
+      "indice": 0.00087688933724,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-10",
+      "indice": 0.00092745843008,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-11",
+      "indice": 0.00097278924764,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1986-12",
+      "indice": 0.00103887984844,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-01",
+      "indice": 0.00109668982472,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-02",
+      "indice": 0.00119140085848,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-03",
+      "indice": 0.00126426357316,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-04",
+      "indice": 0.00129580529904,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-05",
+      "indice": 0.0013643570007199,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-06",
+      "indice": 0.0014761903828,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-07",
+      "indice": 0.00162521176468,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-08",
+      "indice": 0.00187750025652,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-09",
+      "indice": 0.00213853563392,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-10",
+      "indice": 0.00250046813632,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-11",
+      "indice": 0.00273239658972,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1987-12",
+      "indice": 0.0028685941746,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1988-01",
+      "indice": 0.00310312016,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1988-02",
+      "indice": 0.00356954304,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1988-03",
+      "indice": 0.0040451908,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1988-04",
+      "indice": 0.00457303196,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1988-05",
+      "indice": 0.00534743636,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1988-06",
+      "indice": 0.00640740744,
+      "origen": "ipecd-chaco"
+    },
+    {
+      "mes": "1988-07",
+      "indice": 0.00821386552,
+      "origen": "ipecd-chaco"
+    },
+    {
       "mes": "1988-08",
-      "indice": 0.01064,
+      "indice": 0.01063968528,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1988-09",
-      "indice": 0.011727,
+      "indice": 0.0117265218,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1988-10",
-      "indice": 0.012341,
+      "indice": 0.0123411092,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1988-11",
-      "indice": 0.013154,
+      "indice": 0.01315386968,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1988-12",
-      "indice": 0.013982,
+      "indice": 0.01398240956,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-01",
-      "indice": 0.015071,
+      "indice": 0.0150709454,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-02",
-      "indice": 0.016718,
+      "indice": 0.01671823384,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-03",
-      "indice": 0.019714,
+      "indice": 0.0197137304,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-04",
-      "indice": 0.026512,
+      "indice": 0.02651214328,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-05",
-      "indice": 0.050012,
+      "indice": 0.05001163496,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-06",
-      "indice": 0.107432,
+      "indice": 0.1074318196,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-07",
-      "indice": 0.289589,
+      "indice": 0.28958929412,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-08",
-      "indice": 0.398541,
+      "indice": 0.3985407104,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-09",
-      "indice": 0.448358,
+      "indice": 0.4483582992,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-10",
-      "indice": 0.476583,
+      "indice": 0.47658311428,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-11",
-      "indice": 0.50502,
+      "indice": 0.5050201016,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1989-12",
-      "indice": 0.746077,
+      "indice": 0.74607722112,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-01",
-      "indice": 1.174335,
+      "indice": 1.174335316,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-02",
-      "indice": 2.041296,
+      "indice": 2.041296012,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-03",
-      "indice": 3.561063,
+      "indice": 3.561062624,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-04",
-      "indice": 4.027939,
+      "indice": 4.027938656000001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-05",
-      "indice": 4.651719,
+      "indice": 4.651718568000001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-06",
-      "indice": 5.180644,
+      "indice": 5.180644056,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-07",
-      "indice": 5.616892,
+      "indice": 5.616891868,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-08",
-      "indice": 6.486013,
+      "indice": 6.486013128,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-09",
-      "indice": 7.506487,
+      "indice": 7.506487156,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-10",
-      "indice": 8.027911,
+      "indice": 8.027911360000001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-11",
-      "indice": 8.461578,
+      "indice": 8.461577824,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1990-12",
-      "indice": 8.906144,
+      "indice": 8.906144212000001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-01",
-      "indice": 9.542111,
+      "indice": 9.542110676,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-02",
-      "indice": 12.128953,
+      "indice": 12.128953144000002,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-03",
-      "indice": 13.720472,
+      "indice": 13.72047152,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-04",
-      "indice": 14.35291,
+      "indice": 14.352909872,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-05",
-      "indice": 14.841586,
+      "indice": 14.841585752000002,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-06",
-      "indice": 15.465924,
+      "indice": 15.465924012000002,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-07",
-      "indice": 15.966714,
+      "indice": 15.966713616,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-08",
-      "indice": 16.245969,
+      "indice": 16.245968536,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-09",
-      "indice": 16.612245,
+      "indice": 16.612244824,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-10",
-      "indice": 16.82326,
+      "indice": 16.823259908,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-11",
-      "indice": 16.96593,
+      "indice": 16.96592996,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1991-12",
-      "indice": 17.136218,
+      "indice": 17.136218008,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-01",
-      "indice": 17.451822,
+      "indice": 17.451822192,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-02",
-      "indice": 17.87611,
+      "indice": 17.876110028,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-03",
-      "indice": 18.18745,
+      "indice": 18.187449728,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-04",
-      "indice": 18.54947,
+      "indice": 18.549469624,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-05",
-      "indice": 18.669701,
+      "indice": 18.669700560000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-06",
-      "indice": 18.792885,
+      "indice": 18.792885076,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-07",
-      "indice": 18.988695,
+      "indice": 18.988695292000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-08",
-      "indice": 19.072043,
+      "indice": 19.072042892,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-09",
-      "indice": 19.264268,
+      "indice": 19.264268352,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-10",
-      "indice": 19.488773,
+      "indice": 19.4887728,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-11",
-      "indice": 19.705865,
+      "indice": 19.705864976,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1992-12",
-      "indice": 19.857679,
+      "indice": 19.857678988,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-01",
-      "indice": 19.795888,
+      "indice": 19.795888476,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-02",
-      "indice": 20.083656,
+      "indice": 20.08365618,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-03",
-      "indice": 20.345529,
+      "indice": 20.345529484000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-04",
-      "indice": 20.49931,
+      "indice": 20.499309852000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-05",
-      "indice": 20.62616,
+      "indice": 20.626160044,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-06",
-      "indice": 20.927951,
+      "indice": 20.927951184,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-07",
-      "indice": 20.924302,
+      "indice": 20.924301692,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-08",
-      "indice": 20.968516,
+      "indice": 20.96851638,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-09",
-      "indice": 21.098393,
+      "indice": 21.09839298,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-10",
-      "indice": 21.255977,
+      "indice": 21.255976588000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-11",
-      "indice": 21.405913,
+      "indice": 21.405913256,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1993-12",
-      "indice": 21.45046,
+      "indice": 21.450459716,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-01",
-      "indice": 21.529122,
+      "indice": 21.529122048,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-02",
-      "indice": 21.572649,
+      "indice": 21.572648916,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-03",
-      "indice": 21.468618,
+      "indice": 21.468618164,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-04",
-      "indice": 21.489884,
+      "indice": 21.48988394,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-05",
-      "indice": 21.499894,
+      "indice": 21.499893744,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-06",
-      "indice": 21.540669,
+      "indice": 21.540669332,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-07",
-      "indice": 21.616103,
+      "indice": 21.616102956,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-08",
-      "indice": 21.659654,
+      "indice": 21.6596541,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-09",
-      "indice": 21.695939,
+      "indice": 21.695938628000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-10",
-      "indice": 21.834368,
+      "indice": 21.834368472,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-11",
-      "indice": 21.89976,
+      "indice": 21.899759924,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1994-12",
-      "indice": 22.014925,
+      "indice": 22.014925268,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-01",
-      "indice": 22.199229,
+      "indice": 22.199228660000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-02",
-      "indice": 22.252523,
+      "indice": 22.252522572,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-03",
-      "indice": 22.30224,
+      "indice": 22.30223982,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-04",
-      "indice": 22.504524,
+      "indice": 22.504523636,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-05",
-      "indice": 22.699444,
+      "indice": 22.699443732,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-06",
-      "indice": 22.730533,
+      "indice": 22.730533196,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-07",
-      "indice": 22.862514,
+      "indice": 22.862513716,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-08",
-      "indice": 22.908492,
+      "indice": 22.90849246,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-09",
-      "indice": 22.922678,
+      "indice": 22.922677736,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-10",
-      "indice": 22.963243,
+      "indice": 22.963242932,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-11",
-      "indice": 22.986289,
+      "indice": 22.986288948,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1995-12",
-      "indice": 23.101422,
+      "indice": 23.101421924000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-01",
-      "indice": 23.182075,
+      "indice": 23.182074888,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-02",
-      "indice": 23.20118,
+      "indice": 23.2011801,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-03",
-      "indice": 23.236348,
+      "indice": 23.236347932,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-04",
-      "indice": 23.234875,
+      "indice": 23.234875188000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-05",
-      "indice": 23.220819,
+      "indice": 23.220819384,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-06",
-      "indice": 23.232092,
+      "indice": 23.232091540000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-07",
-      "indice": 23.255761,
+      "indice": 23.25576064,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-08",
-      "indice": 23.265512,
+      "indice": 23.2655115,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-09",
-      "indice": 23.26569,
+      "indice": 23.265689524000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-10",
-      "indice": 23.346448,
+      "indice": 23.346447684,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-11",
-      "indice": 23.390768,
+      "indice": 23.390767568000005,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1996-12",
-      "indice": 23.402234,
+      "indice": 23.402233932,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-01",
-      "indice": 23.383315,
+      "indice": 23.383314836,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-02",
-      "indice": 23.376857,
+      "indice": 23.37685742,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-03",
-      "indice": 23.406749,
+      "indice": 23.406749268,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-04",
-      "indice": 23.444531,
+      "indice": 23.444530816,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-05",
-      "indice": 23.415254,
+      "indice": 23.41525396,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-06",
-      "indice": 23.403885,
+      "indice": 23.403884700000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-07",
-      "indice": 23.425943,
+      "indice": 23.425943492,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-08",
-      "indice": 23.45785,
+      "indice": 23.457850248000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-09",
-      "indice": 23.450017,
+      "indice": 23.450017192,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-10",
-      "indice": 23.467091,
+      "indice": 23.467091312,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-11",
-      "indice": 23.372383,
+      "indice": 23.372382544,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1997-12",
-      "indice": 23.409145,
+      "indice": 23.4091445,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-01",
-      "indice": 23.493382,
+      "indice": 23.49338222,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-02",
-      "indice": 23.493148,
+      "indice": 23.493147552,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-03",
-      "indice": 23.448763,
+      "indice": 23.448762932,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-04",
-      "indice": 23.505019,
+      "indice": 23.505018516,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-05",
-      "indice": 23.515425,
+      "indice": 23.515424828000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-06",
-      "indice": 23.557349,
+      "indice": 23.557349480000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-07",
-      "indice": 23.550625,
+      "indice": 23.550625028,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-08",
-      "indice": 23.659187,
+      "indice": 23.659187300000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-09",
-      "indice": 23.65977,
+      "indice": 23.659769924000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-10",
-      "indice": 23.69794,
+      "indice": 23.697939888000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-11",
-      "indice": 23.670103,
+      "indice": 23.670103408000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1998-12",
-      "indice": 23.719368,
+      "indice": 23.719367504,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-01",
-      "indice": 23.696856,
+      "indice": 23.696855560000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-02",
-      "indice": 23.651144,
+      "indice": 23.651143852,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-03",
-      "indice": 23.657334,
+      "indice": 23.657334232,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-04",
-      "indice": 23.641191,
+      "indice": 23.641190692,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-05",
-      "indice": 23.658257,
+      "indice": 23.65825672,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-06",
-      "indice": 23.605513,
+      "indice": 23.605513064000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-07",
-      "indice": 23.594702,
+      "indice": 23.594702152,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-08",
-      "indice": 23.506807,
+      "indice": 23.506806848000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-09",
-      "indice": 23.533065,
+      "indice": 23.533065388000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-10",
-      "indice": 23.477449,
+      "indice": 23.477449072,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-11",
-      "indice": 23.486714,
+      "indice": 23.486714412,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "1999-12",
-      "indice": 23.451514,
+      "indice": 23.451514212,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-01",
-      "indice": 23.511152,
+      "indice": 23.511152252,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-02",
-      "indice": 23.62915,
+      "indice": 23.629149796,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-03",
-      "indice": 23.544224,
+      "indice": 23.544224256,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-04",
-      "indice": 23.412689,
+      "indice": 23.412688796,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-05",
-      "indice": 23.448391,
+      "indice": 23.4483907,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-06",
-      "indice": 23.401433,
+      "indice": 23.401432824000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-07",
-      "indice": 23.400211,
+      "indice": 23.400210932,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-08",
-      "indice": 23.343276,
+      "indice": 23.34327562,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-09",
-      "indice": 23.345137,
+      "indice": 23.34513678,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-10",
-      "indice": 23.411467,
+      "indice": 23.411466904,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-11",
-      "indice": 23.427635,
+      "indice": 23.42763472,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2000-12",
-      "indice": 23.39661,
+      "indice": 23.396609992,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-01",
-      "indice": 23.412284,
+      "indice": 23.412284196,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-02",
-      "indice": 23.392378,
+      "indice": 23.392377876,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-03",
-      "indice": 23.597834,
+      "indice": 23.597833756,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-04",
-      "indice": 23.517618,
+      "indice": 23.51761776,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-05",
-      "indice": 23.52172,
+      "indice": 23.521720404000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-06",
-      "indice": 23.566769,
+      "indice": 23.566768568000004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-07",
-      "indice": 23.556824,
+      "indice": 23.5568235,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-08",
-      "indice": 23.556767,
+      "indice": 23.556766856,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-09",
-      "indice": 23.613233,
+      "indice": 23.613232832,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-10",
-      "indice": 23.64552,
+      "indice": 23.645519912,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-11",
-      "indice": 23.610053,
+      "indice": 23.610052676,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2001-12",
-      "indice": 23.839898,
+      "indice": 23.839897844000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-01",
-      "indice": 24.097296,
+      "indice": 24.097296272,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-02",
-      "indice": 24.594477,
+      "indice": 24.594476844000003,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-03",
-      "indice": 25.586516,
+      "indice": 25.586515584,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-04",
-      "indice": 28.150749,
+      "indice": 28.150749004,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-05",
-      "indice": 29.478792,
+      "indice": 29.47879186,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-06",
-      "indice": 31.135831,
+      "indice": 31.13583116,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-07",
-      "indice": 32.071372,
+      "indice": 32.071371556,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-08",
-      "indice": 33.612428,
+      "indice": 33.612428220000005,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-09",
-      "indice": 34.091742,
+      "indice": 34.091741656,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-10",
-      "indice": 34.572649,
+      "indice": 34.572649216,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-11",
-      "indice": 34.557865,
+      "indice": 34.557865132,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2002-12",
-      "indice": 35.06686,
+      "indice": 35.066860024,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-01",
-      "indice": 35.144066,
+      "indice": 35.144065796,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-02",
-      "indice": 35.341939,
+      "indice": 35.341939472,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-03",
-      "indice": 35.835908,
+      "indice": 35.83590752,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-04",
-      "indice": 35.875922,
+      "indice": 35.875922460000005,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-05",
-      "indice": 35.682839,
+      "indice": 35.682839248,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-06",
-      "indice": 35.642136,
+      "indice": 35.642136488000006,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-07",
-      "indice": 35.773041,
+      "indice": 35.773040772,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-08",
-      "indice": 35.673428,
+      "indice": 35.673428252,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-09",
-      "indice": 35.649047,
+      "indice": 35.649047056,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-10",
-      "indice": 35.68029,
+      "indice": 35.68029026800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-11",
-      "indice": 35.575693,
+      "indice": 35.575693076,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2003-12",
-      "indice": 35.98811,
+      "indice": 35.988109948,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-01",
-      "indice": 36.029743,
+      "indice": 36.029743288000006,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-02",
-      "indice": 36.148728,
+      "indice": 36.148728056,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-03",
-      "indice": 36.688618,
+      "indice": 36.688618204,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-04",
-      "indice": 36.780349,
+      "indice": 36.780349116,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-05",
-      "indice": 37.322157,
+      "indice": 37.322157068,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-06",
-      "indice": 37.906472,
+      "indice": 37.906472296,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-07",
-      "indice": 38.338067,
+      "indice": 38.338067208000005,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-08",
-      "indice": 38.481441,
+      "indice": 38.481441264,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-09",
-      "indice": 38.540513,
+      "indice": 38.540512864,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-10",
-      "indice": 38.59324,
+      "indice": 38.593240336,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-11",
-      "indice": 38.974179,
+      "indice": 38.974179328000005,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2004-12",
-      "indice": 39.726687,
+      "indice": 39.726686776,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-01",
-      "indice": 39.768676,
+      "indice": 39.768676164000006,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-02",
-      "indice": 40.301915,
+      "indice": 40.301914688,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-03",
-      "indice": 41.445719,
+      "indice": 41.445718888,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-04",
-      "indice": 41.554564,
+      "indice": 41.55456438,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-05",
-      "indice": 41.622035,
+      "indice": 41.622035476,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-06",
-      "indice": 41.967208,
+      "indice": 41.96720782800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-07",
-      "indice": 42.192991,
+      "indice": 42.192990812,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-08",
-      "indice": 42.270836,
+      "indice": 42.270835852,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-09",
-      "indice": 42.678082,
+      "indice": 42.678081936000005,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-10",
-      "indice": 42.968342,
+      "indice": 42.968341976000005,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-11",
-      "indice": 43.463767,
+      "indice": 43.463766584,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2005-12",
-      "indice": 43.718195,
+      "indice": 43.71819524800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-01",
-      "indice": 44.288479,
+      "indice": 44.288478948000005,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-02",
-      "indice": 44.945954,
+      "indice": 44.945953948,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-03",
-      "indice": 45.139175,
+      "indice": 45.139174724,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-04",
-      "indice": 45.616263,
+      "indice": 45.61626286,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-05",
-      "indice": 45.657297,
+      "indice": 45.657297392,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-06",
-      "indice": 45.882741,
+      "indice": 45.882740512,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-07",
-      "indice": 46.013062,
+      "indice": 46.013062172,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-08",
-      "indice": 46.243806,
+      "indice": 46.243805552,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-09",
-      "indice": 46.632092,
+      "indice": 46.63209208,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-10",
-      "indice": 46.877628,
+      "indice": 46.87762763600001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-11",
-      "indice": 47.396818,
+      "indice": 47.396818448000005,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2006-12",
-      "indice": 48.325602,
+      "indice": 48.325602024,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-01",
-      "indice": 48.541715,
+      "indice": 48.541715068,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-02",
-      "indice": 48.863728,
+      "indice": 48.863728116,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-03",
-      "indice": 49.572927,
+      "indice": 49.57292718,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-04",
-      "indice": 50.520954,
+      "indice": 50.520953532,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-05",
-      "indice": 51.10221,
+      "indice": 51.102209984,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-06",
-      "indice": 52.66047,
+      "indice": 52.66047024,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-07",
-      "indice": 53.757414,
+      "indice": 53.757413668000005,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-08",
-      "indice": 55.55565,
+      "indice": 55.55565027600001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-09",
-      "indice": 57.904483,
+      "indice": 57.90448274800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-10",
-      "indice": 59.780127,
+      "indice": 59.78012742800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-11",
-      "indice": 60.104633,
+      "indice": 60.104632812,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2007-12",
-      "indice": 60.954527,
+      "indice": 60.95452748,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-01",
-      "indice": 61.682395,
+      "indice": 61.682394788,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-02",
-      "indice": 62.912605,
+      "indice": 62.912605364,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-03",
-      "indice": 66.146606,
+      "indice": 66.146605532,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-04",
-      "indice": 66.345094,
+      "indice": 66.3450942,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-05",
-      "indice": 67.172614,
+      "indice": 67.17261448800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-06",
-      "indice": 67.729376,
+      "indice": 67.72937645600001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-07",
-      "indice": 67.589992,
+      "indice": 67.589991756,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-08",
-      "indice": 67.491941,
+      "indice": 67.491940992,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-09",
-      "indice": 68.672475,
+      "indice": 68.67247478,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-10",
-      "indice": 69.445463,
+      "indice": 69.44546308000001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-11",
-      "indice": 71.051337,
+      "indice": 71.051336664,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2008-12",
-      "indice": 71.830693,
+      "indice": 71.83069336800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-01",
-      "indice": 71.922335,
+      "indice": 71.92233526800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-02",
-      "indice": 71.066339,
+      "indice": 71.066339232,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-03",
-      "indice": 72.838787,
+      "indice": 72.83878663600001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-04",
-      "indice": 73.420286,
+      "indice": 73.420285848,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-05",
-      "indice": 73.307338,
+      "indice": 73.307337712,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-06",
-      "indice": 74.912208,
+      "indice": 74.91220788800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-07",
-      "indice": 75.463176,
+      "indice": 75.463175984,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-08",
-      "indice": 76.109905,
+      "indice": 76.10990480800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-09",
-      "indice": 77.84025,
+      "indice": 77.840249536,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-10",
-      "indice": 79.690922,
+      "indice": 79.690922304,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-11",
-      "indice": 81.172446,
+      "indice": 81.172446124,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2009-12",
-      "indice": 84.415695,
+      "indice": 84.41569544800001,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2010-01",
-      "indice": 86.344853,
+      "indice": 86.344852524,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2010-02",
-      "indice": 90.561319,
+      "indice": 90.561318596,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2010-03",
-      "indice": 89.907744,
+      "indice": 89.90774394,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2010-04",
-      "indice": 89.32423,
+      "indice": 89.32422982,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2010-05",
-      "indice": 93.812182,
+      "indice": 93.81218249200002,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2010-06",
-      "indice": 95.807645,
+      "indice": 95.807645416,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2010-07",
-      "indice": 97.823031,
+      "indice": 97.823030844,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2010-08",
-      "indice": 98.516151,
+      "indice": 98.516151104,
       "origen": "ipecd-chaco"
     },
     {
@@ -1606,122 +3321,122 @@
     },
     {
       "mes": "2015-01",
-      "indice": 294.369308,
+      "indice": 294.36930779792044,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-02",
-      "indice": 301.027669,
+      "indice": 301.0276694143445,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-03",
-      "indice": 305.57806,
+      "indice": 305.57806027585326,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-04",
-      "indice": 310.559145,
+      "indice": 310.5591447144956,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-05",
-      "indice": 318.383206,
+      "indice": 318.3832060127267,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-06",
-      "indice": 324.082275,
+      "indice": 324.0822745354052,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-07",
-      "indice": 331.364758,
+      "indice": 331.36475792466007,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-08",
-      "indice": 339.234144,
+      "indice": 339.2341435960591,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-09",
-      "indice": 346.437781,
+      "indice": 346.4377813773661,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-10",
-      "indice": 351.535246,
+      "indice": 351.5352457909023,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-11",
-      "indice": 356.820994,
+      "indice": 356.8209943215332,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2015-12",
-      "indice": 367.214065,
+      "indice": 367.2140654575069,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-01",
-      "indice": 376.961345,
+      "indice": 376.9613451995346,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-02",
-      "indice": 384.680761,
+      "indice": 384.6807614719063,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-03",
-      "indice": 395.386131,
+      "indice": 395.3861308917776,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-04",
-      "indice": 408.643762,
+      "indice": 408.64376181692654,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-05",
-      "indice": 426.022403,
+      "indice": 426.0224027484347,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-06",
-      "indice": 438.627592,
+      "indice": 438.627592164211,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-07",
-      "indice": 448.743134,
+      "indice": 448.7431341036575,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-08",
-      "indice": 460.749336,
+      "indice": 460.7493359552624,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-09",
-      "indice": 470.072902,
+      "indice": 470.0729024310149,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-10",
-      "indice": 488.496583,
+      "indice": 488.4965830664717,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-11",
-      "indice": 487.367403,
+      "indice": 487.36740271290415,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2016-12",
-      "indice": 493.703612,
+      "indice": 493.70361168137066,
       "origen": "ipecd-chaco"
     },
     {
@@ -1911,7 +3626,7 @@
     },
     {
       "mes": "2020-02",
-      "indice": 1459.186286,
+      "indice": 1459.186286414494,
       "origen": "ipecd-chaco"
     },
     {
@@ -2021,17 +3736,17 @@
     },
     {
       "mes": "2021-12",
-      "indice": 2991.892322,
+      "indice": 2991.89232219041,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2022-01",
-      "indice": 3102.838268,
+      "indice": 3102.8382675348,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2022-02",
-      "indice": 3274.166829,
+      "indice": 3274.16682875211,
       "origen": "ipecd-chaco"
     },
     {
@@ -2076,102 +3791,102 @@
     },
     {
       "mes": "2022-11",
-      "indice": 5627.679572,
+      "indice": 5627.67957242494,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2022-12",
-      "indice": 5909.561396,
+      "indice": 5909.56139599731,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-01",
-      "indice": 6228.037516,
+      "indice": 6228.03751621807,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-02",
-      "indice": 6707.133295,
+      "indice": 6707.13329450103,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-03",
-      "indice": 7123.813203,
+      "indice": 7123.813202900101,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-04",
-      "indice": 7705.999443,
+      "indice": 7705.99944339999,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-05",
-      "indice": 8304.271312,
+      "indice": 8304.27131159008,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-06",
-      "indice": 8760.621812,
+      "indice": 8760.62181238036,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-07",
-      "indice": 9289.474566,
+      "indice": 9289.47456605881,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-08",
-      "indice": 10654.459216,
+      "indice": 10654.4592155834,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-09",
-      "indice": 12063.875668,
+      "indice": 12063.8756676158,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-10",
-      "indice": 13163.804199,
+      "indice": 13163.8041986064,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-11",
-      "indice": 14643.132415,
+      "indice": 14643.1324146002,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2023-12",
-      "indice": 18967.556085,
+      "indice": 18967.5560850882,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2024-01",
-      "indice": 23018.243122,
+      "indice": 23018.2431217908,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2024-02",
-      "indice": 25466.2526,
+      "indice": 25466.2525996908,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2024-03",
-      "indice": 27601.624287,
+      "indice": 27601.6242871818,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2024-04",
-      "indice": 29262.655191,
+      "indice": 29262.6551912647,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2024-05",
-      "indice": 30580.642714,
+      "indice": 30580.6427138933,
       "origen": "ipecd-chaco"
     },
     {
       "mes": "2024-06",
-      "indice": 31906.216799,
+      "indice": 31906.2167988767,
       "origen": "ipecd-chaco"
     },
     {
