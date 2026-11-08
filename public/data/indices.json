@@ -32,7 +32,11 @@
         "IPECD"
       ],
       "primerMes": "1960-01",
-      "ultimoOficial": "2026-06"
+      "ultimoOficial": "2026-06",
+      "salvedad": {
+        "hasta": "1988-12",
+        "texto": "Ojo con 1960 a 1988: son los números de la serie histórica que encadenó la provincia, y no los revisamos mes a mes. Traen saltos sin explicación, por ejemplo junio de 1965 (−10,51%, y julio rebota +19,70%) o junio de 1973 (−10,43%, sin rebote). Y el índice de julio de 1976 vale la décima parte que el de junio y el de agosto: una cuenta por mes que empieza en julio de 1976 da unas diez veces de más, y una que termina ahí, diez veces de menos; por día pasa lo mismo, en menor medida, con cualquier fecha del 2 de julio al 31 de agosto. Un período que sólo pasa por encima de esos meses no se ve afectado. Para esos años, tomá el resultado como una aproximación."
+      }
     },
     {
       "slug": "cordoba",

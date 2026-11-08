@@ -73,7 +73,7 @@ describe("agruparParaSelector", () => {
     // lo viejo: pasó con Córdoba, que decía "con datos desde 1990" arriba de un resultado de 1968.
     const publicado = INDICES.map((d) => {
       const p = catalogo.indices.find((i) => i.slug === d.slug);
-      return { slug: d.slug, nombre: p?.nombre, tipo: p?.tipo, enElSelector: p?.enElSelector, cubre: p?.cubre, organismos: p?.organismos };
+      return { slug: d.slug, nombre: p?.nombre, tipo: p?.tipo, enElSelector: p?.enElSelector, cubre: p?.cubre, organismos: p?.organismos, salvedad: p?.salvedad };
     });
     const declarado = INDICES.map((d) => ({
       slug: d.slug,
@@ -82,6 +82,7 @@ describe("agruparParaSelector", () => {
       enElSelector: d.enElSelector,
       cubre: d.cubre,
       organismos: [d.organismoCorto],
+      salvedad: d.salvedad,
     }));
     expect(publicado).toEqual(declarado);
   });
@@ -439,5 +440,55 @@ describe("una región del INDEC", () => {
     expect(nea.tipo).toBe("region");
     expect(nea.cubre).toContain("Formosa");
     expect(nea.cubre).toContain("No es el índice de ninguna de ellas");
+  });
+});
+
+describe("la salvedad de Chaco dice números que salen de chaco.json", () => {
+  // La salvedad (en `indices-declarados.ts`, y su párrafo en `datos.html`) cita a mano tres
+  // cosas de la serie histórica: junio de 1965 da −10,51%, julio +19,70%, y julio de 1976 vale
+  // la décima parte que sus vecinos. Igual que las fechas del FAQ, este test TIENE que frenar
+  // el pipeline si se pone rojo: quiere decir que la provincia (o datos.gob.ar) corrigió la
+  // serie y la página estaría avisando de un defecto que ya no está. Ese día se reescribe la
+  // salvedad, o se saca si ya no hace falta.
+  const datos = serieDe("chaco").datos;
+  const valor = (mes: string) => datos.find((p) => p.mes === mes)?.indice ?? Number.NaN;
+  const variacion = (mes: string) => {
+    const anterior = sumarMeses(mes, -1);
+    return ((valor(mes) / valor(anterior) - 1) * 100).toFixed(2).replace(".", ",").replace("-", "−");
+  };
+  const declarada = INDICES.find((i) => i.slug === "chaco")?.salvedad?.texto ?? "";
+  const pagina = readFileSync(resolve(import.meta.dirname, "../datos.html"), "utf8");
+  const parrafo = /<p id="salvedad-chaco">([\s\S]*?)<\/p>/.exec(pagina)?.[1] ?? "";
+
+  it("junio de 1973", () => {
+    expect(variacion("1973-06")).toBe("−10,43");
+    for (const texto of [declarada, parrafo]) expect(texto).toContain("−10,43%");
+  });
+
+  it("junio y julio de 1965", () => {
+    expect([variacion("1965-06"), variacion("1965-07")]).toEqual(["−10,51", "19,70"]);
+    for (const texto of [declarada, parrafo]) {
+      expect(texto).toContain("−10,51%");
+      expect(texto).toContain("+19,70%");
+    }
+  });
+
+  it("julio de 1976 vale alrededor de la décima parte de junio y de agosto", () => {
+    for (const vecino of ["1976-06", "1976-08"]) {
+      const razon = valor(vecino) / valor("1976-07");
+      expect(razon).toBeGreaterThan(8);
+      expect(razon).toBeLessThan(12);
+    }
+    for (const texto of [declarada, parrafo]) {
+      expect(texto).toMatch(/julio\s+de\s+1976\s+vale\s+la\s+décima\s+parte/);
+      // Y para qué lado: el índice de julio es bajo, así que empezar ahí da de más.
+      expect(texto).toMatch(/empieza\s+en\s+julio\s+de\s+1976\s+da\s+unas\s+diez\s+veces\s+de\s+más/);
+      expect(texto).toMatch(/del\s+2\s+de\s+julio\s+al\s+31\s+de\s+agosto/);
+    }
+  });
+
+  it("el tramo que cubre es el que dice la página", () => {
+    expect(INDICES.find((i) => i.slug === "chaco")?.salvedad?.hasta).toBe("1988-12");
+    expect(parrafo).toContain("de 1960 a 1988");
   });
 });

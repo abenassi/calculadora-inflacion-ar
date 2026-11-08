@@ -13,10 +13,12 @@ import {
   adjust,
   hoyFecha,
   mesActual,
+  hayMesesSinPublicar,
   RangoError,
   motivoParaEstimar,
   sumaDeVariaciones,
 } from "../engine/adjust.js";
+import { comoSujeto } from "../engine/sujeto.js";
 import * as analytics from "./analytics.js";
 import {
   aOrdinal,
@@ -38,11 +40,17 @@ import type { Fila, Mes, Metodologia, Punto, Resultado, SerieIndice } from "../e
 import {
   agruparParaSelector,
   buscarIndice,
+  indicesQueCubren,
   MESES_DE_ATRASO_TOLERADOS,
+  acotarPunto,
+  periodoAIntentar,
+  primerMesPedibleDe,
   rangoPedible,
+  tocaLaSalvedad,
   SLUG_NACIONAL,
   type CatalogoIndices,
   type EntradaCatalogo,
+  type PeriodoCorrido,
 } from "../engine/indices.js";
 import { dibujar } from "./chart.js";
 import {
@@ -157,11 +165,11 @@ function leerMetodologia(): Metodologia {
  * del calendario) y los atajos de fecha (`sincronizarAtajos`) tienen que estar de
  * acuerdo en el mismo piso — que quedaran separados es justo cómo un atajo podía
  * quedar habilitado un mes antes de donde el calendario ya no dejaba entrar, y tirar
- * el `RangoError` del motor en vez de aparecer gris.
+ * el `RangoError` del motor en vez de aparecer gris. Y el acotado del período
+ * (`acotarPunto`) también, por eso la cuenta vive en `indices.ts`.
  */
 function primerMesPedible(dias: boolean): Mes {
-  const { primero } = rangoPedible(serie);
-  return dias ? sumarMeses(primero, 1) : primero;
+  return primerMesPedibleDe(serie, dias);
 }
 
 function poblarSelects(): void {
@@ -265,6 +273,10 @@ function alternarModo(): void {
     campo.hidden = (campo.dataset.modo === "dia") !== dias;
   }
   el<HTMLButtonElement>("atajo-ahora").textContent = dias ? "hoy" : "ahora";
+  // Los campos por mes y por día guardan períodos distintos, así que cambiar de modo puede
+  // entrar o salir del tramo de la salvedad: Chaco de 1970 por mes y de 2024 por día mostraba
+  // la salvedad de un período que ya no estaba en pantalla, o la callaba al revés.
+  pintarNotaDelIndice(corridosVigentes);
   calcular();
 }
 
@@ -630,6 +642,13 @@ function armarExplicacion(r: Resultado): string {
         : null;
 
   const lineas: string[] = alerta ? [alerta, ""] : [];
+  // La salvedad del tramo viejo (Chaco 1960-1988) viaja con el texto, con la misma condición
+  // que en la nota del índice: sin ella, el mensaje decía "datos oficiales ya publicados" de
+  // un cálculo que la pantalla mandaba a tomar como aproximación. Va arriba por lo mismo que
+  // la alerta: quien lo recibe lee el principio.
+  if (indiceActivo.salvedad && tocaLaSalvedad(indiceActivo, r.desde, r.hasta)) {
+    lineas.push(indiceActivo.salvedad.texto, "");
+  }
 
   lineas.push(
     `${pesos(r.monto)} ${conPreposicion("de", r.desde)} equivalen a ` +
@@ -815,6 +834,12 @@ function poblarSelectorDeIndices(): void {
  * necesita.
  */
 function pintarNotaDelIndice(corridos: PeriodoCorrido[] = []): void {
+  // Lo que la nota dice que se pidió es lo que `cambiarIndice` intenta devolver. Se guarda
+  // acá, y no en cada llamador, para que las dos cosas no se separen: si la nota dice
+  // "pediste desde enero 1965", elegir un índice que llega a 1965 tiene que volver ahí; y
+  // si la persona tocó las fechas y la nota se borró, ya no hay pedido que devolver.
+  corridosVigentes = corridos;
+
   // El atraso se calcula SIEMPRE, incluso para el nacional, y por eso se resuelve antes de
   // cualquier `return`. `#aviso-atraso` vive en la tarjeta del resultado y lo enciende
   // cualquier índice: con el early return del nacional adentro del medio, volver de
@@ -847,6 +872,15 @@ function pintarNotaDelIndice(corridos: PeriodoCorrido[] = []): void {
   if (indiceActivo.slug !== SLUG_NACIONAL) {
     partes.push(`${indiceActivo.cubre} Lo publica ${fuenteDe([], serie).publicadosPor}.`);
   }
+  // La salvedad de un tramo viejo (los años 1960-1988 de Chaco) sólo cuando el período
+  // entra en él: con Chaco de 2024 a hoy sería ruido, y con 1965 es lo primero que hay que
+  // saber. Va al final, después de decir qué índice es.
+  const desde = leerPuntoLaxo("desde");
+  const hasta = leerPuntoLaxo("hasta");
+  const completo = (v: Punto) => esMesValido(v) || esFechaValida(v);
+  if (indiceActivo.salvedad && completo(desde) && completo(hasta) && tocaLaSalvedad(indiceActivo, desde, hasta)) {
+    partes.push(indiceActivo.salvedad.texto);
+  }
 
   const nota = el("nota-indice");
   nota.textContent = partes.join(" ");
@@ -874,7 +908,8 @@ function fraseDeLosCorridos(corridos: PeriodoCorrido[]): string[] {
       `${indiceActivo.nombre} tiene datos de ${nombrarMes(primero)} a ` +
         `${nombrarMes(indiceActivo.ultimoOficial)} y el cálculo no estima más allá de ` +
         `${nombrarMes(ultimo)}, así que se corrió el período: pediste ` +
-        `${conPreposicion("de", desde.pedido)} ${conPreposicion("a", hasta.pedido)}.`,
+        `${conPreposicion("de", desde.pedido)} ${conPreposicion("a", hasta.pedido)}.` +
+        quienCubre(desde.pedido),
     ];
   }
   return corridos.map(fraseDelCorrido);
@@ -899,10 +934,28 @@ function fraseDelCorrido(c: PeriodoCorrido): string {
       // recorte por el hueco. Lo mismo para Córdoba y Chaco, que encadenan desde 1968 y
       // 1960.
       `La serie de ${indiceActivo.nombre} que usamos arranca en ${nombrarMes(primero)}, ` +
-        `así que se corrió el período: pediste ${conPreposicion(punta, c.pedido)}.`
+        `así que se corrió el período: pediste ${conPreposicion(punta, c.pedido)}.` +
+        quienCubre(c.pedido)
     : `${indiceActivo.nombre} publicó hasta ${nombrarMes(indiceActivo.ultimoOficial)} y el ` +
         `cálculo no estima más allá de ${nombrarMes(ultimo)}, así que se corrió el ` +
         `período: pediste ${conPreposicion(punta, c.pedido)}.`;
+}
+
+/**
+ * La oración que dice qué otro índice llega al punto pedido, o nada si no llega ninguno.
+ *
+ * Sin ella el aviso decía qué pasó pero no qué hacer: quien llega con un link de 1965 al
+ * nacional no tiene cómo saber que Chaco mide desde 1960 sin probar los dieciséis.
+ */
+function quienCubre(pedido: Punto): string {
+  const otros = indicesQueCubren(catalogo, pedido, indiceActivo.slug).map((i) => i.nombre);
+  if (otros.length === 0) return "";
+  const lista =
+    otros.length === 1 ? otros[0]! : `${otros.slice(0, -1).join(", ")} y ${otros.at(-1)!}`;
+  return (
+    ` ${capitalizar(conPreposicion("desde", pedido))} hay datos en ${lista}: ` +
+    `${otros.length === 1 ? "lo" : "los"} elegís arriba, en «según el índice».`
+  );
 }
 
 /**
@@ -917,7 +970,7 @@ function fraseDelCorrido(c: PeriodoCorrido): string {
 function pintarTextosDeLaFuente(): void {
   const fuente = fuenteDe([], serie);
   el("rotulo-metodologia").textContent =
-    `Meses que ${fuente.publicadosPor} todavía no publicó:`;
+    `Meses que ${comoSujeto(fuente.publicadosPor)} todavía no publicó:`;
   // La bajada del encabezado también: quien eligió Tucumán no puede seguir leyendo arriba
   // de todo que el sitio calcula "según el IPC del INDEC".
   //
@@ -944,6 +997,9 @@ function pintarTextosDeLaFuente(): void {
  * año que el motor va a rechazar. Si el período que había cargado queda afuera, `calcular`
  * lo dice nombrando el mes en vez de recalcular otra cosa en silencio.
  */
+/** Las puntas que se corrieron y que la persona todavía no volvió a tocar. Ver `pintarNotaDelIndice`. */
+let corridosVigentes: PeriodoCorrido[] = [];
+
 async function cambiarIndice(slug: string): Promise<void> {
   const entrada = buscarIndice(catalogo, slug);
   const cargada = await cargarIndice(entrada.slug);
@@ -952,7 +1008,13 @@ async function cambiarIndice(slug: string): Promise<void> {
 
   // Los desplegables se rearman con el rango del índice nuevo, y `innerHTML` se lleva
   // puesta la selección: hay que leer el período ANTES y volver a escribirlo después.
-  const antes = { desde: leerPuntoLaxo("desde"), hasta: leerPuntoLaxo("hasta") };
+  // Lo que se había pedido y el índice anterior no alcanzaba vuelve a intentarse: si no,
+  // un link con `desde=1965-01` abierto con el nacional quedaba en 1990 aun eligiendo
+  // Chaco, que mide desde 1960.
+  const antes = periodoAIntentar(
+    { desde: leerPuntoLaxo("desde"), hasta: leerPuntoLaxo("hasta") },
+    corridosVigentes,
+  );
   poblarSelects();
   const corrido = escribirPeriodoAcotado(antes);
 
@@ -971,15 +1033,6 @@ function leerPuntoLaxo(prefijo: "desde" | "hasta"): Punto {
   return `${anio}-${mes}`;
 }
 
-/** Una punta del período que no entraba en el índice elegido, y contra qué extremo se topó. */
-type PeriodoCorrido = {
-  punta: "desde" | "hasta";
-  /** El punto que se había pedido. La nota lo nombra: correrlo en silencio sería cambiarle
-   * la pregunta a la persona sin decírselo. */
-  pedido: Punto;
-  contra: "primero" | "ultimo";
-};
-
 /**
  * Devuelve el período al formulario, corriendo las puntas que el índice nuevo no alcanza.
  *
@@ -988,7 +1041,6 @@ type PeriodoCorrido = {
  * quedaría ofreciendo algo que el motor rechaza, que es justo lo que la regla 3 prohíbe.
  */
 function escribirPeriodoAcotado(periodo: { desde: Punto; hasta: Punto }): PeriodoCorrido[] {
-  const { primero, ultimo } = rangoPedible(serie);
   const corridos: PeriodoCorrido[] = [];
 
   for (const [prefijo, punto] of [
@@ -1000,24 +1052,10 @@ function escribirPeriodoAcotado(periodo: { desde: Punto; hasta: Punto }): Period
     // año elegido sin `option`: el `value` quedaba vacío y el sitio contestaba
     // `Mes inválido: "-05"`. Hoy no se dispara porque los dieciséis caen en el mismo año
     // tope, pero Neuquén ya lleva cinco meses de atraso y son doce los que hacen falta.
-    const mes = mesDe(punto);
-    const fuera =
-      aOrdinal(mes) < aOrdinal(primero)
-        ? primero
-        : aOrdinal(mes) > aOrdinal(ultimo)
-          ? ultimo
-          : null;
-
-    if (fuera === null) {
-      escribirPunto(prefijo, punto);
-    } else {
-      corridos.push({
-        punta: prefijo,
-        pedido: punto,
-        contra: fuera === primero ? "primero" : "ultimo",
-      });
-      escribirPunto(prefijo, usaDias() ? primerDia(fuera) : fuera);
-    }
+    // El piso es el de `acotarPunto`, el mismo que usa el motor.
+    const { escribir, contra } = acotarPunto(punto, serie, usaDias());
+    escribirPunto(prefijo, escribir);
+    if (contra !== null) corridos.push({ punta: prefijo, pedido: punto, contra });
     acotarMesesDelAnio(prefijo);
   }
   return corridos;
@@ -1071,6 +1109,10 @@ function calcular(): void {
     // proyectado con el desplegable diciendo "no estimar ninguno".
     sincronizarOpcionesDeMetodologia(desde, hasta);
     sincronizarAtajos(desde, hasta);
+    // Sin meses por publicar las tres metodologías dan lo mismo (ver `adjust`), y el rótulo
+    // "Meses que el IDECBA todavía no publicó:" quedaba encabezando una lista vacía. Se
+    // oculta en vez de deshabilitarse porque no hay nada que elegir, no algo que no se pueda.
+    el("bloque-metodologia").hidden = !hayMesesSinPublicar(desde, hasta, serie);
 
     const metodologia = leerMetodologia();
     const r = adjust(monto, desde, hasta, serie, { metodologia });
@@ -1306,6 +1348,10 @@ async function iniciar(): Promise<void> {
     } else {
       aplicarAtajoDesde(Number(boton.dataset.atajoDesde));
     }
+    // Un atajo cambia el período a mano, igual que tocar los desplegables: la nota de "se
+    // corrió el período" queda hablando de un pedido que ya no existe, y sin borrarla el
+    // próximo cambio de índice devolvía la fecha vieja por encima de la del atajo.
+    pintarNotaDelIndice([]);
   });
   el("usar-dias").addEventListener("change", () => {
     alternarModo();

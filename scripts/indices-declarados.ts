@@ -20,7 +20,7 @@
  */
 
 import type { EntradaCatalogo, TipoIndice } from "../src/engine/indices.js";
-import type { EtiquetaFuente } from "../src/engine/types.js";
+import type { EtiquetaFuente, Mes } from "../src/engine/types.js";
 
 export type IndiceDeclarado = {
   slug: string;
@@ -47,6 +47,13 @@ export type IndiceDeclarado = {
    * falta: seis es el piso que ya se usa.
    */
   decimalesDeLaFuente?: number;
+  /**
+   * Un tramo viejo de la serie que hay que leer con cuidado, y por qué.
+   *
+   * La nota del índice la muestra sólo cuando el período elegido entra en el tramo: con
+   * Chaco de 2024 a hoy no tiene nada que decir, y con 1965 es lo primero que hay que saber.
+   */
+  salvedad?: { hasta: Mes; texto: string };
 };
 
 /**
@@ -72,6 +79,7 @@ export function entradaDeCatalogo(
     organismos: [decl.organismoCorto],
     primerMes: rango.primerMes,
     ultimoOficial: rango.ultimoOficial,
+    ...(decl.salvedad ? { salvedad: decl.salvedad } : {}),
   };
 }
 
@@ -154,7 +162,25 @@ export const INDICES: IndiceDeclarado[] = [
     etiqueta: {
       corta: "IPC de Chaco",
       larga: "el IPC de la Provincia del Chaco",
-      publicadosPor: "el instituto de estadística del Chaco",
+      // Con la sigla adelante: es la que lleva el sello de cada fila ("IPECD ✓"), y sin
+      // esta aposición ningún texto de la pantalla decía qué era.
+      publicadosPor: "el IPECD, el instituto de estadística del Chaco",
+    },
+    // El tramo que entró cuando el MCP reescribió las filas viejas (ver 3ed0681) no tuvo
+    // revisión metodológica. Los números de este texto los ata `tests/indices.test.ts` a
+    // `chaco.json`: si la fuente corrige julio de 1976, el test lo avisa.
+    salvedad: {
+      hasta: "1988-12",
+      texto:
+        "Ojo con 1960 a 1988: son los números de la serie histórica que encadenó la " +
+        "provincia, y no los revisamos mes a mes. Traen saltos sin explicación, por ejemplo " +
+        "junio de 1965 (−10,51%, y julio rebota +19,70%) o junio de 1973 (−10,43%, sin " +
+        "rebote). Y el índice de julio de 1976 vale la décima parte que el de junio y el de " +
+        "agosto: una cuenta por mes que empieza en julio de 1976 da unas diez veces de más, " +
+        "y una que termina ahí, diez veces de menos; por día pasa lo mismo, en menor medida, " +
+        "con cualquier fecha del 2 de julio al 31 de agosto. Un período que sólo pasa por " +
+        "encima de esos meses no se ve afectado. Para esos años, tomá el resultado como una " +
+        "aproximación.",
     },
   },
   {

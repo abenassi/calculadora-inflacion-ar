@@ -317,3 +317,14 @@ export function diasEntre(a: Punto, b: Punto): number {
   );
   return Math.abs(aDate(b) - aDate(a)) / 86_400_000;
 }
+
+/**
+ * El mes publicado más viejo que hace falta para ubicar un punto.
+ *
+ * Un día siempre necesita el mes anterior, aunque sea el día 1: prorratear arranca del
+ * nivel con el que cerró ese mes. Es la contraparte de `mesTopeNecesario` (en `adjust.ts`), y decide si la
+ * ventana de referencia entra en la serie o hay que proyectar.
+ */
+export function mesPisoNecesario(punto: Punto): Mes {
+  return esFecha(punto) ? sumarMeses(mesDe(punto), -1) : mesDe(punto);
+}

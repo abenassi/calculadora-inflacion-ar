@@ -29,6 +29,7 @@ import {
 } from "../engine/mes.js";
 import { monedasDelPeriodo, PESO, type Equivalencia, type Moneda } from "../engine/moneda.js";
 import type { Mes, Punto, Resultado } from "../engine/types.js";
+import { comoSujeto } from "../engine/sujeto.js";
 import { fuenteDe, llevaSello, mesDelTramo, quienPublicaAhora } from "./etiquetas.js";
 
 /** Para arrancar una oración con el organismo, que viene con el artículo en minúscula. */
@@ -396,7 +397,7 @@ export function avisarTramoAjeno(r: Resultado): string {
  *    publicado y su fila lo muestra sellado, aunque el único porcentaje sea el estimado.
  */
 function deDondeSalenLasFilas(r: Resultado): string {
-  const organismo = fuenteDe(r.desglose, r).publicadosPor;
+  const organismo = comoSujeto(fuenteDe(r.desglose, r).publicadosPor);
   const tramos = r.desglose.slice(1);
   if (tramos.some(llevaSello)) return ` El resto son datos oficiales.`;
   if (tramos.some((f) => !f.esProyeccion)) {
@@ -656,7 +657,7 @@ export function explicarTabla(r: Resultado): string {
       return hayTramoOficial(r)
         ? `Todas las filas salen de datos oficiales publicados por ${fuenteDe(r.desglose, r).publicadosPor}. ` +
             `Acá no hay nada estimado.` + aclararParciales(r) + aclararDeflacion(r)
-        : `Acá no hay nada estimado: todo sale de meses que ${fuenteDe(r.desglose, r).publicadosPor} ` +
+        : `Acá no hay nada estimado: todo sale de meses que ${comoSujeto(fuenteDe(r.desglose, r).publicadosPor)} ` +
             `ya publicó.` + aclararParciales(r) + aclararDeflacion(r);
     case "ventana_reciente":
       // Qué se está mirando lo dice `avisarTramoAjeno`, arriba de la tabla. Acá abajo queda

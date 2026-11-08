@@ -185,7 +185,14 @@ sirve para lo único que hace este sitio, que es traer un monto hasta hoy.
   opción que desaparece se lee como un bug.
 - **Cada índice arranca donde arranca.** Santa Fe mide desde diciembre de 2013, Chaco
   desde 1960 y Córdoba desde 1968. Si cambiar de índice deja tu período afuera, se corre y se dice cuál era el
-  mes que pediste.
+  mes que pediste y qué índices lo cubren. El pedido se recuerda mientras no toques el
+  período: si después elegís uno que sí llega, vuelve al mes que habías pedido (antes se
+  quedaba en el mes corrido, y con 1965 el nacional te dejaba en 1990 aunque eligieras Chaco).
+- **Chaco de 1960 a 1988 lleva una salvedad**, que se muestra sólo cuando el período toca
+  esos años: es la serie histórica que encadenó la provincia y trae saltos sin explicación
+  (junio y julio de 1965) y un julio de 1976 que vale la décima parte de sus vecinos. Está en
+  la declaración del índice (`salvedad`), y un test la ata a `chaco.json` y a `datos.html`
+  para que deje de pasar si la provincia corrige la serie.
 - **Neuquén viene cinco meses detrás del nacional**, y eso cambia sobre qué ventana se
   calcula. Se avisa a partir de dos meses de atraso: uno es lo normal —los organismos
   publican en fechas distintas— y avisarlo sería un cartel permanente que nadie lee.

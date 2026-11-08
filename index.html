@@ -98,7 +98,7 @@
                 "name": "¿Desde qué año hay datos?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Con el índice nacional, desde enero de 1990. Los índices provinciales y las regiones arrancan cada uno cuando arranca su serie —Córdoba en 1968, Chaco en 1960, Santa Fe en diciembre de 2013, las seis regiones en diciembre de 2016— y el desplegable de años se acomoda solo al que elijas. Dos cosas para tener en cuenta si vas tan atrás: entre 2007 y 2016 el INDEC estuvo intervenido —en 2016 el Poder Ejecutivo declaró por Decreto 55/2016 la emergencia del sistema estadístico— y los números oficiales de esos años están cuestionados; y antes de 1992 la moneda no era el peso —desde 1985 era el austral y, más atrás, el peso argentino, el peso ley y el peso moneda nacional—, así que un monto de esa época no se puede leer en pesos."
+                  "text": "Con el índice nacional, desde enero de 1990. Los índices provinciales y las regiones arrancan cada uno cuando arranca su serie —Córdoba en 1968, Chaco en 1960, Santa Fe en diciembre de 2013, las seis regiones en diciembre de 2016— y el desplegable de años se acomoda solo al que elijas. Tres cosas para tener en cuenta si vas tan atrás: entre 2007 y 2016 el INDEC estuvo intervenido —en 2016 el Poder Ejecutivo declaró por Decreto 55/2016 la emergencia del sistema estadístico— y los números oficiales de esos años están cuestionados; y antes de 1992 la moneda no era el peso —desde 1985 era el austral y, más atrás, el peso argentino, el peso ley y el peso moneda nacional—, así que un monto de esa época no se puede leer en pesos; y Chaco, de 1960 a 1988, trae saltos que nadie explica, así que ahí el resultado es una aproximación (la calculadora te lo avisa)."
                 }
               },
               {
@@ -287,7 +287,7 @@
           está pidiendo. Va debajo del resultado, no arriba, para que no parezca una
           decisión previa al cálculo.
         -->
-        <p class="metodologia">
+        <p class="metodologia" id="bloque-metodologia">
           <!-- El organismo lo pone main.ts: con Córdoba elegida acá no publica el INDEC. -->
           <label for="metodologia" id="rotulo-metodologia">Meses que el INDEC no publicó:</label>
           <select id="metodologia">
@@ -446,17 +446,19 @@
         <details>
           <summary>¿Desde qué año hay datos?</summary>
           <p>
-            Con el índice nacional, desde enero de 1990. Los índices provinciales y las regiones arrancan cada uno cuando arranca su serie —Córdoba en 1968, Chaco en 1960, Santa Fe en diciembre de 2013, las seis regiones en diciembre de 2016— y el desplegable de años se acomoda solo al que elijas. Dos cosas para tener en cuenta si vas tan atrás: entre 2007 y 2016
+            Con el índice nacional, desde enero de 1990. Los índices provinciales y las regiones arrancan cada uno cuando arranca su serie —Córdoba en 1968, Chaco en 1960, Santa Fe en diciembre de 2013, las seis regiones en diciembre de 2016— y el desplegable de años se acomoda solo al que elijas. Tres cosas para tener en cuenta si vas tan atrás: entre 2007 y 2016
             el INDEC estuvo intervenido —en 2016 el Poder Ejecutivo declaró por Decreto 55/2016 la
             emergencia del sistema estadístico— y los números oficiales de esos años están
             cuestionados; y antes de 1992 la moneda no era el peso —desde 1985 era el austral y,
             más atrás, el peso argentino, el peso ley y el peso moneda nacional—, así que un monto
-            de esa época no se puede leer en pesos.
+            de esa época no se puede leer en pesos; y Chaco, de 1960 a 1988, trae saltos que nadie
+            explica, así que ahí el resultado es una aproximación (la calculadora te lo avisa).
           </p>
           <p>
-            Las dos cosas están explicadas en fuentes y metodología:
-            <a href="./datos.html#indec-intervenido">el INDEC intervenido</a> y
-            <a href="./datos.html#monedas">las monedas de antes de 1992</a>.
+            Las tres están explicadas en fuentes y metodología:
+            <a href="./datos.html#indec-intervenido">el INDEC intervenido</a>,
+            <a href="./datos.html#monedas">las monedas de antes de 1992</a> y
+            <a href="./datos.html#salvedad-chaco">la salvedad de Chaco</a>.
           </p>
         </details>
 

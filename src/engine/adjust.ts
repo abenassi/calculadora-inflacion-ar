@@ -27,6 +27,7 @@
 // El motor mira cómo se imprime un porcentaje en un solo lugar: la frase que promete el
 // resultado de sumar una columna tiene que dar lo que da sumar esa columna en pantalla.
 import { comoSeMuestra } from "../ui/format.js";
+import { comoSujeto } from "./sujeto.js";
 import type {
   BaseProyeccion,
   Fecha,
@@ -52,6 +53,7 @@ import {
   largoEnDias,
   interpolarEnMes,
   mesDe,
+  mesPisoNecesario,
   nombrarMes,
   primerDia,
   rangoMeses,
@@ -115,7 +117,7 @@ function armarIndice(serie: SerieIndice): Indice {
    * el artículo puesto ("el INDEC", "la dirección de estadística de Córdoba") y el género
    * de una sigla no se puede adivinar: "El DEIE" está mal y "La INDEC" también.
    */
-  const publicaAhora = serie.fuentes.at(-1)?.etiqueta.publicadosPor ?? "el organismo";
+  const publicaAhora = comoSujeto(serie.fuentes.at(-1)?.etiqueta.publicadosPor ?? "el organismo");
   const organismoCorto = publicaAhora.charAt(0).toUpperCase() + publicaAhora.slice(1);
   const ultimo = datos.at(-1)!;
   const penultimo = datos.at(-2)!;
@@ -246,16 +248,10 @@ function ventanaDeReferencia(
   return [inicio, fin];
 }
 
-/**
- * El mes publicado más viejo que hace falta para ubicar un punto.
- *
- * Un día siempre necesita el mes anterior, aunque sea el día 1: prorratear arranca del
- * nivel con el que cerró ese mes. Es la contraparte de `mesTopeNecesario`, y decide si la
- * ventana de referencia entra en la serie o hay que proyectar.
- */
-export function mesPisoNecesario(punto: Punto): Mes {
-  return esFecha(punto) ? sumarMeses(mesDe(punto), -1) : mesDe(punto);
-}
+// `mesPisoNecesario` vive en `mes.ts`: lo usan también el catálogo (qué índice cubre un
+// pedido) y la interfaz (hasta dónde se corre un período), y tienen que medir con el mismo
+// piso que el motor. Se reexporta para no mover los imports de siempre.
+export { mesPisoNecesario } from "./mes.js";
 
 /**
  * El mes más nuevo que hace falta tener publicado para poder ubicar un punto.
@@ -558,6 +554,23 @@ export function sePuedeEvitarEstimar(
   hoy?: Mes,
 ): boolean {
   return evaluarPeriodo(desde, hasta, armarIndice(serie), hoy).sinEstimarPosible;
+}
+
+/**
+ * Si el período toca algún mes que el organismo todavía no publicó.
+ *
+ * Es la misma condición con la que `adjust` decide que "las tres metodologías coinciden"
+ * (`desplazamiento === 0`), y la interfaz la usa para no mostrar el selector de qué hacer
+ * con los meses sin publicar cuando no hay ninguno: con CABA y un período ya publicado se
+ * leía "Meses que el IDECBA todavía no publicó:" y abajo nada, un rótulo de lista vacía.
+ */
+export function hayMesesSinPublicar(
+  desde: Punto,
+  hasta: Punto,
+  serie: SerieIndice,
+  hoy?: Mes,
+): boolean {
+  return evaluarPeriodo(desde, hasta, armarIndice(serie), hoy).desplazamiento > 0;
 }
 
 /**

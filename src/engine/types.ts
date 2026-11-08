@@ -56,7 +56,7 @@ export type EtiquetaFuente = {
   corta: string;
   /** Entra después de "según". */
   larga: string;
-  /** Entra después de "publicados por". */
+  /** Entra después de "publicados por". De sujeto, con algo atrás, va por `comoSujeto`. */
   publicadosPor: string;
 };
 

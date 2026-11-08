@@ -9,8 +9,8 @@
  * bajan sólo cuando se eligen.
  */
 
-import { sumarMeses } from "./mes.js";
-import type { Mes } from "./types.js";
+import { compararMeses, esFecha, mesDe, mesPisoNecesario, primerDia, sumarMeses } from "./mes.js";
+import type { Mes, Punto } from "./types.js";
 
 /**
  * Qué es la jurisdicción que se eligió.
@@ -50,6 +50,13 @@ export type EntradaCatalogo = {
   organismos: string[];
   primerMes: Mes;
   ultimoOficial: Mes;
+  /**
+   * Un tramo viejo de la serie que hay que leer con cuidado, y por qué.
+   *
+   * La nota del índice la muestra sólo cuando el período elegido entra en el tramo: con
+   * Chaco de 2024 a hoy no tiene nada que decir, y con 1965 es lo primero que hay que saber.
+   */
+  salvedad?: { hasta: Mes; texto: string };
 };
 
 export type CatalogoIndices = {
@@ -133,4 +140,108 @@ export function rangoPedible(serie: { datos: { mes: Mes }[]; ultimo_oficial: Mes
     primero: serie.datos[0]!.mes,
     ultimo: sumarMeses(serie.ultimo_oficial, HORIZONTE_MESES),
   };
+}
+
+/**
+ * El primer mes que se puede pedir en un índice.
+ *
+ * En modo por mes es el primero de la serie: el índice de nivel alcanza. En modo por día es
+ * uno después: prorratear un día del primer mes necesita el índice del mes anterior, que no
+ * existe. El calendario, los atajos y el acotado del período tienen que usar el mismo piso.
+ */
+export function primerMesPedibleDe(
+  serie: { datos: { mes: Mes }[]; ultimo_oficial: Mes },
+  dias: boolean,
+): Mes {
+  const { primero } = rangoPedible(serie);
+  return dias ? sumarMeses(primero, 1) : primero;
+}
+
+/**
+ * Lo que se escribe en el formulario para un punto pedido, y si se corrió contra qué extremo.
+ *
+ * El piso se mide con `mesPisoNecesario`, el del motor: una fecha necesita también el mes
+ * anterior. Con el mes de la fecha, el 15 de enero de 1968 entraba en Córdoba (que arranca en
+ * enero de 1968) y el motor lo rechazaba; y al correrlo se escribía el 1 de enero, que
+ * tampoco calcula. Se corre al primer punto que el calendario ofrece. Es el mismo piso que
+ * usa `indicesQueCubren`: el índice que el aviso sugiere es uno que deja el pedido intacto.
+ */
+export function acotarPunto(
+  punto: Punto,
+  serie: { datos: { mes: Mes }[]; ultimo_oficial: Mes },
+  dias: boolean,
+): { escribir: Punto; contra: "primero" | "ultimo" | null } {
+  const { primero, ultimo } = rangoPedible(serie);
+  const aPunto = (mes: Mes): Punto => (dias ? primerDia(mes) : mes);
+  if (compararMeses(mesPisoNecesario(punto), primero) < 0) {
+    return { escribir: aPunto(primerMesPedibleDe(serie, dias)), contra: "primero" };
+  }
+  if (compararMeses(mesDe(punto), ultimo) > 0) return { escribir: aPunto(ultimo), contra: "ultimo" };
+  return { escribir: punto, contra: null };
+}
+
+/** Una punta del período que no entraba en el índice elegido, y contra qué extremo se topó. */
+export type PeriodoCorrido = {
+  punta: "desde" | "hasta";
+  /** El punto que se había pedido. La nota lo nombra: correrlo en silencio sería cambiarle
+   * la pregunta a la persona sin decírselo. */
+  pedido: Punto;
+  contra: "primero" | "ultimo";
+};
+
+/**
+ * El período que hay que intentar escribir al cambiar de índice.
+ *
+ * Es el del formulario, salvo las puntas que el índice anterior corrió y que la persona no
+ * volvió a tocar: ésas vuelven a lo que se había pedido. Si no, el pedido se perdía en el
+ * primer índice que no lo alcanzaba: un link con `desde=1965-01` abierto con el nacional
+ * quedaba en enero de 1990, y al elegir Chaco —que mide desde 1960— seguía en 1990, con
+ * la nota diciendo "pediste desde enero 1965" arriba de un cálculo que no lo honraba.
+ *
+ * Un pedido de otro modo (mes contra fecha) no se restituye: la persona cambió de modo
+ * después, y escribir un mes en un campo de fecha lo dejaría en blanco.
+ */
+export function periodoAIntentar(
+  formulario: { desde: Punto; hasta: Punto },
+  corridos: readonly PeriodoCorrido[],
+): { desde: Punto; hasta: Punto } {
+  const periodo = { ...formulario };
+  for (const c of corridos) {
+    if (esFecha(c.pedido) === esFecha(formulario[c.punta])) periodo[c.punta] = c.pedido;
+  }
+  return periodo;
+}
+
+/**
+ * Los otros índices que sí arrancan antes de un punto que el elegido no alcanza.
+ *
+ * El aviso de "se corrió el período" decía qué pasó pero no qué hacer: quien llega con un
+ * link de 1965 al nacional no tiene cómo saber que Chaco lo cubre sin abrir los dieciséis.
+ * Mira el `primerMes` del catálogo con el mismo piso que `rangoPedible` (y, con fechas,
+ * el mes anterior que necesita el prorrateo: ver `mesPisoNecesario`).
+ */
+export function indicesQueCubren(
+  catalogo: CatalogoIndices,
+  pedido: Punto,
+  salvo: string,
+): EntradaCatalogo[] {
+  const piso = mesPisoNecesario(pedido);
+  const { nacional, provincias, regiones } = agruparParaSelector(catalogo);
+  return [nacional, ...provincias, ...regiones].filter(
+    (i) => i.slug !== salvo && compararMeses(i.primerMes, piso) <= 0,
+  );
+}
+
+/**
+ * Si el período entra en el tramo de la salvedad del índice. Va por la punta más vieja,
+ * así que deflactar (desde más nuevo que hasta) cuenta igual.
+ */
+export function tocaLaSalvedad(
+  entrada: Pick<EntradaCatalogo, "salvedad">,
+  desde: Punto,
+  hasta: Punto,
+): boolean {
+  if (!entrada.salvedad) return false;
+  const viejo = compararMeses(mesDe(desde), mesDe(hasta)) <= 0 ? mesDe(desde) : mesDe(hasta);
+  return compararMeses(viejo, entrada.salvedad.hasta) <= 0;
 }

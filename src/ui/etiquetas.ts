@@ -21,6 +21,7 @@ import {
   ordenReal,
   restarDias,
 } from "../engine/mes.js";
+import { comoSujeto } from "../engine/sujeto.js";
 import type {
   EtiquetaFuente,
   Fila,
@@ -108,7 +109,9 @@ export function fuenteDe(filas: Fila[], serie: FuentesDeSerie): Fuente {
 export function quienPublicaAhora(serie: FuentesDeSerie): string {
   const ultima = serie.fuentes.at(-1);
   if (!ultima) throw new Error("La serie no declara ninguna fuente");
-  return ultima.etiqueta.publicadosPor;
+  // Siempre va de sujeto ("… todavía no publicó julio"), así que sale con la aposición
+  // cerrada: ver `comoSujeto`.
+  return comoSujeto(ultima.etiqueta.publicadosPor);
 }
 
 /**
