@@ -21,7 +21,7 @@
       "organismo": "Instituto Nacional de Estadística y Censos (INDEC)",
       "organismoCorto": "INDEC",
       "url": "https://www.indec.gob.ar/",
-      "rango": "2016-12/2026-09",
+      "rango": "2016-12/2026-10",
       "etiqueta": {
         "corta": "IPC del INDEC",
         "larga": "el IPC Nivel General Nacional del INDEC",
@@ -36,10 +36,6 @@
   },
   "rem": {
     "senda": [
-      {
-        "mes": "2026-10",
-        "tasaPct": 1.8
-      },
       {
         "mes": "2026-11",
         "tasaPct": 1.7
@@ -73,8 +69,8 @@
     ],
     "organismo": "BCRA"
   },
-  "ultimo_oficial": "2026-09",
-  "actualizado": "2026-11-07T14:08:37.567Z",
+  "ultimo_oficial": "2026-10",
+  "actualizado": "2026-11-12T20:04:08.221Z",
   "datos": [
     {
       "mes": "1990-01",
@@ -2279,6 +2275,11 @@
     {
       "mes": "2026-09",
       "indice": 12514.1508,
+      "origen": "indec"
+    },
+    {
+      "mes": "2026-10",
+      "indice": 12785.9321,
       "origen": "indec"
     }
   ]
