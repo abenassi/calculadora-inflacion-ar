@@ -70,7 +70,7 @@
     "organismo": "BCRA"
   },
   "ultimo_oficial": "2026-10",
-  "actualizado": "2026-11-12T20:04:08.221Z",
+  "actualizado": "2026-11-14T02:12:00.098Z",
   "datos": [
     {
       "mes": "1990-01",
@@ -1829,7 +1829,7 @@
     },
     {
       "mes": "2019-04",
-      "indice": 212.959641,
+      "indice": 213.0517,
       "origen": "indec"
     },
     {
@@ -2134,7 +2134,7 @@
     },
     {
       "mes": "2024-05",
-      "indice": 6073.7,
+      "indice": 6073.7165,
       "origen": "indec"
     },
     {
