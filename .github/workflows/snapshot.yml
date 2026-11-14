@@ -49,8 +49,12 @@ jobs:
 
       # Los tests corren contra el snapshot recién bajado. Si el INDEC revisó la
       # serie hacia atrás o cambió de base, esto lo caza antes de publicar.
+      # Todos menos los que atan un texto escrito a mano a los datos
+      # (tests/textos-contra-datos.test.ts): ésos no dicen que los datos estén mal sino
+      # que hay que reescribir un texto, y frenando acá el 2026-10-02 pararon cinco
+      # semanas a todos los índices. Corren después del commit y frenan sólo el deploy.
       - name: Verificar el snapshot nuevo
-        run: npm test
+        run: npm run test:datos
 
       # El push de abajo lo hace el GITHUB_TOKEN, y GitHub no dispara otros workflows por
       # pushes de ese token: "Publicar el sitio" nunca se enteraba de los datos nuevos (ver
@@ -73,9 +77,19 @@ jobs:
           gh workflow run deploy.yml --ref main
 
       # Si el MCP deja de traer el IPC, todo lo de arriba sigue en verde ("Sin cambios") y
-      # el sitio queda viejo sin que nadie se entere. Va último para no frenar el resto.
+      # el sitio queda viejo sin que nadie se entere. Va después del commit para no frenar el resto.
       - name: Avisar si el IPC nacional o el REM quedaron atrasados
         run: npx tsx scripts/verificar-frescura.ts
+
+      # Los datos ya están en main. Si un texto a mano (el FAQ, la salvedad de Chaco) quedó
+      # desfasado, el job queda en rojo acá y el deploy, que corre `npm test` entero, no
+      # publica hasta que se arregle el texto: el sitio se queda con los datos de ayer.
+      # Va después de la frescura, que no lleva `if` y se saltearía detrás de este rojo (un
+      # texto desfasado puede durar semanas). Mismo `if` que el aviso de índices conservados:
+      # tiene que salir aunque haya fallado el dispatch o la frescura.
+      - name: Avisar si un texto escrito a mano dejó de coincidir con los datos
+        if: ${{ !cancelled() && steps.snapshot.outcome == 'success' }}
+        run: npm run test:textos
 
       # Cuando un índice jurisdiccional no se puede actualizar, el snapshot conserva el de la
       # corrida anterior para no sacarlo del desplegable, y el job quedaba en verde con el

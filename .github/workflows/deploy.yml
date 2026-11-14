@@ -37,7 +37,9 @@ jobs:
       - run: npm ci
 
       # El sitio no se publica si el motor está roto: el snapshot commiteado es
-      # parte de lo que se testea.
+      # parte de lo que se testea. Incluye tests/textos-contra-datos.test.ts, que el
+      # snapshot no usa de gate: si un texto escrito a mano dejó de coincidir con los
+      # datos, el freno es acá y el sitio sigue con lo de ayer (ver 0001).
       - run: npm test
 
       - run: npm run build

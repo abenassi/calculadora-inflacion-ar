@@ -9,6 +9,8 @@
     "build": "tsc --noEmit && vite build && tsx scripts/generar-paginas.ts",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:datos": "vitest run --exclude tests/textos-contra-datos.test.ts",
+    "test:textos": "vitest run tests/textos-contra-datos.test.ts",
     "test:watch": "vitest",
     "snapshot": "tsx scripts/fetch-snapshot.ts",
     "verificar": "tsc --noEmit && vitest run && npm run build"

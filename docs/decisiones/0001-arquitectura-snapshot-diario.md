@@ -53,6 +53,31 @@ y no commitea**. El sitio sigue sirviendo el último snapshot bueno.
 Además los tests corren contra el snapshot recién bajado, antes de publicarlo. Si la
 serie cambió de forma incompatible, se caza ahí.
 
+### Un texto desfasado frena el deploy, no los datos
+
+No todos los tests del snapshot dicen lo mismo cuando se ponen rojos. La mayoría dice que
+los datos están mal, y ésos frenan el commit. Pero algunos atan un texto escrito a mano a
+los datos: las fechas de arranque que nombra el FAQ ("Chaco en 1960"), los números de la
+salvedad de Chaco. Cuando uno de ésos se pone rojo, los datos están bien: la fuente cambió
+algo que la página nombraba y hay que reescribir el texto.
+
+Hasta 2026-11 frenaban el commit igual que los otros, y el 2026-10-02 eso salió caro: el MCP
+reescribió las filas viejas de Chaco, la serie pasó de arrancar en 1988 a 1960, y la
+publicación de **todos** los índices, CABA incluido, quedó parada cinco semanas por una
+frase sobre Chaco.
+
+Ahora viven en `tests/textos-contra-datos.test.ts`. El gate del snapshot
+(`npm run test:datos`) corre todo lo demás; el snapshot commitea los datos y después corre
+esos (`npm run test:textos`), que dejan el job en rojo para que se vea. El que frenan es el
+deploy, que sigue corriendo `npm test` entero: el sitio se queda con los datos de ayer hasta
+que se arregla el texto, y ese día se publica todo junto, porque `main` siguió juntando los
+meses de cada índice. Se descartó generar esas fechas desde el catálogo en el build (que
+elimina el test): Agustín eligió esta opción el 2026-11-10. `tests/pipeline.test.ts` ata los
+dos workflows a esta división, y un test nuevo que compare un texto a mano con el snapshot
+va en ese archivo. El arreglo del texto se publica con su propio push (el deploy corre en
+cada push a `main`); el job del snapshot sigue en rojo hasta su corrida del día siguiente,
+porque un cambio en `index.html` o `datos.html` no lo dispara.
+
 ### Comparar por contenido es comparar números
 
 Comparar el JSON como texto dejó de alcanzar el 2026-09-05. Ese día el MCP sacó la escala de
