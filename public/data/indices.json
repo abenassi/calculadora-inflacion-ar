@@ -80,7 +80,7 @@
         "DEyC Río Negro"
       ],
       "primerMes": "1989-09",
-      "ultimoOficial": "2026-09"
+      "ultimoOficial": "2026-10"
     },
     {
       "slug": "san-luis",
@@ -125,7 +125,7 @@
         "INDEC Gran Buenos Aires"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-08"
+      "ultimoOficial": "2026-10"
     },
     {
       "slug": "pampeana",
@@ -137,7 +137,7 @@
         "INDEC Pampeana"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-08"
+      "ultimoOficial": "2026-10"
     },
     {
       "slug": "noroeste",
@@ -149,7 +149,7 @@
         "INDEC Noroeste"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-08"
+      "ultimoOficial": "2026-10"
     },
     {
       "slug": "noreste",
@@ -161,7 +161,7 @@
         "INDEC Noreste"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-08"
+      "ultimoOficial": "2026-10"
     },
     {
       "slug": "cuyo",
@@ -173,7 +173,7 @@
         "INDEC Cuyo"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-08"
+      "ultimoOficial": "2026-10"
     },
     {
       "slug": "patagonia",
@@ -185,8 +185,8 @@
         "INDEC Patagónica"
       ],
       "primerMes": "2016-12",
-      "ultimoOficial": "2026-08"
+      "ultimoOficial": "2026-10"
     }
   ],
-  "actualizado": "2026-11-13T19:50:16.130Z"
+  "actualizado": "2026-11-14T18:14:59.749Z"
 }

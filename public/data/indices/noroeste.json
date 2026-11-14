@@ -8,7 +8,7 @@
       "organismo": "Instituto Nacional de Estadística y Censos (INDEC)",
       "organismoCorto": "INDEC Noroeste",
       "url": "https://www.indec.gob.ar/",
-      "rango": "2016-12/2026-08",
+      "rango": "2016-12/2026-10",
       "etiqueta": {
         "corta": "IPC Región Noroeste del INDEC",
         "larga": "el IPC de la Región Noroeste del INDEC",
@@ -16,8 +16,8 @@
       }
     }
   ],
-  "ultimo_oficial": "2026-08",
-  "actualizado": "2026-11-07T14:08:45.241Z",
+  "ultimo_oficial": "2026-10",
+  "actualizado": "2026-11-14T18:14:58.747Z",
   "datos": [
     {
       "mes": "2016-12",
@@ -602,6 +602,16 @@
     {
       "mes": "2026-08",
       "indice": 12397.9365,
+      "origen": "indec-noroeste"
+    },
+    {
+      "mes": "2026-09",
+      "indice": 12631.4816,
+      "origen": "indec-noroeste"
+    },
+    {
+      "mes": "2026-10",
+      "indice": 12841.1929,
       "origen": "indec-noroeste"
     }
   ]

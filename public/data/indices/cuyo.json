@@ -8,7 +8,7 @@
       "organismo": "Instituto Nacional de Estadística y Censos (INDEC)",
       "organismoCorto": "INDEC Cuyo",
       "url": "https://www.indec.gob.ar/",
-      "rango": "2016-12/2026-08",
+      "rango": "2016-12/2026-10",
       "etiqueta": {
         "corta": "IPC Región Cuyo del INDEC",
         "larga": "el IPC de la Región Cuyo del INDEC",
@@ -16,8 +16,8 @@
       }
     }
   ],
-  "ultimo_oficial": "2026-08",
-  "actualizado": "2026-09-12T15:36:50.241Z",
+  "ultimo_oficial": "2026-10",
+  "actualizado": "2026-11-14T18:14:59.429Z",
   "datos": [
     {
       "mes": "2016-12",
@@ -602,6 +602,16 @@
     {
       "mes": "2026-08",
       "indice": 12360.9149,
+      "origen": "indec-cuyo"
+    },
+    {
+      "mes": "2026-09",
+      "indice": 12591.9359,
+      "origen": "indec-cuyo"
+    },
+    {
+      "mes": "2026-10",
+      "indice": 12882.1531,
       "origen": "indec-cuyo"
     }
   ]

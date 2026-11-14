@@ -8,7 +8,7 @@
       "organismo": "Dirección de Estadística y Censos de la Provincia de Río Negro",
       "organismoCorto": "DEyC Río Negro",
       "url": "https://estadisticaycensos.rionegro.gov.ar/",
-      "rango": "1989-09/2026-09",
+      "rango": "1989-09/2026-10",
       "etiqueta": {
         "corta": "IPC de Río Negro",
         "larga": "el IPC de Viedma, que Río Negro publica como referencia provincial",
@@ -16,8 +16,8 @@
       }
     }
   ],
-  "ultimo_oficial": "2026-09",
-  "actualizado": "2026-11-07T14:08:43.852Z",
+  "ultimo_oficial": "2026-10",
+  "actualizado": "2026-11-14T18:14:55.705Z",
   "datos": [
     {
       "mes": "1989-09",
@@ -2242,6 +2242,11 @@
     {
       "mes": "2026-09",
       "indice": 17538428813336.6,
+      "origen": "deyc-rio-negro"
+    },
+    {
+      "mes": "2026-10",
+      "indice": 17937810498253.7,
       "origen": "deyc-rio-negro"
     }
   ]

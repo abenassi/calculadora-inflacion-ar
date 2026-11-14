@@ -8,7 +8,7 @@
       "organismo": "Instituto Nacional de Estadística y Censos (INDEC)",
       "organismoCorto": "INDEC Pampeana",
       "url": "https://www.indec.gob.ar/",
-      "rango": "2016-12/2026-08",
+      "rango": "2016-12/2026-10",
       "etiqueta": {
         "corta": "IPC Región Pampeana del INDEC",
         "larga": "el IPC de la Región Pampeana del INDEC",
@@ -16,8 +16,8 @@
       }
     }
   ],
-  "ultimo_oficial": "2026-08",
-  "actualizado": "2026-09-12T15:36:49.710Z",
+  "ultimo_oficial": "2026-10",
+  "actualizado": "2026-11-14T18:14:58.462Z",
   "datos": [
     {
       "mes": "2016-12",
@@ -602,6 +602,16 @@
     {
       "mes": "2026-08",
       "indice": 12223.9951,
+      "origen": "indec-pampeana"
+    },
+    {
+      "mes": "2026-09",
+      "indice": 12463.7838,
+      "origen": "indec-pampeana"
+    },
+    {
+      "mes": "2026-10",
+      "indice": 12783.6887,
       "origen": "indec-pampeana"
     }
   ]
