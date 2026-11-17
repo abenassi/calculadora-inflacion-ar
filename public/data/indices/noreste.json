@@ -17,7 +17,7 @@
     }
   ],
   "ultimo_oficial": "2026-10",
-  "actualizado": "2026-11-14T18:14:59.048Z",
+  "actualizado": "2026-11-17T21:02:12.516Z",
   "datos": [
     {
       "mes": "2016-12",
@@ -356,7 +356,7 @@
     },
     {
       "mes": "2022-07",
-      "indice": 861.702,
+      "indice": 887.9574,
       "origen": "indec-noreste"
     },
     {
@@ -466,7 +466,7 @@
     },
     {
       "mes": "2024-05",
-      "indice": 6119.4,
+      "indice": 6119.4234,
       "origen": "indec-noreste"
     },
     {
