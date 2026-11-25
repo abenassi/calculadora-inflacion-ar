@@ -92,6 +92,12 @@ export type FuenteSerie = {
    * midió.
    */
   republica?: TramoRepublicado[];
+  /**
+   * La etiqueta de la fuente cuando el cálculo tiene alguna fila de un tramo de `republica`.
+   * La de siempre dice "republica el IPC que publicaba el INDEC", y arriba de una fila sellada
+   * `BCRA (IPC San Luis)` eso contradice la tabla.
+   */
+  etiquetaConRepublica?: EtiquetaFuente;
 };
 
 /** Un tramo de meses, inclusivo en las dos puntas, en que una fuente republica otro índice. */

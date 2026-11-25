@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 
 import { adjust } from "../src/engine/adjust.js";
 import { sumarMeses } from "../src/engine/mes.js";
-import { mesDelTramo, selloDelTramo } from "../src/ui/etiquetas.js";
+import { fuenteDe, mesDelTramo, organismoDelMes, selloDelTramo } from "../src/ui/etiquetas.js";
 import type { Mes, SerieIndice } from "../src/engine/types.js";
 
 const leer = (archivo: string) =>
@@ -79,5 +79,41 @@ describe("los meses en que el BCRA republica otro índice", () => {
   it("la fila de partida no muestra la inflación de ningún mes y lleva el sello a secas", () => {
     const r = adjust(1000, "2016-01", "2016-06", serie, { metodologia: "sin_proyectar" });
     expect(selloDelTramo(r.desglose, 0, r)).toBe("BCRA");
+  });
+
+  /*
+   * La frase de la fuente va arriba de la tabla. Decía "el BCRA, que republica el IPC que
+   * publicaba el INDEC" sobre filas selladas `BCRA (IPC San Luis)`: se contradecían en pantalla.
+   */
+  it("la fuente nombra el IPC de la Ciudad y el de San Luis cuando el cálculo pasa por el hueco", () => {
+    for (const [desde, hasta] of [
+      ["2015-09", "2016-06"],
+      ["2016-06", "2015-09"],
+      ["2016-01", "2016-02"],
+    ] as const) {
+      const f = fuenteDe(adjust(1000, desde, hasta, serie, { metodologia: "sin_proyectar" }).desglose, serie);
+      expect(f.publicadosPor, `${desde} → ${hasta}`).toMatch(/Ciudad.*San Luis/);
+      expect(f.larga, `${desde} → ${hasta}`).toMatch(/Ciudad.*San Luis/);
+      // Una coma más adentro partiría la aposición que cierra `comoSujeto`.
+      expect(f.publicadosPor.split(",")).toHaveLength(2);
+    }
+  });
+
+  it("y fuera del hueco dice lo de siempre", () => {
+    for (const [desde, hasta] of [
+      ["2010-01", "2015-10"],
+      ["2016-05", "2016-11"],
+      // La fila de partida no muestra inflación: de abril a junio se ven mayo y junio, no abril.
+      ["2016-04", "2016-06"],
+    ] as const) {
+      const f = fuenteDe(adjust(1000, desde, hasta, serie, { metodologia: "sin_proyectar" }).desglose, serie);
+      expect(f.publicadosPor, `${desde} → ${hasta}`).not.toMatch(/San Luis/);
+    }
+  });
+
+  it("una fila prorrateada dice sobre qué índice se prorrateó", () => {
+    const fila = adjust(1000, "2016-03", "2016-06", serie, { metodologia: "sin_proyectar" }).desglose[1]!;
+    expect(organismoDelMes(fila, "2016-04", serie)).toBe("BCRA (IPC San Luis)");
+    expect(organismoDelMes(fila, "2016-05", serie)).toBe("BCRA");
   });
 });

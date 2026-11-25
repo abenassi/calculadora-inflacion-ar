@@ -58,10 +58,11 @@ import {
   fuenteDeLaSerie,
   hayTramosDeDias,
   mesDelTramo,
-  organismoDeFila,
   quienPublicaAhora,
   rotularFila,
+  organismoDelMes,
   selloDelTramo,
+  selloParaPintar,
 } from "./etiquetas.js";
 import {
   avisarTramoAjeno,
@@ -456,9 +457,7 @@ function pintarResultado(r: Resultado): void {
       ? "estimado"
       : f.esParcial
         ? "prorrateado"
-        : // Adentro del paréntesis, espacios duros: a 360 px "BCRA (IPC San Luis)" se partía en
-          // "BCRA (IPC San" / "Luis)". Así el único corte posible queda antes del paréntesis.
-          `${selloDelTramo(r.desglose, i, r)!.replace(/\(.*\)/, (p) => p.replaceAll(" ", " "))} ✓`,
+        : `${selloParaPintar(selloDelTramo(r.desglose, i, r)!)} ✓`,
     indice: indice(f.indice),
   }));
   // Con montos de décadas atrás, o en el modo por día, la tabla no entraba en un escritorio y la
@@ -542,11 +541,12 @@ function pintarResultado(r: Resultado): void {
         // El organismo sale del origen de la propia fila: en el tramo reconstruido del
         // nacional el dato de fondo es del BCRA, y decir INDEC acá contradice el sello
         // de al lado.
-        const organismo = organismoDeFila(f, r);
         // El mes del TRAMO, no el del punto final: es el mismo criterio del que sale el
         // rótulo de la fila. La fila de partida no representa ningún tramo y su índice se
-        // prorratea sobre su propio mes.
+        // prorratea sobre su propio mes. Con ese mes, el índice que el BCRA republica
+        // (`organismoDelMes`): "según BCRA" en abril de 2016 dejaba afuera el IPC San Luis.
         const mes = i === 0 ? mesDe(f.punto) : mesDelTramo(r.desglose, i);
+        const organismo = organismoDelMes(f, mes, r);
         marca.title =
           `Parte proporcional de la inflación de ${nombrarMes(mes)}` +
           (organismo ? `, según ${organismo}.` : ".");
@@ -685,11 +685,10 @@ function armarExplicacion(r: Resultado): string {
     // La etiqueta de cada línea tiene que ser el mismo sello que la persona ve en la tabla.
     // Decía "oficial INDEC" en filas selladas "BCRA ✓", así que el texto que se manda por
     // mensaje contradecía a la pantalla que el destinatario podía abrir.
-    const organismo = organismoDeFila(f, r);
     const etiqueta = f.esProyeccion
       ? "estimado"
       : f.esParcial
-        ? `prorrateado sobre el dato de ${organismo}`
+        ? `prorrateado sobre el dato de ${organismoDelMes(f, mesDelTramo(r.desglose, i), r)}`
         : `oficial ${selloDelTramo(r.desglose, i, r)}`;
     // El mismo rótulo que la tabla, no el punto final a secas. Un tramo del 2 de mayo al
     // 1 de junio salía acá como "1 jun 2026: +2,08%", que se lee como que junio subió

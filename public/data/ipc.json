@@ -25,7 +25,12 @@
           "hasta": "2016-04",
           "indice": "IPC San Luis"
         }
-      ]
+      ],
+      "etiquetaConRepublica": {
+        "corta": "serie de inflación mensual del BCRA",
+        "larga": "la serie de inflación mensual del BCRA, que para ese tramo republica el IPC que publicaba el INDEC salvo de noviembre de 2015 a abril de 2016 (meses en que el INDEC no publicó y la serie trae el IPC de la Ciudad de Buenos Aires y el de San Luis)",
+        "publicadosPor": "el BCRA, que republica el IPC que publicaba el INDEC salvo de noviembre de 2015 a abril de 2016 (cuando trae el de la Ciudad y el de San Luis)"
+      }
     },
     {
       "id": "indec",

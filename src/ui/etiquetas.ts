@@ -76,7 +76,18 @@ export type Fuente = EtiquetaFuente & {
 export function fuenteDe(filas: Fila[], serie: FuentesDeSerie): Fuente {
   const presentes = serie.fuentes.filter((f) => filas.some((fila) => fila.origen === f.id));
 
-  if (presentes.length === 1) return { presentes, ...presentes[0]!.etiqueta };
+  if (presentes.length === 1) {
+    const unica = presentes[0]!;
+    // Si alguna fila es de un mes en que la fuente republica otro índice, la etiqueta de siempre
+    // ("republica el IPC que publicaba el INDEC") contradice el sello de esa fila. Se decide con
+    // el mismo `indiceRepublicado` y el mismo mes que el sello (`mesDelTramo`). La fila 0 no
+    // muestra la inflación de ningún mes; en un desglose recortado (las páginas por año) eso
+    // deja afuera el primer mes, y por eso la de 2016 lo detecta por febrero a abril.
+    const republica =
+      unica.etiquetaConRepublica &&
+      filas.some((f, i) => i > 0 && !f.esProyeccion && indiceRepublicado(f, mesDelTramo(filas, i), serie));
+    return { presentes, ...(republica ? unica.etiquetaConRepublica! : unica.etiqueta) };
+  }
   if (presentes.length === 0) {
     const ultima = serie.fuentes.at(-1);
     if (!ultima) throw new Error("El cálculo no declara ninguna fuente");
@@ -158,10 +169,29 @@ export function selloDeFila(fila: Fila, serie: FuentesDeSerie): string | null {
  * superficies no sabría cuál creer.
  */
 export function selloDelMes(fila: Fila, mes: Mes, serie: FuentesDeSerie): string | null {
-  const sello = selloDeFila(fila, serie);
-  if (sello === null) return null;
+  return llevaSello(fila) ? organismoDelMes(fila, mes, serie) : null;
+}
+
+/**
+ * El organismo de la fila con el índice que republica en `mes`, sin mirar si la fila lleva sello.
+ * Lo usan las filas prorrateadas, que no llevan sello pero sí dicen sobre qué dato se prorrateó:
+ * "según BCRA" para la parte de abril de 2016 contradecía a la fila entera de abril, sellada
+ * `BCRA (IPC San Luis)`.
+ */
+export function organismoDelMes(fila: Fila, mes: Mes, serie: FuentesDeSerie): string | null {
+  const organismo = organismoDeFila(fila, serie);
+  if (organismo === null) return null;
   const otro = indiceRepublicado(fila, mes, serie);
-  return otro ? `${sello} (${otro})` : sello;
+  return otro ? `${organismo} (${otro})` : organismo;
+}
+
+/**
+ * El sello con espacios duros adentro del paréntesis, para pintarlo: a 360 px "BCRA (IPC San
+ * Luis)" se partía en "BCRA (IPC San" / "Luis)". Así el único corte posible es antes del
+ * paréntesis. Sólo para el HTML; el texto que se copia va con espacios comunes.
+ */
+export function selloParaPintar(sello: string): string {
+  return sello.replace(/\(.*\)/, (p) => p.replaceAll(" ", "\u00a0"));
 }
 
 /**

@@ -39,7 +39,7 @@ import { adjust } from "../src/engine/adjust.js";
 import { aniosDisponibles, resumenAnual, type ResumenAnual } from "../src/engine/anual.js";
 import { compararMeses, mesConAnio, mesDe, soloMes } from "../src/engine/mes.js";
 import type { Fila, FuentesDeSerie, Mes, SerieIndice } from "../src/engine/types.js";
-import { fuenteDe, organismoDeFila, selloDelMes } from "../src/ui/etiquetas.js";
+import { fuenteDe, organismoDeFila, selloDelMes, selloParaPintar } from "../src/ui/etiquetas.js";
 
 /**
  * El id de la fuente del índice del INDEC dentro de la serie nacional.
@@ -385,7 +385,7 @@ function sello(f: Fila, serie: FuentesDeSerie): string {
   // Con el índice que el BCRA republica en ese mes, si no es el del INDEC: el mismo sello que la
   // calculadora (`selloDelMes`), con el mismo mes con el que se rotula la fila.
   const conIndice = selloDelMes(f, mesDeFila(f), serie) ?? organismo;
-  return `<span class="origen origen--publicado">${esc(conIndice)} ✓</span>`;
+  return `<span class="origen origen--publicado">${esc(selloParaPintar(conIndice))} ✓</span>`;
 }
 
 function tablaDelAnio(r: ResumenAnual, fuenteLarga: string): string {
@@ -398,7 +398,7 @@ function tablaDelAnio(r: ResumenAnual, fuenteLarga: string): string {
               <td>${esc(sub)}</td>
               <td>${esc(acum)}</td>
               <td class="col-tecnica">${esc(fIndice(f.indice))}</td>
-              <td>${sello(f, r)}</td>
+              <td class="celda-origen">${sello(f, r)}</td>
             </tr>`;
     })
     .join("\n");
@@ -450,7 +450,8 @@ function avisosDelAnio(anio: number): string {
           inflación que se vivió esos años.
         </p>
         <p>
-          En la tabla de abajo cada mes dice <strong>BCRA ✓</strong>. El tilde significa que es un
+          En la tabla de abajo ${anio === ULTIMO_INTERVENIDO ? "los meses del INDEC dicen" : "cada mes dice"}
+          <strong>BCRA ✓</strong>. El tilde significa que es un
           dato publicado y no una cuenta nuestra, y eso es cierto: acá nadie estimó nada. Lo que
           está en discusión es el número que se publicó, no quién lo publicó. Y el BCRA no es una
           fuente alternativa al INDEC: republica en su serie mensual el mismo IPC que el INDEC
@@ -470,8 +471,8 @@ function avisosDelAnio(anio: number): string {
         <h2>Sobre el dato oficial de ${APAGON}</h2>
         <p>
           ${APAGON} es un año partido. De enero a abril <strong>el INDEC no publicó IPC</strong>:
-          fue el apagón estadístico que siguió al Decreto 55/2016, que había empezado en noviembre
-          de 2015. Para esos meses el INDEC sugirió usar el IPC de la Ciudad de Buenos Aires y el
+          el apagón estadístico había empezado en noviembre de 2015, y el Decreto 55/2016 llegó
+          después, en enero. Para esos meses el INDEC sugirió usar el IPC de la Ciudad de Buenos Aires y el
           de San Luis, y eso es lo que trae la serie del BCRA que usa esta página: enero es el de la
           Ciudad y febrero a abril, el de San Luis. Por eso esas filas dicen
           <strong>BCRA (IPC CABA) ✓</strong> o <strong>BCRA (IPC San Luis) ✓</strong>. Son
