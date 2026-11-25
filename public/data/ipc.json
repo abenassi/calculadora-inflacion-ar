@@ -13,7 +13,19 @@
         "corta": "serie de inflación mensual del BCRA",
         "larga": "la serie de inflación mensual del BCRA, que para ese tramo republica el IPC que publicaba el INDEC",
         "publicadosPor": "el BCRA, que republica el IPC que publicaba el INDEC"
-      }
+      },
+      "republica": [
+        {
+          "desde": "2015-11",
+          "hasta": "2016-01",
+          "indice": "IPC CABA"
+        },
+        {
+          "desde": "2016-02",
+          "hasta": "2016-04",
+          "indice": "IPC San Luis"
+        }
+      ]
     },
     {
       "id": "indec",

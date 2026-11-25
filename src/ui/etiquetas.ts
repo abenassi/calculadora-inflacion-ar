@@ -147,6 +147,41 @@ export function selloDeFila(fila: Fila, serie: FuentesDeSerie): string | null {
 }
 
 /**
+ * El sello de una fila que muestra la inflación de `mes`: el de `selloDeFila` y, si en ese mes
+ * el organismo republica otro índice (`FuenteSerie.republica`), el nombre de ese índice entre
+ * paréntesis: `"BCRA (IPC CABA)"`.
+ *
+ * Recibe el mes y no lo deduce de la fila porque el mes de un tramo depende de la fila anterior
+ * (`mesDelTramo`); quien llama le pasa el mismo mes con el que rotula la fila, y así el rótulo
+ * y el sello no pueden hablar de meses distintos. La tabla, el texto que se copia y las páginas
+ * por año pasan por acá: si uno solo dijera "BCRA" a secas, la persona que compara dos de esas
+ * superficies no sabría cuál creer.
+ */
+export function selloDelMes(fila: Fila, mes: Mes, serie: FuentesDeSerie): string | null {
+  const sello = selloDeFila(fila, serie);
+  if (sello === null) return null;
+  const otro = indiceRepublicado(fila, mes, serie);
+  return otro ? `${sello} (${otro})` : sello;
+}
+
+/**
+ * El sello de la fila `i` del desglose, con el mes del tramo que la rotula (`mesDelTramo`). La
+ * de partida no muestra la inflación de ningún mes, así que lleva el sello de su origen a secas.
+ */
+export function selloDelTramo(desglose: Fila[], i: number, serie: FuentesDeSerie): string | null {
+  const fila = desglose[i]!;
+  return i === 0 ? selloDeFila(fila, serie) : selloDelMes(fila, mesDelTramo(desglose, i), serie);
+}
+
+/** El índice que el organismo de la fila republica en `mes`, si no es el de su etiqueta. */
+export function indiceRepublicado(fila: Fila, mes: Mes, serie: FuentesDeSerie): string | null {
+  const fuente = serie.fuentes.find((f) => f.id === fila.origen);
+  // Comparar `YYYY-MM` como texto es comparar meses: el formato es fijo y con ceros.
+  const tramo = fuente?.republica?.find((t) => t.desde <= mes && mes <= t.hasta);
+  return tramo?.indice ?? null;
+}
+
+/**
  * Si el número que muestra una fila lo publicó un organismo, tal cual.
  *
  * Es el predicado detrás del sello, y vive suelto porque hay tres superficies que tienen

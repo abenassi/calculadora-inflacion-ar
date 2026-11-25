@@ -237,6 +237,18 @@ async function construirIpc(): Promise<SerieIndice> {
             "que publicaba el INDEC",
           publicadosPor: "el BCRA, que republica el IPC que publicaba el INDEC",
         },
+        // Salvo en estos seis meses. El INDEC no calculó el IPC de noviembre de 2015 a abril
+        // de 2016 y sugirió usar el de la Ciudad y el de San Luis ("Consideraciones sobre el
+        // uso de Índices de Precios al Consumidor alternativos", 14/1/2016); `bcra:27`
+        // coincide número a número con el IPCBA de noviembre a enero (2,0 / 3,9 / 4,1) y con
+        // el de San Luis de febrero a abril (2,7 / 3,0 / 3,4), el mismo criterio que la Res.
+        // MHFP 203/2016 fijó para el CER. Mayo de 2016 ya es el IPC-GBA del INDEC. El test
+        // `republica.test.ts` compara estos tramos contra los índices de CABA y San Luis del
+        // propio snapshot: si el BCRA corrige esos meses, rojea.
+        republica: [
+          { desde: "2015-11", hasta: "2016-01", indice: "IPC CABA" },
+          { desde: "2016-02", hasta: "2016-04", indice: "IPC San Luis" },
+        ],
       },
       {
         id: "indec",

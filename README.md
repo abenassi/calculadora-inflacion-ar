@@ -336,8 +336,11 @@ asesoramiento contable, financiero ni legal.
 
 Entre 2007 y 2015 el INDEC estuvo intervenido, y en 2016 el Poder Ejecutivo declaró
 por Decreto 55/2016 la emergencia administrativa del Sistema Estadístico Nacional
-—entre enero y mayo de 2016 no hubo IPC nacional. El sitio usa los números oficiales de
-ese período porque son los que existen, y lo dice en cada lugar donde aparecen.
+—de noviembre de 2015 a abril de 2016 el INDEC no publicó IPC, y la serie del BCRA trae
+para esos meses el IPC de la Ciudad (nov-2015 a ene-2016) y el de San Luis (feb a abr-2016),
+los dos que el INDEC sugirió usar; la tabla los rotula `BCRA (IPC CABA) ✓` y
+`BCRA (IPC San Luis) ✓`. El sitio usa los números oficiales de ese período porque son los
+que existen, y lo dice en cada lugar donde aparecen.
 
 Antes de 1992 la moneda no era el peso. Con el índice nacional, que arranca en 1990, era
 el austral (1 peso = 10.000 australes, Decreto 2128/91, dictado bajo la Ley 23.928). Con

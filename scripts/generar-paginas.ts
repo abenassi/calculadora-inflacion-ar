@@ -39,7 +39,7 @@ import { adjust } from "../src/engine/adjust.js";
 import { aniosDisponibles, resumenAnual, type ResumenAnual } from "../src/engine/anual.js";
 import { compararMeses, mesConAnio, mesDe, soloMes } from "../src/engine/mes.js";
 import type { Fila, FuentesDeSerie, Mes, SerieIndice } from "../src/engine/types.js";
-import { fuenteDe, organismoDeFila } from "../src/ui/etiquetas.js";
+import { fuenteDe, organismoDeFila, selloDelMes } from "../src/ui/etiquetas.js";
 
 /**
  * El id de la fuente del índice del INDEC dentro de la serie nacional.
@@ -94,8 +94,25 @@ const PRIMER_ANIO_EN_PESOS = 1992;
  * falla que el sitio existe para no cometer: dar un número que no se puede defender.
  */
 const INTERVENIDOS = { desde: 2007, hasta: 2015 };
+const ULTIMO_INTERVENIDO = INTERVENIDOS.hasta;
 
-/** El año del apagón estadístico: enero a mayo de 2016 no tienen IPC nacional del INDEC. */
+/**
+ * Lo que la página de 2015 agrega al aviso de los años intervenidos: sus dos últimos meses no
+ * son del INDEC. El párrafo de arriba dice que el BCRA republica el IPC del INDEC, y en
+ * noviembre y diciembre de 2015 no había IPC del INDEC que republicar.
+ */
+const HUECO_2015 = `
+        <p>
+          Noviembre y diciembre de 2015 son la excepción: el INDEC no calculó el IPC de esos meses,
+          y la serie del BCRA trae el de la Ciudad de Buenos Aires, uno de los dos que el propio
+          INDEC sugirió usar. Por eso esas dos filas dicen <strong>BCRA (IPC CABA) ✓</strong>. El
+          detalle está en <a href="../datos.html#indec-intervenido">fuentes y metodología</a>.
+        </p>`;
+
+/**
+ * El año del apagón estadístico: el INDEC no publicó IPC de noviembre de 2015 a abril de 2016, y
+ * de mayo a noviembre publicó el del Gran Buenos Aires. El nacional arranca en diciembre.
+ */
 const APAGON = 2016;
 
 /* ------------------------------------------------------------------- helpers */
@@ -365,7 +382,10 @@ function sello(f: Fila, serie: FuentesDeSerie): string {
         `La serie declara ${serie.fuentes.map((x) => x.id).join(", ")}.`,
     );
   }
-  return `<span class="origen origen--publicado">${esc(organismo)} ✓</span>`;
+  // Con el índice que el BCRA republica en ese mes, si no es el del INDEC: el mismo sello que la
+  // calculadora (`selloDelMes`), con el mismo mes con el que se rotula la fila.
+  const conIndice = selloDelMes(f, mesDeFila(f), serie) ?? organismo;
+  return `<span class="origen origen--publicado">${esc(conIndice)} ✓</span>`;
 }
 
 function tablaDelAnio(r: ResumenAnual, fuenteLarga: string): string {
@@ -435,7 +455,7 @@ function avisosDelAnio(anio: number): string {
           está en discusión es el número que se publicó, no quién lo publicó. Y el BCRA no es una
           fuente alternativa al INDEC: republica en su serie mensual el mismo IPC que el INDEC
           publicaba.
-        </p>
+        </p>${anio === ULTIMO_INTERVENIDO ? HUECO_2015 : ""}
         <p>
           Lo decimos acá y no en letra chica porque el sitio existe para dar un número que puedas
           defender ante otra persona, y este es un número que te van a discutir. Si lo necesitás
@@ -449,17 +469,21 @@ function avisosDelAnio(anio: number): string {
       <section class="tarjeta aviso-serie">
         <h2>Sobre el dato oficial de ${APAGON}</h2>
         <p>
-          ${APAGON} es un año partido. Entre enero y mayo <strong>no hubo IPC nacional del
-          INDEC</strong>: fue el apagón estadístico que siguió al Decreto 55/2016, y el índice
-          nuevo empezó a publicarse a mitad de año. La serie mensual del BCRA sí trae valores para
-          esos meses y son los que usa esta página, pero no declara de dónde los toma, así que ese
-          tramo hay que leerlo con más cuidado que el resto.
+          ${APAGON} es un año partido. De enero a abril <strong>el INDEC no publicó IPC</strong>:
+          fue el apagón estadístico que siguió al Decreto 55/2016, que había empezado en noviembre
+          de 2015. Para esos meses el INDEC sugirió usar el IPC de la Ciudad de Buenos Aires y el
+          de San Luis, y eso es lo que trae la serie del BCRA que usa esta página: enero es el de la
+          Ciudad y febrero a abril, el de San Luis. Por eso esas filas dicen
+          <strong>BCRA (IPC CABA) ✓</strong> o <strong>BCRA (IPC San Luis) ✓</strong>. Son
+          índices de una ciudad y de una provincia, no un IPC nacional, así que ese tramo hay que
+          leerlo con más cuidado que el resto.
         </p>
         <p>
-          Es además el año donde se empalman las dos fuentes del sitio: diciembre de ${APAGON} es
-          el ancla del índice del INDEC, y todo lo anterior está reconstruido hacia atrás con las
-          variaciones del BCRA. Por eso once filas dicen BCRA y una dice INDEC. El detalle está en
-          <a href="../datos.html">fuentes y metodología</a>.
+          De mayo a noviembre el dato es del INDEC, pero del Gran Buenos Aires: el índice nacional
+          recién arranca en diciembre de ${APAGON}, que es además el mes donde se empalman las dos
+          fuentes del sitio. Todo lo anterior está reconstruido hacia atrás con las variaciones de
+          la serie del BCRA. El detalle, con las fuentes, está en
+          <a href="../datos.html#indec-intervenido">fuentes y metodología</a>.
         </p>
       </section>`);
   }
@@ -498,7 +522,7 @@ function paginaAnio(
     r.anio >= INTERVENIDOS.desde && r.anio <= INTERVENIDOS.hasta
       ? " Es el dato oficial de los años del INDEC intervenido, que está cuestionado."
       : r.anio === APAGON
-        ? " Entre enero y mayo de 2016 no hubo IPC nacional del INDEC."
+        ? " De enero a abril de 2016 el INDEC no publicó IPC."
         : "";
 
   const description = r.completo
@@ -773,14 +797,16 @@ ${filas}
           <a href="../inflacion-2011/">2011</a>.
         </p>
         <p>
-          <strong>2016 (†).</strong> Entre enero y mayo no hubo IPC nacional del INDEC: fue el
-          apagón estadístico, y el índice nuevo empezó a publicarse a mitad de año.
-          <a href="../inflacion-2016/">La página de 2016</a> lo explica.
+          <strong>2016 (†).</strong> De noviembre de 2015 a abril de 2016 el INDEC no publicó
+          IPC: fue el apagón estadístico, y esos meses salen del IPC de la Ciudad y del de San
+          Luis. De mayo a noviembre el dato es del Gran Buenos Aires, y el nacional arranca en
+          diciembre. <a href="../inflacion-2016/">La página de 2016</a> lo explica.
         </p>
         <p>
           <strong>Antes de diciembre de 2016.</strong> El INDEC publica un índice de nivel recién
           desde ahí. Para atrás, la serie se reconstruye con las variaciones mensuales que publica
-          el BCRA —que republica el IPC que publicaba el INDEC— encadenadas hacia atrás. Es el
+          el BCRA —que republica el IPC que publicaba el INDEC, salvo de noviembre de 2015 a abril
+          de 2016, cuando el INDEC no publicó— encadenadas hacia atrás. Es el
           mismo empalme que usa la calculadora, y el detalle está en
           <a href="../datos.html">fuentes y metodología</a>.
         </p>

@@ -61,7 +61,7 @@ import {
   organismoDeFila,
   quienPublicaAhora,
   rotularFila,
-  selloDeFila,
+  selloDelTramo,
 } from "./etiquetas.js";
 import {
   avisarTramoAjeno,
@@ -452,7 +452,13 @@ function pintarResultado(r: Resultado): void {
     acumulado: f.acumuladoPct === null ? "—" : porcentaje(f.acumuladoPct),
     monto: pesos(f.monto),
     // Con espacio duro antes del ✓: a 320 px el sello quedaba "DGEyC" / "Córdoba" / "✓", con la ✓ sola.
-    origen: f.esProyeccion ? "estimado" : f.esParcial ? "prorrateado" : `${selloDeFila(f, r)} ✓`,
+    origen: f.esProyeccion
+      ? "estimado"
+      : f.esParcial
+        ? "prorrateado"
+        : // Adentro del paréntesis, espacios duros: a 360 px "BCRA (IPC San Luis)" se partía en
+          // "BCRA (IPC San" / "Luis)". Así el único corte posible queda antes del paréntesis.
+          `${selloDelTramo(r.desglose, i, r)!.replace(/\(.*\)/, (p) => p.replaceAll(" ", " "))} ✓`,
     indice: indice(f.indice),
   }));
   // Con montos de décadas atrás, o en el modo por día, la tabla no entraba en un escritorio y la
@@ -684,7 +690,7 @@ function armarExplicacion(r: Resultado): string {
       ? "estimado"
       : f.esParcial
         ? `prorrateado sobre el dato de ${organismo}`
-        : `oficial ${organismo}`;
+        : `oficial ${selloDelTramo(r.desglose, i, r)}`;
     // El mismo rótulo que la tabla, no el punto final a secas. Un tramo del 2 de mayo al
     // 1 de junio salía acá como "1 jun 2026: +2,08%", que se lee como que junio subió
     // 2,08% cuando ese número es la parte de mayo —junio subió 1,89%—. Y este texto se

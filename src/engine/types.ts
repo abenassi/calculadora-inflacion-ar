@@ -81,6 +81,25 @@ export type FuenteSerie = {
   /** Rango que aporta esta fuente al empalme, `YYYY-MM/YYYY-MM`. */
   rango: string;
   etiqueta: EtiquetaFuente;
+  /**
+   * Meses en que la serie del organismo no trae el índice que dice su etiqueta sino otro, con
+   * el nombre de ese otro índice. El sello de esas filas lo nombra al lado del organismo.
+   *
+   * Existe por el BCRA: entre noviembre de 2015 y abril de 2016 el INDEC no publicó IPC, y
+   * `bcra:27` trae para esos meses el IPC de la Ciudad (nov-2015 a ene-2016) y el de San Luis
+   * (feb a abr-2016), los dos que el propio INDEC sugirió usar. Un sello `BCRA ✓` a secas
+   * debajo de "republica el IPC que publicaba el INDEC" atribuía al INDEC seis meses que no
+   * midió.
+   */
+  republica?: TramoRepublicado[];
+};
+
+/** Un tramo de meses, inclusivo en las dos puntas, en que una fuente republica otro índice. */
+export type TramoRepublicado = {
+  desde: Mes;
+  hasta: Mes;
+  /** Cómo entra en el sello, entre paréntesis: `"IPC CABA"`. */
+  indice: string;
 };
 
 /**
